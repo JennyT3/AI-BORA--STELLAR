@@ -157,12 +157,10 @@ export function ServicosSection() {
                 </li>
               ))}
             </ul>
-
-            
+            <a
               href={`${WHATSAPP_LINK}?text=Olá, tenho interesse no ${pack.label} de €${pack.price}.`}
               target="_blank"
               rel="noopener noreferrer"
-              <a
               style={{ marginTop: "auto", display: "block", textAlign: "center", padding: "14px 24px", borderRadius: 8, fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, textDecoration: "none", backgroundColor: pack.highlight ? "#F22283" : "#1A1A1A", color: "#ffffff" }}
             >
               {pack.cta}
