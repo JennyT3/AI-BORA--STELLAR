@@ -11,7 +11,7 @@ const WaIcon = ({ size = 32 }: { size?: number }) => (
 );
 
 // URL DE TU GOOGLE APPS SCRIPT - REEMPLAZA ESTO
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/TU_URL_AQUI/exec';const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwltQr3n1neMBeGAnoW5MRmkdvh9Zd33ownF_7N9v853fT1g7wgEJOXvj3eAHsyKOAokw/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwltQr3n1neMBeGAnoW5MRmkdvh9Zd33ownF_7N9v853fT1g7wgEJOXvj3eAHsyKOAokw/exec';
 
 export function CTAFooterSection() {
   const { ref, isInView } = useSectionInView();
