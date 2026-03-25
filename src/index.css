@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface2);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-fuchsia-brand: var(--fuchsia);
+  --color-orange-brand: var(--orange);
+  --color-orange2-brand: var(--orange2);
+  --color-coral-brand: var(--coral);
+  --color-salmon-brand: var(--salmon);
+  --color-whatsapp: var(--whatsapp);
+
+  --radius-card: var(--radius-card);
+  --radius-pill: var(--radius-pill);
+}
+
+:root {
+  --bg:             #FAFAFA;
+  --surface:        #FFFFFF;
+  --surface2:       #F5F2F0;
+  --text-primary:   #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted:     #888888;
+
+  --fuchsia:  #F22283;
+  --orange:   #F25C05;
+  --orange2:  #F27405;
+  --coral:    #F25252;
+  --salmon:   #F2C1BD;
+
+  --grad:      linear-gradient(135deg, #F22283 0%, #F25C05 100%);
+  --grad-rev:  linear-gradient(135deg, #F25C05 0%, #F22283 100%);
+  --grad-soft: linear-gradient(135deg, #F2C1BD 0%, #F25252 50%, #F25C05 100%);
+  --grad-v:    linear-gradient(160deg, #F22283 0%, #F25C05 100%);
+
+  --border:    rgba(26,26,26,0.08);
+  --border-h:  rgba(242,34,131,0.3);
+  --shadow:    0 4px 24px rgba(242,34,131,0.12);
+  --shadow-lg: 0 8px 48px rgba(242,34,131,0.2);
+
+  --radius-card: 1.25rem;
+  --radius-pill: 100px;
+  --whatsapp:    #25D366;
+}
+
+*, *::before, *::after {
+  font-family: 'Montserrat', sans-serif !important;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+h2 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+p, span, a, li, button, input, textarea, label {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.grad-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.underline-brand {
+  text-decoration: underline;
+  text-decoration-color: var(--fuchsia);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.underline-gradient {
+  position: relative;
+}
+.underline-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--grad);
+  border-radius: 2px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: var(--border-h);
+}
+
+@keyframes drift {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  33%  { transform: translate(30px,-50px) rotate(10deg); }
+  66%  { transform: translate(-20px,20px) rotate(-5deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  animation: drift 12s infinite alternate ease-in-out;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes ring {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.whatsapp-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--whatsapp);
+  border-radius: 50%;
+  animation: ring 3s infinite;
+}
+
+.bg-grad     { background: var(--grad); }
+.bg-grad-rev { background: var(--grad-rev); }
+.bg-grad-v   { background: var(--grad-v); }
+
+.perspective-1000 { perspective: 1000px; }
+.preserve-3d      { transform-style: preserve-3d; }
+.backface-hidden  { backface-visibility: hidden; }
+.rotate-y-180     { transform: rotateY(180deg); }
+.group:hover .group-hover\:rotate-y-180 { transform: rotateY(180deg); }
