@@ -7,3 +7,8 @@ coverage/
 .env*
 !.env.example
 public/hero-video.mp4
+public/logo.png
+public/*.jpg
+public/*.jpeg
+public/*.mp4
+public/*.png
