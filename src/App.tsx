@@ -1,19 +1,16 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { Route, Switch } from "wouter";
 import { Home } from "./pages/Home";
 import { Servicos } from "./pages/Servicos";
 import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
+import { Labs } from "./pages/Labs";
 
 export default function App() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/servicos" component={Servicos} />
+      <Route path="/labs" component={Labs} />
       <Route path="/privacidade" component={Privacidade} />
       <Route path="/termos" component={Termos} />
       <Route>

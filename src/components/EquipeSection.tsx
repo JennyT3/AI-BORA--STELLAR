@@ -1,0 +1,61 @@
+export function EquipeSection() {
+  return (
+    <section id="quem-somos" className="py-24 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Texto */}
+          <div className="space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-text-primary leading-tight">
+              A equipa que coloca o seu<br />
+              <span className="text-fuchsia-brand">negócio no mapa.</span>
+            </h2>
+            
+            <div className="space-y-4 text-lg text-text-secondary leading-relaxed">
+              <p>
+                A AI BORA nasceu com uma missão simples: descomplicar o marketing digital 
+                para negócios locais em Portugal.
+              </p>
+              <p>
+                Gerir uma padaria, uma oficina ou um cabeleireiro já dá muito trabalho. 
+                Não precisa de se preocupar com o Google ou as redes sociais.
+              </p>
+              <p>
+                Nós tratamos de tudo — desde o site até aparecer no Google Maps quando 
+                alguém procura perto de si. Sem jargões. Sem complicações. Resultados reais.
+              </p>
+            </div>
+          </div>
+
+          {/* Imagen temporal - Gradiente profesional */}
+          <div className="relative">
+            <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-fuchsia-500 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl">
+              <div className="text-center text-white p-8">
+                <div className="text-6xl mb-4">🚀</div>
+                <div className="text-3xl font-bold mb-2">AI BORA</div>
+                <div className="text-lg opacity-90">Equipa criativa & técnica</div>
+                <div className="mt-6 flex justify-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">💡</div>
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">⚡</div>
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">🎯</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Badge flotante */}
+            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 border border-black/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl">✓</div>
+                <div>
+                  <div className="font-bold text-text-primary">+50 negócios</div>
+                  <div className="text-sm text-text-secondary">ajudados em Portugal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
