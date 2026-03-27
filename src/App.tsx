@@ -4,6 +4,7 @@ import { Servicos } from "./pages/Servicos";
 import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Labs } from "./pages/Labs";
+import { Prompts } from "./pages/Prompts";
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Route path="/" component={Home} />
       <Route path="/servicos" component={Servicos} />
       <Route path="/labs" component={Labs} />
+      <Route path="/prompts" component={Prompts} />
       <Route path="/privacidade" component={Privacidade} />
       <Route path="/termos" component={Termos} />
       <Route>
