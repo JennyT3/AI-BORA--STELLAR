@@ -2,51 +2,33 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
-import { categories } from '../data/prompts';
+import { prompts as localPrompts, categories } from '../data/prompts';
 import type { Prompt } from '../data/prompts';
 import { PromptCard } from '../components/PromptCard';
 import { Search } from 'lucide-react';
 
+// ── Google Sheet público como fuente de datos ──────────────────────────────
 const SHEET_ID = "1e5ASsGLdmntjUMyTCHFiB0fQwzrsrciA-DgtYTy4U2c";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
 
 function parseCSV(csv: string): Prompt[] {
   const lines = csv.trim().split('\n');
   if (lines.length < 2) return [];
-
+  // lines[0] = cabecera: id,titulo,prompt,imagen_url,categoria,fecha,activo
   return lines.slice(1).map((line, i) => {
-    const cols: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    for (let ci = 0; ci < line.length; ci++) {
-      const ch = line[ci];
-      if (ch === '"') {
-        inQuotes = !inQuotes;
-      } else if (ch === ',' && !inQuotes) {
-        cols.push(current.trim());
-        current = '';
-      } else {
-        current += ch;
-      }
-    }
-    cols.push(current.trim());
-
-    const activo = (cols[6] || '').toUpperCase();
+    // split respetando comas dentro de comillas
+    const cols = line.match(/(".*?"|[^",\r\n]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) ?? [];
+    const clean = (s?: string) => (s ?? '').replace(/^"|"$/g, '').trim();
+    const activo = clean(cols[6]).toUpperCase();
     if (activo === 'FALSE') return null;
-
-    const titulo = cols[1] || '';
-    const categoria = cols[4] || 'Tendencias';
-
-    if (!titulo) return null;
-
     return {
-      id: `sheet-${cols[0] || i}`,
-      title: titulo,
-      prompt: cols[2] || '',
-      image: cols[3] || '',
-      category: categoria,
+      id: `sheet-${clean(cols[0]) || i}`,
+      title: clean(cols[1]),
+      prompt: clean(cols[2]),
+      image: clean(cols[3]),
+      category: clean(cols[4]) || 'Tendencias',
       isPremium: false,
-      tags: [categoria.toLowerCase(), 'tendencia'],
+      tags: [clean(cols[4]).toLowerCase(), 'tendencia'].filter(Boolean),
     } as Prompt;
   }).filter(Boolean) as Prompt[];
 }
@@ -57,22 +39,21 @@ export function Prompts() {
   const [displayCount, setDisplayCount] = useState(9);
   const [isLoading, setIsLoading] = useState(false);
   const [sheetPrompts, setSheetPrompts] = useState<Prompt[]>([]);
-  const [loadingSheet, setLoadingSheet] = useState(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
+  // ── Cargar datos del Sheet al montar ──────────────────────────────────────
   useEffect(() => {
     fetch(SHEET_URL)
       .then(r => r.text())
-      .then(csv => {
-        setSheetPrompts(parseCSV(csv));
-        setLoadingSheet(false);
-      })
-      .catch(() => setLoadingSheet(false));
+      .then(csv => setSheetPrompts(parseCSV(csv)))
+      .catch(() => {}); // si falla, se usan solo los locales
   }, []);
 
+  // Sheet primero, luego los hardcodeados
   const allPrompts = useMemo(() => [...sheetPrompts], [sheetPrompts]);
 
+  // ── Filtrar ───────────────────────────────────────────────────────────────
   const filteredPrompts = useMemo(() => {
     let result = allPrompts;
     if (activeFilter !== "Todos") {
@@ -118,6 +99,7 @@ export function Prompts() {
       <Navbar />
 
       <main className="pt-20">
+        {/* HEADER */}
         <section
           className="py-10 px-4 sm:px-6 lg:px-8 border-b border-[#333]"
           style={{ backgroundColor: '#0a0a0a' }}
@@ -138,6 +120,7 @@ export function Prompts() {
               </p>
             </div>
 
+            {/* Buscador */}
             <div className="max-w-xl mx-auto relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
@@ -150,6 +133,7 @@ export function Prompts() {
               />
             </div>
 
+            {/* Filtros */}
             <div className="flex flex-wrap justify-center gap-2 mt-6">
               {categories.map((cat) => (
                 <button
@@ -171,17 +155,30 @@ export function Prompts() {
           </div>
         </section>
 
+        {/* Badge de prompts del Sheet */}
+        {sheetPrompts.length > 0 && (
+          <div className="text-center pt-4">
+            <span style={{
+              display: 'inline-block',
+              backgroundColor: 'rgba(255,111,46,0.15)',
+              border: '1px solid rgba(255,111,46,0.3)',
+              color: '#ff6f2e',
+              borderRadius: 999,
+              padding: '4px 14px',
+              fontSize: 11,
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 700,
+              letterSpacing: 0.5
+            }}>
+              ✦ {sheetPrompts.length} novos prompts em tendência
+            </span>
+          </div>
+        )}
+
+        {/* Grid */}
         <section className="py-8 px-4 sm:px-6 lg:px-8 bg-bg">
           <div className="max-w-5xl mx-auto">
-            {loadingSheet ? (
-              <div className="flex justify-center py-20">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" />
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.2s' }} />
-                </div>
-              </div>
-            ) : visiblePrompts.length === 0 ? (
+            {visiblePrompts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   Nenhum prompt encontrado.
@@ -225,6 +222,7 @@ export function Prompts() {
           </div>
         </section>
 
+        {/* CTA */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 bg-card border-t border-border">
           <div className="max-w-2xl mx-auto text-center">
             <h2
