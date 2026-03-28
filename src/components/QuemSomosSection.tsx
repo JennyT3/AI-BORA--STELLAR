@@ -9,13 +9,13 @@ export function QuemSomosSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Texto */}
-          <div className="space-y-6 order-2 lg:order-1">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-primary leading-tight">
+          <div className="space-y-4 order-1">
+            <h2 style={{fontSize:"clamp(22px, 3.5vw, 32px)",fontWeight:900,lineHeight:1.2,maxWidth:"340px"}} className="text-text-primary">
               A equipa que coloca o seu<br />
               <span className="text-fuchsia-brand">negócio no mapa.</span>
             </h2>
             
-            <div className="space-y-4 text-lg text-text-secondary leading-relaxed">
+            <div className="space-y-2 text-xs text-text-secondary leading-relaxed">
               <p>
                 A AI BORA nasceu com uma missão simples: descomplicar o marketing digital 
                 para negócios locais em Portugal.
@@ -32,7 +32,7 @@ export function QuemSomosSection() {
           </div>
 
           {/* Imagen - Con fallback si falla */}
-          <div className="relative order-1 lg:order-2">
+          <div className="relative order-2">
             {!imageError ? (
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img 

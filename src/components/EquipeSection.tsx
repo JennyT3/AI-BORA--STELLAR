@@ -2,22 +2,17 @@ export function EquipeSection() {
   return (
     <section id="quem-somos" className="py-16 lg:py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12 items-center">
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-center">
           
           <div className="space-y-4 w-full lg:w-1/2">
-            <h2 className="text-2xl md:text-3xl font-bold text-text-primary leading-tight">
+            <h2 className="text-lg font-bold text-text-primary leading-tight">
               A equipa que coloca o seu<br />
               <span className="text-fuchsia-brand">negócio no mapa.</span>
             </h2>
             
-            <div className="space-y-3 text-sm text-text-secondary leading-relaxed">
+            <div className="space-y-2 text-xs text-text-secondary leading-relaxed">
               <p>
-                A AI BORA nasceu com uma missão simples: descomplicar o marketing digital 
-                para negócios locais em Portugal.
-              </p>
-              <p>
-                Gerir uma padaria, uma oficina ou um cabeleireiro já dá muito trabalho. 
-                Nós tratamos de tudo — desde o site até aparecer no Google Maps.
+                A AI BORA nasceu com uma missão simples: descomplicar o marketing digital para negócios locais em Portugal. Gerir uma padaria, uma oficina ou um cabeleireiro já dá muito trabalho — nós tratamos de tudo, desde o site até ao Google Maps.
               </p>
             </div>
           </div>

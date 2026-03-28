@@ -73,12 +73,11 @@ export function CTAFooterSection() {
         >
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[400px] h-[150px] bg-fuchsia-brand/10 blur-[80px] rounded-full pointer-events-none" />
 
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 relative z-10 items-start">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 relative z-10 items-stretch">
             
             <div className="flex flex-col space-y-4">
               <div className="text-center md:text-left">
-                <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-1">Pronto para começar?</h2>
-                <h2 className="text-xl md:text-2xl font-bold text-fuchsia-brand mb-2">Fale connosco hoje.</h2>
+                <h2 style={{fontSize:"clamp(18px, 2.5vw, 24px)",fontWeight:900,lineHeight:1.2,marginBottom:"8px",maxWidth:"220px"}}>Pronto para começar?<br />  <span className="text-fuchsia-brand">Fale connosco hoje.</span></h2>
                 <p className="text-xs text-text-secondary font-medium">Resposta em menos de 24 horas.</p>
               </div>
 
