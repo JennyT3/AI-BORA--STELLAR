@@ -30,7 +30,7 @@ export function ResultadosSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 text-text-primary"
+            className="mt-6 text-2xl md:text-3xl font-bold text-text-primary"
           >
             Negócios reais. Resultados que se vêem.
           </motion.h2>
@@ -44,7 +44,7 @@ export function ResultadosSection() {
             transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="card p-8 text-center flex flex-col justify-center"
           >
-            <span className="font-extrabold text-5xl text-fuchsia-brand mb-2 block">
+            <span className="font-extrabold text-4xl text-fuchsia-brand mb-2 block">
               <AnimatedCounter from={0} to={12} suffix="+" />
             </span>
             <span className="text-text-secondary font-bold">Negócios já connosco</span>
@@ -56,7 +56,7 @@ export function ResultadosSection() {
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="card p-8 text-center flex flex-col justify-center"
           >
-            <span className="font-extrabold text-5xl text-orange-brand mb-2 block">
+            <span className="font-extrabold text-4xl text-orange-brand mb-2 block">
               <AnimatedCounter from={0} to={98} suffix="%" />
             </span>
             <span className="text-text-secondary font-bold">Clientes satisfeitos</span>
@@ -68,7 +68,7 @@ export function ResultadosSection() {
             transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="card p-8 text-center flex flex-col justify-center"
           >
-            <span className="font-extrabold text-5xl text-fuchsia-brand mb-2 block">
+            <span className="font-extrabold text-4xl text-fuchsia-brand mb-2 block">
               3 sem.
             </span>
             <span className="text-text-secondary font-bold">Para estar online</span>

@@ -1,107 +1,89 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { SectionBadge } from './SectionBadge';
-import { useSectionInView } from '../hooks/useSectionInView';
+import { motion, AnimatePresence } from 'motion/react';
+import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    q: "Não percebo nada de tecnologia. Consigo mesmo assim?",
-    a: "Sim, é precisamente para si que trabalhamos. Não precisa de saber nada — nós tratamos de tudo e explicamos em linguagem simples. Se souber usar o WhatsApp, consegue trabalhar connosco."
+    question: "Quanto tempo demora a criar o meu site?",
+    answer: "Normalmente entre 2 a 3 semanas. Depende da complexidade e da rapidez com que nos envia o conteúdo (textos e imagens)."
   },
   {
-    q: "Já tenho um Facebook. Não chega?",
-    a: "O Facebook é um bom começo, mas não substitui o Google Maps, um site próprio ou um email profissional. A maioria dos clientes procura no Google — e se não aparecer lá, perde oportunidades todos os dias."
+    question: "Preciso de pagar alguma coisa antes?",
+    answer: "Não. O pagamento só é feito quando o site estiver online e a funcionar. Sem riscos para si."
   },
   {
-    q: "Quanto tempo demora até estar tudo pronto?",
-    a: "Em média 2 a 3 semanas para o Pack Essencial, 3 a 4 semanas para os outros packs. Começamos logo após a primeira conversa."
+    question: "E se eu não perceber nada de tecnologia?",
+    answer: "Perfeito! Nós tratamos de tudo. Não precisa de saber programar nem gerir servidores. Explicamos tudo de forma simples."
   },
   {
-    q: "Posso alterar o site ou as redes depois?",
-    a: "Sim. Todos os packs incluem um período de suporte para ajustes. No Pack Total as actualizações são ilimitadas. Nunca fica dependente de nós para mudanças simples."
+    question: "O site fica a meu nome?",
+    answer: "Sim, totalmente. O domínio é seu, o site é seu. Não ficamos com nada."
   },
   {
-    q: "Como se faz o pagamento?",
-    a: "Aceitamos transferência bancária, MB Way e cartão de crédito. O pagamento é feito em duas partes: metade no início, metade quando está tudo online. Sem surpresas."
-  },
-  {
-    q: "Os packs têm mensalidades?",
-    a: "Não. Os packs de Setup são pagamento único — paga uma vez e é seu. Se quiser gestão contínua, temos planos mensais separados. Mas nunca é obrigado."
+    question: "E depois de ficar online, preciso de ajuda?",
+    answer: "Oferecemos 30 dias de suporte gratuito. Depois pode escolher um plano de manutenção ou chamar-nos quando precisar."
   }
 ];
 
 export function FAQSection() {
-  const { ref, isInView } = useSectionInView();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-24 bg-surface2">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
+    <section id="faq" className="py-16 bg-bg">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="text-center mb-16">
-          <SectionBadge text="DÚVIDAS FREQUENTES" />
-          <motion.h2 
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 text-text-primary"
-          >
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
             Perguntas frequentes
-          </motion.h2>
+          </h2>
+          <p className="text-sm text-text-secondary">
+            Esclarecemos as dúvidas mais comuns
+          </p>
         </div>
 
-        <div className="space-y-4">
-          {faqs.map((faq, index) => {
-            const isOpen = openIndex === index;
-            
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 24 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-                transition={{ duration: 0.5, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="card rounded-2xl overflow-hidden"
+        <div className="space-y-3">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="card rounded-xl overflow-hidden"
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full flex items-center justify-between p-4 text-left"
               >
-                <button
-                  onClick={() => toggleFAQ(index)}
-                  className="w-full flex justify-between items-center p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface2 rounded-2xl"
-                  aria-expanded={isOpen}
+                <span className="font-semibold text-sm text-text-primary pr-4">
+                  {faq.question}
+                </span>
+                <motion.div
+                  animate={{ rotate: openIndex === index ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="shrink-0"
                 >
-                  <span className="font-bold text-lg text-text-primary pr-8">{faq.q}</span>
+                  <ChevronDown size={18} className="text-fuchsia-brand" />
+                </motion.div>
+              </button>
+              
+              <AnimatePresence>
+                {openIndex === index && (
                   <motion.div
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                      isOpen ? 'bg-grad text-white' : 'bg-surface2 text-text-muted border border-black/5'
-                    }`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
                   >
-                    <Plus size={18} strokeWidth={isOpen ? 3 : 2} />
+                    <div className="px-4 pb-4 text-sm text-text-secondary leading-relaxed border-t border-black/5 pt-3">
+                      {faq.answer}
+                    </div>
                   </motion.div>
-                </button>
-                
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-6 pt-0 text-text-secondary leading-relaxed font-medium">
-                        {faq.a}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
         </div>
 
       </div>

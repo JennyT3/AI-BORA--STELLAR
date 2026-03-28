@@ -10,7 +10,7 @@ export function QuemSomosSection() {
           
           {/* Texto */}
           <div className="space-y-6 order-2 lg:order-1">
-            <h2 className="text-4xl md:text-5xl font-bold text-text-primary leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-text-primary leading-tight">
               A equipa que coloca o seu<br />
               <span className="text-fuchsia-brand">negócio no mapa.</span>
             </h2>
