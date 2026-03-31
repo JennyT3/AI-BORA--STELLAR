@@ -10,7 +10,8 @@ import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
   return (
-    <Switch>
+    <>
+      <Switch>
       <Route path="/" component={Home} />
       <Route path="/servicos" component={Servicos} />
       <Route path="/packs" component={Packs} />
@@ -28,6 +29,7 @@ export default function App() {
         </div>
       </Route>
     </Switch>
-  <Analytics />
+    <Analytics />
+    </>
   );
 }
