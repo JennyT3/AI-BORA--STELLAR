@@ -1,6 +1,7 @@
 import { Route, Switch } from "wouter";
 import { Home } from "./pages/Home";
 import { Servicos } from "./pages/Servicos";
+import { Packs } from "./pages/Packs";
 import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Labs } from "./pages/Labs";
@@ -11,6 +12,7 @@ export default function App() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/servicos" component={Servicos} />
+      <Route path="/packs" component={Packs} />
       <Route path="/labs" component={Labs} />
       <Route path="/prompts" component={Prompts} />
       <Route path="/privacidade" component={Privacidade} />
