@@ -6,6 +6,7 @@ import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Labs } from "./pages/Labs";
 import { Prompts } from "./pages/Prompts";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
   return (
@@ -27,5 +28,6 @@ export default function App() {
         </div>
       </Route>
     </Switch>
+  <Analytics />
   );
 }
