@@ -86,6 +86,7 @@ export function Footer() {
           <p className="text-xs text-text-muted font-normal">
             © {new Date().getFullYear()} AI BORA · Todos os direitos reservados · Feito com ❤️ pela equipa AI BORA
           </p>
+          <a href="/admin" className="text-xs text-text-muted hover:text-fuchsia-brand">Admin</a>
         </div>
 
       </div>

@@ -3,9 +3,10 @@ import { Navbar } from "../components/Navbar";
 import { CTAFooterSection } from "../components/CTAFooterSection";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
-import { Download, Mail, User, FileText, Check, X, Plus, Trash2, Calculator } from "lucide-react";
+import { Download, Mail, User, FileText, Check, X, Plus, Trash2, Calculator, Save, Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { createProposal } from "../services/firebase";
 
 const IVA_TAXA = 0.23;
 
@@ -68,14 +69,20 @@ export function Orcamento() {
   const dataValidadeStr = dataValidade.toLocaleDateString("pt-PT");
 
   const numeroOrcamento = numeroOrcamentoInput || "ORC-0001";
-  const subtotal = precoTotal > 0 ? precoTotal / (1 + IVA_TAXA) : 0;
-  const iva = precoTotal > 0 ? precoTotal - subtotal : 0;
-  const descontoPercentValor = subtotal * (descontoPercent / 100);
-  const descontoTotal = descontoPercentValor + descontoValor;
-  const totalComDesconto = precoTotal - (descontoTotal * 1.23);
-  const ivaComDesconto = totalComDesconto - (totalComDesconto / 1.23);
-  const total = totalComDesconto > 0 ? totalComDesconto : precoTotal;
-  const porMarca = marcas.length > 0 ? subtotal / marcas.length : 0;
+  
+  // El precio total es el valor que el usuario ingresa (valor cerrado/final con IVA)
+  // El descuento se resta directamente del total
+  const total = precoTotal;
+  const descuentoPorcentaje = total * (descontoPercent / 100);
+  const descuentoAplicado = descuentoPorcentaje + descontoValor;
+  const totalConDescuento = total - descuentoAplicado;
+  
+  // Calculamos el subtotal y IVA a partir del total con descuento
+  const subtotalComDesconto = totalConDescuento / (1 + IVA_TAXA);
+  const ivaComDesconto = totalConDescuento - subtotalComDesconto;
+  
+  // Valor por marca (sin IVA)
+  const porMarcaSemIVA = marcas.length > 0 ? subtotalComDesconto / marcas.length : 0;
 
   const toggleRede = (marcaId: string, redeId: string) => {
     setMarcas(prev => prev.map(m => {
@@ -224,7 +231,7 @@ export function Orcamento() {
       if (y > 248) { doc.addPage(); y = 18; }
 
       // Barra naranja: MARCA: NOME
-      const subtotalMarca = marcas.length > 0 ? subtotal / marcas.length : 0;
+      const subtotalMarca = marcas.length > 0 ? subtotalComDesconto / marcas.length : 0;
       doc.setFillColor(242, 92, 5);
       doc.rect(14, y, 182, 9, "F");
       doc.setTextColor(255, 255, 255);
@@ -308,7 +315,7 @@ export function Orcamento() {
     doc.text("TOTAL MENSAL (c/ IVA 23%)", 158, y + 7, { align: "center" });
     doc.setFontSize(17);
     doc.setFont("helvetica", "bold");
-    doc.text(total.toFixed(2) + " €", 194, y + 18, { align: "right" });
+    doc.text(totalConDescuento.toFixed(2) + " €", 194, y + 18, { align: "right" });
 
     let ty = y + 4;
     const linhaFin = (label: string, valor: string, bold: boolean, cor: [number,number,number]) => {
@@ -323,12 +330,12 @@ export function Orcamento() {
       ty += 7;
     };
 
-    linhaFin("Subtotal (sem IVA):", subtotal.toFixed(2) + " €", false, [80,80,80]);
-    if (descontoTotal > 0) {
-      linhaFin("Desconto:", "- " + descontoTotal.toFixed(2) + " €", false, [242,92,5]);
+    linhaFin("Subtotal (sem IVA):", subtotalComDesconto.toFixed(2) + " €", false, [80,80,80]);
+    if (descuentoAplicado > 0) {
+      linhaFin("Desconto:", "- " + descuentoAplicado.toFixed(2) + " €", false, [242,92,5]);
     }
-    linhaFin("IVA (23%):", (total - (total/1.23)).toFixed(2) + " €", false, [80,80,80]);
-    linhaFin("TOTAL A PAGAR:", total.toFixed(2) + " €", true, [242,92,5]);
+    linhaFin("IVA (23%):", ivaComDesconto.toFixed(2) + " €", false, [80,80,80]);
+    linhaFin("TOTAL A PAGAR:", totalConDescuento.toFixed(2) + " €", true, [242,92,5]);
 
     // CONDIÇÕES COMERCIAIS
     ty += 6;
@@ -389,156 +396,242 @@ export function Orcamento() {
     
     const logoBase64 = await loadImageAsBase64("/logo.png");
     
-    // HEADER
+    // ====== HEADER NEGRO ======
     doc.setFillColor(26, 26, 26);
-    doc.rect(0, 0, pW, 45, "F");
+    doc.rect(0, 0, pW, 70, "F");
     
     if (logoBase64) {
-      doc.addImage(logoBase64, "PNG", 15, 10, 25, 25);
+      doc.addImage(logoBase64, "PNG", 15, 15, 20, 20);
     }
     
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("AI BORA", 45, 20);
-    
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(200, 200, 200);
-    doc.text("Marketing Digital & Criativo", 45, 28);
-    
-    doc.setTextColor(242, 92, 5);
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.text("PROPOSTA COMERCIAL", 198, 20, { align: "right" });
-    doc.setFontSize(9);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Nº " + numeroOrcamento, 198, 28, { align: "right" });
-    doc.text("Data: " + dataCriacaoStr, 198, 34, { align: "right" });
-    doc.text("Validade: " + dataValidadeStr, 198, 40, { align: "right" });
+    doc.text("AI BORA", 40, 22);
     
-    // CLIENTE
-    let y = 55;
-    doc.setFillColor(247, 245, 243);
-    doc.rect(14, y, 182, 30, "F");
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(200, 200, 200);
+    doc.text("Marketing Digital & Criativo", 40, 28);
     
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
     doc.setTextColor(242, 92, 5);
-    doc.text("DADOS DO CLIENTE", 18, y + 8);
-    
     doc.setFontSize(11);
-    doc.setTextColor(26, 26, 26);
-    doc.text(cliente.nome || "—", 18, y + 18);
-    if (cliente.empresa) {
-      doc.setTextColor(100, 100, 100);
-      doc.text(cliente.empresa, 18, y + 25);
-    }
-    
-    if (cliente.email) {
-      doc.setTextColor(100, 100, 100);
-      doc.text(cliente.email, 110, y + 18);
-    }
-    if (cliente.telefone) {
-      doc.text(cliente.telefone, 110, y + 25);
-    }
-    
-    // INVESTIMENTO
-    y += 38;
-    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(242, 92, 5);
-    doc.text("INVESTIMENTO MENSAL", 14, y);
-    doc.setDrawColor(242, 92, 5);
-    doc.setLineWidth(0.5);
-    doc.line(14, y + 2, 196, y + 2);
+    doc.text("PROPOSTA COMERCIAL", 195, 18, { align: "right" });
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text("Nº " + numeroOrcamento, 195, 25, { align: "right" });
+    doc.text("Data: " + dataCriacaoStr, 195, 31, { align: "right" });
+    doc.text("Validade: " + dataValidadeStr, 195, 37, { align: "right" });
     
-    y += 10;
-    doc.setFillColor(242, 92, 5);
-    doc.roundedRect(14, y, 182, 25, 3, 3, "F");
+    // Cliente info en header
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(9);
-    doc.text("VALOR MENSAL (COM IVA)", 105, y + 10, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.text("Proposta exclusiva para", 15, 50);
+    doc.setTextColor(242, 92, 5);
+    doc.text(cliente.nome || "Cliente", 15, 58);
+    if (cliente.empresa) {
+      doc.setTextColor(180, 180, 180);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(cliente.empresa, 15, 64);
+    }
+    
+    // ====== INVESTIMENTO BOX ======
+    const valorPorMarca = porMarcaSemIVA;
+    doc.setFillColor(242, 92, 5);
+    doc.roundedRect(15, 78, 180, 32, 3, 3, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text("VALOR POR MARCA (SEM IVA)", 105, 85, { align: "center" });
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.text(total.toFixed(2) + " €", 196, y + 20, { align: "right" });
-    
-    // Valor sem IVA
-    doc.setFontSize(8);
+    // Big number is por marca (or subtotal if 1 marca)
+    const valorMostrar = marcas.length > 1 ? porMarcaSemIVA : subtotalComDesconto;
+    doc.text(valorMostrar.toFixed(2) + " €", 190, 98, { align: "right" });
+    doc.setFontSize(7);
     doc.setTextColor(255, 255, 255);
-    doc.text(`(${ (subtotal - descontoTotal).toFixed(2) } € sem IVA)`, 105, y + 32, { align: "center" });
-    
-    // SERVIÇOS
-    y += 40;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(242, 92, 5);
-    doc.text("SERVIÇOS INCLUÍDOS", 14, y);
-    doc.setDrawColor(242, 92, 5);
-    doc.line(14, y + 2, 196, y + 2);
-    
-    y += 8;
-    if (marcas[0]?.servicos && marcas[0].servicos.length > 0) {
-      autoTable(doc, {
-        startY: y,
-        head: [["#", "Serviço", "Descrição"]],
-        body: marcas[0].servicos.map((s, i) => [i + 1, s, ""]),
-        theme: "plain",
-        headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 9, fontStyle: "bold", cellPadding: 4 },
-        bodyStyles: { fontSize: 9, textColor: [40, 40, 40], cellPadding: 4 },
-        columnStyles: { 0: { cellWidth: 10, halign: "center" }, 1: { cellWidth: 80 }, 2: { cellWidth: 92 } },
-        alternateRowStyles: { fillColor: [250, 248, 246] },
-        margin: { left: 14, right: 14 },
-      });
-      y = (doc as any).lastAutoTable?.finalY + 10;
+    if (marcas.length > 1) {
+      doc.text("por marca (sem IVA)", 105, 107, { align: "center" });
+    } else {
+      doc.text("(sem IVA)", 105, 107, { align: "center" });
+    }
+    if (descuentoAplicado > 0) {
+      const descuentoPorMarca = (descuentoAplicado / marcas.length).toFixed(2);
+      // Show discount in a separate box
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(80, 103, 50, 12, 2, 2, 'F');
+      doc.setFontSize(7);
+      doc.setTextColor(255, 255, 255);
+      doc.text("💰 " + descuentoAplicado.toFixed(2) + " € desc. (" + descuentoPorMarca + " €/marca)", 105, 110, { align: "center" });
     }
     
-    // CONDIÇÕES
-    if (y > 200) { doc.addPage(); y = 20; }
-    doc.setFillColor(247, 245, 243);
-    doc.rect(14, y, 182, 45, "F");
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
+    // ====== QUEM SOMOS ======
+    let y = 115;
     doc.setTextColor(26, 26, 26);
-    doc.text("CONDIÇÕES COMERCIAIS", 18, y + 8);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Marketing digital", 15, y);
+    doc.setTextColor(242, 92, 5);
+    doc.text("que realmente funciona.", 15, y + 6);
+    
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    const sobreTexto = "A AI BORA é uma empresa especializada em ajudar negócios locais a crescer na internet. Somos o teu parceiro digital — com foco em resultados concretos e atenção prioritária.";
+    doc.text(sobreTexto, 15, y + 14, { maxWidth: 100 });
+    
+    // Stats
+    y += 35;
+    const stats = [
+      { icon: "💪", label: "Proximidade" },
+      { icon: "📈", label: "Crescimento" },
+      { icon: "🎯", label: "Prioridade" },
+      { icon: "❤️", label: "Satisfação" }
+    ];
+    stats.forEach((s, i) => {
+      doc.setFillColor(245, 242, 240);
+      doc.roundedRect(15 + (i * 45), y, 42, 18, 2, 2, "F");
+      doc.setFontSize(12);
+      doc.text(s.icon, 22 + (i * 45), y + 8);
+      doc.setFontSize(6);
+      doc.setTextColor(100, 100, 100);
+      doc.text(s.label, 35 + (i * 45), y + 8);
+    });
+    
+    // ====== SERVIÇOS ======
+    y += 30;
+    doc.setTextColor(242, 92, 5);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("SERVIÇOS INCLUÍDOS", 15, y);
+    doc.setDrawColor(242, 92, 5);
+    doc.setLineWidth(0.5);
+    doc.line(15, y + 2, 195, y + 2);
+    
+    y += 10;
+    
+    // Servicios em cards
+    const servicosMap: Record<string, {icon: string, desc: string}> = {
+      "Gestão de Redes Sociais": { icon: "📱", desc: "Gestão completa das tuas redes sociais" },
+      "Criação de Conteúdo": { icon: "📝", desc: "Conteúdo de qualidade e estratégia" },
+      "Community Management": { icon: "💬", desc: "Engajamento e comunidade" },
+      "Email Marketing": { icon: "📧", desc: "Email marketing e newsletters" },
+      "Design de Posts": { icon: "🎨", desc: "Design visual profissional" },
+      "Logotipo": { icon: "✏️", desc: "Logotipo e identidade" },
+      "Identidade Corporativa": { icon: "🏢", desc: "Identidade visual completa" },
+      "Banners e Posters": { icon: "📰", desc: "Banners e materiais gráficos" },
+      "Landing Page": { icon: "🌐", desc: "Página web moderna" },
+      "Site Catálogo": { icon: "📦", desc: "Catálogo online" },
+      "Loja Online": { icon: "🛒", desc: "E-commerce completo" },
+      "SEO Local": { icon: "🔍", desc: "SEO para negócios locais" },
+      "Fotografia Profissional": { icon: "📸", desc: "Fotografia profissional" },
+      "Produção de Videos": { icon: "🎬", desc: "Produção de vídeo" },
+      "Criação de Reels": { icon: " Reels", desc: "Conteúdo para Reels" },
+      "Edição de Conteúdo": { icon: "✂️", desc: "Edição profissional" },
+      "Google Ads": { icon: "🔵", desc: "Campanhas Google Ads" },
+      "Facebook Ads": { icon: "🔷", desc: "Campanhas Facebook" },
+      "Instagram Ads": { icon: "📸", desc: "Campanhas Instagram" },
+      "Gestão de Budget": { icon: "💰", desc: "Gestão de orçamento" },
+      "Chatbot WhatsApp": { icon: "🤖", desc: "Chatbot automático" },
+      "IA e Automação": { icon: "⚡", desc: "Automação com IA" },
+      "Respostas Automáticas": { icon: "💬", desc: "Respostas 24/7" },
+      "Fluxos de CRM": { icon: "📊", desc: "CRM automatizado" },
+      "Consultoria Estratégica": { icon: "📊", desc: "Estratégia digital" },
+      "Análise de Concorrentes": { icon: "🔎", desc: "Análise da concorrência" },
+      "Dashboard Excel": { icon: "📈", desc: "Relatórios Excel" },
+      "Plano de Marketing": { icon: "📋", desc: "Plano de marketing" },
+    };
+    
+    if (marcas[0]?.servicos && marcas[0].servicos.length > 0) {
+      const cols = 2;
+      const cardW = 85;
+      const cardH = 22;
+      const gapX = 8;
+      const gapY = 8;
+      
+      marcas[0].servicos.forEach((servico, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const cardX = 15 + (col * (cardW + gapX));
+        const cardY = y + (row * (cardH + gapY));
+        
+        doc.setFillColor(245, 242, 240);
+        doc.roundedRect(cardX, cardY, cardW, cardH, 2, 2, "F");
+        
+        const info = servicosMap[servico] || { icon: "📋", desc: servico };
+        doc.setFillColor(242, 92, 5);
+        doc.roundedRect(cardX, cardY, 5, cardH, 1, 1, "F");
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(26, 26, 26);
+        doc.text(servico, cardX + 8, cardY + 8);
+        
+        doc.setFontSize(6);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 100, 100);
+        doc.text(info.desc, cardX + 8, cardY + 14);
+      });
+    }
+    
+    // ====== CONDIÇÕES ======
+    y = 230;
+    if (y > 200) { doc.addPage(); y = 20; }
+    doc.setFillColor(245, 242, 240);
+    doc.roundedRect(15, y, 180, 40, 3, 3, "F");
+    
+    doc.setTextColor(242, 92, 5);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("CONDIÇÕES COMERCIAIS", 20, y + 8);
     doc.setDrawColor(242, 92, 5);
     doc.setLineWidth(0.3);
-    doc.line(18, y + 10, 192, y + 10);
+    doc.line(20, y + 10, 190, y + 10);
     
     const conds = [
-      "Período experimental de 3 meses.",
-      "Contrato anual renovável automaticamente.",
-      "Pagamento mensal até ao dia 5 de cada mês.",
-      "Validade da proposta: 10 dias.",
+      "Período experimental de 3 meses",
+      "Contrato anual renovável automaticamente",
+      "Pagamento mensal até ao dia 5",
+      "Validade da proposta: 10 dias"
     ];
     
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(60, 60, 60);
-    let cy = y + 16;
+    doc.setTextColor(80, 80, 80);
+    let cy = y + 18;
     conds.forEach(c => {
-      doc.text("•  " + c, 18, cy);
-      cy += 7;
+      doc.text("•  " + c, 20, cy);
+      cy += 6;
     });
     
-    // FOOTER
-    const totalPages = (doc as any).internal.getNumberOfPages();
-    for (let p = 1; p <= totalPages; p++) {
-      doc.setPage(p);
-      doc.setDrawColor(220, 220, 220);
-      doc.setLineWidth(0.3);
-      doc.line(14, pH - 15, 196, pH - 15);
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text("AI BORA, Lda  |  NIF: 319918645  |  helloaibora@proton.me  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 10, { align: "center" });
-    }
+    // ====== CTA ======
+    y += 48;
+    doc.setTextColor(26, 26, 26);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Pronto para começar, " + (cliente.nome || "cliente") + "?", 105, y, { align: "center" });
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Fala connosco hoje e começamos esta semana!", 105, y + 7, { align: "center" });
+    
+    // ====== FOOTER ======
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(15, pH - 15, 195, pH - 15);
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(7);
+    doc.text("AI BORA, Lda  |  NIF: 319918645  |  helloaibora@proton.me  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 10, { align: "center" });
     
     return doc;
   };
 
   const gerarPDF = async () => {
-    if (!cliente.nome || total <= 0) {
+    if (!cliente.nome || totalConDescuento <= 0) {
       alert("Preenche o Nome do Cliente e o Valor Total.");
       return;
     }
@@ -551,7 +644,21 @@ export function Orcamento() {
     }
   };
 
-  const podeGerar = !!cliente.nome && total > 0;
+  const gerarPropostaPDF = async () => {
+    if (!cliente.nome || totalConDescuento <= 0) {
+      alert("Preenche o Nome do Cliente e o Valor Total.");
+      return;
+    }
+    try {
+      const doc = await criarPropostaPDF();
+      doc.save(`Proposta-${cliente.nome.replace(/\s+/g, '-')}.pdf`);
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao gerar Proposta PDF.");
+    }
+  };
+
+  const podeGerar = !!cliente.nome && totalConDescuento > 0;
 
   return (
     <div className="min-h-screen bg-bg">
@@ -789,30 +896,30 @@ export function Orcamento() {
                   </div>
                   {(descontoPercent > 0 || descontoValor > 0) && (
                     <div style={{ fontSize: 10, color: "#F25C05", marginTop: 4 }}>
-                      Desconto total: {descontoTotal.toFixed(2)} € (sem IVA)
+                      Desconto total: {descuentoAplicado.toFixed(2)} € (aplicado ao total)
                     </div>
                   )}
                 </div>
 
                 <div style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>Subtotal (sem IVA)</span>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{(subtotal - descontoTotal).toFixed(2)} €</span>
-                  </div>
-                  {descontoTotal > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9", color: "#F25C05" }}>
-                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>Desconto</span>
-                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>- {descontoTotal.toFixed(2)} €</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>Subtotal (sem IVA)</span>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{subtotalComDesconto.toFixed(2)} €</span>
                     </div>
-                  )}
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>IVA (23%)</span>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{(total > 0 ? total - (total/1.23) : 0).toFixed(2)} €</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>TOTAL</span>
-                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 18, fontWeight: 900, color: "#F22283" }}>{total.toFixed(2)} €</span>
-                  </div>
+                    {descuentoAplicado > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9", color: "#F25C05" }}>
+                        <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>Desconto</span>
+                        <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>- {descuentoAplicado.toFixed(2)} €</span>
+                      </div>
+                    )}
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>IVA (23%)</span>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{ivaComDesconto.toFixed(2)} €</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>TOTAL</span>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 18, fontWeight: 900, color: "#F22283" }}>{totalConDescuento.toFixed(2)} €</span>
+                    </div>
                 </div>
 
                 <div style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 12, marginBottom: 16, fontSize: 11, color: "#666", lineHeight: 1.6 }}>
@@ -846,16 +953,42 @@ export function Orcamento() {
 
                 <button
                   onClick={() => {
+                    // Create a shorter, cleaner URL
+                    const baseUrl = 'https://aibora.pt/proposta';
+                    let shortParams = '';
+                    
+                    // Essential params only
+                    if (cliente.nome) {
+                      const baseUrl = 'https://aibora.pt/proposta';
+                      // Only name and essential values
+                      let shortUrl = baseUrl + '?n=' + encodeURIComponent(cliente.nome.toLowerCase().replace(/\s+/g, '-'));
+                      if (marcas.length > 1) shortUrl += '&m=' + marcas.length;
+                      if (totalConDescuento > 0) shortUrl += '&v=' + Math.round(totalConDescuento);
+                      if (descuentoAplicado > 0) shortUrl += '&d=' + Math.round(descuentoAplicado);
+                      navigator.clipboard.writeText(shortUrl).then(() => {
+                        alert('Link copiado! ' + shortUrl);
+                      });
+                    }
+                  }}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#1A1A1A", color: "#ffffff", border: "2px solid #1A1A1A", transition: "all 0.2s ease", marginBottom: 12 }}
+                >
+                  🔗 Copiar Link da Proposta
+                </button>
+
+                <button
+                  onClick={() => {
                     const params = new URLSearchParams();
                     if (cliente.nome) params.set('nome', encodeURIComponent(cliente.nome));
                     if (cliente.empresa) params.set('empresa', encodeURIComponent(cliente.empresa));
                     if (cliente.email) params.set('email', encodeURIComponent(cliente.email));
                     if (marcas[0]?.servicos.length > 0) params.set('servicos', encodeURIComponent(JSON.stringify(marcas[0].servicos)));
                     if (marcas[0]?.nome) params.set('marca', encodeURIComponent(marcas[0].nome));
-                    params.set('valor', total.toFixed(2));
-                    params.set('subtotal', (subtotal - descontoTotal).toFixed(2));
-                    params.set('iva', (total - (total/1.23)).toFixed(2));
-                    params.set('desconto', descontoTotal.toFixed(2));
+                    params.set('valor', totalConDescuento.toFixed(2));
+                    params.set('subtotal', subtotalComDesconto.toFixed(2));
+                    params.set('iva', ivaComDesconto.toFixed(2));
+                    params.set('desconto', descuentoAplicado.toFixed(2));
+                    params.set('marcas', marcas.length.toString());
+                    params.set('valorPorMarca', porMarcaSemIVA.toFixed(2));
                     window.open('/proposta.html?' + params.toString(), '_blank');
                   }}
                   style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#F25C05", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
@@ -865,14 +998,47 @@ export function Orcamento() {
 
                 <button
                   onClick={async () => {
-                    if (!cliente.nome || total <= 0) {
+                    if (!cliente.nome || totalConDescuento <= 0) {
                       alert("Preenche o Nome do Cliente e o Valor Total.");
                       return;
                     }
-                    const doc = await criarPropostaPDF();
-                    doc.save(`Proposta-${cliente.nome.replace(/\s+/g, '-')}.pdf`);
+                    try {
+                      const proposalData = {
+                        cliente: cliente.nome,
+                        empresa: cliente.empresa || '',
+                        email: cliente.email || '',
+                        telefone: cliente.telefone || '',
+                        valor: totalConDescuento,
+                        subtotal: subtotalComDesconto,
+                        iva: ivaComDesconto,
+                        desconto: descuentoAplicado,
+                        marcas: marcas.length,
+                        valorPorMarca: porMarcaSemIVA,
+                        servicos: marcas[0]?.servicos || [],
+                        redes: marcas.map(m => ({ nome: m.nome, redes: m.redes })),
+                        numeroOrcamento: numeroOrcamento
+                      };
+                      const id = await createProposal(proposalData);
+                      const link = `https://aibora.pt/p/${id}`;
+                      navigator.clipboard.writeText(link).then(() => {
+                        alert(`✅ Proposta salva! Link único:\n${link}\n\nLink copiado para clipboard!`);
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      alert("Erro ao salvar proposta: " + err.message);
+                    }
                   }}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#F22283", color: "#ffffff", border: "none", transition: "all 0.2s ease" }}
+                  disabled={!podeGerar}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#10B981" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
+                >
+                  <Save size={16} style={{ marginRight: 6 }} />
+                  💾 Guardar Proposta (Link Único)
+                </button>
+
+                <button
+                  onClick={gerarPropostaPDF}
+                  disabled={!podeGerar}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F22283" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease" }}
                 >
                   📥 Download Proposta em PDF
                 </button>

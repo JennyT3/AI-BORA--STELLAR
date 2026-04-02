@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proposta | AI BORA</title>
-<meta name="description" content="Marketing digital, redes sociais, página web e inteligência artificial para o seu negócio crescer.">
-<meta property="og:title" content="Proposta | AI BORA">
-<meta property="og:description" content="Marketing digital, redes sociais, página web e inteligência artificial para o seu negócio crescer.">
+<title>Proposta AI BORA</title>
+<meta name="description" content="Marketing digital para o seu negócio crescer - AI BORA">
+<meta property="og:title" content="Proposta AI BORA - Marketing Digital">
+<meta property="og:description" content="Proposta exclusiva de marketing digital para o seu negócio">
 <meta property="og:image" content="https://i.imgur.com/68Y4K6C.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.aibora.pt/proposta">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Proposta AI BORA">
+<meta name="twitter:description" content="Marketing digital para o seu negócio crecer">
+<meta name="twitter:image" content="https://i.imgur.com/68Y4K6C.png">
 <link rel="icon" type="image/png" href="logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -126,8 +129,6 @@
 </head>
 <body>
 
-</script>
-
 <!-- ══════════════ HERO ══════════════ -->
 <section class="hero">
   <img src="logo.png" alt="AI BORA" class="hero-logo">
@@ -149,10 +150,11 @@
   </div>
   
   <div class="valor-box" id="valor-box" style="display:none;">
-    <div class="valor-label">Investimento Mensal</div>
+    <div class="valor-label" id="valor-label-display">Investimento Mensal</div>
     <div class="valor-num" id="valor-display">0 €</div>
-    <div class="valor-subtotal" id="valor-sem-iva-display" style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px;">(sem IVA)</div>
-    <div class="valor-desconto" id="valor-desconto-display" style="font-size: 12px; color: #F25C05; margin-top: 4px; display: none;">Desconto</div>
+    <div class="valor-subtotal" id="valor-sem-iva-display" style="font-size: 14px; color: #ffffff; margin-top: 2px; font-weight: 600;">0 €</div>
+    <div class="valor-desconto" id="valor-desconto-display" style="font-size: 12px; color: #F25C05; margin-top: 4px; display: none;"></div>
+    <div id="valor-por-marca-display" style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 8px;"></div>
   </div>
   
   <a href="https://wa.me/351936021747" class="hero-cta" target="_blank">
@@ -431,125 +433,102 @@
 </footer>
 
 <script>
-  // Get URL parameters
-  const params = new URLSearchParams(window.location.search);
-  const nomeCliente = params.get('nome') ? decodeURIComponent(params.get('nome')) : '';
-  const empresaCliente = params.get('empresa') ? decodeURIComponent(params.get('empresa')) : '';
-  const servicosSelecionados = params.get('servicos') ? JSON.parse(decodeURIComponent(params.get('servicos'))) : [];
-  const marcaCliente = params.get('marca') ? decodeURIComponent(params.get('marca')) : '';
-  const valorTotal = params.get('valor') || '0';
-  const valorSubtotal = params.get('subtotal') || '0';
-  const valorIva = params.get('iva') || '0';
-  const valorDesconto = params.get('desconto') || '0';
-
-  // Update document title
-  if (nomeCliente) {
-    document.title = 'Proposta ' + nomeCliente + ' | AI BORA';
-  }
-
-  // Update client name in hero
-  if (nomeCliente) {
-    const nomeEl = document.getElementById('nome-cliente');
-    if (nomeEl) nomeEl.textContent = nomeCliente;
+console.log('Script starting...');
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded');
+  try {
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('Raw URL:', window.location.href);
     
-    const nomeCtaEl = document.getElementById('nome-cta');
-    if (nomeCtaEl) nomeCtaEl.textContent = nomeCliente + '?';
-  }
-
-  // Show valor box if we have a value
-  const valorBox = document.getElementById('valor-box');
-  const valorDisplay = document.getElementById('valor-display');
-  const valorSemIvaDisplay = document.getElementById('valor-sem-iva-display');
-  const valorDescontoDisplay = document.getElementById('valor-desconto-display');
-  if (valorBox && valorDisplay && parseFloat(valorTotal) > 0) {
-    valorBox.style.display = 'block';
-    valorDisplay.textContent = parseFloat(valorTotal).toFixed(2) + ' €';
-    if (valorSemIvaDisplay) {
-      valorSemIvaDisplay.textContent = parseFloat(valorSubtotal).toFixed(2) + ' € sem IVA';
-    }
-    if (valorDescontoDisplay && parseFloat(valorDesconto) > 0) {
-      valorDescontoDisplay.textContent = 'Desconto: - ' + parseFloat(valorDesconto).toFixed(2) + ' €';
-      valorDescontoDisplay.style.display = 'block';
-    }
-  }
-
-  // Highlight selected services in the grid
-  if (servicosSelecionados.length > 0) {
-    const cards = document.querySelectorAll('.servico-card');
-    const servicoMap = {
-      'Gestão de Redes Sociais': ['Instagram', 'Facebook', 'LinkedIn'],
-      'Criação de Conteúdo': ['Posts'],
-      'Community Management': ['Instagram', 'Facebook'],
-      'Email Marketing': ['Email'],
-      'Design de Posts': ['Posts'],
-      'Logotipo': ['Logótipo'],
-      'Identidade Corporativa': ['Logótipo', 'Posts'],
-      'Banners e Posters': ['Banners'],
-      'Landing Page': ['Landing Page', 'SEO'],
-      'Site Catálogo': ['Landing Page', 'SEO'],
-      'Loja Online': ['Landing Page', 'SEO', 'Mobile'],
-      'SEO Local': ['SEO'],
-      'Fotografia Profissional': ['Fotografia'],
-      'Produção de Videos': ['Reels', 'Edição'],
-      'Criação de Reels': ['Reels'],
-      'Edição de Conteúdo': ['Edição'],
-      'Google Ads': ['Google Ads'],
-      'Facebook Ads': ['Meta Ads'],
-      'Instagram Ads': ['Meta Ads'],
-      'Gestão de Budget': ['Google Ads', 'Meta Ads'],
-      'Chatbot WhatsApp': ['Chatbot', 'WhatsApp Auto'],
-      'IA e Automação': ['Chatbot', 'WhatsApp Auto', 'CRM'],
-      'Respostas Automáticas': ['Chatbot', 'WhatsApp Auto'],
-      'Fluxos de CRM': ['CRM'],
-      'Consultoria Estratégica': [],
-      'Análise de Concorrentes': [],
-      'Dashboard Excel': [],
-      'Plano de Marketing': []
-    };
+    let nomeCliente = '';
+    let numMarcas = 1;
+    let valorTotal = 0;
+    let valorDesconto = 0;
+    let valorSubtotal = 0;
+    let servicosSelecionados = [];
     
-    cards.forEach(card => {
-      const nome = card.querySelector('.servico-nome').textContent;
-      const items = card.querySelectorAll('.servico-item');
-      
-      let hasMatch = false;
-      servicosSelecionados.forEach(servico => {
-        const mappedItems = servicoMap[servico] || [];
-        items.forEach(item => {
-          if (mappedItems.includes(item.textContent)) {
-            hasMatch = true;
-          }
-        });
-      });
-      
-      if (hasMatch || servicosSelecionados.some(s => nome.toLowerCase().includes(s.toLowerCase().split(' ')[0].toLowerCase()))) {
-        card.classList.add('selecionado');
+    // Try different parameter names
+    const nome = urlParams.get('nome') || urlParams.get('n') || '';
+    const valor = urlParams.get('valor') || urlParams.get('v');
+    const desconto = urlParams.get('desconto') || urlParams.get('d');
+    const subtotal = urlParams.get('subtotal');
+    const marcas = urlParams.get('marcas') || urlParams.get('m');
+    const valorPorMarca = urlParams.get('valorPorMarca');
+    const servicos = urlParams.get('servicos');
+    
+    console.log('nome:', nome, 'valor:', valor);
+    
+    if (nome) {
+      // Decode nome - handle encoding issues
+      nomeCliente = decodeURIComponent(nome.replace(/-/g, ' '));
+    }
+    
+    if (valor) {
+      valorTotal = parseFloat(valor);
+    }
+    
+    if (desconto) {
+      valorDesconto = parseFloat(desconto);
+    }
+    
+    if (subtotal) {
+      valorSubtotal = parseFloat(subtotal);
+    } else if (valorTotal > 0) {
+      valorSubtotal = valorTotal / 1.23;
+    }
+    
+    if (marcas) {
+      numMarcas = parseInt(marcas);
+    }
+    
+    if (servicos) {
+      try {
+        servicosSelecionados = JSON.parse(decodeURIComponent(servicos));
+      } catch(e) {
+        console.log('servicos parse error', e);
       }
-    });
-  }
+    }
 
-  // Update hero badges based on selected services
-  const heroBadges = document.getElementById('hero-badges');
-  if (heroBadges && servicosSelecionados.length > 0) {
-    const badgeMap = {
-      'Marketing': '📱', 'Redes': '📲', 'Design': '🎨', 'Web': '💻', 
-      'Multimédia': '🎬', 'Video': '🎬', 'Foto': '📸', 'Publicidade': '📢',
-      'Ads': '📊', 'Automação': '⚡', 'Chatbot': '🤖', 'IA': '🤖',
-      'Consultoria': '📊', 'SEO': '🔍', 'Loja': '🛒'
-    };
+    console.log('Parsed - nome:', nomeCliente, 'valor:', valorTotal);
+
+    // Update name in page
+    if (nomeCliente) {
+      document.title = 'Proposta ' + nomeCliente + ' | AI BORA';
+      const nomeEl = document.getElementById('nome-cliente');
+      if (nomeEl) nomeEl.textContent = nomeCliente;
+      const nomeCtaEl = document.getElementById('nome-cta');
+      if (nomeCtaEl) nomeCtaEl.textContent = nomeCliente + '?';
+    }
+
+    // Show valor box if we have value
+    const valorBox = document.getElementById('valor-box');
+    const valorDisplay = document.getElementById('valor-display');
     
-    let newBadges = '';
-    servicosSelecionados.forEach(s => {
-      for (const [key, icon] of Object.entries(badgeMap)) {
-        if (s.includes(key)) {
-          newBadges += '<span class="badge">' + icon + ' ' + s + '</span>';
-          break;
+    if (valorBox && valorDisplay && valorTotal > 0) {
+      valorBox.style.display = 'block';
+      
+      // Show biggest value (por marca or subtotal)
+      let displayValue = numMarcas > 1 ? (valorPorMarca ? parseFloat(valorPorMarca) : valorSubtotal / numMarcas) : valorSubtotal;
+      valorDisplay.textContent = displayValue.toFixed(2) + ' €';
+      
+      const semIvaEl = document.getElementById('valor-sem-iva-display');
+      if (semIvaEl) {
+        semIvaEl.textContent = numMarcas > 1 ? 'por marca (sem IVA)' : '(sem IVA)';
+      }
+      
+      if (valorDesconto > 0) {
+        const descEl = document.getElementById('valor-desconto-display');
+        if (descEl) {
+          descEl.innerHTML = '<div style="background:rgba(255,255,255,0.15);padding:8px 12px;border-radius:8px;margin-top:8px;font-size:11px;">💰 Desconto: ' + valorDesconto.toFixed(2) + ' € (' + (valorDesconto / numMarcas).toFixed(2) + ' €/marca)</div>';
+          descEl.style.display = 'block';
         }
       }
-    });
-    
-    if (newBadges) {
-      heroBadges.innerHTML = newBadges;
     }
+    
+    console.log('Script completed - valorTotal:', valorTotal);
+  } catch(e) {
+    console.error('Error:', e);
   }
 
   // Animation observer
@@ -559,6 +538,7 @@
     });
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+});
 </script>
 </body>
 </html>

@@ -7,6 +7,8 @@ import { Termos } from "./pages/Termos";
 import { Labs } from "./pages/Labs";
 import { Prompts } from "./pages/Prompts";
 import { Orcamento } from "./pages/Orcamento";
+import { PropostaPage } from "./pages/Proposta";
+import { Admin } from "./pages/Admin";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
@@ -21,6 +23,8 @@ export default function App() {
       <Route path="/privacidade" component={Privacidade} />
       <Route path="/termos" component={Termos} />
       <Route path="/orcamento" component={Orcamento} />
+      <Route path="/p/:id" component={PropostaPage} />
+      <Route path="/admin" component={Admin} />
       <Route>
         <div className="min-h-screen bg-bg flex items-center justify-center text-text-primary">
           <div className="text-center">
