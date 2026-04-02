@@ -1,7 +1,9 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/proposta", "destination": "/proposta.html" },
+    { "source": "/baixar-pdf", "destination": "/baixar-pdf.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
