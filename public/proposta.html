@@ -189,16 +189,15 @@
     color: var(--branco);
   }
   .sobre-img {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    display: flex;
+    align-items: stretch;
   }
   .sobre-img img {
     width: 100%;
-    aspect-ratio: 1/1;
-    object-fit: contain;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
+    height: 100%;
+    min-height: 400px;
+    object-fit: cover;
+    border-radius: 16px;
   }
   .sobre-stats {
     display: grid;
