@@ -1,13 +1,15 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/proposta", "destination": "/proposta.html" },
-    { "source": "/baixar-pdf", "destination": "/baixar-pdf.html" },
+    { "source": "/proposta/", "destination": "/proposta.html" },
+    { "source": "/baixar-pdf/", "destination": "/baixar-pdf.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/(.*)\\.(mp4|webm|ogg|jpg|jpeg|png|svg|webp|gif)",
+      "source": "/(.*)\\.(mp4|webm|ogg|jpg|jpeg|png|svg|webp|gif|html)",
       "headers": [
         {
           "key": "Cache-Control",
