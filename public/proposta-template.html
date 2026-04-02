@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta Isilda Costa</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --laranja: #F25C05;
+    --preto: #1A1A1A;
+    --branco: #ffffff;
+    --cinza: #F5F2F0;
+  }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--preto);
+    color: var(--branco);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    background: linear-gradient(135deg, #1A1A1A 0%, #2a1a0a 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242,92,5,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-logo {
+    width: 80px; height: 80px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+  }
+  .hero-para {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--laranja);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-cliente {
+    font-size: clamp(13px, 3vw, 18px);
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+  .hero-titulo {
+    font-size: clamp(36px, 8vw, 72px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-titulo span { color: var(--laranja); }
+  .hero-desc {
+    font-size: clamp(15px, 2.5vw, 18px);
+    color: rgba(255,255,255,0.65);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .badge {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--laranja);
+    color: var(--branco);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 18px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 32px rgba(242,92,5,0.35);
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(242,92,5,0.5); }
+
+  /* ── QUEM SOMOS ── */
+  .secao {
+    padding: 100px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .secao-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--laranja);
+    margin-bottom: 12px;
+  }
+  .secao-titulo {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .secao-titulo span { color: var(--laranja); }
+  .secao-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.8;
+    max-width: 600px;
+  }
+
+  /* ── SOBRE ── */
+  .sobre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .sobre-grid { grid-template-columns: 1fr; gap: 40px; }
+    .sobre-img { order: -1; }
+  }
+  .sobre-img {
+    border-radius: 24px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+  }
+  .sobre-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sobre-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .stat-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--laranja);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── DIVISOR ── */
+  .divisor {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(242,92,5,0.4), transparent);
+    margin: 0 24px;
+  }
+
+  /* ── SERVIÇOS ── */
+  .servicos-bg {
+    background: rgba(255,255,255,0.02);
+    padding: 100px 24px;
+  }
+  .servicos-inner { max-width: 1100px; margin: 0 auto; }
+  .servicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+  .servico-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .servico-card:hover {
+    border-color: var(--laranja);
+    transform: translateY(-4px);
+  }
+  .servico-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+  .servico-nome {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .servico-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .servico-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .servico-item {
+    background: rgba(242,92,5,0.12);
+    border: 1px solid rgba(242,92,5,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--laranja);
+  }
+
+  /* ── PORTFÓLIO ── */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+  .portfolio-item {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+  }
+  .portfolio-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+  .portfolio-item:hover img { transform: scale(1.05); }
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,26,26,0.9) 0%, transparent 60%);
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-tag {
+    background: var(--laranja);
+    color: var(--branco);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── PORQUÊ NÓS ── */
+  .porque-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+  .porque-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .porque-num {
+    font-size: 48px;
+    font-weight: 900;
+    color: rgba(242,92,5,0.15);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .porque-titulo {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .porque-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+  }
+
+  /* ── PRÓXIMOS PASSOS ── */
+  .passos-bg {
+    background: rgba(255,255,255,0.02);
+    padding: 100px 24px;
+  }
+  .passos-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+  .passos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 60px;
+    text-align: left;
+  }
+  .passo {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .passo:last-child { border-bottom: none; }
+  .passo-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--laranja);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .passo-texto h4 {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .passo-texto p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+  }
+
+  /* ── CTA FINAL ── */
+  .cta-final {
+    padding: 120px 24px;
+    text-align: center;
+    background: linear-gradient(135deg, #1A1A1A 0%, #2a1a0a 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-final::before {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242,92,5,0.15) 0%, transparent 70%);
+  }
+  .cta-titulo {
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .cta-titulo span { color: var(--laranja); }
+  .cta-desc {
+    font-size: 18px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 48px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-botoes {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-principal {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--laranja);
+    color: var(--branco);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 18px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(242,92,5,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-principal:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(242,92,5,0.55); }
+  .btn-secundario {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--branco);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 18px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: border-color 0.2s;
+  }
+  .btn-secundario:hover { border-color: rgba(255,255,255,0.5); }
+
+  /* ── RODAPÉ ── */
+  .rodape {
+    background: #111;
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .rodape-logo {
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .rodape-logo span { color: var(--laranja); }
+  .rodape-info {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.8;
+  }
+
+  /* ── ANIMAÇÕES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .fade-in.visivel {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero">
+  <img src="logo.png" alt="AI BORA" class="hero-logo">
+
+  <p class="hero-para">Proposta exclusiva para</p>
+  <p class="hero-cliente" id="nome-cliente">Isilda Costa</p>
+
+  <h1 class="hero-titulo">
+    Marketing digital<br>para o teu negócio <span>crescer.</span>
+  </h1>
+  <p class="hero-desc">
+    Propomos uma presença digital forte: redes sociais, website profissional e inteligência artificial ao serviço do teu sucesso.
+  </p>
+  <div class="hero-badges">
+    <span class="badge">📱 Marketing digital</span>
+    <span class="badge">📲 Redes sociais</span>
+    <span class="badge">💻 Página web</span>
+    <span class="badge">🤖 Inteligência artificial</span>
+  </div>
+  <a href="https://wa.me/351936021747" class="hero-cta" target="_blank">
+    💬 Falar connosco agora
+  </a>
+</section>
+
+<!-- ══════════════ QUEM SOMOS ══════════════ -->
+<section class="secao">
+  <div class="sobre-grid">
+    <div class="fade-in">
+      <p class="secao-label">Quem somos</p>
+      <h2 class="secao-titulo">Marketing digital<br>que <span>realmente funciona.</span></h2>
+      <p class="secao-desc">
+        A AI BORA é uma empresa portuguesa especializada em ajudar negócios locais a crescer na internet. Queremos ser o teu parceiro digital — com foco em resultados concretos e suporte em português.
+      </p>
+      <div class="sobre-stats">
+        <div class="stat-card">
+          <div class="stat-num">💪</div>
+          <div class="stat-label">Proximidade</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">📈</div>
+          <div class="stat-label">Crescimento orgânico</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">🎯</div>
+          <div class="stat-label">Tu és prioridade</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">❤️</div>
+          <div class="stat-label">Clientes satisfeitos</div>
+        </div>
+      </div>
+    </div>
+    <div class="sobre-img fade-in">
+      <img src="estudio.jpg" alt="AI BORA Studio">
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ══════════════ SERVIÇOS ══════════════ -->
+<section class="servicos-bg">
+  <div class="servicos-inner">
+    <div class="fade-in" style="text-align:center;">
+      <p class="secao-label">O que fazemos</p>
+      <h2 class="secao-titulo">Serviços <span>incluídos</span></h2>
+      <p class="secao-desc" style="margin: 0 auto;">
+        Tudo o que o teu negócio precisa para ter uma presença digital forte e profissional.
+      </p>
+    </div>
+
+    <div class="servicos-grid">
+      <div class="servico-card fade-in">
+        <div class="servico-icon">📱</div>
+        <div class="servico-nome">Marketing Digital</div>
+        <div class="servico-desc">Gestão completa das tuas redes sociais com conteúdo de qualidade e estratégia definida.</div>
+        <div class="servico-items">
+          <span class="servico-item">Instagram</span>
+          <span class="servico-item">Facebook</span>
+          <span class="servico-item">LinkedIn</span>
+        </div>
+      </div>
+      <div class="servico-card fade-in">
+        <div class="servico-icon">🎨</div>
+        <div class="servico-nome">Design & Identidade</div>
+        <div class="servico-desc">Identidade visual profissional que representa a tua marca com credibilidade.</div>
+        <div class="servico-items">
+          <span class="servico-item">Logótipo</span>
+          <span class="servico-item">Posts</span>
+          <span class="servico-item">Banners</span>
+        </div>
+      </div>
+      <div class="servico-card fade-in">
+        <div class="servico-icon">💻</div>
+        <div class="servico-nome">Website</div>
+        <div class="servico-desc">Site moderno, rápido e otimizado para aparecer no Google e converter visitantes.</div>
+        <div class="servico-items">
+          <span class="servico-item">Landing Page</span>
+          <span class="servico-item">SEO</span>
+          <span class="servico-item">Mobile</span>
+        </div>
+      </div>
+      <div class="servico-card fade-in">
+        <div class="servico-icon">🎬</div>
+        <div class="servico-nome">Multimédia</div>
+        <div class="servico-desc">Fotografia e vídeo profissional que mostra o melhor do teu negócio.</div>
+        <div class="servico-items">
+          <span class="servico-item">Fotografia</span>
+          <span class="servico-item">Reels</span>
+          <span class="servico-item">Edição</span>
+        </div>
+      </div>
+      <div class="servico-card fade-in">
+        <div class="servico-icon">📢</div>
+        <div class="servico-nome">Publicidade Paga</div>
+        <div class="servico-desc">Campanhas pagas geridas por especialistas para maximizar o teu investimento.</div>
+        <div class="servico-items">
+          <span class="servico-item">Google Ads</span>
+          <span class="servico-item">Meta Ads</span>
+        </div>
+      </div>
+      <div class="servico-card fade-in">
+        <div class="servico-icon">⚡</div>
+        <div class="servico-nome">Automação & IA</div>
+        <div class="servico-desc">Automatiza processos repetitivos e responde aos clientes 24/7 com inteligência artificial.</div>
+        <div class="servico-items">
+          <span class="servico-item">Chatbot</span>
+          <span class="servico-item">WhatsApp Auto</span>
+          <span class="servico-item">CRM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ══════════════ PORTFÓLIO ══════════════ -->
+<section class="secao">
+  <div class="fade-in" style="text-align:center;">
+    <p class="secao-label">Portfólio</p>
+    <h2 class="secao-titulo">O nosso <span>trabalho</span></h2>
+    <p class="secao-desc" style="margin: 0 auto;">
+      Resultados reais de clientes reais. Sem stock photos, sem promessas — apenas trabalho com impacto.
+    </p>
+  </div>
+
+  <div class="portfolio-grid fade-in">
+    <div class="portfolio-item">
+      <img src="branding.jpg" alt="Branding">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Branding</span></div>
+    </div>
+    <div class="portfolio-item">
+      <img src="mopack.jpg" alt="Packaging">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Packaging</span></div>
+    </div>
+    <div class="portfolio-item">
+      <img src="foto-criativa.jpg" alt="Fotografia">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Fotografia</span></div>
+    </div>
+    <div class="portfolio-item">
+      <img src="antes.jpg" alt="Antes">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Antes</span></div>
+    </div>
+    <div class="portfolio-item">
+      <img src="depois.jpg" alt="Depois">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Depois</span></div>
+    </div>
+    <div class="portfolio-item">
+      <img src="estudio.jpg" alt="Estúdio">
+      <div class="portfolio-overlay"><span class="portfolio-tag">Estúdio</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ══════════════ PORQUÊ NÓS ══════════════ -->
+<section class="servicos-bg">
+  <div class="servicos-inner">
+    <div class="fade-in" style="text-align:center;">
+      <p class="secao-label">A nossa diferença</p>
+      <h2 class="secao-titulo">Porque a <span>AI BORA?</span></h2>
+    </div>
+    <div class="porque-grid">
+      <div class="porque-card fade-in">
+        <div class="porque-num">01</div>
+        <div class="porque-titulo">Empresa colaborativa</div>
+        <div class="porque-desc">Falamos a tua língua, conhecemos o teu mercado, estamos no teu fuso horário.</div>
+      </div>
+      <div class="porque-card fade-in">
+        <div class="porque-num">02</div>
+        <div class="porque-titulo">Experimenta os nossos serviços</div>
+        <div class="porque-desc">Prova durante 3 meses. Se gostares, ficamos juntos — porque queremos que vendas mais.</div>
+      </div>
+      <div class="porque-card fade-in">
+        <div class="porque-num">03</div>
+        <div class="porque-titulo">Queremos que vendas mais</div>
+        <div class="porque-desc">Design, redes sociais, website, publicidade e automação — tudo feito por nós para o teu negócio crescer.</div>
+      </div>
+      <div class="porque-card fade-in">
+        <div class="porque-num">04</div>
+        <div class="porque-titulo">Resultados transparentes</div>
+        <div class="porque-desc">Relatórios mensais com dados reais. Sabes sempre o que está a acontecer.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divisor"></div>
+
+<!-- ══════════════ PRÓXIMOS PASSOS ══════════════ -->
+<section class="passos-bg">
+  <div class="passos-inner">
+    <div class="fade-in">
+      <p class="secao-label" style="text-align:center;">Como começamos</p>
+      <h2 class="secao-titulo" style="text-align:center;">Próximos <span>passos</span></h2>
+    </div>
+    <div class="passos-lista">
+      <div class="passo fade-in">
+        <div class="passo-num">1</div>
+        <div class="passo-texto">
+          <h4>Aceitas a proposta</h4>
+          <p>Respondes ao WhatsApp ou email a confirmar que queres avançar. Sem burocracia.</p>
+        </div>
+      </div>
+      <div class="passo fade-in">
+        <div class="passo-num">2</div>
+        <div class="passo-texto">
+          <h4>Reunião de onboarding</h4>
+          <p>Marcamos uma chamada de 30 minutos para alinhar objetivos, tom de voz e primeiras ações.</p>
+        </div>
+      </div>
+      <div class="passo fade-in">
+        <div class="passo-num">3</div>
+        <div class="passo-texto">
+          <h4>Arranque em 5 dias úteis</h4>
+          <p>A equipa já está a trabalhar. Recebes os primeiros conteúdos para aprovação.</p>
+        </div>
+      </div>
+      <div class="passo fade-in">
+        <div class="passo-num">4</div>
+        <div class="passo-texto">
+          <h4>Crescimento mês a mês</h4>
+          <p>Relatório mensal, ajustes de estratégia e comunicação contínua. Crescemos juntos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CTA FINAL ══════════════ -->
+<section class="cta-final">
+  <div class="fade-in">
+    <h2 class="cta-titulo">Pronto para começar,<br><span id="nome-cta">Isilda?</span></h2>
+    <p class="cta-desc">
+      A proposta é válida por 10 dias. Fala connosco hoje e começamos esta semana.
+    </p>
+    <div class="cta-botoes">
+      <a href="https://wa.me/351936021747" class="btn-principal" target="_blank">
+        💬 WhatsApp agora
+      </a>
+      <a href="mailto:helloaibora@proton.me" class="btn-secundario">
+        ✉️ Enviar email
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ RODAPÉ ══════════════ -->
+<footer class="rodape">
+  <img src="logo.png" alt="AI BORA" style="width:60px;height:60px;border-radius:12px;margin-bottom:12px;">
+  <div class="rodape-logo">AI <span>BORA</span></div>
+  <div class="rodape-info">
+    helloaibora@proton.me · +351 936 021 747 · www.aibora.pt<br>
+    Esta proposta foi preparada exclusivamente para o cliente indicado e tem validade de 10 dias.
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visivel');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
