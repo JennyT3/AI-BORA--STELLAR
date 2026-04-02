@@ -162,8 +162,8 @@
   .sobre-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
+    gap: 40px;
+    align-items: start;
   }
   @media (max-width: 768px) {
     .sobre-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -173,15 +173,15 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .sobre-header img {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
   }
   .sobre-header-titulo {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 900;
     color: var(--laranja);
   }
@@ -189,16 +189,15 @@
     color: var(--branco);
   }
   .sobre-img {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
   .sobre-img img {
     width: 100%;
-    max-height: 300px;
-    border-radius: 12px;
+    aspect-ratio: 1/1;
     object-fit: cover;
-    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
   }
   .sobre-stats {
     display: grid;
@@ -570,8 +569,8 @@
       </div>
     </div>
     <div class="sobre-img fade-in">
-      <img src="https://i.imgur.com/FL1CGDf.png" alt="AI BORA Studio" style="max-height: 220px;">
-      <img src="https://i.imgur.com/68Y4K6C.png" alt="AI BORA" style="max-height: 180px; max-width: 180px; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px;">
+      <img src="https://i.imgur.com/FL1CGDf.png" alt="AI BORA Studio">
+      <img src="https://i.imgur.com/68Y4K6C.png" alt="AI BORA">
     </div>
   </div>
 </section>
