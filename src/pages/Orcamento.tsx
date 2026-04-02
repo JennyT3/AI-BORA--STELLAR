@@ -931,14 +931,6 @@ export function Orcamento() {
                 </div>
 
                 <button
-                  onClick={gerarPDF}
-                  disabled={!podeGerar}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F22283" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
-                >
-                  📄 Gerar PDF do Orçamento
-                </button>
-
-                <button
                   onClick={async () => {
                     const doc = await criarPDF();
                     const pdfBlob = doc.output('blob');
@@ -948,52 +940,15 @@ export function Orcamento() {
                   disabled={!podeGerar}
                   style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#1A1A1A" : "#cccccc", color: "#ffffff", border: "2px solid #1A1A1A", transition: "all 0.2s ease", marginBottom: 12 }}
                 >
-                  👁️ Previsualizar PDF
+                  👁️ Previsualizar Orçamento
                 </button>
 
                 <button
-                  onClick={() => {
-                    // Create a shorter, cleaner URL
-                    const baseUrl = 'https://aibora.pt/proposta';
-                    let shortParams = '';
-                    
-                    // Essential params only
-                    if (cliente.nome) {
-                      const baseUrl = 'https://aibora.pt/proposta';
-                      // Only name and essential values
-                      let shortUrl = baseUrl + '?n=' + encodeURIComponent(cliente.nome.toLowerCase().replace(/\s+/g, '-'));
-                      if (marcas.length > 1) shortUrl += '&m=' + marcas.length;
-                      if (totalConDescuento > 0) shortUrl += '&v=' + Math.round(totalConDescuento);
-                      if (descuentoAplicado > 0) shortUrl += '&d=' + Math.round(descuentoAplicado);
-                      navigator.clipboard.writeText(shortUrl).then(() => {
-                        alert('Link copiado! ' + shortUrl);
-                      });
-                    }
-                  }}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#1A1A1A", color: "#ffffff", border: "2px solid #1A1A1A", transition: "all 0.2s ease", marginBottom: 12 }}
+                  onClick={gerarPDF}
+                  disabled={!podeGerar}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F22283" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
                 >
-                  🔗 Copiar Link da Proposta
-                </button>
-
-                <button
-                  onClick={() => {
-                    const params = new URLSearchParams();
-                    if (cliente.nome) params.set('nome', encodeURIComponent(cliente.nome));
-                    if (cliente.empresa) params.set('empresa', encodeURIComponent(cliente.empresa));
-                    if (cliente.email) params.set('email', encodeURIComponent(cliente.email));
-                    if (marcas[0]?.servicos.length > 0) params.set('servicos', encodeURIComponent(JSON.stringify(marcas[0].servicos)));
-                    if (marcas[0]?.nome) params.set('marca', encodeURIComponent(marcas[0].nome));
-                    params.set('valor', totalConDescuento.toFixed(2));
-                    params.set('subtotal', subtotalComDesconto.toFixed(2));
-                    params.set('iva', ivaComDesconto.toFixed(2));
-                    params.set('desconto', descuentoAplicado.toFixed(2));
-                    params.set('marcas', marcas.length.toString());
-                    params.set('valorPorMarca', porMarcaSemIVA.toFixed(2));
-                    window.open('/proposta.html?' + params.toString(), '_blank');
-                  }}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#F25C05", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
-                >
-                  💼 Ver Proposta Comercial
+                  📄 Gerar PDF do Orçamento
                 </button>
 
                 <button
@@ -1003,6 +958,9 @@ export function Orcamento() {
                       return;
                     }
                     try {
+                      const doc = await criarPDF();
+                      const pdfBlob = doc.output('blob');
+                      
                       const proposalData = {
                         cliente: cliente.nome,
                         empresa: cliente.empresa || '',
@@ -1016,31 +974,30 @@ export function Orcamento() {
                         valorPorMarca: porMarcaSemIVA,
                         servicos: marcas[0]?.servicos || [],
                         redes: marcas.map(m => ({ nome: m.nome, redes: m.redes })),
-                        numeroOrcamento: numeroOrcamento
+                        numeroOrcamento: numeroOrcamento,
+                        dataCriacao: dataCriacaoStr,
+                        dataValidade: dataValidadeStr,
+                        temOrcamentoPDF: true
                       };
                       const id = await createProposal(proposalData);
+                      
                       const link = `https://aibora.pt/p/${id}`;
                       navigator.clipboard.writeText(link).then(() => {
-                        alert(`✅ Proposta salva! Link único:\n${link}\n\nLink copiado para clipboard!`);
+                        const pdfUrl = URL.createObjectURL(pdfBlob);
+                        window.open(pdfUrl, '_blank');
+                        setTimeout(() => {
+                          alert(`✅ Proposta guardada! Link único copiado:\n${link}\n\nO PDF do orçamento também foi aberto.`);
+                        }, 500);
                       });
                     } catch (err) {
                       console.error(err);
-                      alert("Erro ao salvar proposta: " + err.message);
+                      alert("Erro ao guardar proposta: " + err.message);
                     }
                   }}
                   disabled={!podeGerar}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#10B981" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "16px", borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F25C05" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease" }}
                 >
-                  <Save size={16} style={{ marginRight: 6 }} />
                   💾 Guardar Proposta (Link Único)
-                </button>
-
-                <button
-                  onClick={gerarPropostaPDF}
-                  disabled={!podeGerar}
-                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F22283" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease" }}
-                >
-                  📥 Download Proposta em PDF
                 </button>
 
                 <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 10, color: "#888", textAlign: "center", marginTop: 12 }}>

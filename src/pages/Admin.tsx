@@ -101,9 +101,14 @@ export function Admin() {
                 {proposals.length} proposta{proposals.length !== 1 ? "s" : ""}
               </p>
             </div>
-            <button onClick={loadProposals} style={{ fontFamily: "Montserrat, sans-serif", padding: "10px 20px", borderRadius: 8, backgroundColor: "#1A1A1A", color: "#fff", border: "none", fontWeight: 600, cursor: "pointer" }}>
-              🔄 Atualizar
-            </button>
+            <div style={{ display: "flex", gap: 12 }}>
+              <a href="/admin/orcamento" style={{ fontFamily: "Montserrat, sans-serif", padding: "10px 20px", borderRadius: 8, backgroundColor: "#F25C05", color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                ➕ Novo Orçamento
+              </a>
+              <button onClick={loadProposals} style={{ fontFamily: "Montserrat, sans-serif", padding: "10px 20px", borderRadius: 8, backgroundColor: "#1A1A1A", color: "#fff", border: "none", fontWeight: 600, cursor: "pointer" }}>
+                🔄 Atualizar
+              </button>
+            </div>
           </div>
 
           {loading ? (

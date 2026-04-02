@@ -23,6 +23,7 @@ export default function App() {
       <Route path="/privacidade" component={Privacidade} />
       <Route path="/termos" component={Termos} />
       <Route path="/orcamento" component={Orcamento} />
+      <Route path="/admin/orcamento" component={Orcamento} />
       <Route path="/p/:id" component={PropostaPage} />
       <Route path="/admin" component={Admin} />
       <Route>
