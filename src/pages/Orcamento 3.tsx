@@ -645,6 +645,29 @@ Equipa AI BORA
                   Enviar por Email
                 </button>
 
+                <button
+                  onClick={() => window.open('/proposta.html', '_blank')}
+                  style={{
+                    width: "100%",
+                    padding: "14px",
+                    borderRadius: 10,
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    border: "1px solid #1A1A1A",
+                    backgroundColor: "#1A1A1A",
+                    color: "#ffffff",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  📄 Ver Proposta Comercial
+                </button>
+
                 {selecionados.length > 0 && (
                   <button 
                     onClick={() => setSelecionados([])} 
