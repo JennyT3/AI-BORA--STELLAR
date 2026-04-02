@@ -6,7 +6,7 @@ import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Labs } from "./pages/Labs";
 import { Prompts } from "./pages/Prompts";
-import { Orcamento } from "./pages/Orcamento 3";
+import { Orcamento } from "./pages/Orcamento";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
