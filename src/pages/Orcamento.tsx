@@ -53,6 +53,8 @@ const SERVICOS_POR_CATEGORIA: Record<string, string[]> = {
 export function Orcamento() {
   const [numeroOrcamentoInput, setNumeroOrcamentoInput] = useState("ORC-0001");
   const [precoTotal, setPrecoTotal] = useState<number>(0);
+  const [descontoPercent, setDescontoPercent] = useState<number>(0);
+  const [descontoValor, setDescontoValor] = useState<number>(0);
   const [marcas, setMarcas] = useState<MarcaData[]>([
     { id: "1", nome: "", redes: [], servicos: [] }
   ]);
@@ -68,7 +70,11 @@ export function Orcamento() {
   const numeroOrcamento = numeroOrcamentoInput || "ORC-0001";
   const subtotal = precoTotal > 0 ? precoTotal / (1 + IVA_TAXA) : 0;
   const iva = precoTotal > 0 ? precoTotal - subtotal : 0;
-  const total = precoTotal;
+  const descontoPercentValor = subtotal * (descontoPercent / 100);
+  const descontoTotal = descontoPercentValor + descontoValor;
+  const totalComDesconto = precoTotal - (descontoTotal * 1.23);
+  const ivaComDesconto = totalComDesconto - (totalComDesconto / 1.23);
+  const total = totalComDesconto > 0 ? totalComDesconto : precoTotal;
   const porMarca = marcas.length > 0 ? subtotal / marcas.length : 0;
 
   const toggleRede = (marcaId: string, redeId: string) => {
@@ -110,21 +116,43 @@ export function Orcamento() {
     return `data:image/svg+xml;base64,${encoded}`;
   };
 
-  const criarPDF = async () => {
+  const loadImageAsBase64 = async (url: string): Promise<string | null> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch { return null; }
+  };
+
+  const criarPDF = async (): Promise<jsPDF> => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pW = 210;
     const pH = 297;
-
+    
+    const logoBase64 = await loadImageAsBase64("/logo.png");
+    
     const redeIconMap: Record<string, string> = {};
     for (const rede of REDES) {
       redeIconMap[rede.id] = svgToBase64(rede.svg);
     }
 
+    // HEADER blanco con línea naranja sutil
     doc.setFillColor(255, 255, 255);
     doc.rect(0, 0, pW, 38, "F");
     doc.setFillColor(242, 92, 5);
     doc.rect(0, 37.5, pW, 0.8, "F");
 
+    // Logo 1:1 — 24×24 mm
+    if (logoBase64) {
+      doc.addImage(logoBase64, "PNG", 12, 7, 24, 24);
+    }
+
+    // "AI BORA" en negro
     doc.setTextColor(26, 26, 26);
     doc.setFontSize(17);
     doc.setFont("helvetica", "bold");
@@ -135,6 +163,7 @@ export function Orcamento() {
     doc.setTextColor(140, 140, 140);
     doc.text("Marketing Digital & Criativo", 40, 24);
 
+    // Bloque derecha: ORÇAMENTO + Nº + Data + Válido até
     doc.setTextColor(26, 26, 26);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -143,10 +172,11 @@ export function Orcamento() {
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(90, 90, 90);
-    doc.text(`Nº ${numeroOrcamento}`, 198, 20, { align: "right" });
-    doc.text(`Data: ${dataCriacaoStr}`, 198, 26, { align: "right" });
-    doc.text(`Válido até: ${dataValidadeStr}`, 198, 32, { align: "right" });
+    doc.text("Nº " + numeroOrcamento, 198, 20, { align: "right" });
+    doc.text("Data: " + dataCriacaoStr, 198, 26, { align: "right" });
+    doc.text("Válido até: " + dataValidadeStr, 198, 32, { align: "right" });
 
+    // DADOS DO CLIENTE
     let y = 46;
 
     doc.setFontSize(7.5);
@@ -178,8 +208,8 @@ export function Orcamento() {
     lbl("Telefone:", cliente.telefone, 18, y + 24);
     lbl("Morada:", cliente.morada, 107, y + 24);
 
+    // MARCAS E SERVIÇOS
     y += 40;
-
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(242, 92, 5);
@@ -187,25 +217,24 @@ export function Orcamento() {
     doc.setDrawColor(242, 92, 5);
     doc.setLineWidth(0.4);
     doc.line(14, y + 1.5, 196, y + 1.5);
-
     y += 7;
 
     for (let mi = 0; mi < marcas.length; mi++) {
       const marca = marcas[mi];
-
       if (y > 248) { doc.addPage(); y = 18; }
 
+      // Barra naranja: MARCA: NOME
       const subtotalMarca = marcas.length > 0 ? subtotal / marcas.length : 0;
       doc.setFillColor(242, 92, 5);
       doc.rect(14, y, 182, 9, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(8.5);
       doc.setFont("helvetica", "bold");
-      const nomeMarca = marca.nome ? marca.nome.toUpperCase() : `MARCA ${mi + 1}`;
-      doc.text(`MARCA: ${nomeMarca}`, 18, y + 6.2);
-
+      const nomeMarca = marca.nome ? marca.nome.toUpperCase() : "MARCA " + (mi + 1);
+      doc.text("MARCA: " + nomeMarca, 18, y + 6.2);
       y += 13;
 
+      // Redes sociais com ícones coloridos
       if (marca.redes.length > 0) {
         doc.setFontSize(7);
         doc.setFont("helvetica", "bold");
@@ -231,10 +260,11 @@ export function Orcamento() {
         y += 10;
       }
 
+      // Tabela de serviços com preço no encabezado
       if (marca.servicos.length > 0) {
-        autoTable(doc as any, {
+        autoTable(doc, {
           startY: y,
-          head: [["#", "Serviços Incluídos", `${subtotalMarca.toFixed(2)} € s/ IVA`]],
+          head: [["#", "Serviços Incluídos", subtotalMarca.toFixed(2) + " € s/ IVA"]],
           body: marca.servicos.map((s, i) => [(i + 1).toString(), s, ""]),
           theme: "plain",
           headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 7.5, fontStyle: "bold", cellPadding: 3 },
@@ -255,12 +285,11 @@ export function Orcamento() {
         doc.text("Serviços a definir conforme proposta comercial", 18, y + 5.5);
         y += 14;
       }
-
       y += 3;
     }
 
+    // RESUMO FINANCEIRO
     if (y > 235) { doc.addPage(); y = 18; }
-
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(242, 92, 5);
@@ -268,9 +297,9 @@ export function Orcamento() {
     doc.setDrawColor(242, 92, 5);
     doc.setLineWidth(0.4);
     doc.line(14, y + 1.5, 196, y + 1.5);
-
     y += 7;
 
+    // Caixa laranja — total
     doc.setFillColor(242, 92, 5);
     doc.roundedRect(120, y, 76, 22, 3, 3, "F");
     doc.setTextColor(255, 255, 255);
@@ -279,10 +308,10 @@ export function Orcamento() {
     doc.text("TOTAL MENSAL (c/ IVA 23%)", 158, y + 7, { align: "center" });
     doc.setFontSize(17);
     doc.setFont("helvetica", "bold");
-    doc.text(`${total.toFixed(2)} €`, 194, y + 18, { align: "right" });
+    doc.text(total.toFixed(2) + " €", 194, y + 18, { align: "right" });
 
     let ty = y + 4;
-    const linhaFin = (label: string, valor: string, bold: boolean = false, cor: [number,number,number] = [80,80,80]) => {
+    const linhaFin = (label: string, valor: string, bold: boolean, cor: [number,number,number]) => {
       doc.setFontSize(8.5);
       doc.setFont("helvetica", bold ? "bold" : "normal");
       doc.setTextColor(cor[0], cor[1], cor[2]);
@@ -294,16 +323,18 @@ export function Orcamento() {
       ty += 7;
     };
 
-    linhaFin("Subtotal (sem IVA):", `${subtotal.toFixed(2)} €`);
-    linhaFin("IVA (23%):", `${iva.toFixed(2)} €`);
-    linhaFin("TOTAL A PAGAR:", `${total.toFixed(2)} €`, true, [242,92,5]);
+    linhaFin("Subtotal (sem IVA):", subtotal.toFixed(2) + " €", false, [80,80,80]);
+    if (descontoTotal > 0) {
+      linhaFin("Desconto:", "- " + descontoTotal.toFixed(2) + " €", false, [242,92,5]);
+    }
+    linhaFin("IVA (23%):", (total - (total/1.23)).toFixed(2) + " €", false, [80,80,80]);
+    linhaFin("TOTAL A PAGAR:", total.toFixed(2) + " €", true, [242,92,5]);
 
+    // CONDIÇÕES COMERCIAIS
     ty += 6;
     if (ty > 238) { doc.addPage(); ty = 18; }
-
     doc.setFillColor(247, 245, 243);
     doc.rect(14, ty, 182, 54, "F");
-
     doc.setFontSize(7.5);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(26, 26, 26);
@@ -313,10 +344,10 @@ export function Orcamento() {
     doc.line(18, ty + 10, 192, ty + 10);
 
     const conds = [
-      `Âmbito: Prestação de serviços conforme detalhado acima para ${marcas.length} marca${marcas.length > 1 ? "s" : ""}.`,
+      "Âmbito: Prestação de serviços conforme detalhado acima para " + marcas.length + " marca" + (marcas.length > 1 ? "s" : "") + ".",
       "Período: 3 meses experimentais + contrato anual renovável automaticamente.",
       "Pagamento: Mensal, por transferência bancária ou débito direto até ao dia 5 de cada mês.",
-      `Validade: Orçamento válido até ${dataValidadeStr} (10 dias corridos a partir da emissão).`,
+      "Validade: Orçamento válido até " + dataValidadeStr + " (10 dias corridos a partir da emissão).",
       "Rescisão: Aviso prévio de 30 dias após o período experimental, por escrito.",
       "Propriedade Intelectual: Todo o conteúdo criado é propriedade do cliente após liquidação total.",
     ];
@@ -326,10 +357,11 @@ export function Orcamento() {
     doc.setTextColor(60, 60, 60);
     let cy = ty + 17;
     conds.forEach(c => {
-      doc.text(`•  ${c}`, 18, cy, { maxWidth: 174 });
+      doc.text("•  " + c, 18, cy, { maxWidth: 174 });
       cy += 6.5;
     });
 
+    // FOOTER todas as páginas
     const totalPages = (doc as any).internal.getNumberOfPages();
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);
@@ -344,9 +376,164 @@ export function Orcamento() {
       doc.setTextColor(160, 160, 160);
       doc.text("Este orçamento não constitui fatura. Sujeito à aceitação formal por escrito.", 105, pH - 7, { align: "center" });
       doc.setTextColor(190, 190, 190);
-      doc.text(`${p} / ${totalPages}`, 196, pH - 7, { align: "right" });
+      doc.text(p + " / " + totalPages, 196, pH - 7, { align: "right" });
     }
 
+    return doc;
+  };
+
+  const criarPropostaPDF = async (): Promise<jsPDF> => {
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pW = 210;
+    const pH = 297;
+    
+    const logoBase64 = await loadImageAsBase64("/logo.png");
+    
+    // HEADER
+    doc.setFillColor(26, 26, 26);
+    doc.rect(0, 0, pW, 45, "F");
+    
+    if (logoBase64) {
+      doc.addImage(logoBase64, "PNG", 15, 10, 25, 25);
+    }
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("AI BORA", 45, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(200, 200, 200);
+    doc.text("Marketing Digital & Criativo", 45, 28);
+    
+    doc.setTextColor(242, 92, 5);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("PROPOSTA COMERCIAL", 198, 20, { align: "right" });
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text("Nº " + numeroOrcamento, 198, 28, { align: "right" });
+    doc.text("Data: " + dataCriacaoStr, 198, 34, { align: "right" });
+    doc.text("Validade: " + dataValidadeStr, 198, 40, { align: "right" });
+    
+    // CLIENTE
+    let y = 55;
+    doc.setFillColor(247, 245, 243);
+    doc.rect(14, y, 182, 30, "F");
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(242, 92, 5);
+    doc.text("DADOS DO CLIENTE", 18, y + 8);
+    
+    doc.setFontSize(11);
+    doc.setTextColor(26, 26, 26);
+    doc.text(cliente.nome || "—", 18, y + 18);
+    if (cliente.empresa) {
+      doc.setTextColor(100, 100, 100);
+      doc.text(cliente.empresa, 18, y + 25);
+    }
+    
+    if (cliente.email) {
+      doc.setTextColor(100, 100, 100);
+      doc.text(cliente.email, 110, y + 18);
+    }
+    if (cliente.telefone) {
+      doc.text(cliente.telefone, 110, y + 25);
+    }
+    
+    // INVESTIMENTO
+    y += 38;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(242, 92, 5);
+    doc.text("INVESTIMENTO MENSAL", 14, y);
+    doc.setDrawColor(242, 92, 5);
+    doc.setLineWidth(0.5);
+    doc.line(14, y + 2, 196, y + 2);
+    
+    y += 10;
+    doc.setFillColor(242, 92, 5);
+    doc.roundedRect(14, y, 182, 25, 3, 3, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.text("VALOR MENSAL (COM IVA)", 105, y + 10, { align: "center" });
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text(total.toFixed(2) + " €", 196, y + 20, { align: "right" });
+    
+    // Valor sem IVA
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`(${ (subtotal - descontoTotal).toFixed(2) } € sem IVA)`, 105, y + 32, { align: "center" });
+    
+    // SERVIÇOS
+    y += 40;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(242, 92, 5);
+    doc.text("SERVIÇOS INCLUÍDOS", 14, y);
+    doc.setDrawColor(242, 92, 5);
+    doc.line(14, y + 2, 196, y + 2);
+    
+    y += 8;
+    if (marcas[0]?.servicos && marcas[0].servicos.length > 0) {
+      autoTable(doc, {
+        startY: y,
+        head: [["#", "Serviço", "Descrição"]],
+        body: marcas[0].servicos.map((s, i) => [i + 1, s, ""]),
+        theme: "plain",
+        headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 9, fontStyle: "bold", cellPadding: 4 },
+        bodyStyles: { fontSize: 9, textColor: [40, 40, 40], cellPadding: 4 },
+        columnStyles: { 0: { cellWidth: 10, halign: "center" }, 1: { cellWidth: 80 }, 2: { cellWidth: 92 } },
+        alternateRowStyles: { fillColor: [250, 248, 246] },
+        margin: { left: 14, right: 14 },
+      });
+      y = (doc as any).lastAutoTable?.finalY + 10;
+    }
+    
+    // CONDIÇÕES
+    if (y > 200) { doc.addPage(); y = 20; }
+    doc.setFillColor(247, 245, 243);
+    doc.rect(14, y, 182, 45, "F");
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(26, 26, 26);
+    doc.text("CONDIÇÕES COMERCIAIS", 18, y + 8);
+    doc.setDrawColor(242, 92, 5);
+    doc.setLineWidth(0.3);
+    doc.line(18, y + 10, 192, y + 10);
+    
+    const conds = [
+      "Período experimental de 3 meses.",
+      "Contrato anual renovável automaticamente.",
+      "Pagamento mensal até ao dia 5 de cada mês.",
+      "Validade da proposta: 10 dias.",
+    ];
+    
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(60, 60, 60);
+    let cy = y + 16;
+    conds.forEach(c => {
+      doc.text("•  " + c, 18, cy);
+      cy += 7;
+    });
+    
+    // FOOTER
+    const totalPages = (doc as any).internal.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.3);
+      doc.line(14, pH - 15, 196, pH - 15);
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text("AI BORA, Lda  |  NIF: 319918645  |  helloaibora@proton.me  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 10, { align: "center" });
+    }
+    
     return doc;
   };
 
@@ -370,231 +557,329 @@ export function Orcamento() {
     <div className="min-h-screen bg-bg">
       <Navbar />
       <main className="pt-20">
-        <section className="py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h1 className="font-display font-black text-4xl md:text-5xl mb-4 text-text-primary">
-                Gerador de <span className="text-fuchsia-brand">Orçamentos</span> Profissionais
-              </h1>
-              <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-                Configura cada marca com as suas redes sociais e serviços. Gera um PDF profissional em segundos.
-              </p>
-            </div>
+        <section style={{ backgroundColor: "#1A1A1A", padding: "80px 16px 60px" }}>
+          <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
+            <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff", lineHeight: 1.1, margin: "0 0 16px" }}>
+              Gerador de <span style={{ color: "#F22283" }}>Orçamentos</span> Profissionais
+            </h1>
+            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 16, color: "#aaaaaa", margin: 0, lineHeight: 1.5 }}>
+              Configura cada marca com as suas redes sociais e serviços. Gera um PDF profissional em segundos.
+            </p>
+          </div>
+        </section>
 
-            <div className="flex flex-col lg:flex-row gap-8">
-              <div className="lg:w-1/3">
-                <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-24">
-                  <h3 className="font-display font-bold text-xl mb-6 text-text-primary">Resumo</h3>
+        <section style={{ backgroundColor: "#ffffff", padding: "64px 16px" }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 32, alignItems: "flex-start", flexWrap: "wrap" }}>
 
-                  <div className="bg-f5 rounded-xl p-4 mb-4">
-                    <label className="block text-xs font-bold text-gray mb-2 uppercase tracking-wide">Nº Orçamento</label>
+            <div style={{ flex: "1 1 600px" }}>
+              <div style={{ marginBottom: 40 }}>
+                <div style={{ width: 36, height: 3, backgroundColor: "#F25C05", marginBottom: 16, borderRadius: 2 }} />
+                <h2 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(22px, 4vw, 32px)", color: "#1A1A1A", margin: "0 0 8px" }}>
+                  Seleciona os Serviços
+                </h2>
+                <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: "#4A4A4A", margin: 0 }}>
+                  Clica nos serviços para adicionares ao teu orçamento personalizado
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+                {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
+                  const catInfo = [
+                    { nome: "Marketing", icon: "📱" },
+                    { nome: "Design", icon: "🎨" },
+                    { nome: "Web", icon: "💻" },
+                    { nome: "Multimédia", icon: "🎬" },
+                    { nome: "Publicidade", icon: "📢" },
+                    { nome: "Automação", icon: "⚡" },
+                    { nome: "Consultoria", icon: "📊" },
+                  ].find(c => c.nome === categoria);
+                  
+                  return (
+                    <div key={categoria} style={{ backgroundColor: "#F5F2F0", borderRadius: 16, padding: "20px", display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 24 }}>{catInfo?.icon}</span>
+                        <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 800, fontSize: 15, color: "#1A1A1A" }}>{categoria}</span>
+                      </div>
+                      <div style={{ height: 1, backgroundColor: "#e0ddd9" }} />
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                        {servicos.map((s) => {
+                          const sel = marcas[0]?.servicos.includes(s);
+                          return (
+                            <button 
+                              key={s} 
+                              onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)}
+                              style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, backgroundColor: sel ? "#F22283" : "#ffffff", color: sel ? "#ffffff" : "#1A1A1A", border: sel ? "1px solid #F22283" : "1px solid rgba(0,0,0,0.10)", borderRadius: 20, padding: "5px 12px", cursor: "pointer", transition: "all 0.15s ease" }}>
+                              {sel ? "✓ " : ""}{s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: 32, backgroundColor: "#F5F2F0", borderRadius: 16, padding: 24 }}>
+                <h3 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 800, fontSize: 16, color: "#1A1A1A", margin: "0 0 16px" }}>
+                  🏷️ Marcas e Redes Sociais
+                </h3>
+                {marcas.map((marca, idx) => (
+                  <div key={marca.id} style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 16, marginBottom: 12, border: "1px solid #e0ddd9" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, color: "#1A1A1A" }}>Marca {idx + 1}</span>
+                      {marcas.length > 1 && (
+                        <button onClick={() => removerMarca(marca.id)} style={{ background: "none", border: "none", color: "#F22283", cursor: "pointer", fontSize: 18, padding: "0 4px" }}>✕</button>
+                      )}
+                    </div>
                     <input
                       type="text"
-                      value={numeroOrcamentoInput}
-                      onChange={e => setNumeroOrcamentoInput(e.target.value.toUpperCase())}
-                      placeholder="ORC-0001"
-                      className="w-full p-3 rounded-lg border-2 border-black font-bold text-center text-lg uppercase tracking-wider outline-none"
+                      value={marca.nome}
+                      onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))}
+                      placeholder="Nome da marca"
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, marginBottom: 12, outline: "none" }}
                     />
-                    <p className="text-xs text-gray text-center mt-2">Define o número manualmente</p>
-                  </div>
-
-                  <div className="bg-f5 rounded-xl p-4 mb-4">
-                    <label className="block text-xs font-bold text-gray mb-2 uppercase tracking-wide">Valor Total (com IVA)</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={precoTotal || ""}
-                        onChange={e => setPrecoTotal(Number(e.target.value))}
-                        placeholder="0.00"
-                        className="flex-1 p-4 rounded-lg border-2 border-black font-bold text-2xl text-right outline-none"
-                      />
-                      <span className="font-bold text-2xl">€</span>
-                    </div>
-                    <p className="text-xs text-gray mt-2 text-center">Ex: 1000€ total = 813.01€ (subtotal) + 186.99€ (IVA 23%)</p>
-                  </div>
-
-                  {marcas.map((marca, idx) => (
-                    <div key={marca.id} className="bg-f5 rounded-xl p-4 mb-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="font-bold text-sm">Marca {idx + 1}</span>
-                        {marcas.length > 1 && (
-                          <button onClick={() => removerMarca(marca.id)} className="text-red-500 hover:text-red-700">
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-                      <input
-                        type="text"
-                        value={marca.nome}
-                        onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))}
-                        placeholder="Nome da marca"
-                        className="w-full p-2 rounded-lg border border-gray-200 text-sm mb-3 outline-none focus:border-fuchsia-brand"
-                      />
-                      <p className="text-xs font-semibold text-gray mb-2">Redes Sociais:</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {REDES.map(rede => (
+                    <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", marginBottom: 8 }}>Redes Sociais:</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {REDES.map(rede => {
+                        const isSelected = marca.redes.includes(rede.id);
+                        return (
                           <button
                             key={rede.id}
                             onClick={() => toggleRede(marca.id, rede.id)}
-                            className={`px-2 py-1 rounded-full text-xs font-semibold transition-all ${marca.redes.includes(rede.id) ? 'text-white' : 'bg-white text-gray-700 border'}`}
-                            style={marca.redes.includes(rede.id) ? { backgroundColor: rede.cor } : {}}
+                            style={{ fontFamily: "Montserrat, sans-serif", fontSize: 10, fontWeight: 600, backgroundColor: isSelected ? rede.cor : "#ffffff", color: isSelected ? "#ffffff" : "#1A1A1A", border: isSelected ? "none" : "1px solid #ddd", borderRadius: 20, padding: "6px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, transition: "all 0.15s ease" }}
                           >
+                            <span dangerouslySetInnerHTML={{ __html: rede.svg.replace('width="20" height="20"', 'width="14" height="14"') }} />
                             {rede.nome}
                           </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-
-                  <button onClick={adicionarMarca} className="w-full p-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-500 font-semibold flex items-center justify-center gap-2 hover:border-fuchsia-brand hover:text-fuchsia-brand transition-colors mb-4">
-                    <Plus size={18} /> Adicionar Marca
-                  </button>
-
-                  <div className="bg-white rounded-xl p-4 mb-4">
-                    <div className="flex justify-between py-2 text-sm text-gray border-b border-dashed border-gray-200">
-                      <span>Subtotal (sem IVA)</span>
-                      <span className="font-semibold">{subtotal.toFixed(2)} €</span>
-                    </div>
-                    <div className="flex justify-between py-2 text-sm text-gray border-b border-dashed border-gray-200">
-                      <span>IVA (23%)</span>
-                      <span className="font-semibold">{iva.toFixed(2)} €</span>
-                    </div>
-                    <div className="flex justify-between py-3 text-xl font-black text-fuchsia-brand">
-                      <span>TOTAL</span>
-                      <span>{total.toFixed(2)} €</span>
+                        );
+                      })}
                     </div>
                   </div>
-
-                  <div className="bg-f5 rounded-xl p-4 mb-4 text-xs text-gray leading-relaxed">
-                    <strong className="text-text-primary">Condições:</strong><br />
-                    • 3 meses período experimental<br />
-                    • Contrato anual após período<br />
-                    • Pagamento mensal<br />
-                    • Validade: 30 dias
-                  </div>
-
-                  <button
-                    onClick={gerarPDF}
-                    disabled={!podeGerar}
-                    className={`w-full p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all mb-3 ${podeGerar ? 'bg-fuchsia-brand text-white hover:bg-fuchsia-600' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-                  >
-                    <FileText size={18} />
-                    Gerar PDF do Orçamento
-                  </button>
-
-                  <button
-                    onClick={() => window.open('/proposta.html', '_blank')}
-                    className="w-full p-4 rounded-xl font-bold border-2 border-black bg-black text-white flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
-                  >
-                    📄 Ver Proposta Comercial
-                  </button>
-
-                  <p className="text-xs text-gray text-center mt-4">
-                    Orçamento válido por 30 dias. Sujeito a disponibilidade de agenda.
-                  </p>
-                </div>
+                ))}
+                <button onClick={adicionarMarca} style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "12px", borderRadius: 10, border: "2px dashed #ccc", backgroundColor: "transparent", color: "#666", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all 0.15s ease" }}>
+                  <Plus size={16} /> Adicionar Marca
+                </button>
               </div>
 
-              <div className="lg:w-2/3 space-y-6">
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <User size={24} className="text-fuchsia-brand" />
-                    <h3 className="font-display font-bold text-xl text-text-primary">Dados do Cliente</h3>
-                  </div>
+              <div style={{ marginTop: 32, backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e0ddd9" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                  <User size={24} color="#F22283" />
+                  <h3 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 800, fontSize: 18, color: "#1A1A1A", margin: 0 }}>Dados do Cliente</h3>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">Nome Completo *</label>
-                      <input
-                        type="text"
-                        value={cliente.nome}
-                        onChange={e => setCliente({...cliente, nome: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="Ex: João Silva"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">Empresa</label>
-                      <input
-                        type="text"
-                        value={cliente.empresa}
-                        onChange={e => setCliente({...cliente, empresa: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="Ex: Empresa, Lda"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">Email *</label>
-                      <input
-                        type="email"
-                        value={cliente.email}
-                        onChange={e => setCliente({...cliente, email: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="joao@empresa.pt"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">Telefone</label>
-                      <input
-                        type="tel"
-                        value={cliente.telefone}
-                        onChange={e => setCliente({...cliente, telefone: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="+351 912 345 678"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">NIF</label>
-                      <input
-                        type="text"
-                        value={cliente.nif}
-                        onChange={e => setCliente({...cliente, nif: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="123456789"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray mb-2">Morada</label>
-                      <input
-                        type="text"
-                        value={cliente.morada}
-                        onChange={e => setCliente({...cliente, morada: e.target.value})}
-                        className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:border-fuchsia-brand"
-                        placeholder="Rua Example, 123, Lisboa"
-                      />
-                    </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Nome Completo *</label>
+                    <input
+                      type="text"
+                      value={cliente.nome}
+                      onChange={e => setCliente({...cliente, nome: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="Ex: João Silva"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Empresa</label>
+                    <input
+                      type="text"
+                      value={cliente.empresa}
+                      onChange={e => setCliente({...cliente, empresa: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="Ex: Empresa, Lda"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Email *</label>
+                    <input
+                      type="email"
+                      value={cliente.email}
+                      onChange={e => setCliente({...cliente, email: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="joao@empresa.pt"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Telefone</label>
+                    <input
+                      type="tel"
+                      value={cliente.telefone}
+                      onChange={e => setCliente({...cliente, telefone: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="+351 912 345 678"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>NIF</label>
+                    <input
+                      type="text"
+                      value={cliente.nif}
+                      onChange={e => setCliente({...cliente, nif: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="123456789"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Morada</label>
+                    <input
+                      type="text"
+                      value={cliente.morada}
+                      onChange={e => setCliente({...cliente, morada: e.target.value})}
+                      style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, outline: "none" }}
+                      placeholder="Rua Example, 123, Lisboa"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ flex: "0 1 320px", position: "sticky", top: 100 }}>
+              <div style={{ backgroundColor: "#F5F2F0", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+                <h3 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 16, color: "#1A1A1A", margin: "0 0 16px" }}>
+                  📋 Resumo do Orçamento
+                </h3>
+
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Nº Orçamento</label>
+                  <input
+                    type="text"
+                    value={numeroOrcamentoInput}
+                    onChange={e => setNumeroOrcamentoInput(e.target.value.toUpperCase())}
+                    placeholder="ORC-0001"
+                    style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "10px 12px", borderRadius: 8, border: "2px solid #1A1A1A", fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="number"
+                      value={precoTotal || ""}
+                      onChange={e => setPrecoTotal(Number(e.target.value))}
+                      placeholder="0.00"
+                      style={{ fontFamily: "Montserrat, sans-serif", flex: 1, padding: "12px", borderRadius: 8, border: "2px solid #1A1A1A", fontSize: 18, fontWeight: 700, textAlign: "right", outline: "none" }}
+                    />
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 18, color: "#1A1A1A" }}>€</span>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                  <h3 className="font-display font-bold text-xl mb-6 text-text-primary">Seleciona os Serviços</h3>
-
-                  {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => (
-                    <div key={categoria} className="mb-6">
-                      <h4 className="font-bold text-lg text-text-primary mb-3">{categoria}</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {servicos.map(servico => (
-                          <button
-                            key={servico}
-                            onClick={() => {
-                              if (marcas.length === 1) {
-                                toggleServico(marcas[0].id, servico);
-                              }
-                            }}
-                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                              marcas[0]?.servicos.includes(servico)
-                                ? 'bg-fuchsia-brand text-white'
-                                : 'bg-f5 text-text-secondary hover:bg-pink-100'
-                            }`}
-                          >
-                            {marcas[0]?.servicos.includes(servico) && <Check size={12} className="inline mr-1" />}
-                            {servico}
-                          </button>
-                        ))}
-                      </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontFamily: "Montserrat, sans-serif", fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Desconto</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}>
+                      <input
+                        type="number"
+                        value={descontoPercent || ""}
+                        onChange={e => setDescontoPercent(Number(e.target.value))}
+                        placeholder="0"
+                        style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #ddd", fontSize: 13, textAlign: "right" }}
+                      />
+                      <span style={{ fontSize: 12, color: "#666" }}>%</span>
                     </div>
-                  ))}
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}>
+                      <input
+                        type="number"
+                        value={descontoValor || ""}
+                        onChange={e => setDescontoValor(Number(e.target.value))}
+                        placeholder="0"
+                        style={{ fontFamily: "Montserrat, sans-serif", width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #ddd", fontSize: 13, textAlign: "right" }}
+                      />
+                      <span style={{ fontSize: 12, color: "#666" }}>€</span>
+                    </div>
+                  </div>
+                  {(descontoPercent > 0 || descontoValor > 0) && (
+                    <div style={{ fontSize: 10, color: "#F25C05", marginTop: 4 }}>
+                      Desconto total: {descontoTotal.toFixed(2)} € (sem IVA)
+                    </div>
+                  )}
                 </div>
+
+                <div style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>Subtotal (sem IVA)</span>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{(subtotal - descontoTotal).toFixed(2)} €</span>
+                  </div>
+                  {descontoTotal > 0 && (
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9", color: "#F25C05" }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>Desconto</span>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600 }}>- {descontoTotal.toFixed(2)} €</span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px dashed #e0ddd9" }}>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, color: "#666" }}>IVA (23%)</span>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 12, fontWeight: 600, color: "#1A1A1A" }}>{(total > 0 ? total - (total/1.23) : 0).toFixed(2)} €</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>TOTAL</span>
+                    <span style={{ fontFamily: "Montserrat, sans-serif", fontSize: 18, fontWeight: 900, color: "#F22283" }}>{total.toFixed(2)} €</span>
+                  </div>
+                </div>
+
+                <div style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 12, marginBottom: 16, fontSize: 11, color: "#666", lineHeight: 1.6 }}>
+                  <strong style={{ color: "#1A1A1A", fontFamily: "Montserrat, sans-serif" }}>Condições:</strong><br />
+                  <span style={{ fontFamily: "Montserrat, sans-serif" }}>• 3 meses período experimental</span><br />
+                  <span style={{ fontFamily: "Montserrat, sans-serif" }}>• Contrato anual renovável</span><br />
+                  <span style={{ fontFamily: "Montserrat, sans-serif" }}>• Pagamento mensal</span><br />
+                  <span style={{ fontFamily: "Montserrat, sans-serif" }}>• Validade: 30 dias</span>
+                </div>
+
+                <button
+                  onClick={gerarPDF}
+                  disabled={!podeGerar}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#F22283" : "#cccccc", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
+                >
+                  📄 Gerar PDF do Orçamento
+                </button>
+
+                <button
+                  onClick={async () => {
+                    const doc = await criarPDF();
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    window.open(pdfUrl, '_blank');
+                  }}
+                  disabled={!podeGerar}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: podeGerar ? "pointer" : "not-allowed", backgroundColor: podeGerar ? "#1A1A1A" : "#cccccc", color: "#ffffff", border: "2px solid #1A1A1A", transition: "all 0.2s ease", marginBottom: 12 }}
+                >
+                  👁️ Previsualizar PDF
+                </button>
+
+                <button
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    if (cliente.nome) params.set('nome', encodeURIComponent(cliente.nome));
+                    if (cliente.empresa) params.set('empresa', encodeURIComponent(cliente.empresa));
+                    if (cliente.email) params.set('email', encodeURIComponent(cliente.email));
+                    if (marcas[0]?.servicos.length > 0) params.set('servicos', encodeURIComponent(JSON.stringify(marcas[0].servicos)));
+                    if (marcas[0]?.nome) params.set('marca', encodeURIComponent(marcas[0].nome));
+                    params.set('valor', total.toFixed(2));
+                    params.set('subtotal', (subtotal - descontoTotal).toFixed(2));
+                    params.set('iva', (total - (total/1.23)).toFixed(2));
+                    params.set('desconto', descontoTotal.toFixed(2));
+                    window.open('/proposta.html?' + params.toString(), '_blank');
+                  }}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#F25C05", color: "#ffffff", border: "none", transition: "all 0.2s ease", marginBottom: 12 }}
+                >
+                  💼 Ver Proposta Comercial
+                </button>
+
+                <button
+                  onClick={async () => {
+                    if (!cliente.nome || total <= 0) {
+                      alert("Preenche o Nome do Cliente e o Valor Total.");
+                      return;
+                    }
+                    const doc = await criarPropostaPDF();
+                    doc.save(`Proposta-${cliente.nome.replace(/\s+/g, '-')}.pdf`);
+                  }}
+                  style={{ fontFamily: "Montserrat, sans-serif", display: "block", width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: "none", textAlign: "center", cursor: "pointer", backgroundColor: "#F22283", color: "#ffffff", border: "none", transition: "all 0.2s ease" }}
+                >
+                  📥 Download Proposta em PDF
+                </button>
+
+                <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 10, color: "#888", textAlign: "center", marginTop: 12 }}>
+                  Orçamento válido por 30 dias<br />Sujeito a disponibilidade de agenda
+                </p>
               </div>
             </div>
           </div>

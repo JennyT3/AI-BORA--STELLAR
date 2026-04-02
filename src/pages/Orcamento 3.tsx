@@ -87,7 +87,9 @@ export function Orcamento() {
     if (!printWindow) return;
 
     const dataAtual = new Date().toLocaleDateString("pt-PT");
-    const numeroOrcamento = `ORC-${Date.now().toString().slice(-6)}`;
+    const dataValidade = new Date();
+    dataValidade.setDate(dataValidade.getDate() + 10);
+    const dataValidadeStr = dataValidade.toLocaleDateString("pt-PT");
 
     const html = `
       <!DOCTYPE html>
@@ -97,69 +99,84 @@ export function Orcamento() {
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
           body { font-family: 'Montserrat', sans-serif; margin: 40px; color: #1A1A1A; line-height: 1.6; }
-          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 3px solid #F25C05; padding-bottom: 20px; }
-          .logo { font-size: 28px; font-weight: 900; color: #F25C05; }
+          
+          /* HEADER - blanco con línea naranja sutil */
+          .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid #F25C05; 
+            padding-bottom: 15px; 
+          }
+          .logo-area { display: flex; align-items: center; gap: 15px; }
+          .logo-img { width: 50px; height: 50px; }
+          .logo-text { font-size: 22px; font-weight: 900; color: #1A1A1A; }
+          .logo-sub { font-size: 10px; color: #888; }
           .doc-info { text-align: right; }
-          .doc-titulo { font-size: 24px; font-weight: 700; color: #1A1A1A; margin-bottom: 5px; }
-          .doc-numero { font-size: 14px; color: #666; }
-          .section { margin-bottom: 30px; }
-          .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #F25C05; margin-bottom: 10px; letter-spacing: 1px; }
-          .cliente-info { background: #F5F2F0; padding: 20px; border-radius: 8px; }
-          .info-row { display: flex; margin-bottom: 8px; }
-          .info-label { width: 100px; font-weight: 600; color: #666; font-size: 13px; }
-          .info-value { flex: 1; font-size: 13px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { background: #1A1A1A; color: white; padding: 12px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-          td { padding: 12px; border-bottom: 1px solid #e0ddd9; font-size: 13px; }
-          .text-right { text-align: right; }
-          .totais { margin-top: 30px; width: 350px; margin-left: auto; }
-          .total-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0ddd9; font-size: 13px; }
-          .total-final { display: flex; justify-content: space-between; padding: 15px 0; font-size: 18px; font-weight: 700; color: #F25C05; border-top: 2px solid #1A1A1A; margin-top: 10px; }
-          .condicoes { background: #F5F2F0; padding: 20px; border-radius: 8px; margin-top: 40px; font-size: 12px; line-height: 1.8; }
-          .condicoes-title { font-weight: 700; color: #1A1A1A; margin-bottom: 10px; font-size: 14px; }
-          .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #888; border-top: 1px solid #e0ddd9; padding-top: 20px; }
-          .validade { background: #F22283; color: white; padding: 15px; text-align: center; border-radius: 8px; margin: 30px 0; font-weight: 700; }
-          .total-input { background: #F25C05; color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; }
-          .total-input h2 { margin: 0; font-size: 32px; }
-          @media print { body { margin: 20px; } .no-print { display: none; } }
+          .doc-titulo { font-size: 20px; font-weight: 700; color: #1A1A1A; margin-bottom: 5px; }
+          .doc-numero { font-size: 12px; color: #666; }
+          
+          /* CLIENTE - caja gris clara */
+          .section { margin-bottom: 25px; }
+          .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #F25C05; margin-bottom: 8px; letter-spacing: 1px; }
+          .cliente-info { background: #F7F5F3; padding: 20px; border-radius: 8px; }
+          .cliente-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+          .info-label { font-weight: 600; color: #666; font-size: 11px; }
+          .info-value { font-size: 12px; color: #1A1A1A; }
+          
+          /* SERVIÇOS - tabla con precio en encabezado */
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th { background: #1A1A1A; color: white; padding: 10px; text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+          th:last-child { text-align: right; }
+          td { padding: 10px; border-bottom: 1px solid #e0ddd9; font-size: 11px; }
+          td:last-child { text-align: right; color: #F25C05; font-weight: 600; }
+          
+          /* TOTAL - caixa laranja */
+          .total-box { background: #F25C05; color: white; padding: 20px; border-radius: 8px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+          .total-label { font-size: 12px; }
+          .total-value { font-size: 28px; font-weight: 900; }
+          
+          /* Totais detalhados */
+          .totais { width: 300px; margin-left: auto; }
+          .total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0ddd9; font-size: 12px; }
+          .total-final { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; font-weight: 700; color: #F25C05; border-top: 2px solid #1A1A1A; margin-top: 5px; }
+          
+          /* CONDIÇÕES - 6 pontos */
+          .condicoes { background: #F7F5F3; padding: 20px; border-radius: 8px; margin-top: 30px; }
+          .condicoes-title { font-weight: 700; color: #1A1A1A; margin-bottom: 12px; font-size: 12px; border-bottom: 1px solid #F25C05; padding-bottom: 8px; }
+          .condicoes ul { padding-left: 18px; font-size: 11px; line-height: 1.8; color: #444; }
+          
+          /* FOOTER */
+          .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #888; border-top: 1px solid #e0ddd9; padding-top: 15px; }
+          .footer strong { color: #1A1A1A; }
+          
+          @media print { body { margin: 20px; } }
         </style>
       </head>
       <body>
         <div class="header">
-          <div class="logo">AI BORA</div>
+          <div class="logo-area">
+            <div class="logo-text">AI BORA</div>
+          </div>
           <div class="doc-info">
             <div class="doc-titulo">ORÇAMENTO</div>
-            <div class="doc-numero">Nº ${numeroOrcamento} | Data: ${dataAtual}</div>
-            <div style="font-size: 11px; color: #888; margin-top: 5px;">NIF: 123456789 | AI BORA - Mediação Imobiliária, Lda</div>
+            <div class="doc-numero">Nº ${numeroOrcamento}</div>
+            <div class="doc-numero">Data: ${dataAtual}</div>
+            <div class="doc-numero">Válido até: ${dataValidadeStr}</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title">Cliente</div>
+          <div class="section-title">Dados do Cliente</div>
           <div class="cliente-info">
-            <div class="info-row">
-              <div class="info-label">Nome:</div>
-              <div class="info-value">${cliente.nome || "Não especificado"}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Empresa:</div>
-              <div class="info-value">${cliente.empresa || "Não especificado"}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">NIF:</div>
-              <div class="info-value">${cliente.nif || "Não especificado"}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Email:</div>
-              <div class="info-value">${cliente.email || "Não especificado"}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Telefone:</div>
-              <div class="info-value">${cliente.telefone || "Não especificado"}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">Morada:</div>
-              <div class="info-value">${cliente.morada || "Não especificado"}</div>
+            <div class="cliente-grid">
+              <div><span class="info-label">Nome:</span> <span class="info-value">${cliente.nome || "—"}</span></div>
+              <div><span class="info-label">Empresa:</span> <span class="info-value">${cliente.empresa || "—"}</span></div>
+              <div><span class="info-label">NIF:</span> <span class="info-value">${cliente.nif || "—"}</span></div>
+              <div><span class="info-label">Email:</span> <span class="info-value">${cliente.email || "—"}</span></div>
+              <div><span class="info-label">Telefone:</span> <span class="info-value">${cliente.telefone || "—"}</span></div>
+              <div><span class="info-label">Morada:</span> <span class="info-value">${cliente.morada || "—"}</span></div>
             </div>
           </div>
         </div>
@@ -169,22 +186,26 @@ export function Orcamento() {
           <table>
             <thead>
               <tr>
-                <th>Descrição do Serviço</th>
+                <th>#</th>
+                <th>Serviço</th>
+                <th>Valor s/IVA</th>
               </tr>
             </thead>
             <tbody>
-              ${selecionados.length > 0 ? selecionados.map(s => `
+              ${selecionados.length > 0 ? selecionados.map((s, i) => `
                 <tr>
+                  <td>${i + 1}</td>
                   <td>${s}</td>
+                  <td>${i === 0 ? subtotal.toFixed(2) + ' €' : ''}</td>
                 </tr>
-              `).join("") : '<tr><td>Consultoria e Serviços de Marketing Digital conforme proposta comercial</td></tr>'}
+              `).join("") : '<tr><td colspan="3">Consultoria e Serviços de Marketing Digital</td></tr>'}
             </tbody>
           </table>
         </div>
 
-        <div class="total-input">
-          <div style="font-size: 14px; margin-bottom: 5px;">VALOR TOTAL MENSAL</div>
-          <h2>${total.toFixed(2)} €</h2>
+        <div class="total-box">
+          <div class="total-label">TOTAL MENSAL (c/ IVA 23%)</div>
+          <div class="total-value">${total.toFixed(2)} €</div>
         </div>
 
         <div class="totais">
@@ -197,33 +218,30 @@ export function Orcamento() {
             <span>${iva.toFixed(2)} €</span>
           </div>
           <div class="total-final">
-            <span>TOTAL COM IVA</span>
+            <span>TOTAL A PAGAR</span>
             <span>${total.toFixed(2)} €</span>
           </div>
         </div>
 
-        <div class="validade">
-          VALIDADE DO ORÇAMENTO: 30 DIAS
-        </div>
-
         <div class="condicoes">
           <div class="condicoes-title">Condições Comerciais</div>
-          <strong>Período de Fidelização:</strong> 3 meses de período experimental, seguido de contrato anual.<br>
-          <strong>Pagamento:</strong> Mensal, por transferência bancária ou débito direto.<br>
-          <strong>Incluso:</strong> Suporte técnico, relatórios mensais de performance, reuniões de alinhamento quinzenais.<br>
-          <strong>Exclusões:</strong> Budget de publicidade paga (Google/Meta) não incluído - faturado separadamente.<br>
-          <strong>Rescisão:</strong> Após período experimental, aviso prévio de 30 dias.<br>
-          <strong>Penalização:</strong> Rescisão antecipada sujeita a pagamento de 50% dos valores em dívida.
+          <ul>
+            <li>Âmbito: Prestação de serviços conforme detalhado acima.</li>
+            <li>Período: 3 meses experimentais + contrato anual renovável automaticamente.</li>
+            <li>Pagamento: Mensal, por transferência bancária ou débito direto até ao dia 5 de cada mês.</li>
+            <li>Validade: Orçamento válido até ${dataValidadeStr} (10 dias corridos a partir da emissão).</li>
+            <li>Rescisão: Aviso prévio de 30 dias após o período experimental, por escrito.</li>
+            <li>Propriedade Intelectual: Todo o conteúdo criado é propriedade do cliente após liquidação total.</li>
+          </ul>
         </div>
 
         <div class="footer">
-          AI BORA - Mediação Imobiliária, Lda | NIF: 123456789 | Rua Example, 123, Lisboa<br>
-          Email: geral@aibora.pt | Tel: +351 912 345 678<br>
-          Este orçamento não constitui fatura. Sujeito à aceitação formal por ambas as partes.
+          <strong>AI BORA, Lda</strong> | NIF: 319918645 | helloaibora@proton.me | +351 936 021 747 | www.aibora.pt<br>
+          Este orçamento não constitui fatura. Sujeito à aceitação formal por escrito.
         </div>
 
-        <div class="no-print" style="margin-top: 40px; text-align: center;">
-          <button onclick="window.print()" style="background: #F25C05; color: white; border: none; padding: 15px 40px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; font-family: Montserrat;">
+        <div style="margin-top: 40px; text-align: center;">
+          <button onclick="window.print()" style="background: #F25C05; color: white; border: none; padding: 15px 40px; font-size: 14px; font-weight: 700; border-radius: 8px; cursor: pointer; font-family: Montserrat;">
             SALVAR COMO PDF / IMPRIMIR
           </button>
         </div>
