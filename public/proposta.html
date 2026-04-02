@@ -169,6 +169,25 @@
     .sobre-grid { grid-template-columns: 1fr; gap: 40px; }
     .sobre-img { order: -1; }
   }
+  .sobre-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .sobre-header img {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+  }
+  .sobre-header-titulo {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--laranja);
+  }
+  .sobre-header-titulo span {
+    color: var(--branco);
+  }
   .sobre-img {
     border-radius: 24px;
     overflow: hidden;
@@ -520,7 +539,10 @@
 <section class="secao">
   <div class="sobre-grid">
     <div class="fade-in">
-      <p class="secao-label">Quem somos</p>
+      <div class="sobre-header">
+        <img src="logo.png" alt="AI BORA">
+        <div class="sobre-header-titulo">AI <span>BORA</span></div>
+      </div>
       <h2 class="secao-titulo">Marketing digital<br>que <span>realmente funciona.</span></h2>
       <p class="secao-desc">
         A AI BORA é uma empresa portuguesa especializada em ajudar negócios locais a crescer na internet. Queremos ser o teu parceiro digital — com foco em resultados concretos e suporte em português.
