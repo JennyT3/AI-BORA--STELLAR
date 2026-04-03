@@ -80,12 +80,12 @@ export function PropostaPage() {
     );
   }
 
-  // Calculate correct values - use valor - desconto as total, then calculate por marca
+  // Calculate correct values - valor already includes discount (total with IVA after discount)
   const numMarcas = proposal.marcas || 1;
-  const valorTotal = (proposal.valor || 0) - (proposal.desconto || 0);
-  const subtotal = valorTotal / 1.23;
-  const iva = valorTotal - subtotal;
-  const valorPorMarca = numMarcas > 1 ? subtotal / numMarcas : subtotal;
+  const valorTotalComIVA = proposal.valor || 0;
+  const subtotal = valorTotalComIVA / 1.23;
+  const iva = valorTotalComIVA - subtotal;
+  const valorPorMarcaSemIVA = numMarcas > 1 ? subtotal / numMarcas : subtotal;
 
   return (
     <div style={{ minHeight: '100vh', background: '#1A1A1A', color: '#ffffff', fontFamily: 'Montserrat, sans-serif' }}>
@@ -119,7 +119,7 @@ export function PropostaPage() {
             VALOR POR MARCA (SEM IVA)
           </div>
           <div style={{ fontSize: 36, fontWeight: 900, color: '#F25C05' }}>
-            {valorPorMarca.toFixed(2)} €
+            {valorPorMarcaSemIVA.toFixed(2)} €
           </div>
           {proposal.desconto > 0 && (
             <div style={{ fontSize: 11, color: '#10B981', marginTop: 6 }}>
@@ -127,7 +127,7 @@ export function PropostaPage() {
             </div>
           )}
           <div style={{ fontSize: 13, color: '#cccccc', marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            Total com IVA: {valorTotal.toFixed(2)} €
+            Total com IVA: {valorTotalComIVA.toFixed(2)} €
           </div>
         </div>
         

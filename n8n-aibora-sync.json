@@ -1,0 +1,74 @@
+{
+  "name": "AIBORA - Firebase to Google Sheets Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{"field": "minutes", "minutesInterval": 15}]
+        },
+        "triggerOn": "manual"
+      },
+      "id": "trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base Manual Trigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "collection": "clientes",
+        "limit": 100
+      },
+      "id": "firebase-get-clientes",
+      "name": "Get All Clientes",
+      "type": "n8n-nodes-base.firebase",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "firebaseApi": "Firebase API"
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "loop-over-clientes",
+      "name": "Loop Over Clientes",
+      "type": "n8n-nodes-base.SplitInBatches",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "TU_SHEET_ID_AQUI",
+        "range": "A1",
+        "valueInputMode": "USER_ENTERED",
+        "data": "={{ { \"nome\": $json.nome, \"email\": $json.email, \"telemovel\": $json.telemovel, \"nif\": $json.nif || \"\", \"morada\": $json.morada || \"\", \"categoria\": $json.categoria || \"\", \"dataEntrada\": $json.createdAt, \"totalFacturado\": $json.totalFacturado || 0, \"numeroOrcamentos\": $json.numeroOrcamentos || 0, \"estado\": $json.estado || \"\", \"observacoes\": $json.observacoes || \"\" } }}"
+      },
+      "id": "google-sheets-append",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [850, 300],
+      "credentials": {
+        "googleSheetsOAuth2": "Google Sheets OAuth2"
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{"node": "Get All Clientes", "type": "main", "index": 0}]]
+    },
+    "Get All Clientes": {
+      "main": [[{"node": "Loop Over Clientes", "type": "main", "index": 0}]]
+    },
+    "Loop Over Clientes": {
+      "main": [[{"node": "Append to Google Sheet", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "aibora-firebase-sync"
+}
