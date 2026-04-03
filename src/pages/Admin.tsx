@@ -4,7 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { getProposal, listProposals, updateProposal, deleteProposal } from "../services/firebase";
 
-const ADMIN_PASSWORD = "aibora2026";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "aibora2026";
 
 export function Admin() {
   const [authenticated, setAuthenticated] = useState(false);

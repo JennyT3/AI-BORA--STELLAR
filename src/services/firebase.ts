@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBAO83G3aS2EMOwqos2PghCR2H3vc6Gwok",
-  authDomain: "aibora-propostas.firebaseapp.com",
-  projectId: "aibora-propostas",
-  storageBucket: "aibora-propostas.firebasestorage.app",
-  messagingSenderId: "649044112508",
-  appId: "1:649044112508:web:d2b071092c55dc479ec5f9",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: "G-8T40H61S36"
 };
 
