@@ -36,7 +36,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/antes.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/antes.webp" alt="Antes - Projeto de redesign de identidade visual" className="w-full h-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -45,7 +45,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/depois.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/depois.webp" alt="Depois - Projeto de redesign de identidade visual" className="w-full h-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -54,7 +54,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/estudio.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/estudio.webp" alt="Estúdio - Espaço de produção criativa da AI BORA" className="w-full h-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -63,7 +63,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/foto-criativa.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/foto-criativa.webp" alt="Fotografia criativa - Produção de conteúdo visual" className="w-full h-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -72,7 +72,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/mopack.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/mopack.webp" alt="Packaging - Design de embalagens para marca local" className="w-full h-full object-cover" />
           </motion.div>
 
           <motion.div
@@ -81,7 +81,7 @@ export function NossoTrabalhoSection() {
             transition={{ duration: 0.6, delay: 0.6 }}
             className="relative aspect-square overflow-hidden rounded-lg"
           >
-            <img src="/branding.webp" alt="" className="w-full h-full object-cover" />
+            <img src="/branding.webp" alt="Branding - Identidade visual completa para negócio" className="w-full h-full object-cover" />
           </motion.div>
 
         </div>
