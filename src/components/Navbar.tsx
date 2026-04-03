@@ -45,17 +45,17 @@ export function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/servicos" className="text-sm font-bold text-text-primary hover:text-[#cb1a74] transition-colors">Serviços</Link>
-          <button onClick={() => scrollToSection('quem-somos')} className="text-sm font-bold text-text-primary hover:text-[#cb1a74] transition-colors">Quem Somos</button>
-          <button onClick={() => scrollToSection('processo')} className="text-sm font-bold text-text-primary hover:text-[#cb1a74] transition-colors">Como Funciona</button>
-          <button onClick={() => scrollToSection('faq')} className="text-sm font-bold text-text-primary hover:text-[#cb1a74] transition-colors">FAQ</button>
-          <Link href="/prompts" className="text-sm font-bold text-[#ff6f2e] hover:text-[#cb1a74] transition-colors">Prompts AI</Link>
+          <Link href="/servicos" className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">Serviços</Link>
+          <button onClick={() => scrollToSection('quem-somos')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">Quem Somos</button>
+          <button onClick={() => scrollToSection('processo')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">Como Funciona</button>
+          <button onClick={() => scrollToSection('faq')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">FAQ</button>
+          <Link href="/prompts" className="text-sm font-bold text-[#F25C05] hover:text-[#F22283] transition-colors">Prompts AI</Link>
           <motion.button
             onClick={() => scrollToSection('contacto')}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="text-white font-bold px-6 py-2.5 rounded-full shadow-[0_4px_14px_rgba(255,111,46,0.3)] text-sm"
-            style={{ background: 'linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)' }}
           >
             Consultoria
           </motion.button>
@@ -76,15 +76,15 @@ export function Navbar() {
           animate={{ opacity: 1, x: 0 }}
           className="fixed inset-0 top-[64px] bg-white z-40 flex flex-col items-center pt-12 gap-8 md:hidden"
         >
-          <Link href="/servicos" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-text-primary hover:text-[#cb1a74]">Serviços</Link>
-          <button onClick={() => scrollToSection('quem-somos')} className="text-xl font-bold text-text-primary hover:text-[#cb1a74]">Quem Somos</button>
-          <button onClick={() => scrollToSection('processo')} className="text-xl font-bold text-text-primary hover:text-[#cb1a74]">Como Funciona</button>
-          <button onClick={() => scrollToSection('faq')} className="text-xl font-bold text-text-primary hover:text-[#cb1a74]">FAQ</button>
-          <Link href="/prompts" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#ff6f2e]">Prompts AI</Link>
+          <Link href="/servicos" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-text-primary hover:text-[#F22283]">Serviços</Link>
+          <button onClick={() => scrollToSection('quem-somos')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">Quem Somos</button>
+          <button onClick={() => scrollToSection('processo')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">Como Funciona</button>
+          <button onClick={() => scrollToSection('faq')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">FAQ</button>
+          <Link href="/prompts" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#F25C05]">Prompts AI</Link>
           <button
             onClick={() => scrollToSection('contacto')}
             className="text-white font-bold px-8 py-4 rounded-full text-lg shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)' }}
           >
             Consultoria
           </button>

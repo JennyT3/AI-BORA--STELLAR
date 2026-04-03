@@ -43,7 +43,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
       {/* CARD */}
       <div
         onClick={() => setIsOpen(true)}
-        className="group relative overflow-hidden rounded-xl cursor-pointer bg-card border border-border hover:border-[#ff6f2e]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#ff6f2e]/10 aspect-square"
+        className="group relative overflow-hidden rounded-xl cursor-pointer bg-card border border-border hover:border-[#F25C05]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#F25C05]/10 aspect-square"
       >
         <img
           src={prompt.image}
@@ -59,7 +59,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
             style={{ 
               backgroundColor: 'rgba(255, 111, 46, 0.2)', 
               border: '1px solid rgba(255, 111, 46, 0.3)',
-              color: '#ff6f2e',
+              color: '#F25C05',
               fontFamily: 'Montserrat, sans-serif'
             }}
           >
@@ -69,7 +69,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
 
         {prompt.isPremium && (
           <div className="absolute top-2 right-2 md:top-3 md:right-3">
-            <Lock className="w-3 h-3 md:w-4 md:h-4" style={{ color: '#cb1a74' }} />
+            <Lock className="w-3 h-3 md:w-4 md:h-4" style={{ color: '#F22283' }} />
           </div>
         )}
 
@@ -150,7 +150,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                       className="px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 inline-block"
                       style={{ 
                         backgroundColor: 'rgba(203, 26, 116, 0.2)', 
-                        color: '#cb1a74',
+                        color: '#F22283',
                         fontFamily: 'Montserrat, sans-serif'
                       }}
                     >
@@ -206,17 +206,17 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         style={{
                           minWidth: '44px',
                           backgroundColor: selectedFormat === ratio.value ? 'rgba(255, 111, 46, 0.2)' : '#1a1a1a',
-                          borderColor: selectedFormat === ratio.value ? '#ff6f2e' : '#444',
+                          borderColor: selectedFormat === ratio.value ? '#F25C05' : '#444',
                           fontFamily: 'Montserrat, sans-serif'
                         }}
                       >
-                        <span style={{ color: selectedFormat === ratio.value ? '#ff6f2e' : '#ffffff' }}>
+                        <span style={{ color: selectedFormat === ratio.value ? '#F25C05' : '#ffffff' }}>
                           {formatIcons[ratio.value]}
                         </span>
                         <span 
                           className="text-[8px] uppercase font-medium"
                           style={{ 
-                            color: selectedFormat === ratio.value ? '#ff6f2e' : '#ffffff'
+                            color: selectedFormat === ratio.value ? '#F25C05' : '#ffffff'
                           }}
                         >
                           {ratio.label}
@@ -248,7 +248,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                       className="px-2 py-0.5 rounded-full text-[10px] font-bold mt-1 inline-block"
                       style={{ 
                         backgroundColor: 'rgba(203, 26, 116, 0.2)', 
-                        color: '#cb1a74',
+                        color: '#F22283',
                         fontFamily: 'Montserrat, sans-serif'
                       }}
                     >
@@ -270,7 +270,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         {prompt.prompt}
                       </p>
                     </div>
-                    <Lock className="w-8 h-8 md:w-10 md:h-10 mb-2 md:mb-3" style={{ color: '#cb1a74' }} />
+                    <Lock className="w-8 h-8 md:w-10 md:h-10 mb-2 md:mb-3" style={{ color: '#F22283' }} />
                     <p 
                       className="text-sm mb-1 text-center"
                       style={{ 
@@ -290,7 +290,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                     <button 
                       className="px-5 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white transition-colors"
                       style={{ 
-                        background: 'linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)',
+                        background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
                         fontFamily: 'Montserrat, sans-serif'
                       }}
                     >
@@ -330,7 +330,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                           }}
                         >
                           {prompt.prompt}
-                          <span style={{ color: '#ff6f2e' }}> in {selectedFormat} format</span>
+                          <span style={{ color: '#F25C05' }}> in {selectedFormat} format</span>
                         </p>
                       </div>
                     </div>
@@ -343,7 +343,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         style={{ 
                           background: copied 
                             ? '#10b981' 
-                            : 'linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)',
+                            : 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
                           fontFamily: 'Montserrat, sans-serif'
                         }}
                       >

@@ -159,9 +159,9 @@ export function Prompts() {
                   style={{
                     fontFamily: 'Montserrat, sans-serif',
                     fontWeight: activeFilter === cat ? 700 : 500,
-                    backgroundColor: activeFilter === cat ? '#ff6f2e' : 'transparent',
+                    backgroundColor: activeFilter === cat ? '#F25C05' : 'transparent',
                     color: activeFilter === cat ? 'white' : '#cccccc',
-                    borderColor: activeFilter === cat ? '#ff6f2e' : '#444'
+                    borderColor: activeFilter === cat ? '#F25C05' : '#444'
                   }}
                 >
                   {cat}
@@ -176,9 +176,9 @@ export function Prompts() {
             {loadingSheet ? (
               <div className="flex justify-center py-20">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" />
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" />
+                  <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" style={{ animationDelay: '0.2s' }} />
                 </div>
               </div>
             ) : visiblePrompts.length === 0 ? (
@@ -199,15 +199,15 @@ export function Prompts() {
                   <div ref={loadMoreRef} className="flex justify-center items-center py-8 mt-4">
                     {isLoading ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" />
-                        <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 rounded-full bg-[#ff6f2e] animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" />
+                        <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" style={{ animationDelay: '0.1s' }} />
+                        <div className="w-2 h-2 rounded-full bg-[#F25C05] animate-bounce" style={{ animationDelay: '0.2s' }} />
                       </div>
                     ) : (
                       <button
                         onClick={loadMore}
-                        className="px-6 py-2 rounded-full text-sm font-medium border transition-colors hover:bg-[#ff6f2e]/10"
-                        style={{ fontFamily: 'Montserrat, sans-serif', color: '#ff6f2e', borderColor: '#ff6f2e' }}
+                        className="px-6 py-2 rounded-full text-sm font-medium border transition-colors hover:bg-[#F25C05]/10"
+                        style={{ fontFamily: 'Montserrat, sans-serif', color: '#F25C05', borderColor: '#F25C05' }}
                       >
                         Carregar mais
                       </button>
@@ -229,7 +229,7 @@ export function Prompts() {
           <div className="max-w-2xl mx-auto text-center">
             <h2
               className="text-xl md:text-2xl font-bold mb-3"
-              style={{ fontFamily: 'Montserrat, sans-serif', color: '#ff6f2e', fontWeight: 800 }}
+              style={{ fontFamily: 'Montserrat, sans-serif', color: '#F25C05', fontWeight: 800 }}
             >
               Queres mais prompts exclusivos?
             </h2>
@@ -238,7 +238,7 @@ export function Prompts() {
             </p>
             <button
               className="px-8 py-3 rounded-full text-sm font-bold text-white transition-transform hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)', fontFamily: 'Montserrat, sans-serif' }}
+              style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', fontFamily: 'Montserrat, sans-serif' }}
             >
               Subscrever Agora
             </button>

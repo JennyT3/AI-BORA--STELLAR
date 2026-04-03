@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 //  DESIGN TOKEN — The Prismatic Editorial
 // ─────────────────────────────────────────────
 const C = {
-  fuchsia: "#cb1a74",
+  fuchsia: "#F22283",
   fuchsiaNeon: "#FF00FF",
-  orange: "#ff6f2e",
+  orange: "#F25C05",
   orangeDeep: "#FD8B00",
   red: "#fb4a50",
   green: "#79FF5B",
@@ -15,7 +15,7 @@ const C = {
   surfaceLow: "#F3F3F4",
   text: "#1A1C1C",
   textMuted: "#564052",
-  ghostBorder: "rgba(203,26,116,0.15)",
+  ghostBorder: "rgba(242,34,131,0.15)",
 };
 
 // ─────────────────────────────────────────────
@@ -95,13 +95,13 @@ function Logo3D({ size = 120 }: { size?: number }) {
       viewBox="0 0 200 200"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ filter: "drop-shadow(0 20px 40px rgba(203,26,116,0.35))" }}
+      style={{ filter: "drop-shadow(0 20px 40px rgba(242,34,131,0.35))" }}
     >
       <defs>
         <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#cb1a74" />
+          <stop offset="0%" stopColor="#F22283" />
           <stop offset="50%" stopColor="#e8483a" />
-          <stop offset="100%" stopColor="#ff6f2e" />
+          <stop offset="100%" stopColor="#F25C05" />
         </linearGradient>
         <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#a8005f" />
