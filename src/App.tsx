@@ -2,6 +2,7 @@ import { Route, Switch } from "wouter";
 import { Home } from "./pages/Home";
 import { Servicos } from "./pages/Servicos";
 import { Packs } from "./pages/Packs";
+import { Prompts } from "./pages/Prompts";
 import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Orcamento } from "./pages/Orcamento";
