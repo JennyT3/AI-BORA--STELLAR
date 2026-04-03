@@ -1,9 +1,7 @@
 import { Navbar } from '../components/Navbar';
 import { motion } from "motion/react";
 import { WHATSAPP_LINK } from "../lib/constants";
-
-// Packs de Pagamento Único (Presença Digital)
-const packsUnico = [
+import { packs } from "../data/packs";
   {
     id: "essencial",
     label: "Pack Essencial",
@@ -183,7 +181,7 @@ export function Packs() {
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 20, justifyContent: "center", maxWidth: 1100, margin: "0 auto" }}>
-            {packsUnico.map((pack, i) => (
+            {packs.map((pack, i) => (
               <motion.div
                 key={pack.id}
                 initial={{ opacity: 0, y: 20 }}

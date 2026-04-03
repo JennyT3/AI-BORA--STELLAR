@@ -4,8 +4,6 @@ import { Servicos } from "./pages/Servicos";
 import { Packs } from "./pages/Packs";
 import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
-import { Labs } from "./pages/Labs";
-import { Prompts } from "./pages/Prompts";
 import { Orcamento } from "./pages/Orcamento";
 import { PropostaPage } from "./pages/Proposta";
 import { Admin } from "./pages/Admin";
@@ -18,7 +16,6 @@ export default function App() {
       <Route path="/" component={Home} />
       <Route path="/servicos" component={Servicos} />
       <Route path="/packs" component={Packs} />
-      <Route path="/labs" component={Labs} />
       <Route path="/prompts" component={Prompts} />
       <Route path="/privacidade" component={Privacidade} />
       <Route path="/termos" component={Termos} />
