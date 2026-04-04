@@ -71,7 +71,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start gap-2 text-sm font-normal text-text-secondary">
                 <Mail size={16} className="text-fuchsia-brand shrink-0 mt-0.5" />
-                <a href="mailto:helloaibora@proton.me" className="hover:text-fuchsia-brand transition-colors">helloaibora@proton.me</a>
+                <a href="mailto:geral@aibora.pt" className="hover:text-fuchsia-brand transition-colors">geral@aibora.pt</a>
               </li>
               <li className="flex items-start gap-2 text-sm font-normal text-text-secondary">
                 <Phone size={16} className="text-fuchsia-brand shrink-0 mt-0.5" />
