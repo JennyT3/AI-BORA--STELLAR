@@ -1,3 +1,4 @@
+import React from "react";
 import { AbsoluteFill, Img, staticFile, spring, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 
 export const LogoReveal: React.FC = () => {

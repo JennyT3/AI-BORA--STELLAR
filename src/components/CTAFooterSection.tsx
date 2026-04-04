@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Loader2 } from 'lucide-react';
 import { useSectionInView } from '../hooks/useSectionInView';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Trash2, Send, CheckCircle } from 'lucide-react';
 import { createSolicitude } from '../services/solicitudes';
@@ -22,7 +22,7 @@ interface Marca {
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  servicosSelecionados: { id: string; nome: string; icon: string; categoria: string }[];
+  servicosSelecionados: { id: string; nome: string; icon?: string; categoria: string }[];
 }
 
 export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props) {

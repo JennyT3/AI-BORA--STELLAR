@@ -1,3 +1,4 @@
+import React from "react";
 import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { Cursor } from "./Cursor";
 

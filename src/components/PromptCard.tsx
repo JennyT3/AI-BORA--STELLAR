@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Lock, Copy, Check, X, Square, RectangleHorizontal, RectangleVertical, Image as ImageIcon } from 'lucide-react';
-import type { Prompt, AspectRatio } from '../data/prompts';
 import { aspectRatios } from '../data/prompts';
+import type { AspectRatio } from '../data/prompts';
 
 interface PromptCardProps {
-  prompt: Prompt;
+  prompt: {
+    id: string;
+    title?: string;
+    category?: string;
+    image?: string;
+    prompt: string;
+    isPremium?: boolean;
+    tags?: string[];
+  };
+  [key: string]: unknown;
 }
 
 export function PromptCard({ prompt }: PromptCardProps) {

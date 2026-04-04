@@ -5,7 +5,7 @@ import { WHATSAPP_LINK, EMAIL } from "../lib/constants";
 
 export function PropostaPage() {
   const [, setLocation] = useLocation();
-  const params = useParams();
+  const params = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
