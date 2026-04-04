@@ -8,10 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit",
-    "video:studio": "remotion studio src/remotion/index.ts",
-    "video:render": "remotion render src/remotion/index.ts AIBoraHero public/hero-video.mp4",
-    "video:terminal": "remotion render src/remotion/index.ts AIBoraHero public/hero-terminal.mp4 --frames=0-270"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
