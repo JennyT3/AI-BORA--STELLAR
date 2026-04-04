@@ -12,6 +12,7 @@ import { Propostas } from "./admin/Propostas";
 import { Solicitacoes } from "./admin/Solicitacoes";
 import { Clientes } from "./admin/Clientes";
 import { Faturacao } from "./admin/Faturacao";
+import { VendoresAdmin } from "./admin/Vendores";
 import { FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -45,7 +46,7 @@ const exportToExcel = (proposals: any[], solicitudes: any[]) => {
 };
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores">("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -73,6 +74,7 @@ export function Admin() {
   const [clienteSortOrder, setClienteSortOrder] = useState<"asc" | "desc">("desc");
   const [clienteFilterOrigem, setClienteFilterOrigem] = useState<string>("todos");
   const [clienteFilterResposta, setClienteFilterResposta] = useState<string>("todos");
+  const [showVendedorForm, setShowVendedorForm] = useState(false);
 
 const gerarFaturaPDF = (proposal: any) => {
     const faturaNum = numeroFatura || `FAC-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
@@ -396,6 +398,14 @@ const gerarFaturaPDF = (proposal: any) => {
             clientes={clientes}
             onCriarFatura={(cliente) => { setFaturaData(cliente); setNumeroFatura(`FAC-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`); setShowFaturaModal(true); }}
             onNavigateClientes={() => setActiveTab("clientes")}
+          />
+        )}
+
+        {activeTab === "vendedores" && (
+          <VendoresAdmin 
+            onNavigateVendas={(vendedorId) => {
+              window.open(`/vendas?admin=true&vendedor=${vendedorId}`, "_blank");
+            }}
           />
         )}
       </main>

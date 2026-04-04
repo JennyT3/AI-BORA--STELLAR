@@ -5,6 +5,7 @@ import { CTAFooterSection } from "../components/CTAFooterSection";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
 import { Sidebar } from "../components/admin/Sidebar";
+import { VendasSidebar } from "../components/admin/VendasSidebar";
 import { theme } from "../styles/theme";
 import { Download, Mail, User, FileText, Check, X, Plus, Trash2, Calculator, Save, Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
@@ -51,12 +52,23 @@ const SERVICOS_POR_CATEGORIA: Record<string, string[]> = {
 export function Orcamento() {
   const [searchParams] = useSearchParams();
   const isAdminMode = window.location.href.includes("/admin");
+  const vendedorId = searchParams.get('vendedor');
+  const isVendedorOrcamento = isAdminMode && vendedorId && vendedorId !== "true";
   const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao">("orcamento");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const solId = searchParams.get('sol');
   const [loadingSolicitude, setLoadingSolicitude] = useState(false);
   const [propostaId, setPropostaId] = useState<string | null>(null);
   const [isEditingProposta, setIsEditingProposta] = useState(false);
+  const [currentVendedor, setCurrentVendedor] = useState<any>(null);
+
+  useEffect(() => {
+    if (isVendedorOrcamento) {
+      import("../services/vendedores").then(({ getVendedor }) => {
+        if (getVendedor) getVendedor(vendedorId).then(v => setCurrentVendedor(v));
+      });
+    }
+  }, [isVendedorOrcamento, vendedorId]);
 
   const [numeroOrcamentoInput, setNumeroOrcamentoInput] = useState("ORC-0001");
   const [precoTotal, setPrecoTotal] = useState<number>(0);
@@ -293,6 +305,110 @@ export function Orcamento() {
         </div>
       );
     }
+  }
+
+  if (isVendedorOrcamento) {
+    const vendedorNome = currentVendedor?.nome || "Vendedor";
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex" }}>
+        <VendasSidebar
+          activeTab="orcamento"
+          onTabChange={(tab) => {
+            if (tab === 'dashboard') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}`;
+            else if (tab === 'orcamento') window.location.href = `/admin/orcamento?vendedor=${vendedorId}`;
+            else if (tab === 'propostas') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}&tab=propostas`;
+            else if (tab === 'clientes') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}&tab=clientes`;
+            else if (tab === 'faturacao') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}&tab=faturacao`;
+            else if (tab === 'perfil') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}&tab=perfil`;
+          }}
+          userName={vendedorNome}
+          onLogout={() => { localStorage.removeItem("vendedorUser"); window.location.href = "/vendas"; }}
+          proposalCount={0}
+          clienteCount={0}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          vendedorId={vendedorId}
+        />
+
+        <main style={{ flex: 1, padding: 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease', height: "100vh" }}>
+          <div style={{ height: "100%", overflow: "auto", paddingRight: 16 }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+              <div style={{ marginBottom: 32 }}>
+                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
+                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial para o seu cliente</p>
+              </div>
+              <div style={{ display: "flex", gap: 32 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, border: `1px solid ${theme.colors.border}` }}>
+                    <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 700, fontSize: 16, color: theme.colors.text.primary, margin: "0 0 16px" }}>Dados do Cliente</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Nome *</label><input value={cliente.nome} onChange={(e) => setCliente({...cliente, nome: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Empresa</label><input value={cliente.empresa} onChange={(e) => setCliente({...cliente, empresa: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Email</label><input value={cliente.email} onChange={(e) => setCliente({...cliente, email: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Telefone</label><input value={cliente.telefone} onChange={(e) => setCliente({...cliente, telefone: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>NIF</label><input value={cliente.nif} onChange={(e) => setCliente({...cliente, nif: e.target.value})} placeholder="123456789" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Morada</label><input value={cliente.morada} onChange={(e) => setCliente({...cliente, morada: e.target.value})} placeholder="Rua, Nº, Cidade" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 20, border: `1px solid ${theme.colors.border}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+                      <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 800, fontSize: 14, color: theme.colors.text.primary }}>Marcas e Redes Sociais</h3>
+                      <button onClick={adicionarMarca} style={{ padding: "6px 12px", borderRadius: 6, backgroundColor: theme.colors.accent.secondary, color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ Adicionar</button>
+                    </div>
+                    {marcas.map((marca, idx) => (
+                      <div key={marca.id} style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 10, padding: 12, marginBottom: 8, border: `1px solid ${theme.colors.border}` }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><span style={{ fontWeight: 700, fontSize: 12 }}>Marca {idx + 1}</span>{marcas.length > 1 && <button onClick={() => removerMarca(marca.id)} style={{ background: "none", border: "none", color: theme.colors.accent.primary, cursor: "pointer", fontSize: 10 }}>X</button>}</div>
+                        <input type="text" value={marca.nome} onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))} placeholder="Nome da marca" style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11, marginBottom: 8, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary }} />
+                        <p style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, marginBottom: 6 }}>Redes Sociais:</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          {REDES.map(rede => { const isSelected = marca.redes.includes(rede.id); return <button key={rede.id} onClick={() => toggleRede(marca.id, rede.id)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: isSelected ? rede.cor : theme.colors.bg.primary, color: isSelected ? "#ffffff" : theme.colors.text.primary, border: isSelected ? "none" : `1px solid ${theme.colors.border}`, borderRadius: 20, padding: "4px 8px", cursor: "pointer" }}>{rede.nome}</button>; })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div style={{ marginBottom: 12 }}><h2 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 900, fontSize: "clamp(16px, 3vw, 22px)", color: theme.colors.text.primary, margin: "0 0 4px" }}>Seleciona os Serviços</h2></div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+                      {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
+                        const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria];
+                        return (
+                          <div key={categoria} style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8, border: `1px solid ${theme.colors.border}` }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 18 }}>{catIcon}</span><span style={{ fontWeight: 700, fontSize: 12 }}>{categoria}</span></div>
+                            <div style={{ height: 1, backgroundColor: theme.colors.border }} />
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                              {servicos.map((s) => { const sel = marcas[0]?.servicos.includes(s); return <button key={s} onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: sel ? theme.colors.accent.primary : theme.colors.bg.primary, color: sel ? "#ffffff" : theme.colors.text.primary, border: sel ? `1px solid ${theme.colors.accent.primary}` : `1px solid rgba(0,0,0,0.10)`, borderRadius: 20, padding: "3px 8px", cursor: "pointer" }}>{sel ? "✓ " : ""}{s}</button>; })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ width: 320, flexShrink: 0 }}>
+                  <div style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, position: "sticky", top: 40, border: `1px solid ${theme.colors.border}` }}>
+                    <h3 style={{ fontWeight: 700, fontSize: 16, margin: "0 0 16px", color: theme.colors.text.primary }}>Resumo do Orçamento</h3>
+                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Nº Orçamento</label><input type="text" value={numeroOrcamentoInput} onChange={e => !isEditingProposta && setNumeroOrcamentoInput(e.target.value.toUpperCase())} placeholder="ORC-0001" disabled={isEditingProposta} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 14, fontWeight: 700, textAlign: "center", backgroundColor: isEditingProposta ? theme.colors.bg.tertiary : theme.colors.bg.primary }} /></div>
+                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 18, fontWeight: 700, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontWeight: 700, fontSize: 18 }}>€</span></div></div>
+                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Desconto</label><div style={{ display: "flex", gap: 8 }}><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoPercent || ""} onChange={e => setDescontoPercent(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>%</span></div><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoValor || ""} onChange={e => setDescontoValor(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>€</span></div></div></div>
+                    <div style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>Subtotal (sem IVA)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{subtotalComDesconto.toFixed(2)} €</span></div>
+                      {descuentoAplicado > 0 && <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}`, color: theme.colors.accent.primary }}><span style={{ fontSize: 12, fontWeight: 600 }}>Desconto</span><span style={{ fontSize: 12, fontWeight: 600 }}>- {descuentoAplicado.toFixed(2)} €</span></div>}
+                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>IVA (23%)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{ivaComDesconto.toFixed(2)} €</span></div>
+                      <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}><span style={{ fontSize: 14, fontWeight: 700 }}>TOTAL</span><span style={{ fontSize: 20, fontWeight: 900, color: theme.colors.accent.primary }}>{totalConDescuento.toFixed(2)} €</span></div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                      {propostaId ? <a href={`/p/${propostaId}`} target="_blank" style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: theme.colors.accent.primary, color: "#ffffff", border: "none", textDecoration: "none", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Ver Proposta</a> : <button disabled style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: "#ccc", color: "#fff", border: "none" }}>Guardar primeiro</button>}
+                      <button onClick={gerarPDF} disabled={!podeGerarProposta} style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: "#3498DB", color: "#ffffff", border: "none" }}>PDF</button>
+                    </div>
+                    <button onClick={handleGuardarProposta} disabled={!podeGerarProposta} style={{ width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: podeGerarProposta ? theme.colors.accent.secondary : "#cccccc", color: "#ffffff", border: "none" }}>Guardar Proposta</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   if (isAdminMode) {

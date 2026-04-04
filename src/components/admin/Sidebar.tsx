@@ -43,6 +43,7 @@ export function Sidebar({
     { id: 'solicitacoes', label: 'Solicitações', icon: MessageSquare, count: solicitudCount },
     { id: 'clientes', label: 'Clientes', icon: Users, count: clienteCount },
     { id: 'faturacao', label: 'Faturação', icon: DollarSign },
+    { id: 'vendedores', label: 'Vendedores', icon: Users },
   ];
 
   return (
