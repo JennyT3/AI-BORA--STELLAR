@@ -145,8 +145,8 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
       return tarefas.length > 0 ? tarefas : selectedCliente.tarefas || [];
     };
 
-    const tarefasAtuais = selectedCliente.tarefas && selectedCliente.tarefas.length > 0 
-      ? selectedCliente.tarefas 
+    const tarefasAtuais = selectedCliente.tarefas && selectedCliente.tarefas.length > 0
+      ? selectedCliente.tarefas
       : getTarefasFromServicos();
 
     const toggleTarefa = (index: number) => {
@@ -181,7 +181,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                   <span className={`text-[11px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(selectedCliente.categoria)}`}>
                     {getCategoriaLabel(selectedCliente.categoria)}
                   </span>
-                  <button 
+                  <button
                     onClick={() => { const currentIndex = PROCESSOS.findIndex(p => p.id === (selectedCliente.processo || "iniciado")); const nextIndex = (currentIndex + 1) % PROCESSOS.length; onUpdateProcesso(selectedCliente.id, PROCESSOS[nextIndex].id); }}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-none text-[11px] font-semibold cursor-pointer ${processo.colorClass}`}
                   >
@@ -297,7 +297,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                 </div>
               )}
             </div>
-            
+
             {selectedCliente.observacoes && (
               <div className="mt-5 pt-4 border-t border-gray-200">
                 <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Observações</h4>
@@ -313,7 +313,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">Plano de Trabalho</h3>
                 <p className="text-xs text-gray-500">
-                  {selectedCliente.servicos && selectedCliente.servicos.length > 0 
+                  {selectedCliente.servicos && selectedCliente.servicos.length > 0
                     ? `Baseado em: ${selectedCliente.servicos.join(", ")}`
                     : "Selecione as tarefas e defina datas"}
                 </p>
@@ -357,7 +357,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                 return (
                   <div key={index} className={`rounded-xl p-4 border-2 transition-colors ${tarefa.concluida ? "bg-emerald-50 border-emerald-500" : "bg-gray-50 border-gray-200"}`}>
                     <div className="flex items-start gap-3 mb-3">
-                      <button 
+                      <button
                         onClick={() => toggleTarefa(index)}
                         className={`w-6 h-6 rounded-md flex items-center justify-center cursor-pointer shrink-0 transition-colors ${tarefa.concluida ? "bg-emerald-500 border-transparent text-white" : "bg-white border-2 border-gray-200 text-transparent"}`}
                       >
@@ -372,18 +372,18 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] text-gray-500 block mb-1">Data Início</label>
-                        <input 
-                          type="date" 
-                          value={tarefa.dataInicio || ""} 
+                        <input
+                          type="date"
+                          value={tarefa.dataInicio || ""}
                           onChange={(e) => updateDataTarefa(index, "dataInicio", e.target.value)}
                           className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
                         />
                       </div>
                       <div>
                         <label className="text-[10px] text-gray-500 block mb-1">Data Entrega</label>
-                        <input 
-                          type="date" 
-                          value={tarefa.dataEntrega || ""} 
+                        <input
+                          type="date"
+                          value={tarefa.dataEntrega || ""}
                           onChange={(e) => updateDataTarefa(index, "dataEntrega", e.target.value)}
                           className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
                         />
@@ -451,16 +451,16 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
             </tr>
           </thead>
           <tbody>
-            {filtered.map((c) => {
+            {filtered.map((c, i) => {
               const processo = getProcessoInfo(c.processo || "iniciado");
               const ProcessoIcon = processo.icon;
               return (
-                <tr key={c.id} onClick={() => onSelectCliente(c)} className="cursor-pointer border-t border-gray-100 bg-white hover:bg-gray-50 transition-colors">
+                <tr key={`${c.id}-${i}`} onClick={() => onSelectCliente(c)} className="cursor-pointer border-t border-gray-100 bg-white hover:bg-gray-50 transition-colors">
                   <td className="px-3.5 py-3 text-xs"><div className="font-bold text-gray-900">{c.nome}</div></td>
                   <td className="px-3.5 py-3"><span className={`text-[10px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(c.categoria)}`}>{getCategoriaLabel(c.categoria)}</span></td>
                   <td className="px-3.5 py-3">
-                    <button 
-                      onClick={(e) => { 
+                    <button
+                      onClick={(e) => {
                         e.stopPropagation();
                         const currentIndex = PROCESSOS.findIndex(p => p.id === (c.processo || "iniciado"));
                         const nextIndex = (currentIndex + 1) % PROCESSOS.length;
