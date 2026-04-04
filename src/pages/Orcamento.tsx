@@ -13,6 +13,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { createProposal } from "../services/firebase";
 
+import { OrcamentoForm } from '../components/OrcamentoForm';
 
 
 interface MarcaData {
@@ -321,73 +322,16 @@ export function Orcamento() {
                 <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
                 <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial para o seu cliente</p>
               </div>
-              <div style={{ display: "flex", gap: 32 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, border: `1px solid ${theme.colors.border}` }}>
-                    <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 700, fontSize: 16, color: theme.colors.text.primary, margin: "0 0 16px" }}>Dados do Cliente</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Nome *</label><input value={cliente.nome} onChange={(e) => setCliente({...cliente, nome: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Empresa</label><input value={cliente.empresa} onChange={(e) => setCliente({...cliente, empresa: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Email</label><input value={cliente.email} onChange={(e) => setCliente({...cliente, email: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Telefone</label><input value={cliente.telefone} onChange={(e) => setCliente({...cliente, telefone: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>NIF</label><input value={cliente.nif} onChange={(e) => setCliente({...cliente, nif: e.target.value})} placeholder="123456789" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Morada</label><input value={cliente.morada} onChange={(e) => setCliente({...cliente, morada: e.target.value})} placeholder="Rua, Nº, Cidade" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                    </div>
-                  </div>
-                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 20, border: `1px solid ${theme.colors.border}` }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 800, fontSize: 14, color: theme.colors.text.primary }}>Marcas e Redes Sociais</h3>
-                      <button onClick={adicionarMarca} style={{ padding: "6px 12px", borderRadius: 6, backgroundColor: theme.colors.accent.secondary, color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ Adicionar</button>
-                    </div>
-                    {marcas.map((marca, idx) => (
-                      <div key={marca.id} style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 10, padding: 12, marginBottom: 8, border: `1px solid ${theme.colors.border}` }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><span style={{ fontWeight: 700, fontSize: 12 }}>Marca {idx + 1}</span>{marcas.length > 1 && <button onClick={() => removerMarca(marca.id)} style={{ background: "none", border: "none", color: theme.colors.accent.primary, cursor: "pointer", fontSize: 10 }}>X</button>}</div>
-                        <input type="text" value={marca.nome} onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))} placeholder="Nome da marca" style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11, marginBottom: 8, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary }} />
-                        <p style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, marginBottom: 6 }}>Redes Sociais:</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                          {REDES.map(rede => { const isSelected = marca.redes.includes(rede.id); return <button key={rede.id} onClick={() => toggleRede(marca.id, rede.id)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: isSelected ? rede.cor : theme.colors.bg.primary, color: isSelected ? "#ffffff" : theme.colors.text.primary, border: isSelected ? "none" : `1px solid ${theme.colors.border}`, borderRadius: 20, padding: "4px 8px", cursor: "pointer" }}>{rede.nome}</button>; })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <div style={{ marginBottom: 12 }}><h2 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 900, fontSize: "clamp(16px, 3vw, 22px)", color: theme.colors.text.primary, margin: "0 0 4px" }}>Seleciona os Serviços</h2></div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                      {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
-                        const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria];
-                        return (
-                          <div key={categoria} style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8, border: `1px solid ${theme.colors.border}` }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 18 }}>{catIcon}</span><span style={{ fontWeight: 700, fontSize: 12 }}>{categoria}</span></div>
-                            <div style={{ height: 1, backgroundColor: theme.colors.border }} />
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                              {servicos.map((s) => { const sel = marcas[0]?.servicos.includes(s); return <button key={s} onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: sel ? theme.colors.accent.primary : theme.colors.bg.primary, color: sel ? "#ffffff" : theme.colors.text.primary, border: sel ? `1px solid ${theme.colors.accent.primary}` : `1px solid rgba(0,0,0,0.10)`, borderRadius: 20, padding: "3px 8px", cursor: "pointer" }}>{sel ? "✓ " : ""}{s}</button>; })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-                <div style={{ width: 320, flexShrink: 0 }}>
-                  <div style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, position: "sticky", top: 40, border: `1px solid ${theme.colors.border}` }}>
-                    <h3 style={{ fontWeight: 700, fontSize: 16, margin: "0 0 16px", color: theme.colors.text.primary }}>Resumo do Orçamento</h3>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Nº Orçamento</label><input type="text" value={numeroOrcamentoInput} onChange={e => !isEditingProposta && setNumeroOrcamentoInput(e.target.value.toUpperCase())} placeholder="ORC-0001" disabled={isEditingProposta} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 14, fontWeight: 700, textAlign: "center", backgroundColor: isEditingProposta ? theme.colors.bg.tertiary : theme.colors.bg.primary }} /></div>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 18, fontWeight: 700, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontWeight: 700, fontSize: 18 }}>€</span></div></div>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Desconto</label><div style={{ display: "flex", gap: 8 }}><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoPercent || ""} onChange={e => setDescontoPercent(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>%</span></div><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoValor || ""} onChange={e => setDescontoValor(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>€</span></div></div></div>
-                    <div style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>Subtotal (sem IVA)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{subtotalComDesconto.toFixed(2)} €</span></div>
-                      {descuentoAplicado > 0 && <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}`, color: theme.colors.accent.primary }}><span style={{ fontSize: 12, fontWeight: 600 }}>Desconto</span><span style={{ fontSize: 12, fontWeight: 600 }}>- {descuentoAplicado.toFixed(2)} €</span></div>}
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>IVA (23%)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{ivaComDesconto.toFixed(2)} €</span></div>
-                      <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}><span style={{ fontSize: 14, fontWeight: 700 }}>TOTAL</span><span style={{ fontSize: 20, fontWeight: 900, color: theme.colors.accent.primary }}>{totalConDescuento.toFixed(2)} €</span></div>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                      {propostaId ? <a href={`/p/${propostaId}`} target="_blank" style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: theme.colors.accent.primary, color: "#ffffff", border: "none", textDecoration: "none", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Ver Proposta</a> : <button disabled style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: "#ccc", color: "#fff", border: "none" }}>Guardar primeiro</button>}
-                      <button onClick={gerarPDF} disabled={!podeGerarProposta} style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: "#3498DB", color: "#ffffff", border: "none" }}>PDF</button>
-                    </div>
-                    <button onClick={handleGuardarProposta} disabled={!podeGerarProposta} style={{ width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: podeGerarProposta ? theme.colors.accent.secondary : "#cccccc", color: "#ffffff", border: "none" }}>Guardar Proposta</button>
-                  </div>
-                </div>
-              </div>
+              <OrcamentoForm
+                cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
+                adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
+                numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
+                precoTotal={precoTotal} setPrecoTotal={setPrecoTotal} descontoPercent={descontoPercent} setDescontoPercent={setDescontoPercent}
+                descontoValor={descontoValor} setDescontoValor={setDescontoValor}
+                subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
+                propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
+                isPublicView={false}
+              />
             </div>
           </div>
         </main>
@@ -424,80 +368,16 @@ export function Orcamento() {
                 <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial</p>
               </div>
 
-              <div style={{ display: "flex", gap: 32 }}>
-                <div style={{ flex: 1 }}>
-                  {/* CLIENTE INFO */}
-                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, border: `1px solid ${theme.colors.border}` }}>
-                    <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 700, fontSize: 16, color: theme.colors.text.primary, margin: "0 0 16px" }}>Dados do Cliente</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Nome *</label><input value={cliente.nome} onChange={(e) => setCliente({...cliente, nome: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Empresa</label><input value={cliente.empresa} onChange={(e) => setCliente({...cliente, empresa: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Email</label><input value={cliente.email} onChange={(e) => setCliente({...cliente, email: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Telefone</label><input value={cliente.telefone} onChange={(e) => setCliente({...cliente, telefone: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>NIF</label><input value={cliente.nif} onChange={(e) => setCliente({...cliente, nif: e.target.value})} placeholder="123456789" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                      <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Morada</label><input value={cliente.morada} onChange={(e) => setCliente({...cliente, morada: e.target.value})} placeholder="Rua, Nº, Cidade" style={{ width: "100%", padding: "8px", borderRadius: 6, border: `2px solid ${theme.colors.text.primary}`, fontSize: 12, backgroundColor: theme.colors.bg.primary, color: theme.colors.text.primary }} /></div>
-                    </div>
-                  </div>
-
-                  {/* MARCAS E REDES */}
-                  <div style={{ marginBottom: 24, backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 20, border: `1px solid ${theme.colors.border}` }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                      <h3 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 800, fontSize: 14, color: theme.colors.text.primary }}>Marcas e Redes Sociais</h3>
-                      <button onClick={adicionarMarca} style={{ padding: "6px 12px", borderRadius: 6, backgroundColor: theme.colors.accent.secondary, color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ Adicionar</button>
-                    </div>
-                    {marcas.map((marca, idx) => (
-                      <div key={marca.id} style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 10, padding: 12, marginBottom: 8, border: `1px solid ${theme.colors.border}` }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}><span style={{ fontWeight: 700, fontSize: 12 }}>Marca {idx + 1}</span>{marcas.length > 1 && <button onClick={() => removerMarca(marca.id)} style={{ background: "none", border: "none", color: theme.colors.accent.primary, cursor: "pointer", fontSize: 10 }}>X</button>}</div>
-                        <input type="text" value={marca.nome} onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))} placeholder="Nome da marca" style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11, marginBottom: 8, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary }} />
-                        <p style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, marginBottom: 6 }}>Redes Sociais:</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                          {REDES.map(rede => { const isSelected = marca.redes.includes(rede.id); return <button key={rede.id} onClick={() => toggleRede(marca.id, rede.id)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: isSelected ? rede.cor : theme.colors.bg.primary, color: isSelected ? "#ffffff" : theme.colors.text.primary, border: isSelected ? "none" : `1px solid ${theme.colors.border}`, borderRadius: 20, padding: "4px 8px", cursor: "pointer" }}>{rede.nome}</button>; })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* SERVIÇOS */}
-                  <div>
-                    <div style={{ marginBottom: 12 }}><h2 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 900, fontSize: "clamp(16px, 3vw, 22px)", color: theme.colors.text.primary, margin: "0 0 4px" }}>Seleciona os Serviços</h2></div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-                      {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
-                        const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria];
-                        return (
-                          <div key={categoria} style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", gap: 8, border: `1px solid ${theme.colors.border}` }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 18 }}>{catIcon}</span><span style={{ fontWeight: 700, fontSize: 12 }}>{categoria}</span></div>
-                            <div style={{ height: 1, backgroundColor: theme.colors.border }} />
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                              {servicos.map((s) => { const sel = marcas[0]?.servicos.includes(s); return <button key={s} onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: sel ? theme.colors.accent.primary : theme.colors.bg.primary, color: sel ? "#ffffff" : theme.colors.text.primary, border: sel ? `1px solid ${theme.colors.accent.primary}` : `1px solid rgba(0,0,0,0.10)`, borderRadius: 20, padding: "3px 8px", cursor: "pointer" }}>{sel ? "✓ " : ""}{s}</button>; })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* RESUMO SIDEBAR */}
-                <div style={{ width: 320, flexShrink: 0 }}>
-                  <div style={{ backgroundColor: theme.colors.bg.secondary, borderRadius: 16, padding: 24, position: "sticky", top: 40, border: `1px solid ${theme.colors.border}` }}>
-                    <h3 style={{ fontWeight: 700, fontSize: 16, margin: "0 0 16px", color: theme.colors.text.primary }}>Resumo do Orçamento</h3>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Nº Orçamento</label><input type="text" value={numeroOrcamentoInput} onChange={e => !isEditingProposta && setNumeroOrcamentoInput(e.target.value.toUpperCase())} placeholder="ORC-0001" disabled={isEditingProposta} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 14, fontWeight: 700, textAlign: "center", backgroundColor: isEditingProposta ? theme.colors.bg.tertiary : theme.colors.bg.primary }} /></div>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.text.primary}`, fontSize: 18, fontWeight: 700, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontWeight: 700, fontSize: 18 }}>€</span></div></div>
-                    <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Desconto</label><div style={{ display: "flex", gap: 8 }}><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoPercent || ""} onChange={e => setDescontoPercent(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>%</span></div><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoValor || ""} onChange={e => setDescontoValor(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: theme.colors.bg.primary }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>€</span></div></div></div>
-                    <div style={{ backgroundColor: theme.colors.bg.primary, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>Subtotal (sem IVA)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{subtotalComDesconto.toFixed(2)} €</span></div>
-                      {descuentoAplicado > 0 && <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}`, color: theme.colors.accent.primary }}><span style={{ fontSize: 12, fontWeight: 600 }}>Desconto</span><span style={{ fontSize: 12, fontWeight: 600 }}>- {descuentoAplicado.toFixed(2)} €</span></div>}
-                      <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>IVA (23%)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{ivaComDesconto.toFixed(2)} €</span></div>
-                      <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}><span style={{ fontSize: 14, fontWeight: 700 }}>TOTAL</span><span style={{ fontSize: 20, fontWeight: 900, color: theme.colors.accent.primary }}>{totalConDescuento.toFixed(2)} €</span></div>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                      {propostaId ? <a href={`/p/${propostaId}`} target="_blank" style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: theme.colors.accent.primary, color: "#ffffff", border: "none", textDecoration: "none", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>Ver Proposta</a> : <button disabled style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, backgroundColor: "#ccc", color: "#fff", border: "none" }}>Guardar primeiro</button>}
-                      <button onClick={gerarPDF} disabled={!podeGerarProposta} style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: "#3498DB", color: "#ffffff", border: "none" }}>PDF</button>
-                    </div>
-                    <button onClick={handleGuardarProposta} disabled={!podeGerarProposta} style={{ width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: podeGerarProposta ? theme.colors.accent.secondary : "#cccccc", color: "#ffffff", border: "none" }}>Guardar Proposta</button>
-                  </div>
-                </div>
-              </div>
+              <OrcamentoForm
+                cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
+                adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
+                numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
+                precoTotal={precoTotal} setPrecoTotal={setPrecoTotal} descontoPercent={descontoPercent} setDescontoPercent={setDescontoPercent}
+                descontoValor={descontoValor} setDescontoValor={setDescontoValor}
+                subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
+                propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
+                isPublicView={false}
+              />
             </div>
           </div>
         </main>
@@ -517,87 +397,17 @@ export function Orcamento() {
         </section>
 
         <section style={{ backgroundColor: "#ffffff", padding: "48px 16px" }}>
-          <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", gap: 32, alignItems: "flex-start", flexWrap: "wrap" }}>
-            <div style={{ flex: "1 1 600px" }}>
-              
-              {/* DADOS DO CLIENTE */}
-              <div style={{ marginBottom: 24, backgroundColor: "#F5F2F0", borderRadius: 16, padding: 24 }}>
-                <h3 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 800, fontSize: 18, color: "#1A1A1A", margin: "0 0 16px" }}>👤 Dados do Cliente</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <div style={{ position: "relative" }}>
-                    <label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Nome Completo *</label>
-                    <input type="text" value={cliente.nome} onChange={e => setCliente({...cliente, nome: e.target.value})} placeholder="Ex: João Silva" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} />
-                  </div>
-                  <div><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Empresa</label><input type="text" value={cliente.empresa} onChange={e => setCliente({...cliente, empresa: e.target.value})} placeholder="Ex: Empresa, Lda" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} /></div>
-                  <div><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Email</label><input type="email" value={cliente.email} onChange={e => setCliente({...cliente, email: e.target.value})} placeholder="email@empresa.pt" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} /></div>
-                  <div><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Telefone</label><input type="tel" value={cliente.telefone} onChange={e => setCliente({...cliente, telefone: e.target.value})} placeholder="+351 912 345 678" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} /></div>
-                  <div><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>NIF</label><input type="text" value={cliente.nif} onChange={e => setCliente({...cliente, nif: e.target.value})} placeholder="123456789" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} /></div>
-                  <div><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Morada</label><input type="text" value={cliente.morada} onChange={e => setCliente({...cliente, morada: e.target.value})} placeholder="Rua Example, 123" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13 }} /></div>
-                </div>
-              </div>
-
-              {/* MARCAS E REDES */}
-              <div style={{ marginBottom: 24, backgroundColor: "#F5F2F0", borderRadius: 16, padding: 24 }}>
-                <h3 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 800, fontSize: 16, color: "#1A1A1A", margin: "0 0 16px" }}>🏷️ Marcas e Redes Sociais</h3>
-                {marcas.map((marca, idx) => (
-                  <div key={marca.id} style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 16, marginBottom: 12, border: "1px solid #e0ddd9" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}><span style={{ fontWeight: 700, fontSize: 14 }}>Marca {idx + 1}</span>{marcas.length > 1 && <button onClick={() => removerMarca(marca.id)} style={{ background: "none", border: "none", color: "#F22283", cursor: "pointer" }}>✕</button>}</div>
-                    <input type="text" value={marca.nome} onChange={e => setMarcas(prev => prev.map(m => m.id === marca.id ? { ...m, nome: e.target.value } : m))} placeholder="Nome da marca" style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, marginBottom: 12 }} />
-                    <p style={{ fontSize: 11, fontWeight: 600, color: "#666", marginBottom: 8 }}>Redes Sociais:</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {REDES.map(rede => { const isSelected = marca.redes.includes(rede.id); return <button key={rede.id} onClick={() => toggleRede(marca.id, rede.id)} style={{ fontSize: 10, fontWeight: 600, backgroundColor: isSelected ? rede.cor : "#ffffff", color: isSelected ? "#ffffff" : "#1A1A1A", border: isSelected ? "none" : "1px solid #ddd", borderRadius: 20, padding: "6px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>{rede.nome}</button>; })}
-                    </div>
-                  </div>
-                ))}
-                <button onClick={adicionarMarca} style={{ width: "100%", padding: "12px", borderRadius: 10, border: "2px dashed #ccc", backgroundColor: "transparent", color: "#666", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><Plus size={16} /> Adicionar Marca</button>
-              </div>
-
-              {/* SERVIÇOS */}
-              <div>
-                <div style={{ marginBottom: 20 }}><h2 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(20px, 4vw, 28px)", color: "#1A1A1A", margin: "0 0 8px" }}>Seleciona os Serviços</h2></div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
-                  {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
-                    const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria];
-                    return (
-                      <div key={categoria} style={{ backgroundColor: "#F5F2F0", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 24 }}>{catIcon}</span><span style={{ fontWeight: 800, fontSize: 15 }}>{categoria}</span></div>
-                        <div style={{ height: 1, backgroundColor: "#e0ddd9" }} />
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                          {servicos.map((s) => { const sel = marcas[0]?.servicos.includes(s); return <button key={s} onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)} style={{ fontSize: 11, fontWeight: 600, backgroundColor: sel ? "#F22283" : "#ffffff", color: sel ? "#ffffff" : "#1A1A1A", border: sel ? "1px solid #F22283" : "1px solid rgba(0,0,0,0.10)", borderRadius: 20, padding: "5px 12px", cursor: "pointer" }}>{sel ? "✓ " : ""}{s}</button>; })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-            </div>
-
-            {/* SIDEBAR RESUMO */}
-            <div style={{ flex: "0 1 320px", position: "sticky", top: 100 }}>
-              <div style={{ backgroundColor: "#F5F2F0", borderRadius: 16, padding: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-                <h3 style={{ fontWeight: 700, fontSize: 16, margin: "0 0 16px" }}>📋 Resumo do Orçamento</h3>
-                <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Nº Orçamento</label><input type="text" value={numeroOrcamentoInput} onChange={e => !isEditingProposta && setNumeroOrcamentoInput(e.target.value.toUpperCase())} placeholder="ORC-0001" disabled={isEditingProposta} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "2px solid #1A1A1A", fontSize: 14, fontWeight: 700, textAlign: "center", backgroundColor: isEditingProposta ? "#f0f0f0" : "#fff" }} /></div>
-                <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: "2px solid #1A1A1A", fontSize: 18, fontWeight: 700, textAlign: "right" }} /><span style={{ fontWeight: 700, fontSize: 18 }}>€</span></div></div>
-                <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: "#666", display: "block", marginBottom: 6 }}>Desconto</label><div style={{ display: "flex", gap: 8 }}><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoPercent || ""} onChange={e => setDescontoPercent(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #ddd", fontSize: 13, textAlign: "right" }} /><span style={{ fontSize: 12, color: "#666" }}>%</span></div><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoValor || ""} onChange={e => setDescontoValor(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #ddd", fontSize: 13, textAlign: "right" }} /><span style={{ fontSize: 12, color: "#666" }}>€</span></div></div></div>
-                <div style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px dashed #e0ddd9" }}><span style={{ fontSize: 12, color: "#666" }}>Subtotal (sem IVA)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{subtotalComDesconto.toFixed(2)} €</span></div>
-                  {descuentoAplicado > 0 && <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px dashed #e0ddd9", color: "#F25C05" }}><span style={{ fontSize: 12, fontWeight: 600 }}>Desconto</span><span style={{ fontSize: 12, fontWeight: 600 }}>- {descuentoAplicado.toFixed(2)} €</span></div>}
-                  <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px dashed #e0ddd9" }}><span style={{ fontSize: 12, color: "#666" }}>IVA (23%)</span><span style={{ fontSize: 12, fontWeight: 600 }}>{ivaComDesconto.toFixed(2)} €</span></div>
-                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8 }}><span style={{ fontSize: 14, fontWeight: 700 }}>TOTAL</span><span style={{ fontSize: 18, fontWeight: 900, color: "#F22283" }}>{totalConDescuento.toFixed(2)} €</span></div>
-                </div>
-                
-                <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                  <button onClick={gerarPDF} disabled={!podeGerarProposta} style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: "#3498DB", color: "#ffffff", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>📄 Preview PDF</button>
-                  {propostaId ? (
-                    <a href={`/p/${propostaId}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: "pointer", backgroundColor: "#F22283", color: "#ffffff", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textDecoration: "none" }}>👁️ Preview Proposta</a>
-                  ) : (
-                    <button disabled style={{ flex: 1, padding: "12px", borderRadius: 10, fontWeight: 700, fontSize: 12, cursor: "not-allowed", backgroundColor: "#666666", color: "#aaaaaa", border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>👁️ Guardar primeiro</button>
-                  )}
-                </div>
-                <button onClick={handleGuardarProposta} disabled={!podeGerarProposta} style={{ width: "100%", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 13, cursor: podeGerarProposta ? "pointer" : "not-allowed", backgroundColor: podeGerarProposta ? "#F25C05" : "#cccccc", color: "#ffffff", border: "none" }}>💾 Guardar Proposta</button>
-              </div>
-            </div>
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+            <OrcamentoForm
+              cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
+              adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
+              numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
+              precoTotal={precoTotal} setPrecoTotal={setPrecoTotal} descontoPercent={descontoPercent} setDescontoPercent={setDescontoPercent}
+              descontoValor={descontoValor} setDescontoValor={setDescontoValor}
+              subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
+              propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
+              isPublicView={true}
+            />
           </div>
         </section>
         <CTAFooterSection />
