@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { listClientes, deleteCliente, updateCliente } from '../services/firebase';
+import { Cliente } from '../types';
+import { Cliente } from '../types';
 
 export function useClientes() {
-  const [clientes, setClientes] = useState<any[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +27,7 @@ export function useClientes() {
     setClientes(prev => prev.filter(c => c.id !== id));
   };
 
-  const updateClienteData = async (id: string, data: any) => {
+  const updateClienteData = async (id: string, data: Partial<Cliente>) => {
     await updateCliente(id, data);
     setClientes(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
   };

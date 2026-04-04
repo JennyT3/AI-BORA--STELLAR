@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app';
+import { Proposal, Cliente, OrcamentoRequest } from '../types';
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -25,7 +26,7 @@ export function generateProposalId() {
 }
 
 // Create new proposal
-export async function createProposal(data: any): Promise<string> {
+export async function createProposal(data: Partial<Proposal>): Promise<string> {
   const id = generateProposalId();
   const docData = {
     ...data,
@@ -37,7 +38,7 @@ export async function createProposal(data: any): Promise<string> {
 }
 
 // Get proposal by ID
-export async function getProposal(id: string): Promise<any | null> {
+export async function getProposal(id: string): Promise<Proposal | null> {
   const docSnap = await getDoc(doc(db, 'propostas', id));
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() };
@@ -46,7 +47,7 @@ export async function getProposal(id: string): Promise<any | null> {
 }
 
 // Update proposal
-export async function updateProposal(id: string, data: any): Promise<void> {
+export async function updateProposal(id: string, data: Partial<Proposal>): Promise<void> {
   await updateDoc(doc(db, 'propostas', id), {
     ...data,
     updatedAt: new Date().toISOString()
@@ -59,14 +60,14 @@ export async function deleteProposal(id: string): Promise<void> {
 }
 
 // List all proposals (most recent first)
-export async function listProposals(limitNum: number = 50): Promise<any[]> {
+export async function listProposals(limitNum: number = 50): Promise<Proposal[]> {
   const q = query(collection(db, 'propostas'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 // Check if proposal is valid (within 10 days)
-export function isProposalValid(proposal: any): boolean {
+export function isProposalValid(proposal: Proposal): boolean {
   if (!proposal.validUntil) return true;
   return new Date(proposal.validUntil) > new Date();
 }
@@ -74,7 +75,7 @@ export function isProposalValid(proposal: any): boolean {
 // ========== SOLICITUDES DE ORÇAMENTO (Clientes pidiendo orçamento) ==========
 
 // Create new Orçamento request (cliente pide orçamento sin precio aún)
-export async function createOrcamentoRequest(data: any): Promise<string> {
+export async function createOrcamentoRequest(data: Partial<OrcamentoRequest>): Promise<string> {
   const id = generateProposalId();
   const docData = {
     ...data,
@@ -87,14 +88,14 @@ export async function createOrcamentoRequest(data: any): Promise<string> {
 }
 
 // List all Orçamento requests
-export async function listOrcamentoRequests(limitNum: number = 50): Promise<any[]> {
+export async function listOrcamentoRequests(limitNum: number = 50): Promise<OrcamentoRequest[]> {
   const q = query(collection(db, 'solicitacoes'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 // Update Orçamento request status
-export async function updateOrcamentoRequest(id: string, data: any): Promise<void> {
+export async function updateOrcamentoRequest(id: string, data: Partial<OrcamentoRequest>): Promise<void> {
   await updateDoc(doc(db, 'solicitacoes', id), {
     ...data,
     updatedAt: new Date().toISOString()
@@ -108,7 +109,7 @@ export async function deleteOrcamentoRequest(id: string): Promise<void> {
 
 // ========== CLIENTES ==========
 
-export async function createCliente(data: any): Promise<string> {
+export async function createCliente(data: Partial<Cliente>): Promise<string> {
   const id = generateProposalId();
   const docData = {
     ...data,
@@ -121,7 +122,7 @@ export async function createCliente(data: any): Promise<string> {
   return id;
 }
 
-export async function getCliente(id: string): Promise<any | null> {
+export async function getCliente(id: string): Promise<Cliente | null> {
   const docSnap = await getDoc(doc(db, 'clientes', id));
   if (docSnap.exists()) {
     return { id: docSnap.id, ...docSnap.data() };
@@ -129,7 +130,7 @@ export async function getCliente(id: string): Promise<any | null> {
   return null;
 }
 
-export async function updateCliente(id: string, data: any): Promise<void> {
+export async function updateCliente(id: string, data: Partial<Cliente>): Promise<void> {
   await updateDoc(doc(db, 'clientes', id), {
     ...data,
     updatedAt: new Date().toISOString()
@@ -140,13 +141,13 @@ export async function deleteCliente(id: string): Promise<void> {
   await deleteDoc(doc(db, 'clientes', id));
 }
 
-export async function listClientes(limitNum: number = 100): Promise<any[]> {
+export async function listClientes(limitNum: number = 100): Promise<Cliente[]> {
   const q = query(collection(db, 'clientes'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-export async function getClientesByCategoria(categoria: string): Promise<any[]> {
+export async function getClientesByCategoria(categoria: string): Promise<Cliente[]> {
   const q = query(collection(db, 'clientes'), where('categoria', '==', categoria));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

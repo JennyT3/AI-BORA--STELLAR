@@ -25,7 +25,7 @@ export function useSolicitudes() {
     setSolicitudes(prev => prev.filter(s => s.id !== id));
   };
 
-  const updateStatus = async (id: string, status: any) => {
+  const updateStatus = async (id: string, status: string) => {
     await updateSolicitudeStatus(id, status);
     setSolicitudes(prev => prev.map(s => s.id === id ? { ...s, status } : s));
   };
