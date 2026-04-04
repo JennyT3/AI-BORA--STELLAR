@@ -149,7 +149,7 @@ export function Admin() {
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Utilizador</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Email" style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", backgroundColor: "#fafafa", color: "theme.colors.text.primary" }} />
+              <input type="email" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Email" style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", backgroundColor: "#fafafa", color: "theme.colors.text.primary" }} />
             </div>
             <div style={{ marginBottom: 24 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Password</label>
@@ -163,7 +163,7 @@ export function Admin() {
     );
   }
 
-  const getUserName = (userId: string) => USERS.find(u => u.id === userId)?.nome || userId;
+  const getUserName = (userId: string) => userId;
   const getStatusColor = (p: any) => { if (p.resposta === "sim") return "#10B981"; if (p.resposta === "nao") return "#dc2626"; if (p.resposta === "reagendar") return "theme.colors.accent.primary"; if (p.dataEnvio) return "#3498DB"; return "theme.colors.text.secondary"; };
   const getStatusLabel = (p: any) => { if (p.resposta === "sim") return "Aceite"; if (p.resposta === "nao") return "Recusada"; if (p.resposta === "reagendar") return "Reagendada"; if (p.dataEnvio) return "Enviada"; return "Pendente"; };
   const getCategoriaColor = (cat: string) => { 
@@ -195,7 +195,7 @@ export function Admin() {
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab as any)}
         userName={currentUser?.nome || ""}
-        onLogout={() => { setAuthenticated(false); setCurrentUser(null); localStorage.removeItem("adminUser"); }}
+        onLogout={() => logout('admin')}
         proposalCount={proposals.length}
         solicitudCount={solicitudes.filter(s => s.status === "pendente").length}
         clienteCount={clientes.length}

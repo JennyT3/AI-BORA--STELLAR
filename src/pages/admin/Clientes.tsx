@@ -1,4 +1,3 @@
-import { theme } from "../../styles/theme";
 import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles } from "lucide-react";
 
 interface ClientesProps {
@@ -30,19 +29,19 @@ interface ClientesProps {
 }
 
 const PROCESSOS = [
-  { id: "iniciado", label: "Iniciado", color: "#8B5CF6", icon: Play },
-  { id: "em_processo", label: "Em Processo", color: "#F59E0B", icon: Clock },
-  { id: "em_revisao", label: "Em Revisão", color: "#3498DB", icon: Eye },
-  { id: "publicado", label: "Publicado", color: "#10B981", icon: CheckCircle },
+  { id: "iniciado", label: "Iniciado", colorClass: "bg-violet-50 text-violet-600", icon: Play },
+  { id: "em_processo", label: "Em Processo", colorClass: "bg-amber-50 text-amber-600", icon: Clock },
+  { id: "em_revisao", label: "Em Revisão", colorClass: "bg-sky-50 text-sky-600", icon: Eye },
+  { id: "publicado", label: "Publicado", colorClass: "bg-emerald-50 text-emerald-600", icon: CheckCircle },
 ];
 
-const getCategoriaColor = (cat: string) => {
-  if (cat === "cliente") return "#10B981";
-  if (cat === "proposta_enviada") return "#F59E0B";
-  if (cat === "potencial") return "#F97316";
-  if (cat === "curioso") return "#8B5CF6";
-  if (cat === "sem_interesse") return "#DC2626";
-  return theme.colors.text.secondary;
+const getCategoriaClasses = (cat: string) => {
+  if (cat === "cliente") return "bg-emerald-50 text-emerald-600";
+  if (cat === "proposta_enviada") return "bg-amber-50 text-amber-600";
+  if (cat === "potencial") return "bg-orange-50 text-orange-600";
+  if (cat === "curioso") return "bg-violet-50 text-violet-600";
+  if (cat === "sem_interesse") return "bg-red-50 text-red-600";
+  return "bg-gray-100 text-gray-500";
 };
 
 const getCategoriaLabel = (cat: string) => {
@@ -164,27 +163,27 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
 
     return (
       <div>
-        <div style={{ marginBottom: 24 }}>
-          <button onClick={() => onSelectCliente(null)} style={{ padding: "10px 16px", borderRadius: 8, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `1px solid ${theme.colors.border}`, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="mb-6">
+          <button onClick={() => onSelectCliente(null)} className="px-4 py-2.5 rounded-lg bg-white text-gray-900 border border-gray-200 text-xs cursor-pointer flex items-center gap-2">
             ← Voltar
           </button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-          <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-              <div style={{ width: 60, height: 60, borderRadius: "50%", backgroundColor: theme.colors.accent.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 24 }}>
+              <div className="w-15 h-15 rounded-full bg-[#F25C05] flex items-center justify-center text-white font-bold text-2xl shrink-0">
                 {selectedCliente.nome?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 style={{ fontFamily: theme.fontFamily.sans, fontWeight: 800, fontSize: 24, color: theme.colors.text.primary, marginBottom: 4 }}>{selectedCliente.nome}</h2>
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, backgroundColor: getCategoriaColor(selectedCliente.categoria) + "20", padding: "4px 10px", borderRadius: 12, color: getCategoriaColor(selectedCliente.categoria), fontWeight: 600 }}>
+                <h2 className="font-sans font-extrabold text-2xl text-gray-900 mb-1">{selectedCliente.nome}</h2>
+                <div className="flex gap-2 items-center">
+                  <span className={`text-[11px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(selectedCliente.categoria)}`}>
                     {getCategoriaLabel(selectedCliente.categoria)}
                   </span>
                   <button 
                     onClick={() => { const currentIndex = PROCESSOS.findIndex(p => p.id === (selectedCliente.processo || "iniciado")); const nextIndex = (currentIndex + 1) % PROCESSOS.length; onUpdateProcesso(selectedCliente.id, PROCESSOS[nextIndex].id); }}
-                    style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, backgroundColor: processo.color + "15", color: processo.color, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-none text-[11px] font-semibold cursor-pointer ${processo.colorClass}`}
                   >
                     <ProcessoIcon size={12} />
                     {processo.label}
@@ -193,215 +192,200 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 12 }}>
+            <div className="flex gap-3">
               {selectedCliente.categoria === "cliente" && (
-                <button onClick={() => onFaturar(selectedCliente)} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Gerar Fatura</button>
+                <button onClick={() => onFaturar(selectedCliente)} className="px-5 py-3 rounded-xl bg-[#F25C05] text-white border-none font-semibold cursor-pointer text-[13px]">Gerar Fatura</button>
               )}
-              <button onClick={() => onEditar(selectedCliente)} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `1px solid ${theme.colors.border}`, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Editar</button>
-              <button onClick={() => { if (confirm("Eliminar cliente?")) onEliminar(selectedCliente.id); }} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: "#fee2e2", color: "#dc2626", border: "none", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Eliminar</button>
+              <button onClick={() => onEditar(selectedCliente)} className="px-5 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 font-semibold cursor-pointer text-[13px]">Editar</button>
+              <button onClick={() => { if (confirm("Eliminar cliente?")) onEliminar(selectedCliente.id); }} className="px-5 py-3 rounded-xl bg-red-100 text-red-600 border-none font-semibold cursor-pointer text-[13px]">Eliminar</button>
             </div>
           </div>
 
-          <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: theme.colors.text.secondary, textTransform: "uppercase", marginBottom: 16 }}>Dados de Contacto</h3>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Phone size={16} color={theme.colors.text.tertiary} />
-                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.telemovel || "—"}</span>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Dados de Contacto</h3>
+            <div className="grid gap-3">
+              <div className="flex items-center gap-3">
+                <Phone size={16} className="text-gray-400" />
+                <span className="text-gray-900">{selectedCliente.telemovel || "—"}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Mail size={16} color={theme.colors.text.tertiary} />
-                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.email || "—"}</span>
+              <div className="flex items-center gap-3">
+                <Mail size={16} className="text-gray-400" />
+                <span className="text-gray-900">{selectedCliente.email || "—"}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <MapPin size={16} color={theme.colors.text.tertiary} />
-                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.morada || "—"}</span>
+              <div className="flex items-center gap-3">
+                <MapPin size={16} className="text-gray-400" />
+                <span className="text-gray-900">{selectedCliente.morada || "—"}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Building size={16} color={theme.colors.text.tertiary} />
-                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.nif || "—"} (NIF)</span>
+              <div className="flex items-center gap-3">
+                <Building size={16} className="text-gray-400" />
+                <span className="text-gray-900">{selectedCliente.nif || "—"} (NIF)</span>
               </div>
               {selectedCliente.empresa && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <Building size={16} color={theme.colors.text.tertiary} />
-                  <span style={{ color: theme.colors.text.primary }}>{selectedCliente.empresa}</span>
+                <div className="flex items-center gap-3">
+                  <Building size={16} className="text-gray-400" />
+                  <span className="text-gray-900">{selectedCliente.empresa}</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: theme.colors.text.secondary, textTransform: "uppercase", marginBottom: 16 }}>Orçamento</h3>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Orçamento</h3>
             {selectedCliente.propostaNumero ? (
-              <div style={{ display: "grid", gap: 12 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Número</span>
-                  <a href={`/admin/orcamento?edit=${selectedCliente.propostaId}`} target="_blank" style={{ color: "#3498DB", fontWeight: 700, fontSize: 14, textDecoration: "none" }}>{selectedCliente.propostaNumero}</a>
+              <div className="grid gap-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 text-[13px]">Número</span>
+                  <a href={`/admin/orcamento?edit=${selectedCliente.propostaId}`} target="_blank" className="text-sky-500 font-bold text-sm no-underline">{selectedCliente.propostaNumero}</a>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Valor</span>
-                  <span style={{ color: theme.colors.accent.primary, fontWeight: 700, fontSize: 18 }}>{selectedCliente.propostaValor?.toFixed(2) || "0.00"} €</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 text-[13px]">Valor</span>
+                  <span className="text-[#F25C05] font-bold text-lg">{selectedCliente.propostaValor?.toFixed(2) || "0.00"} €</span>
                 </div>
                 {selectedCliente.dataEnvio && (
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Enviada</span>
-                    <span style={{ color: "#3498DB", fontSize: 13 }}>{selectedCliente.dataEnvio}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 text-[13px]">Enviada</span>
+                    <span className="text-sky-500 text-[13px]">{selectedCliente.dataEnvio}</span>
                   </div>
                 )}
                 {selectedCliente.resposta && (
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Resposta</span>
-                    <span style={{ 
-                      fontSize: 12, padding: "4px 10px", borderRadius: 6, fontWeight: 600,
-                      backgroundColor: selectedCliente.resposta === "sim" ? "#dcfce7" : selectedCliente.resposta === "nao" ? "#fee2e2" : "#fef3c7",
-                      color: selectedCliente.resposta === "sim" ? "#16a34a" : selectedCliente.resposta === "nao" ? "#dc2626" : "#d97706"
-                    }}>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 text-[13px]">Resposta</span>
+                    <span className={`text-[12px] px-2.5 py-1 rounded-md font-semibold ${(selectedCliente?.resposta || c?.resposta) === "sim" ? "bg-emerald-100 text-emerald-600" : (selectedCliente?.resposta || c?.resposta) === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
                       {selectedCliente.resposta === "sim" ? "✓ Aceito" : selectedCliente.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
                     </span>
                   </div>
                 )}
                 {selectedCliente.propostaId && (
                   <div style={{ marginTop: 8 }}>
-                    <a href={`/p/${selectedCliente.propostaId}`} target="_blank" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 8, backgroundColor: "#3498DB", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, textDecoration: "none", cursor: "pointer" }}>
+                    <a href={`/p/${selectedCliente.propostaId}`} target="_blank" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-sky-500 text-white border-none text-xs font-semibold no-underline cursor-pointer">
                       <FileText size={14} /> Ver Proposta
                     </a>
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ textAlign: "center", padding: 20, color: theme.colors.text.tertiary }}>
-                <FileText size={32} style={{ marginBottom: 8, opacity: 0.5 }} />
-                <div style={{ fontSize: 13 }}>Sem orçamento vinculado</div>
-                <button onClick={() => onVincularProposta(selectedCliente)} style={{ marginTop: 12, padding: "8px 16px", borderRadius: 8, backgroundColor: "#F59E0B", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Vincular Proposta</button>
+              <div className="text-center p-5 text-gray-400">
+                <FileText size={32} className="mb-2 opacity-50" />
+                <div className="text-[13px]">Sem orçamento vinculado</div>
+                <button onClick={() => onVincularProposta(selectedCliente)} className="mt-3 px-4 py-2 rounded-lg bg-amber-500 text-white border-none text-xs font-semibold cursor-pointer">Vincular Proposta</button>
               </div>
             )}
           </div>
 
-          <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: theme.colors.text.secondary, textTransform: "uppercase", marginBottom: 16 }}>Histórico</h3>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <Calendar size={16} color={theme.colors.text.tertiary} />
-                <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Entrada</span>
-                <span style={{ color: theme.colors.text.primary, fontSize: 13, marginLeft: "auto" }}>
+          <div className="bg-white rounded-2xl p-6 border border-gray-200">
+            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Histórico</h3>
+            <div className="grid gap-3">
+              <div className="flex items-center gap-3">
+                <Calendar size={16} className="text-gray-400" />
+                <span className="text-gray-500 text-[13px]">Entrada</span>
+                <span className="text-gray-900 text-[13px] ml-auto">
                   {selectedCliente.createdAt ? new Date(selectedCliente.createdAt).toLocaleDateString("pt-PT") : "—"}
                 </span>
               </div>
               {selectedCliente.origem && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <Building size={16} color={theme.colors.text.tertiary} />
-                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Origem</span>
-                  <span style={{ color: theme.colors.text.primary, fontSize: 13, marginLeft: "auto" }}>{selectedCliente.origem}</span>
+                <div className="flex items-center gap-3">
+                  <Building size={16} className="text-gray-400" />
+                  <span className="text-gray-500 text-[13px]">Origem</span>
+                  <span className="text-gray-900 text-[13px] ml-auto">{selectedCliente.origem}</span>
                 </div>
               )}
               {selectedCliente.dataResposta && (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <Calendar size={16} color={theme.colors.text.tertiary} />
-                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Data Resposta</span>
-                  <span style={{ color: theme.colors.text.primary, fontSize: 13, marginLeft: "auto" }}>{new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT")}</span>
+                <div className="flex items-center gap-3">
+                  <Calendar size={16} className="text-gray-400" />
+                  <span className="text-gray-500 text-[13px]">Data Resposta</span>
+                  <span className="text-gray-900 text-[13px] ml-auto">{new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT")}</span>
                 </div>
               )}
             </div>
             
             {selectedCliente.observacoes && (
-              <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid #e8e8e8" }}>
-                <h4 style={{ fontSize: 12, fontWeight: 700, color: theme.colors.text.secondary, textTransform: "uppercase", marginBottom: 12 }}>Observações</h4>
-                <p style={{ fontSize: 13, color: theme.colors.text.primary, lineHeight: 1.6 }}>{selectedCliente.observacoes}</p>
+              <div className="mt-5 pt-4 border-t border-gray-200">
+                <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Observações</h4>
+                <p className="text-[13px] text-gray-900 leading-relaxed">{selectedCliente.observacoes}</p>
               </div>
             )}
           </div>
         </div>
 
         {selectedCliente.categoria === "cliente" && (
-          <div style={{ marginTop: 24, backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div className="mt-6 bg-white rounded-2xl p-6 border border-gray-200">
+            <div className="flex justify-between items-center mb-5">
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: theme.colors.text.primary, marginBottom: 4 }}>Plano de Trabalho</h3>
-                <p style={{ fontSize: 12, color: theme.colors.text.secondary }}>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Plano de Trabalho</h3>
+                <p className="text-xs text-gray-500">
                   {selectedCliente.servicos && selectedCliente.servicos.length > 0 
                     ? `Baseado em: ${selectedCliente.servicos.join(", ")}`
                     : "Selecione as tarefas e defina datas"}
                 </p>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ fontSize: 12, color: theme.colors.text.secondary }}>
+              <div className="flex items-center gap-4">
+                <div className="text-xs text-gray-500">
                   Progresso: {tarefasAtuais.filter((t: any) => t.concluida).length} / {tarefasAtuais.length}
                 </div>
-                <div style={{ width: 100, height: 8, backgroundColor: "#e8e8e8", borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ width: `${(tarefasAtuais.filter((t: any) => t.concluida).length / tarefasAtuais.length) * 100 || 0}%`, height: "100%", backgroundColor: theme.colors.status.success, borderRadius: 4 }} />
+                <div className="w-[100px] h-2 bg-gray-200 rounded-sm overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-sm" style={{ width: `${(tarefasAtuais.filter((t: any) => t.concluida).length / tarefasAtuais.length) * 100 || 0}%` }} />
                 </div>
               </div>
             </div>
 
             {processo.id === "publicado" && selectedCliente.publicacaoData && (
-              <div style={{ backgroundColor: "#E8F5E9", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <div className="bg-emerald-50 rounded-xl p-4 mb-5">
+                <div className="flex items-center gap-2 mb-3">
                   <CheckCircle size={20} color="#10B981" />
-                  <span style={{ fontWeight: 700, color: "#10B981" }}>ProjetoPublicado!</span>
+                  <span className="font-bold text-emerald-500">ProjetoPublicado!</span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+                <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <span style={{ fontSize: 11, color: theme.colors.text.secondary }}>Data</span>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>{selectedCliente.publicacaoData}</div>
+                    <span className="text-[11px] text-gray-500">Data</span>
+                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoData}</div>
                   </div>
                   <div>
-                    <span style={{ fontSize: 11, color: theme.colors.text.secondary }}>Horário</span>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>{selectedCliente.publicacaoHora || "—"}</div>
+                    <span className="text-[11px] text-gray-500">Horário</span>
+                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoHora || "—"}</div>
                   </div>
                   <div>
-                    <span style={{ fontSize: 11, color: theme.colors.text.secondary }}>Plataforma</span>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>{selectedCliente.publicacaoPlataforma || "—"}</div>
+                    <span className="text-[11px] text-gray-500">Plataforma</span>
+                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoPlataforma || "—"}</div>
                   </div>
                 </div>
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
               {tarefasAtuais.map((tarefa: any, index: number) => {
                 const Icon = tarefa.icon || FileText;
                 return (
-                  <div key={index} style={{ 
-                    backgroundColor: tarefa.concluida ? "#dcfce7" : "#fafafa", 
-                    borderRadius: 12, 
-                    padding: 16, 
-                    border: `2px solid ${tarefa.concluida ? "#10B981" : "#e8e8e8"}`,
-                  }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
+                  <div key={index} className={`rounded-xl p-4 border-2 transition-colors ${tarefa.concluida ? "bg-emerald-50 border-emerald-500" : "bg-gray-50 border-gray-200"}`}>
+                    <div className="flex items-start gap-3 mb-3">
                       <button 
                         onClick={() => toggleTarefa(index)}
-                        style={{ 
-                          width: 24, height: 24, borderRadius: 6, 
-                          backgroundColor: tarefa.concluida ? "#10B981" : "#fff",
-                          border: tarefa.concluida ? "none" : `2px solid ${theme.colors.border}`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          cursor: "pointer", flexShrink: 0 
-                        }}
+                        className={`w-6 h-6 rounded-md flex items-center justify-center cursor-pointer shrink-0 transition-colors ${tarefa.concluida ? "bg-emerald-500 border-transparent text-white" : "bg-white border-2 border-gray-200 text-transparent"}`}
                       >
                         {tarefa.concluida && <Check size={14} color="#fff" />}
                       </button>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 600, fontSize: 13, color: theme.colors.text.primary, textDecoration: tarefa.concluida ? "line-through" : "none" }}>{tarefa.nome}</div>
+                        <div className={`font-semibold text-[13px] text-gray-900 ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</div>
                         <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 2 }}>{tarefa.descricao}</div>
                       </div>
                       <Icon size={18} color={tarefa.concluida ? "#10B981" : theme.colors.text.tertiary} />
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label style={{ fontSize: 10, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Data Início</label>
+                        <label className="text-[10px] text-gray-500 block mb-1">Data Início</label>
                         <input 
                           type="date" 
                           value={tarefa.dataInicio || ""} 
                           onChange={(e) => updateDataTarefa(index, "dataInicio", e.target.value)}
-                          style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11 }}
+                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
                         />
                       </div>
                       <div>
-                        <label style={{ fontSize: 10, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Data Entrega</label>
+                        <label className="text-[10px] text-gray-500 block mb-1">Data Entrega</label>
                         <input 
                           type="date" 
                           value={tarefa.dataEntrega || ""} 
                           onChange={(e) => updateDataTarefa(index, "dataEntrega", e.target.value)}
-                          style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11 }}
+                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
                         />
                       </div>
                     </div>
@@ -411,10 +395,10 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
             </div>
 
             {tarefasAtuais.length === 0 && (
-              <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.tertiary }}>
+              <div className="text-center p-10 text-gray-400">
                 <FileText size={40} style={{ marginBottom: 12, opacity: 0.5 }} />
-                <div style={{ fontSize: 14, marginBottom: 8 }}>Sem tarefas definidas</div>
-                <div style={{ fontSize: 12 }}>As tarefas são geradas automaticamente com base nos serviços do orçamento</div>
+                <div className="text-sm mb-2">Sem tarefas definidas</div>
+                <div className="text-xs">As tarefas são geradas automaticamente com base nos serviços do orçamento</div>
               </div>
             )}
           </div>
@@ -425,45 +409,45 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Clientes</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{clientes.length} clientes</p>
+          <h1 className="font-sans text-2xl md:text-3xl font-black text-gray-900 mb-2">Clientes</h1>
+          <p className="text-gray-500 text-sm">{clientes.length} clientes</p>
         </div>
-        <button onClick={onNovoCliente} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>+ Novo Cliente</button>
+        <button onClick={onNovoCliente} className="px-5 py-3 rounded-xl bg-[#F25C05] text-white border-none font-semibold cursor-pointer text-[13px]">+ Novo Cliente</button>
       </div>
 
-      <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 20, marginBottom: 24, border: "1px solid #e8e8e8" }}>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-          <input type="text" placeholder="Buscar..." value={search} onChange={(e) => onSearchChange(e.target.value)} style={{ flex: 1, minWidth: 150, padding: "10px 14px", borderRadius: 8, border: "2px solid #e0e0e0", fontSize: 12 }} />
-          <select value={filterCategoria} onChange={(e) => onFilterCategoriaChange(e.target.value)} style={{ padding: "10px 14px", borderRadius: 8, border: "2px solid #e0e0e0", fontSize: 12, minWidth: 120 }}>
+      <div className="bg-white rounded-2xl p-5 mb-6 border border-gray-200">
+        <div className="flex gap-3 flex-wrap items-center">
+          <input type="text" placeholder="Buscar..." value={search} onChange={(e) => onSearchChange(e.target.value)} className="flex-1 min-w-[150px] px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs" />
+          <select value={filterCategoria} onChange={(e) => onFilterCategoriaChange(e.target.value)} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs min-w-[120px]">
             <option value="todos">Todos</option>
             <option value="cliente">Cliente</option>
             <option value="potencial">Potencial</option>
             <option value="curioso">Curioso</option>
           </select>
-          <select value={sortBy} onChange={(e) => onSortByChange(e.target.value)} style={{ padding: "10px 14px", borderRadius: 8, border: "2px solid #e0e0e0", fontSize: 12 }}>
+          <select value={sortBy} onChange={(e) => onSortByChange(e.target.value)} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs">
             <option value="createdAt">Data</option>
             <option value="nome">Nome</option>
             <option value="propostaValor">Valor</option>
           </select>
-          <button onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")} style={{ padding: "10px 14px", borderRadius: 8, border: "2px solid #e0e0e0", backgroundColor: "#fff", cursor: "pointer" }}>{sortOrder === "asc" ? "↑" : "↓"}</button>
+          <button onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer">{sortOrder === "asc" ? "↑" : "↓"}</button>
         </div>
       </div>
 
-      <div style={{ backgroundColor: "#ffffff", borderRadius: 16, border: "1px solid #e8e8e8", overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <table className="w-full border-collapse">
           <thead>
             <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Nome</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Categoria</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Processo</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Telefone</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Email</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Orçamento</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Proposta</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Resposta</th>
-              <th style={{ padding: "12px 14px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "center" }}>Ações</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Nome</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Categoria</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Processo</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Telefone</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Email</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Orçamento</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Proposta</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Resposta</th>
+              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -471,10 +455,10 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
               const processo = getProcessoInfo(c.processo || "iniciado");
               const ProcessoIcon = processo.icon;
               return (
-                <tr key={c.id} onClick={() => onSelectCliente(c)} style={{ cursor: "pointer", borderTop: "1px solid #f0f0f0", backgroundColor: "#fff" }}>
-                  <td style={{ padding: "12px 14px", fontSize: 12 }}><div style={{ fontWeight: 700, color: theme.colors.text.primary }}>{c.nome}</div></td>
-                  <td style={{ padding: "12px 14px" }}><span style={{ fontSize: 10, backgroundColor: getCategoriaColor(c.categoria) + "20", padding: "4px 8px", borderRadius: 12, color: getCategoriaColor(c.categoria), fontWeight: 600 }}>{getCategoriaLabel(c.categoria)}</span></td>
-                  <td style={{ padding: "12px 14px" }}>
+                <tr key={c.id} onClick={() => onSelectCliente(c)} className="cursor-pointer border-t border-gray-100 bg-white hover:bg-gray-50 transition-colors">
+                  <td className="px-3.5 py-3 text-xs"><div className="font-bold text-gray-900">{c.nome}</div></td>
+                  <td className="px-3.5 py-3"><span className={`text-[10px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(c.categoria)}`}>{getCategoriaLabel(c.categoria)}</span></td>
+                  <td className="px-3.5 py-3">
                     <button 
                       onClick={(e) => { 
                         e.stopPropagation();
@@ -482,52 +466,40 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                         const nextIndex = (currentIndex + 1) % PROCESSOS.length;
                         onUpdateProcesso(c.id, PROCESSOS[nextIndex].id);
                       }}
-                      style={{ 
-                        display: "flex", 
-                        alignItems: "center", 
-                        gap: 6, 
-                        padding: "6px 12px", 
-                        borderRadius: 20, 
-                        backgroundColor: processo.color + "15", 
-                        color: processo.color, 
-                        border: "none", 
-                        fontSize: 11, 
-                        fontWeight: 600, 
-                        cursor: "pointer" 
-                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-none text-[11px] font-semibold cursor-pointer ${processo.colorClass}`}
                     >
                       <ProcessoIcon size={12} />
                       {processo.label}
                     </button>
                   </td>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#666" }}>{c.telemovel || "—"}</td>
-                  <td style={{ padding: "12px 14px", fontSize: 12, color: "#666" }}>{c.email || "—"}</td>
-                  <td style={{ padding: "12px 14px" }}>
+                  <td className="px-3.5 py-3 text-xs text-gray-500">{c.telemovel || "—"}</td>
+                  <td className="px-3.5 py-3 text-xs text-gray-500">{c.email || "—"}</td>
+                  <td className="px-3.5 py-3">
                     {c.propostaNumero ? (
-                      <a href={`/admin/orcamento?edit=${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} style={{ color: "#3498DB", fontWeight: 600, fontSize: 12, cursor: "pointer", textDecoration: "none" }}>{c.propostaNumero}</a>
-                    ) : <span style={{ fontSize: 12, color: "#d1d5db" }}>—</span>}
+                      <a href={`/admin/orcamento?edit=${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} className="text-sky-500 font-semibold text-xs cursor-pointer no-underline hover:text-sky-600 transition-colors">{c.propostaNumero}</a>
+                    ) : <span className="text-xs text-gray-300">—</span>}
                   </td>
-                  <td style={{ padding: "12px 14px" }}>
+                  <td className="px-3.5 py-3">
                     {c.propostaId ? (
-                      <a href={`/p/${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} style={{ padding: "6px 12px", borderRadius: 6, backgroundColor: "#3498DB", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Proposta</a>
+                      <a href={`/p/${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} className="px-3 py-1.5 rounded-md bg-sky-500 text-white border-none text-[11px] font-semibold cursor-pointer no-underline inline-block hover:bg-sky-600 transition-colors">Proposta</a>
                     ) : (
-                      <button onClick={(e) => { e.stopPropagation(); onVincularProposta(c); }} style={{ padding: "4px 10px", borderRadius: 6, backgroundColor: "#F59E0B", color: "#fff", border: "none", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>Vincular</button>
+                      <button onClick={(e) => { e.stopPropagation(); onVincularProposta(c); }} className="px-2.5 py-1 rounded-md bg-amber-500 text-white border-none text-[10px] font-semibold cursor-pointer hover:bg-amber-600 transition-colors">Vincular</button>
                     )}
                   </td>
-                  <td style={{ padding: "12px 14px" }}>
+                  <td className="px-3.5 py-3">
                     {c.resposta ? (
-                      <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 4, fontWeight: 600, backgroundColor: c.resposta === "sim" ? "#dcfce7" : c.resposta === "nao" ? "#fee2e2" : "#fef3c7", color: c.resposta === "sim" ? "#16a34a" : c.resposta === "nao" ? "#dc2626" : "#d97706" }}>
+                      <span className={`text-[10px] px-2.5 py-1 rounded-md font-semibold ${(selectedCliente?.resposta || c?.resposta) === "sim" ? "bg-emerald-100 text-emerald-600" : (selectedCliente?.resposta || c?.resposta) === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
                         {c.resposta === "sim" ? "✓ Aceito" : c.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
                       </span>
-                    ) : <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 4, backgroundColor: "#f3f4f6", color: "#9ca3af" }}>Pendente</span>}
+                    ) : <span className="text-[10px] px-2 py-1 rounded-sm bg-gray-100 text-gray-400 font-semibold">Pendente</span>}
                   </td>
-                  <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                    <div style={{ display: "flex", gap: 4, justifyContent: "center" }} onClick={(e) => e.stopPropagation()}>
+                  <td className="px-3.5 py-3 text-center">
+                    <div className="flex gap-1 justify-center" onClick={(e) => e.stopPropagation()}>
                       {c.categoria === "cliente" && (
-                        <button onClick={() => onFaturar(c)} title="Faturar" style={{ padding: "6px 8px", borderRadius: 6, backgroundColor: "#10B981", color: "#fff", border: "none", fontSize: 11, cursor: "pointer" }}>€</button>
+                        <button onClick={() => onFaturar(c)} title="Faturar" className="px-2 py-1.5 rounded-md bg-emerald-500 text-white border-none text-[11px] cursor-pointer hover:bg-emerald-600 transition-colors">€</button>
                       )}
-                      <button onClick={() => onEditar(c)} title="Editar" style={{ padding: "6px 8px", borderRadius: 6, backgroundColor: "#f3f4f6", color: "#6b7280", border: "none", fontSize: 11, cursor: "pointer" }}>✎</button>
-                      <button onClick={() => onEliminar(c.id)} title="Eliminar" style={{ padding: "6px 8px", borderRadius: 6, backgroundColor: "#fee2e2", color: "#dc2626", border: "none", fontSize: 11, cursor: "pointer" }}>✕</button>
+                      <button onClick={() => onEditar(c)} title="Editar" className="px-2 py-1.5 rounded-md bg-gray-100 text-gray-500 border-none text-[11px] cursor-pointer hover:bg-gray-200 transition-colors">✎</button>
+                      <button onClick={() => onEliminar(c.id)} title="Eliminar" className="px-2 py-1.5 rounded-md bg-red-100 text-red-600 border-none text-[11px] cursor-pointer hover:bg-red-200 transition-colors">✕</button>
                     </div>
                   </td>
                 </tr>
