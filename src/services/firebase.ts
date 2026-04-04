@@ -153,4 +153,4 @@ export async function getClientesByCategoria(categoria: string): Promise<Cliente
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-export { db };
+export { app, db };

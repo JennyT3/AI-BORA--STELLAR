@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { getVendedor, Vendedor } from '../services/vendedores';
+import { app } from '../services/firebase';
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "aibora2026";
-export interface User { id: string; nome: string; role: "admin" | "user"; }
-const USERS: User[] = [
-  { id: "jenny", nome: "Jenny", role: "admin" },
-  { id: "portugal", nome: "Portugal", role: "user" },
-];
+const auth = getAuth(app);
+
+export interface User {
+  id: string;
+  nome: string;
+  role: "admin" | "user";
+  email: string;
+}
 
 export function useAuth() {
   const [vendedor, setVendedor] = useState<Vendedor | null>(null);
@@ -15,17 +19,23 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkLogin = async () => {
-      setLoading(true);
-      // Check Admin
-      const savedAdmin = localStorage.getItem("adminUser");
-      if (savedAdmin) {
-        const user = JSON.parse(savedAdmin);
-        setCurrentUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
         setAuthenticated(true);
+        setCurrentUser({
+          id: firebaseUser.uid,
+          nome: firebaseUser.email?.split('@')[0] || 'Admin',
+          role: 'admin',
+          email: firebaseUser.email || ''
+        });
+      } else {
+        setAuthenticated(false);
+        setCurrentUser(null);
       }
+      setLoading(false);
+    });
 
-      // Check Vendedor (VendasApp logic)
+    const checkVendedor = async () => {
       const params = new URLSearchParams(window.location.search);
       const adminMode = params.get("admin") === "true";
       const vendedorId = params.get("vendedor");
@@ -44,23 +54,23 @@ export function useAuth() {
       } else if (savedVendedor) {
         setVendedor(JSON.parse(savedVendedor));
       }
-
-      setLoading(false);
     };
 
-    checkLogin();
+    checkVendedor();
+    return () => unsubscribe();
   }, []);
 
-  const login = (type: 'admin' | 'vendedor', data: any, password?: string) => {
+  const login = async (type: 'admin' | 'vendedor', data: any, password?: string) => {
     if (type === 'admin') {
-      const user = USERS.find(u => u.id === data.toLowerCase());
-      if (user && password === ADMIN_PASSWORD) {
-        setAuthenticated(true);
-        setCurrentUser(user);
-        localStorage.setItem("adminUser", JSON.stringify(user));
+      try {
+        await signInWithEmailAndPassword(auth, data, password!);
         return { success: true };
+      } catch (err: any) {
+        const msg = err.code === 'auth/invalid-credential'
+          ? 'Email ou password incorretos'
+          : 'Erro ao iniciar sessão';
+        return { success: false, error: msg };
       }
-      return { success: false, error: "Utilizador ou password incorretos" };
     } else if (type === 'vendedor') {
       setVendedor(data);
       localStorage.setItem("vendedorUser", JSON.stringify(data));
@@ -68,11 +78,9 @@ export function useAuth() {
     }
   };
 
-  const logout = (type: 'admin' | 'vendedor') => {
+  const logout = async (type: 'admin' | 'vendedor') => {
     if (type === 'admin') {
-      localStorage.removeItem("adminUser");
-      setAuthenticated(false);
-      setCurrentUser(null);
+      await signOut(auth);
     } else {
       localStorage.removeItem("vendedorUser");
       setVendedor(null);

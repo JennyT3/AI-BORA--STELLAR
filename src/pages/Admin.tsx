@@ -60,9 +60,9 @@ export function Admin() {
     setShowFaturaModal(true);
   };
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    const result = login('admin', username, password);
+    const result = await login('admin', username, password);
     if (result?.success) {
       setError("");
       loadAll();
@@ -149,7 +149,7 @@ export function Admin() {
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 20 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Utilizador</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="jenny ou portugal" style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", backgroundColor: "#fafafa", color: "theme.colors.text.primary" }} />
+              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="helloaibora@gmail.com" style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", backgroundColor: "#fafafa", color: "theme.colors.text.primary" }} />
             </div>
             <div style={{ marginBottom: 24 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Password</label>
