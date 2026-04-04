@@ -17,6 +17,8 @@ import { FileSpreadsheet } from "lucide-react";
 import { gerarFaturaPDF } from "../services/pdfAdmin";
 import { ClienteFormModal } from "../components/admin/ClienteFormModal";
 import { FaturaModal } from "../components/admin/FaturaModal";
+import { exportToExcel } from "../services/exportService";
+import { Proposal, Solicitude, Cliente } from "../types";
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "aibora2026";
 
@@ -31,21 +33,6 @@ const USERS: User[] = [
   { id: "portugal", nome: "Portugal", role: "user" },
 ];
 
-const exportToExcel = (proposals: any[], solicitudes: any[]) => {
-  const csvProposals = "Nº Orçamento,Cliente,Email,Telefone,Valor,Data,Criado Por,Status,Data Envio,Resposta\n" + 
-    proposals.map(p => `"${p.numeroOrcamento}","${p.cliente}","${p.email || ''}","${p.telefone || ''}",${p.valor || 0},"${new Date(p.createdAt).toLocaleDateString('pt-PT')}","${p.criadoPor || ''}","${p.resposta || 'pendente'}","${p.dataEnvio || ''}","${p.resposta || ''}"`).join("\n");
-  
-  const csvSolicitudes = "Nome,Empresa,Email,Telefone,Servicos,Data,Status\n" + 
-    solicitudes.map(s => `"${s.nome}","${s.empresa || ''}","${s.email || ''}","${s.telefone || ''}","${(s.servicos || []).join(', ')}","${new Date(s.createdAt).toLocaleDateString('pt-PT')}","${s.status || 'pendente'}"`).join("\n");
-  
-  const csvContent = "=== PROPOSTAS ===\n" + csvProposals + "\n\n=== SOLICITAÇÕES ===\n" + csvSolicitudes;
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `AIBORA_Export_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
-};
-
 export function Admin() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores">("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -54,23 +41,23 @@ export function Admin() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
-  const [proposals, setProposals] = useState<any[]>([]);
-  const [solicitudes, setSolicitudes] = useState<any[]>([]);
-  const [clientes, setClientes] = useState<any[]>([]);
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [solicitudes, setSolicitudes] = useState<Solicitude[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({ total: 0, enviadas: 0, respondidas: 0, aceitas: 0, reagendadas: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
   const [showFaturaModal, setShowFaturaModal] = useState(false);
-  const [faturaData, setFaturaData] = useState<any>(null);
+  const [faturaData, setFaturaData] = useState<Proposal | null>(null);
   const [numeroFatura, setNumeroFatura] = useState("");
   const [showClienteForm, setShowClienteForm] = useState(false);
-  const [clienteFormData, setClienteFormData] = useState<any>(null);
-  const [clienteProposalData, setClienteProposalData] = useState<any>(null);
+  const [clienteFormData, setClienteFormData] = useState<Partial<Cliente> | null>(null);
+  const [clienteProposalData, setClienteProposalData] = useState<Proposal | null>(null);
   const [clienteSearch, setClienteSearch] = useState("");
   const [showClienteSuggestions, setShowClienteSuggestions] = useState(false);
   const [clienteFilterCategoria, setClienteFilterCategoria] = useState<string>("todos");
-  const [selectedCliente, setSelectedCliente] = useState<any>(null);
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [clienteSortBy, setClienteSortBy] = useState<"nome" | "createdAt" | "propostaValor">("createdAt");
   const [clienteSortOrder, setClienteSortOrder] = useState<"asc" | "desc">("desc");
   const [clienteFilterOrigem, setClienteFilterOrigem] = useState<string>("todos");
