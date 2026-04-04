@@ -14,56 +14,20 @@ import { useState, useEffect } from "react";
 import { getVendedor, Vendedor } from "./services/vendedores";
 import { Analytics } from "@vercel/analytics/react";
 
+import { useAuth } from "./hooks/useAuth";
+
 function VendasApp() {
-  const [vendedor, setVendedor] = useState<Vendedor | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const adminMode = params.get("admin") === "true";
-    const vendedorId = params.get("vendedor");
-
-    const checkLogin = async () => {
-      const savedVendedor = localStorage.getItem("vendedorUser");
-      
-      // Si es admin y viene con vendedor específico, cargar ese vendedor
-      if (adminMode && vendedorId) {
-        try {
-          const v = await getVendedor(vendedorId);
-          if (v) {
-            setVendedor(v);
-            localStorage.setItem("vendedorUser", JSON.stringify(v));
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      } else if (savedVendedor) {
-        setVendedor(JSON.parse(savedVendedor));
-      }
-      setLoading(false);
-    };
-
-    checkLogin();
-  }, []);
-
-  const handleLogin = (vendedorLogado: Vendedor) => {
-    setVendedor(vendedorLogado);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("vendedorUser");
-    setVendedor(null);
-  };
+  const { vendedor, loading, login, logout } = useAuth();
 
   if (loading) {
     return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>A carregar...</div>;
   }
 
   if (!vendedor) {
-    return <VendasLogin onLogin={handleLogin} />;
+    return <VendasLogin onLogin={(v) => login('vendedor', v)} />;
   }
 
-  return <VendasDashboard vendedor={vendedor} onLogout={handleLogout} />;
+  return <VendasDashboard vendedor={vendedor} onLogout={() => logout('vendedor')} />;
 }
 
 export default function App() {

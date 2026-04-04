@@ -20,24 +20,12 @@ import { FaturaModal } from "../components/admin/FaturaModal";
 import { exportToExcel } from "../services/exportService";
 import { Proposal, Solicitude, Cliente } from "../types";
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "aibora2026";
-
-interface User {
-  id: string;
-  nome: string;
-  role: "admin" | "user";
-}
-
-const USERS: User[] = [
-  { id: "jenny", nome: "Jenny", role: "admin" },
-  { id: "portugal", nome: "Portugal", role: "user" },
-];
+import { useAuth } from "../hooks/useAuth";
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores">("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { authenticated, currentUser, login, logout } = useAuth();
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -74,10 +62,13 @@ export function Admin() {
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    const user = USERS.find(u => u.id === username.toLowerCase());
-    if (user && password === ADMIN_PASSWORD) {
-      setAuthenticated(true); setCurrentUser(user); localStorage.setItem("adminUser", JSON.stringify(user)); setError(""); loadAll();
-    } else { setError("Utilizador ou password incorretos"); }
+    const result = login('admin', username, password);
+    if (result?.success) {
+      setError("");
+      loadAll();
+    } else {
+      setError(result?.error || "Erro no login");
+    }
   };
 
   useEffect(() => {
@@ -88,15 +79,6 @@ export function Admin() {
     }
   }, []);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("adminUser");
-    if (savedUser) {
-      const user = JSON.parse(savedUser);
-      setCurrentUser(user);
-      setAuthenticated(true);
-      loadAll();
-    }
-  }, []);
 
   const loadAll = () => { loadProposals(); loadSolicitudes(); loadClientes(); loadStats(); };
   useEffect(() => { if (authenticated) loadAll(); }, [authenticated]);
