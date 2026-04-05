@@ -14,28 +14,14 @@ export interface User {
 
 export function useAuth() {
   const [vendedor, setVendedor] = useState<Vendedor | null>(null);
-  const [authenticated, setAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [vendedorReady, setVendedorReady] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        setAuthenticated(true);
-        setCurrentUser({
-          id: firebaseUser.uid,
-          nome: firebaseUser.email?.split('@')[0] || 'Admin',
-          role: 'admin',
-          email: firebaseUser.email || ''
-        });
-      } else {
-        setAuthenticated(false);
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    });
-
-    const checkVendedor = async () => {
+    const initVendedor = async () => {
       const params = new URLSearchParams(window.location.search);
       const adminMode = params.get("admin") === "true";
       const vendedorId = params.get("vendedor");
@@ -52,11 +38,35 @@ export function useAuth() {
           console.error("Erro ao carregar vendedor:", err);
         }
       } else if (savedVendedor) {
-        setVendedor(JSON.parse(savedVendedor));
+        try {
+          setVendedor(JSON.parse(savedVendedor));
+        } catch {
+          console.warn("Dados de vendedor corrompidos — a limpar localStorage");
+          localStorage.removeItem("vendedorUser");
+        }
       }
+
+      setVendedorReady(true);
     };
 
-    checkVendedor();
+    initVendedor();
+
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        setAuthenticated(true);
+        setCurrentUser({
+          id: firebaseUser.uid,
+          nome: firebaseUser.email?.split('@')[0] || 'Admin',
+          role: 'admin',
+          email: firebaseUser.email || ''
+        });
+      } else {
+        setAuthenticated(false);
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    });
+
     return () => unsubscribe();
   }, []);
 
@@ -87,5 +97,5 @@ export function useAuth() {
     }
   };
 
-  return { vendedor, authenticated, currentUser, login, logout, loading };
+  return { vendedor, vendedorReady, authenticated, currentUser, login, logout, loading };
 }

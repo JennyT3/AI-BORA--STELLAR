@@ -26,7 +26,7 @@ export function useSolicitudes() {
   };
 
   const updateStatus = async (id: string, status: string) => {
-    await updateSolicitudeStatus(id, status);
+    await updateSolicitudeStatus(id, status as "pendente" | "em-analise" | "proposta-enviada");
     setSolicitudes(prev => prev.map(s => s.id === id ? { ...s, status } : s));
   };
 

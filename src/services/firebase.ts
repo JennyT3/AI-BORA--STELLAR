@@ -41,7 +41,7 @@ export async function createProposal(data: Partial<Proposal>): Promise<string> {
 export async function getProposal(id: string): Promise<Proposal | null> {
   const docSnap = await getDoc(doc(db, 'propostas', id));
   if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() };
+    return { id: docSnap.id, ...docSnap.data() } as any;
   }
   return null;
 }
@@ -63,7 +63,7 @@ export async function deleteProposal(id: string): Promise<void> {
 export async function listProposals(limitNum: number = 50): Promise<Proposal[]> {
   const q = query(collection(db, 'propostas'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 }
 
 // Check if proposal is valid (within 10 days)
@@ -91,7 +91,7 @@ export async function createOrcamentoRequest(data: Partial<OrcamentoRequest>): P
 export async function listOrcamentoRequests(limitNum: number = 50): Promise<OrcamentoRequest[]> {
   const q = query(collection(db, 'solicitacoes'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 }
 
 // Update Orçamento request status
@@ -125,7 +125,7 @@ export async function createCliente(data: Partial<Cliente>): Promise<string> {
 export async function getCliente(id: string): Promise<Cliente | null> {
   const docSnap = await getDoc(doc(db, 'clientes', id));
   if (docSnap.exists()) {
-    return { id: docSnap.id, ...docSnap.data() };
+    return { id: docSnap.id, ...docSnap.data() } as any;
   }
   return null;
 }
@@ -144,13 +144,13 @@ export async function deleteCliente(id: string): Promise<void> {
 export async function listClientes(limitNum: number = 100): Promise<Cliente[]> {
   const q = query(collection(db, 'clientes'), orderBy('createdAt', 'desc'), limit(limitNum));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 }
 
 export async function getClientesByCategoria(categoria: string): Promise<Cliente[]> {
   const q = query(collection(db, 'clientes'), where('categoria', '==', categoria));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 }
 
 export { app, db };

@@ -1,4 +1,5 @@
 import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles } from "lucide-react";
+import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
 
 interface ClientesProps {
   clientes: any[];
@@ -34,24 +35,6 @@ const PROCESSOS = [
   { id: "em_revisao", label: "Em Revisão", colorClass: "bg-sky-50 text-sky-600", icon: Eye },
   { id: "publicado", label: "Publicado", colorClass: "bg-emerald-50 text-emerald-600", icon: CheckCircle },
 ];
-
-const getCategoriaClasses = (cat: string) => {
-  if (cat === "cliente") return "bg-emerald-50 text-emerald-600";
-  if (cat === "proposta_enviada") return "bg-amber-50 text-amber-600";
-  if (cat === "potencial") return "bg-orange-50 text-orange-600";
-  if (cat === "curioso") return "bg-violet-50 text-violet-600";
-  if (cat === "sem_interesse") return "bg-red-50 text-red-600";
-  return "bg-gray-100 text-gray-500";
-};
-
-const getCategoriaLabel = (cat: string) => {
-  if (cat === "cliente") return "Cliente";
-  if (cat === "proposta_enviada") return "Proposta Enviada";
-  if (cat === "potencial") return "Potencial";
-  if (cat === "curioso") return "Curioso";
-  if (cat === "sem_interesse") return "Sem Interesse";
-  return cat;
-};
 
 const getProcessoInfo = (processo: string) => {
   return PROCESSOS.find(p => p.id === processo) || PROCESSOS[0];
@@ -250,7 +233,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                 {selectedCliente.resposta && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-500 text-[13px]">Resposta</span>
-                    <span className={`text-[12px] px-2.5 py-1 rounded-md font-semibold ${(selectedCliente?.resposta || c?.resposta) === "sim" ? "bg-emerald-100 text-emerald-600" : (selectedCliente?.resposta || c?.resposta) === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
+                    <span className={`text-[12px] px-2.5 py-1 rounded-md font-semibold ${selectedCliente?.resposta === "sim" ? "bg-emerald-100 text-emerald-600" : selectedCliente?.resposta === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
                       {selectedCliente.resposta === "sim" ? "✓ Aceito" : selectedCliente.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
                     </span>
                   </div>
@@ -365,9 +348,9 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                       </button>
                       <div style={{ flex: 1 }}>
                         <div className={`font-semibold text-[13px] text-gray-900 ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</div>
-                        <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 2 }}>{tarefa.descricao}</div>
+                        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{tarefa.descricao}</div>
                       </div>
-                      <Icon size={18} color={tarefa.concluida ? "#10B981" : theme.colors.text.tertiary} />
+                      <Icon size={18} color={tarefa.concluida ? "#10B981" : "#9CA3AF"} />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
@@ -488,7 +471,7 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                   </td>
                   <td className="px-3.5 py-3">
                     {c.resposta ? (
-                      <span className={`text-[10px] px-2.5 py-1 rounded-md font-semibold ${(selectedCliente?.resposta || c?.resposta) === "sim" ? "bg-emerald-100 text-emerald-600" : (selectedCliente?.resposta || c?.resposta) === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
+                      <span className={`text-[10px] px-2.5 py-1 rounded-md font-semibold ${selectedCliente?.resposta === "sim" ? "bg-emerald-100 text-emerald-600" : selectedCliente?.resposta === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
                         {c.resposta === "sim" ? "✓ Aceito" : c.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
                       </span>
                     ) : <span className="text-[10px] px-2 py-1 rounded-sm bg-gray-100 text-gray-400 font-semibold">Pendente</span>}

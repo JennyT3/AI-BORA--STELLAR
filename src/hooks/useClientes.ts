@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { listClientes, deleteCliente, updateCliente } from '../services/firebase';
 import { Cliente } from '../types';
-import { Cliente } from '../types';
 
 export function useClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]);

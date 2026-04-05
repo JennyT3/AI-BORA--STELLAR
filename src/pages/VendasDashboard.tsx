@@ -8,6 +8,7 @@ import { VendasClientesTab } from "../components/dashboard/VendasClientesTab";
 import { VendasPropostasTab } from "../components/dashboard/VendasPropostasTab";
 import { VendasFaturacaoTab } from "../components/dashboard/VendasFaturacaoTab";
 import { VendasPerfilTab } from "../components/dashboard/VendasPerfilTab";
+import { Cliente, Proposal } from "../types";
 
 interface VendasDashboardProps {
   vendedor: Vendedor;
@@ -21,9 +22,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   
   // Data states
   const [stats, setStats] = useState({ totalClientes: 0, propostasEnviadas: 0, propostasAceitas: 0, valorTotalPropostas: 0, comissaoTotal: 0 });
-  const [clientes, setClientes] = useState<any[]>([]);
-  const [propostas, setPropostas] = useState<any[]>([]);
-  const [allPropostas, setAllPropostas] = useState<any[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [propostas, setPropostas] = useState<Proposal[]>([]);
+  const [allPropostas, setAllPropostas] = useState<Proposal[]>([]);
 
   // Form states
   const [showNovoCliente, setShowNovoCliente] = useState(false);
@@ -98,13 +99,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   };
 
   if (loading) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.bg.primary }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 18, color: theme.colors.text.secondary }}>A carregar...</div>
-        </div>
-      </div>
-    );
+    return <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary }} />;
   }
 
   return (

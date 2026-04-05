@@ -1,5 +1,6 @@
 import { FileText, Users, Check, Plus, DollarSign, ArrowRight, TrendingUp, Clock, FolderOpen } from "lucide-react";
 import { theme } from "../../styles/theme";
+import { getStatusColorDashboard, getStatusLabelDashboard, getProposalStatusBadge } from "../../utils/labels";
 
 interface DashboardProps {
   stats: { total: number; enviadas: number; respondidas: number; aceitas: number; reagendadas: number };
@@ -12,26 +13,6 @@ interface DashboardProps {
   onNovaFatura: () => void;
   onNavigate: (tab: string) => void;
 }
-
-const getStatusColor = (status: string) => {
-  if (status === "pendente") return theme.colors.accent.primary;
-  if (status === "em-analise") return "#3498DB";
-  return theme.colors.status.success;
-};
-
-const getStatusLabel = (status: string) => {
-  if (status === "pendente") return "Pendente";
-  if (status === "em-analise") return "Em Análise";
-  return "Concluída";
-};
-
-const getProposalStatusBadge = (p: any) => {
-  if (p.resposta === "sim") return { color: "#dcfce7", text: "✓ Aceito", textColor: "#16a34a" };
-  if (p.resposta === "nao") return { color: "#fee2e2", text: "✕ Recusado", textColor: "#dc2626" };
-  if (p.resposta === "reagendar") return { color: "#fef3c7", text: "↻ Reagendado", textColor: "#d97706" };
-  if (p.dataEnvio) return { color: "#E8F4FD", text: "Enviada", textColor: "#3498DB" };
-  return { color: "#f3f4f6", text: "Pendente", textColor: "#9ca3af" };
-};
 
 export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, onNovoOrcamento, onNovoCliente, onNovaFatura, onNavigate }: DashboardProps) {
   const clientesAtivos = clientes.filter(c => c.categoria === "cliente").length;
@@ -118,8 +99,8 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
                   <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 14 }}>{s.nome}</div>
                   <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 2 }}>{s.telefone} · {new Date(s.createdAt).toLocaleDateString("pt-PT")}</div>
                 </div>
-                <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 20, backgroundColor: getStatusColor(s.status) + "15", color: getStatusColor(s.status), fontWeight: 600 }}>
-                  {getStatusLabel(s.status)}
+                <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 20, backgroundColor: getStatusColorDashboard(s.status) + "15", color: getStatusColorDashboard(s.status), fontWeight: 600 }}>
+                  {getStatusLabelDashboard(s.status)}
                 </span>
               </div>
             ))}
