@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { Proposal, Cliente, OrcamentoRequest } from '../types';
+import { Proposal, Cliente, OrcamentoRequest, Tarea } from '../types';
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -199,6 +199,106 @@ export async function listVendedoresAtivos(): Promise<any[]> {
   const q = query(collection(db, 'vendedores'), where('ativo', '==', true), orderBy('nome', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function getClienteByPropostaId(propostaId: string): Promise<Cliente | null> {
+  const q = query(collection(db, 'clientes'), where('propostaId', '==', propostaId));
+  const snapshot = await getDocs(q);
+  if (!snapshot.empty) {
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as Cliente;
+  }
+  return null;
+}
+
+function generateTareaId() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+  return 'tar-' + id;
+}
+
+export async function createTarea(data: Partial<Tarea>): Promise<string> {
+  const id = generateTareaId();
+  await setDoc(doc(db, 'tareas', id), {
+    ...data,
+    estado: data.estado || 'disponivel',
+    criadoEm: new Date().toISOString(),
+    atualizadoEm: new Date().toISOString(),
+  });
+  return id;
+}
+
+export async function listTareas(filtro?: { estado?: string; asignadaA?: string }): Promise<Tarea[]> {
+  let q;
+  
+  if (filtro?.estado && filtro?.asignadaA) {
+    q = query(collection(db, 'tareas'), where('estado', '==', filtro.estado), where('asignadaA', '==', filtro.asignadaA), orderBy('criadoEm', 'desc'));
+  } else if (filtro?.estado) {
+    q = query(collection(db, 'tareas'), where('estado', '==', filtro.estado), orderBy('criadoEm', 'desc'));
+  } else if (filtro?.asignadaA) {
+    q = query(collection(db, 'tareas'), where('asignadaA', '==', filtro.asignadaA), orderBy('criadoEm', 'desc'));
+  } else {
+    q = query(collection(db, 'tareas'), orderBy('criadoEm', 'desc'));
+  }
+  
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Record<string, any> } as Tarea));
+}
+
+export async function getTarea(id: string): Promise<Tarea | null> {
+  const docSnap = await getDoc(doc(db, 'tareas', id));
+  if (docSnap.exists()) {
+    return { id: docSnap.id, ...docSnap.data() } as Tarea;
+  }
+  return null;
+}
+
+export async function updateTarea(id: string, data: Partial<Tarea>): Promise<void> {
+  await updateDoc(doc(db, 'tareas', id), {
+    ...data,
+    atualizadoEm: new Date().toISOString(),
+  });
+}
+
+export async function solicitarTarea(tareaId: string, vendedorId: string): Promise<void> {
+  const tarea = await getTarea(tareaId);
+  if (!tarea) return;
+  
+  const solicitantes = tarea.solicitantes || [];
+  if (!solicitantes.includes(vendedorId)) {
+    await updateTarea(tareaId, { solicitantes: [...solicitantes, vendedorId] });
+  }
+}
+
+export async function asignarTarea(tareaId: string, vendedorId: string, prazo: string): Promise<void> {
+  const q = query(collection(db, 'vendedores'), where('__name__', '==', vendedorId));
+  const snapshot = await getDocs(q);
+  const vendedorNome = snapshot.empty ? 'Vendedor' : snapshot.docs[0].data().nome || 'Vendedor';
+  
+  await updateTarea(tareaId, {
+    asignadaA: vendedorId,
+    asignadoNome: vendedorNome,
+    prazo: prazo,
+    estado: 'asignada',
+  });
+}
+
+export async function entregarTarea(tareaId: string, entregaUrl: string, nota?: string): Promise<void> {
+  await updateTarea(tareaId, {
+    entregaUrl: entregaUrl,
+    entregaNota: nota,
+    estado: 'entregue',
+  });
+}
+
+export async function aprobarTarea(tareaId: string, tipo: 'admin' | 'cliente'): Promise<void> {
+  const estado = tipo === 'admin' ? 'aprovada_admin' : 'aprovada_cliente';
+  await updateTarea(tareaId, { estado });
+}
+
+export async function marcarTareaPaga(tareaId: string): Promise<void> {
+  await updateTarea(tareaId, { estado: 'paga' });
 }
 
 export { app, db };

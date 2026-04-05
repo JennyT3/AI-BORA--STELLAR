@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto, delegarClienteAVendedor, listVendedoresAtivos } from "../services/firebase";
+import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto, delegarClienteAVendedor, listVendedoresAtivos, listTareas, createTarea, updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, getClienteByPropostaId } from "../services/firebase";
 import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude } from "../services/solicitudes";
-import { Proposal, Solicitude, Cliente } from "../types";
+import { Proposal, Solicitude, Cliente, Tarea } from "../types";
 
 interface UseAdminDataOptions {
   currentUserId?: string;
@@ -13,6 +13,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [contactos, setContactos] = useState<Contacto[]>([]);
   const [vendedores, setVendedores] = useState<any[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
@@ -118,12 +119,63 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     }
   };
 
+  const loadTareas = async () => {
+    try {
+      const data = await listTareas();
+      setTareas(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCrearTarea = async (tareaData: Partial<Tarea>) => {
+    try {
+      await createTarea(tareaData);
+      loadTareas();
+      alert("Tarefa criada com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao criar tarefa");
+    }
+  };
+
+  const handleAsignarTarea = async (tareaId: string, vendedorId: string, prazo: string) => {
+    try {
+      await asignarTarea(tareaId, vendedorId, prazo);
+      loadTareas();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao atribuir tarefa");
+    }
+  };
+
+  const handleAprobarEntrega = async (tareaId: string) => {
+    try {
+      await aprobarTarea(tareaId, 'admin');
+      loadTareas();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao aprobar entrega");
+    }
+  };
+
+  const handleMarcarPaga = async (tareaId: string) => {
+    try {
+      await marcarTareaPaga(tareaId);
+      loadTareas();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao marcar como paga");
+    }
+  };
+
   const loadAll = () => {
     loadProposals();
     loadSolicitudes();
     loadClientes();
     loadContactos();
     loadVendedores();
+    loadTareas();
     loadStats();
   };
 
@@ -185,6 +237,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
         dataResposta: new Date().toISOString(),
         respondidoPor: currentUserId,
       });
+      
       const clienteVinculado = clientes.find(c => c.propostaId === proposal.id);
       if (clienteVinculado) {
         await updateCliente(clienteVinculado.id, {
@@ -194,6 +247,29 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
         });
         loadClientes();
       }
+      
+      // Crear tareas automáticamente si proposta foi aceita
+      if (resposta === "sim" && proposal.servicos && proposal.servicos.length > 0) {
+        const cliente = await getClienteByPropostaId(proposal.id);
+        if (cliente) {
+          for (const servico of proposal.servicos) {
+            await createTarea({
+              titulo: `${servico} — ${proposal.cliente}`,
+              clienteId: cliente.id,
+              clienteNome: cliente.nome,
+              propostaId: proposal.id,
+              servicoNome: servico,
+              estado: 'disponivel',
+              recorrente: true,
+              periodicidade: 'mensal',
+              porcentagemColaborador: 30,
+              porcentagemVendedor: 10,
+            });
+          }
+          loadTareas();
+        }
+      }
+      
       loadProposals();
     } catch (e) {
       alert("Erro: " + e);
@@ -340,6 +416,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     clientes,
     contactos,
     vendedores,
+    tareas,
     loading,
     stats,
     editingId,
@@ -394,6 +471,11 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     loadSolicitudes,
     loadClientes,
     loadContactos,
+    loadTareas,
     handleEliminarSolicitude,
+    handleCrearTarea,
+    handleAsignarTarea,
+    handleAprobarEntrega,
+    handleMarcarPaga,
   };
 }

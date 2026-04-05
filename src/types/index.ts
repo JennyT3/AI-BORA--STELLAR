@@ -105,3 +105,28 @@ export interface OrcamentoRequest {
 
 export type ProposalStatus = "pendente" | "enviada" | "aceite" | "recusada" | "reagendada";
 export type ClienteCategoria = "potencial" | "ativo" | "inativo";
+
+export interface Tarea {
+  id: string;
+  titulo: string;
+  descricao?: string;
+  servicoId?: string;
+  servicoNome?: string;
+  clienteId: string;
+  clienteNome?: string;
+  propostaId?: string;
+  valorCliente?: number;
+  porcentagemColaborador?: number;
+  porcentagemVendedor?: number;
+  recorrente?: boolean;
+  periodicidade?: 'mensal' | 'pontual';
+  estado: 'disponivel' | 'asignada' | 'entregue' | 'aprovada_admin' | 'aprovada_cliente' | 'paga';
+  solicitantes?: string[];
+  asignadaA?: string;
+  asignadoNome?: string;
+  prazo?: string;
+  entregaUrl?: string;
+  entregaNota?: string;
+  criadoEm?: string;
+  atualizadoEm?: string;
+}

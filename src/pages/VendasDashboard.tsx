@@ -2,13 +2,13 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { theme } from "../styles/theme";
 import { VendasSidebar } from "../components/admin/VendasSidebar";
 import { getStatsVendedor, updateVendedor, Vendedor, importarClientesParaVendedor } from "../services/vendedores";
-import { listClientes, createCliente, listProposals } from "../services/firebase";
-import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check } from "lucide-react";
+import { listClientes, createCliente, listProposals, listTareas, solicitarTarea, entregarTarea } from "../services/firebase";
+import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check, CheckSquare, Clock, Calendar, Link as LinkIcon } from "lucide-react";
 import { VendasClientesTab } from "../components/dashboard/VendasClientesTab";
 import { VendasPropostasTab } from "../components/dashboard/VendasPropostasTab";
 import { VendasFaturacaoTab } from "../components/dashboard/VendasFaturacaoTab";
 import { VendasPerfilTab } from "../components/dashboard/VendasPerfilTab";
-import { Cliente, Proposal } from "../types";
+import { Cliente, Proposal, Tarea } from "../types";
 import * as XLSX from "xlsx";
 
 interface VendasDashboardProps {
@@ -17,7 +17,7 @@ interface VendasDashboardProps {
 }
 
 export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas">("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -26,6 +26,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [propostas, setPropostas] = useState<Proposal[]>([]);
   const [allPropostas, setAllPropostas] = useState<Proposal[]>([]);
+  const [tareas, setTareas] = useState<Tarea[]>([]);
 
   // Form states
   const [showNovoCliente, setShowNovoCliente] = useState(false);
@@ -100,6 +101,57 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     setImportResult(null);
   };
 
+  const handleSolicitarTarea = async (tareaId: string) => {
+    try {
+      await solicitarTarea(tareaId, vendedor.id);
+      loadData();
+      alert("Tarefa solicitada! Aguarde pela atribuição.");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao solicitar tarefa");
+    }
+  };
+
+  const [showEntregaModal, setShowEntregaModal] = useState(false);
+  const [entregaTarea, setEntregaTarea] = useState<Tarea | null>(null);
+  const [entregaUrl, setEntregaUrl] = useState("");
+  const [entregaNota, setEntregaNota] = useState("");
+
+  const handleEntregarTarea = async () => {
+    if (!entregaTarea) return;
+    try {
+      await entregarTarea(entregaTarea.id, entregaUrl, entregaNota);
+      loadData();
+      setShowEntregaModal(false);
+      setEntregaTarea(null);
+      setEntregaUrl("");
+      setEntregaNota("");
+      alert("Tarefa entregue com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao entregar tarefa");
+    }
+  };
+
+  const misTareas = tareas.filter(t => t.asignadaA === vendedor.id);
+  const disponiblesTareas = tareas.filter(t => t.estado === 'disponivel');
+
+  const getEstadoTareaColor = (estado: string) => {
+    switch (estado) {
+      case 'asignada': return { bg: '#FEF3C7', color: '#D97706', label: 'Em Andamento' };
+      case 'entregue': return { bg: '#DBEAFE', color: '#2563EB', label: 'Entregue' };
+      case 'aprovada_admin': return { bg: '#D1FAE5', color: '#059669', label: 'Aprovada' };
+      case 'aprovada_cliente': return { bg: '#D1FAE5', color: '#059669', label: 'Confirmada' };
+      case 'paga': return { bg: '#F3E8FF', color: '#9333EA', label: 'Paga' };
+      default: return { bg: '#E0F2FE', color: '#0284C7', label: 'Disponível' };
+    }
+  };
+
+  const isPrazoVencido = (prazo?: string) => {
+    if (!prazo) return false;
+    return new Date(prazo) < new Date();
+  };
+
   // Profile states
   const [editProfile, setEditProfile] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -120,10 +172,11 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, clientesData, propostasData] = await Promise.all([
+      const [statsData, clientesData, propostasData, tareasData] = await Promise.all([
         getStatsVendedor(vendedor.id),
         listClientes(100),
-        listProposals(100)
+        listProposals(100),
+        listTareas()
       ]);
       
       // Filter to only this vendor's clients
@@ -137,6 +190,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
       setClientes(clientesDoVendedor);
       setPropostas(propostasDoVendedor);
       setAllPropostas(propostasData);
+      setTareas(tareasData);
     } catch (err) {
       console.error("Error loading data:", err);
     }
@@ -327,6 +381,102 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
             }}
           />
         )}
+
+        {/* TAREFAS */}
+        {activeTab === "tarefas" && (
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Tarefas</h2>
+            
+            {/* Disponíveis */}
+            <div style={{ marginBottom: 32 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Tarefas Disponíveis</h3>
+              {disponiblesTareas.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 40, color: "#999", backgroundColor: "#f9f9f9", borderRadius: 12 }}>Nenhuma tarefa disponível</div>
+              ) : (
+                <div style={{ display: "grid", gap: 12 }}>
+                  {disponiblesTareas.map(t => {
+                    const yaSolicito = t.solicitantes?.includes(vendedor.id);
+                    return (
+                      <div key={t.id} style={{ backgroundColor: "#fff", borderRadius: 12, padding: 16, border: "1px solid #e0e0e0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{t.titulo}</div>
+                            <div style={{ fontSize: 12, color: "#666" }}>{t.clienteNome} • {t.servicoNome}</div>
+                            {t.periodicidade && (
+                              <span style={{ fontSize: 11, color: "#9333EA", marginTop: 4, display: "block" }}>
+                                {t.periodicidade === 'mensal' ? '🔄 Mensal' : '📌 Pontual'}
+                              </span>
+                            )}
+                          </div>
+                          {yaSolicito ? (
+                            <span style={{ fontSize: 12, padding: "6px 12px", borderRadius: 20, backgroundColor: "#FEF3C7", color: "#D97706", fontWeight: 600 }}>
+                              Aguardando atribuição
+                            </span>
+                          ) : (
+                            <button 
+                              onClick={() => handleSolicitarTarea(t.id)}
+                              style={{ padding: "8px 16px", borderRadius: 8, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                            >
+                              Solicitar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* As Minhas Tarefas */}
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>As Minhas Tarefas</h3>
+              {misTareas.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 40, color: "#999", backgroundColor: "#f9f9f9", borderRadius: 12 }}>Nenhuma tarefa atribuída</div>
+              ) : (
+                <div style={{ display: "grid", gap: 12 }}>
+                  {misTareas.map(t => {
+                    const estado = getEstadoTareaColor(t.estado);
+                    const vencido = isPrazoVencido(t.prazo);
+                    return (
+                      <div key={t.id} style={{ backgroundColor: "#fff", borderRadius: 12, padding: 16, border: "1px solid #e0e0e0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{t.titulo}</div>
+                            <div style={{ fontSize: 12, color: "#666" }}>{t.clienteNome}</div>
+                            {t.prazo && (
+                              <div style={{ fontSize: 11, marginTop: 8, display: "flex", alignItems: "center", gap: 4, color: vencido ? "#dc2626" : "#666" }}>
+                                <Calendar size={12} /> Prazo: {t.prazo} {vencido && " (vencido)"}
+                              </div>
+                            )}
+                            {t.entregaUrl && (
+                              <div style={{ fontSize: 11, marginTop: 4, color: "#2563EB" }}>
+                                <LinkIcon size={12} style={{ display: "inline" }} /> {t.entregaUrl}
+                              </div>
+                            )}
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                            <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, backgroundColor: estado.bg, color: estado.color, fontWeight: 600 }}>
+                              {estado.label}
+                            </span>
+                            {t.estado === 'asignada' && (
+                              <button 
+                                onClick={() => { setEntregaTarea(t); setShowEntregaModal(true); }}
+                                style={{ padding: "8px 16px", borderRadius: 8, backgroundColor: "#2563EB", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                              >
+                                Entregar
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Import Modal */}
@@ -411,7 +561,40 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                   Fechar
                 </button>
               </div>
-            )}
+              )}
+          </div>
+        </div>
+      )}
+
+      {/* Entrega Modal */}
+      {showEntregaModal && entregaTarea && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
+          <div style={{ backgroundColor: "#fff", borderRadius: 16, padding: 24, width: 450 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Entregar Tarefa</h3>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Link da Entrega (URL)</label>
+              <input 
+                type="url"
+                value={entregaUrl}
+                onChange={e => setEntregaUrl(e.target.value)}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 13 }}
+                placeholder="https://..."
+              />
+            </div>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Notas</label>
+              <textarea 
+                value={entregaNota}
+                onChange={e => setEntregaNota(e.target.value)}
+                rows={3}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 13 }}
+                placeholder="Descrição do trabalho realizado..."
+              />
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button onClick={() => { setShowEntregaModal(false); setEntregaTarea(null); }} style={{ flex: 1, padding: 10, borderRadius: 8, backgroundColor: "#f3f4f6", border: "none", fontSize: 13, cursor: "pointer" }}>Cancelar</button>
+              <button onClick={handleEntregarTarea} style={{ flex: 1, padding: 10, borderRadius: 8, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Entregar</button>
+            </div>
           </div>
         </div>
       )}

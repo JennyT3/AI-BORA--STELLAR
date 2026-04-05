@@ -8,7 +8,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  User
+  User,
+  CheckSquare
 } from 'lucide-react';
 import { theme } from '../../styles/theme';
 
@@ -40,6 +41,7 @@ export function VendasSidebar({
     { id: 'orcamento', label: 'Novo Orçamento', icon: FilePlus2, href: vendedorId ? `/admin/orcamento?vendedor=${vendedorId}` : '/admin/orcamento' },
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
     { id: 'clientes', label: 'Meus Clientes', icon: Users, count: clienteCount },
+    { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
     { id: 'faturacao', label: 'Faturação', icon: DollarSign },
     { id: 'perfil', label: 'Meu Perfil', icon: User },
   ];

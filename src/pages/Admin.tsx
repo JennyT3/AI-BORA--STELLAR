@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useLocation } from "wouter";
-import { updateCliente } from "../services/firebase";
+import { updateCliente, listTareas, createTarea, updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga } from "../services/firebase";
+import { getVendedor } from "../services/vendedores";
 import { updateSolicitudeStatus } from "../services/solicitudes";
 import { Sidebar } from "../components/admin/Sidebar";
 import { theme } from "../styles/theme";
@@ -10,14 +11,16 @@ import { Solicitacoes } from "./admin/Solicitacoes";
 import { Clientes } from "./admin/Clientes";
 import { Faturacao } from "./admin/Faturacao";
 import { VendoresAdmin } from "./admin/Vendores";
+import { TarefasAdmin } from "./admin/TarefasAdmin";
 import { gerarFaturaPDF } from "../services/pdfAdmin";
 import { ClienteFormModal } from "../components/admin/ClienteFormModal";
 import { FaturaModal } from "../components/admin/FaturaModal";
 import { exportToExcel } from "../services/exportService";
 import { useAuth } from "../hooks/useAuth";
 import { useAdminData } from "../hooks/useAdminData";
+import { Tarea } from "../types";
 
-type AdminTab = "dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores";
+type AdminTab = "dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores" | "tarefas";
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
@@ -195,6 +198,18 @@ export function Admin() {
         {activeTab === "vendedores" && (
           <VendoresAdmin
             onNavigateVendas={vendedorId => window.open(`/vendas?admin=true&vendedor=${vendedorId}`, "_blank")}
+          />
+        )}
+
+        {activeTab === "tarefas" && (
+          <TarefasAdmin
+            tareas={admin.tareas}
+            clientes={admin.clientes}
+            vendedores={admin.vendedores}
+            onCrearTarea={admin.handleCrearTarea}
+            onAsignarTarea={admin.handleAsignarTarea}
+            onAprobarEntrega={admin.handleAprobarEntrega}
+            onMarcarPaga={admin.handleMarcarPaga}
           />
         )}
       </main>

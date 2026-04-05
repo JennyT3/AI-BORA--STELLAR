@@ -9,7 +9,8 @@ import {
   LogOut, 
   ExternalLink,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CheckSquare
 } from 'lucide-react';
 import { theme } from '../../styles/theme';
 
@@ -44,6 +45,7 @@ export function Sidebar({
     { id: 'clientes', label: 'Clientes', icon: Users, count: clienteCount },
     { id: 'faturacao', label: 'Faturação', icon: DollarSign },
     { id: 'vendedores', label: 'Vendedores', icon: Users },
+    { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
   ];
 
   return (
