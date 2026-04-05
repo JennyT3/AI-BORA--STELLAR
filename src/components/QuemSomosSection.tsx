@@ -1,79 +1,94 @@
 import { useState } from 'react';
 
 export function QuemSomosSection() {
-  const [imageError, setImageError] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const teamMembers = [
+    {
+      name: "Jenny Tejedor",
+      role: "Founder, CEO & Technical Lead",
+      image: "/jenny-photo.JPG"
+    },
+    {
+      name: "Aylen Fuente",
+      role: "Co-Founder & Chief Marketing Officer",
+      image: "/aylen-photo.jpeg"
+    },
+    {
+      name: "Bora",
+      role: "Customer Experience AI",
+      image: "/bora-photo.JPG"
+    }
+  ];
+
+  const handleImageError = (index: number) => {
+    setImageErrors(prev => ({ ...prev, [index]: true }));
+  };
 
   return (
-    <section id="quem-somos" className="py-24 bg-white overflow-hidden">
+    <section id="quem-somos" className="py-24" style={{ backgroundColor: '#F5F2F0' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          
-          {/* Texto */}
-          <div className="space-y-4 order-1">
-            <h2 style={{fontSize:"clamp(22px, 3.5vw, 32px)",fontWeight:900,lineHeight:1.2,maxWidth:"340px"}} className="text-text-primary">
-              A equipa que coloca o seu<br />
-              <span className="text-fuchsia-brand">negócio no mapa.</span>
-            </h2>
-            
-            <div className="space-y-2 text-xs text-text-secondary leading-relaxed">
-              <p>
-                A AI BORA nasceu com uma missão simples: descomplicar o marketing digital 
-                para negócios locais em Portugal.
-              </p>
-              <p>
-                Gerir uma padaria, uma oficina ou um cabeleireiro já dá muito trabalho. 
-                Não precisa de se preocupar com o Google ou as redes sociais.
-              </p>
-              <p>
-                Nós tratamos de tudo — desde o site até aparecer no Google Maps quando 
-                alguém procura perto de si. <strong>Sem jargões. Sem complicações. Resultados reais.</strong>
-              </p>
-            </div>
-          </div>
-
-          {/* Imagen - Con fallback si falla */}
-          <div className="relative order-2">
-            {!imageError ? (
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img 
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80"
-                  alt="Equipa AI BORA trabalhando"
-                  className="w-full h-auto object-cover aspect-[4/3]"
-                  onError={() => setImageError(true)}
-                  loading="eager"
-                />
-                {/* Overlay sutil */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-              </div>
-            ) : (
-              /* Fallback: Gradiente profesional si la imagen falla */
-              <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-fuchsia-500 via-purple-600 to-blue-600 flex items-center justify-center shadow-2xl">
-                <div className="text-center text-white p-8">
-                  <div className="text-6xl mb-4">🚀</div>
-                  <div className="text-3xl font-bold mb-2">AI BORA</div>
-                  <div className="text-lg opacity-90">Equipa criativa & técnica</div>
-                  <div className="mt-6 flex justify-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">💡</div>
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">⚡</div>
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl">🎯</div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Badge flotante - Compromiso real */}
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 border border-black/5 z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-xl">❤️</div>
-                <div>
-                  <div className="font-bold text-text-primary">Compromisso total</div>
-                  <div className="text-sm text-text-secondary">com o seu sucesso</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        
+        {/* Título con barra naranja */}
+        <div className="mb-8">
+          <div className="w-16 h-1 mb-3" style={{ backgroundColor: '#F25C05' }}></div>
+          <h2 style={{fontSize:"clamp(28px, 4vw, 42px)",fontWeight:900,fontFamily:'Montserrat',lineHeight:1.2}} className="text-text-primary">
+            Quem Somos
+          </h2>
         </div>
+
+        {/* Los dos caminos - debajo del título */}
+        <div className="mb-12">
+          <p className="text-lg md:text-xl text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
+            A equipa que te faz escolher dois caminhos:<br/>
+            <span className="font-semibold text-text-primary">Ou lhe ensinamos como fazê-lo, ou fazemos tudo por si.</span>
+          </p>
+        </div>
+
+        {/* Team Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center mb-12">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="flex flex-col items-center text-center w-full max-w-xs">
+              <div className="w-56 h-56 mb-4 overflow-hidden" style={{ borderRadius: '12px' }}>
+                {!imageErrors[index] ? (
+                  <img 
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                    onError={() => handleImageError(index)}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-4xl text-gray-400">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <h4 className="text-xl font-bold text-text-primary" style={{fontFamily:'Montserrat'}}>
+                {member.name}
+              </h4>
+              <p className="text-sm text-text-secondary mt-1" style={{fontFamily:'Montserrat', fontWeight: 600}}>
+                {member.role}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Texto principal */}
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-lg text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
+            A AIBORA nasceu com uma missão simples: descomplicar o marketing digital para negócios locais em Portugal.
+          </p>
+        </div>
+
+        {/* Compromisso */}
+        <div className="text-center mt-8">
+          <h3 className="text-xl font-bold" style={{fontFamily:'Montserrat', color: '#E11D48'}}>
+            Compromisso total com o seu sucesso
+          </h3>
+        </div>
+
       </div>
     </section>
   );
