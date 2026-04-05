@@ -84,6 +84,7 @@ export interface Solicitude {
   origem?: string;
   observacoes?: string;
   status?: "pendente" | "em-analise" | "proposta-enviada" | "contactado" | "convertido" | "descartado";
+  vendedorId?: string;
   criadoEm?: string;
   createdAt?: string;
   updatedAt?: string;

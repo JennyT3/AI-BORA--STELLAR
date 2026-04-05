@@ -3,6 +3,7 @@ import { HeroSection } from '../components/HeroSection';
 import { ComoFuncionaSection } from '../components/ComoFuncionaSection';
 import { NossoTrabalhoSection } from '../components/NossoTrabalhoSection';
 import { QuemSomosSection } from '../components/QuemSomosSection';
+import { ColaboraConNosotrosSection } from '../components/ColaboraConNosotrosSection';
 import { FAQSection } from '../components/FAQSection';
 import { CTAFooterSection } from '../components/CTAFooterSection';
 import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
@@ -31,6 +32,7 @@ export function Home() {
           </div>
         </section>
         <QuemSomosSection />
+        <ColaboraConNosotrosSection />
         <FAQSection />
         <CTAFooterSection />
       </main>

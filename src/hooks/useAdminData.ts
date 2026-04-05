@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto, delegarClienteAVendedor, listVendedoresAtivos, listTareas, createTarea, updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, getClienteByPropostaId } from "../services/firebase";
-import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude } from "../services/solicitudes";
+import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude, asignarVendedorASolicitude } from "../services/solicitudes";
+import { sendPropostaRespostaEmail } from "../services/emailService";
 import { Proposal, Solicitude, Cliente, Tarea } from "../types";
 
 interface UseAdminDataOptions {
@@ -226,17 +227,31 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   };
 
   const handleRegistrarResposta = async (proposal: Proposal) => {
-    const resposta = prompt("Resposta do cliente (sim/nao):", proposal.resposta || "");
-    if (!resposta || (resposta !== "sim" && resposta !== "nao")) {
-      alert("Resposta deve ser 'sim' ou 'nao'");
+    const resposta = prompt("Resposta do cliente (sim/nao/reagendar):", proposal.resposta || "");
+    if (!resposta || (resposta !== "sim" && resposta !== "nao" && resposta !== "reagendar")) {
+      alert("Resposta deve ser 'sim', 'nao' ou 'reagendar'");
       return;
     }
     try {
       await updateProposal(proposal.id, {
         resposta: resposta.toLowerCase() as "sim" | "nao" | "reagendar",
         dataResposta: new Date().toISOString(),
-        respondidoPor: currentUserId,
+        atualizadoPor: currentUserId,
       });
+
+      // Enviar email automático de resposta
+      if (proposal.email) {
+        try {
+          await sendPropostaRespostaEmail({
+            nome: proposal.cliente,
+            email: proposal.email,
+            resposta: resposta.toLowerCase() as "sim" | "nao" | "reagendar",
+            empresa: proposal.empresa,
+          });
+        } catch (emailErr) {
+          console.error("Erro ao enviar email de resposta:", emailErr);
+        }
+      }
       
       const clienteVinculado = clientes.find(c => c.propostaId === proposal.id);
       if (clienteVinculado) {

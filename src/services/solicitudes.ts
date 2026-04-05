@@ -58,6 +58,14 @@ export async function updateSolicitudeStatus(id: string, status: Solicitude['sta
   await updateDoc(doc(db, 'solicitudes', id), { status, updatedAt: new Date().toISOString() });
 }
 
+export async function asignarVendedorASolicitude(id: string, vendedorId: string): Promise<void> {
+  if (vendedorId) {
+    await updateDoc(doc(db, 'solicitudes', id), { vendedorId, updatedAt: new Date().toISOString() });
+  } else {
+    await updateDoc(doc(db, 'solicitudes', id), { vendedorId: null, updatedAt: new Date().toISOString() });
+  }
+}
+
 export async function deleteSolicitude(id: string): Promise<void> {
   await deleteDoc(doc(db, 'solicitudes', id));
 }
