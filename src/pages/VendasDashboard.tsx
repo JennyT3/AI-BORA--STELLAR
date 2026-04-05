@@ -103,7 +103,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex" }}>
+    <div data-theme="dark" style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex" }}>
       <VendasSidebar
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab as any)}
@@ -116,7 +116,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         vendedorId={vendedor.id}
       />
 
-      <main style={{ flex: 1, padding: 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease' }}>
+      <main style={{ flex: 1, padding: 40, overflow: "auto", backgroundColor: theme.colors.bg.primary, marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease' }}>
         
         {/* DASHBOARD */}
         {activeTab === "dashboard" && (

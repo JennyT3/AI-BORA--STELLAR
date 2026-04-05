@@ -186,3 +186,8 @@ p, span, a, li, button, input, textarea, label {
 .backface-hidden  { backface-visibility: hidden; }
 .rotate-y-180     { transform: rotateY(180deg); }
 .group:hover .group-hover\:rotate-y-180 { transform: rotateY(180deg); }
+
+/* Panel vendedor/admin — fondo oscuro para evitar flash */
+body:has([data-theme="dark"]) {
+  background-color: #1A1A1A;
+}
