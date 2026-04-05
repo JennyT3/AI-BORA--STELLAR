@@ -155,6 +155,7 @@ export function Admin() {
         {activeTab === "clientes" && (
           <Clientes
             clientes={admin.clientes}
+            vendedores={admin.vendedores}
             search={admin.clienteSearch}
             onSearchChange={admin.setClienteSearch}
             filterCategoria={admin.clienteFilterCategoria}
@@ -179,6 +180,7 @@ export function Admin() {
             onNavigateFaturacao={() => setActiveTab("faturacao")}
             onUpdateProcesso={(clienteId, processo) => { updateCliente(clienteId, { processo }).then(() => admin.loadClientes()); }}
             onUpdateTarefas={(clienteId, tarefas) => { updateCliente(clienteId, { tarefas }).then(() => admin.loadClientes()); }}
+            onDelegarVendedor={admin.handleDelegarVendedor}
           />
         )}
 

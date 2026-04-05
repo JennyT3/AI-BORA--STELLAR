@@ -191,4 +191,14 @@ export async function listContactos(limitNum: number = 100): Promise<Contacto[]>
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Contacto));
 }
 
+export async function delegarClienteAVendedor(clienteId: string, vendedorId: string): Promise<void> {
+  await updateDoc(doc(db, 'clientes', clienteId), { vendedorId });
+}
+
+export async function listVendedoresAtivos(): Promise<any[]> {
+  const q = query(collection(db, 'vendedores'), where('ativo', '==', true), orderBy('nome', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
 export { app, db };

@@ -1,8 +1,10 @@
-import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight } from "lucide-react";
 import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
 
 interface ClientesProps {
   clientes: any[];
+  vendedores: any[];
   search: string;
   onSearchChange: (v: string) => void;
   filterCategoria: string;
@@ -27,6 +29,7 @@ interface ClientesProps {
   onNavigateFaturacao: () => void;
   onUpdateProcesso: (clienteId: string, processo: string) => void;
   onUpdateTarefas: (clienteId: string, tarefas: any[]) => void;
+  onDelegarVendedor: (clienteId: string, vendedorId: string) => void;
 }
 
 const PROCESSOS = [
@@ -92,7 +95,9 @@ const SERVICOS_TAREFAS: Record<string, { nome: string; descricao: string; icon: 
   ],
 };
 
-export function Clientes({ clientes, search, onSearchChange, filterCategoria, onFilterCategoriaChange, filterOrigem, onFilterOrigemChange, filterResposta, onFilterRespostaChange, sortBy, onSortByChange, sortOrder, onSortOrderChange, selectedCliente, onSelectCliente, onNovoCliente, onVincularProposta, onVerProposta, onEditarProposta, onFaturar, onEditar, onEliminar, onNavigateFaturacao, onUpdateProcesso, onUpdateTarefas }: ClientesProps) {
+export function Clientes({ clientes, vendedores, search, onSearchChange, filterCategoria, onFilterCategoriaChange, filterOrigem, onFilterOrigemChange, filterResposta, onFilterRespostaChange, sortBy, onSortByChange, sortOrder, onSortOrderChange, selectedCliente, onSelectCliente, onNovoCliente, onVincularProposta, onVerProposta, onEditarProposta, onFaturar, onEditar, onEliminar, onNavigateFaturacao, onUpdateProcesso, onUpdateTarefas, onDelegarVendedor }: ClientesProps) {
+  const [showVendedorDropdown, setShowVendedorDropdown] = useState(false);
+  
   const filtered = clientes.filter(c => {
     const searchLower = search.toLowerCase();
     const matchesSearch = !search || c.nome?.toLowerCase().includes(searchLower) || c.email?.toLowerCase().includes(searchLower) || c.nif?.includes(search) || c.telemovel?.includes(search);
@@ -269,7 +274,62 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                 <div className="flex items-center gap-3">
                   <Building size={16} className="text-gray-400" />
                   <span className="text-gray-500 text-[13px]">Origem</span>
-                  <span className="text-gray-900 text-[13px] ml-auto">{selectedCliente.origem}</span>
+                  <span className={`ml-auto text-[11px] px-2.5 py-1 rounded-xl font-semibold ${
+                    selectedCliente.origem === 'Website' ? 'bg-blue-100 text-blue-600' :
+                    selectedCliente.origem === 'Simulador' ? 'bg-purple-100 text-purple-600' :
+                    selectedCliente.origem === 'Instagram' ? 'bg-pink-100 text-pink-600' :
+                    selectedCliente.origem === 'WhatsApp' ? 'bg-green-100 text-green-600' :
+                    selectedCliente.origem === 'Email' ? 'bg-gray-100 text-gray-600' :
+                    selectedCliente.origem === 'Excel' ? 'bg-emerald-100 text-emerald-600' :
+                    selectedCliente.origem === 'Vendedor' ? 'bg-amber-100 text-amber-600' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>{selectedCliente.origem}</span>
+                </div>
+              )}
+              {selectedCliente.vendedorId ? (
+                <div className="flex items-center gap-3">
+                  <User size={16} className="text-gray-400" />
+                  <span className="text-gray-500 text-[13px]">Vendedor</span>
+                  <span className="text-gray-900 text-[13px] ml-auto">{vendedores.find(v => v.id === selectedCliente.vendedorId)?.nome || selectedCliente.vendedorId}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 mt-3">
+                  <button 
+                    onClick={() => setShowVendedorDropdown(!showVendedorDropdown)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 text-xs font-semibold hover:bg-amber-100 transition-colors"
+                  >
+                    <User size={14} /> Delegar a Vendedor
+                  </button>
+                </div>
+              )}
+              {showVendedorDropdown && (
+                <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="text-xs text-gray-500 mb-2">Selecionar vendedor:</div>
+                  <div className="grid gap-1">
+                    {vendedores.filter(v => v.ativo).map(v => (
+                      <button
+                        key={v.id}
+                        onClick={() => { onDelegarVendedor(selectedCliente.id, v.id); setShowVendedorDropdown(false); }}
+                        className="text-left px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-white hover:shadow-sm transition-all"
+                      >
+                        {v.nome}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {selectedCliente.solicitacaoId && (
+                <div className="flex items-center gap-3">
+                  <FileText size={16} className="text-gray-400" />
+                  <span className="text-gray-500 text-[13px]">Solicitação</span>
+                  <span className="text-sky-500 text-[13px] ml-auto font-mono">{selectedCliente.solicitacaoId.slice(0, 12)}...</span>
+                </div>
+              )}
+              {selectedCliente.propostaId && (
+                <div className="flex items-center gap-3">
+                  <FileText size={16} className="text-gray-400" />
+                  <span className="text-gray-500 text-[13px]">Proposta</span>
+                  <span className="text-sky-500 text-[13px] ml-auto font-mono">{selectedCliente.propostaId.slice(0, 12)}...</span>
                 </div>
               )}
               {selectedCliente.dataResposta && (
@@ -287,6 +347,59 @@ export function Clientes({ clientes, search, onSearchChange, filterCategoria, on
                 <p className="text-[13px] text-gray-900 leading-relaxed">{selectedCliente.observacoes}</p>
               </div>
             )}
+
+            {/* Timeline */}
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <h4 className="text-xs font-bold text-gray-500 uppercase mb-4">Timeline</h4>
+              <div className="relative">
+                <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200" />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 relative">
+                    <div className="w-4 h-4 rounded-full bg-sky-500 border-2 border-white z-10" />
+                    <div className="flex-1">
+                      <div className="text-xs font-semibold text-gray-900">Contacto recebido</div>
+                      <div className="text-[11px] text-gray-500">{selectedCliente.createdAt ? new Date(selectedCliente.createdAt).toLocaleDateString("pt-PT") : '—'}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 relative">
+                    <div className={`w-4 h-4 rounded-full border-2 border-white z-10 ${selectedCliente.categoria ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                    <div className="flex-1">
+                      <div className="text-xs font-semibold text-gray-900">Cliente criado</div>
+                      <div className="text-[11px] text-gray-500">{selectedCliente.categoria ? 'Converter' : 'Pendente'}</div>
+                    </div>
+                  </div>
+                  {selectedCliente.propostaId && (
+                    <div className="flex items-center gap-3 relative">
+                      <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white z-10" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-gray-900">Proposta enviada</div>
+                        <div className="text-[11px] text-gray-500">{selectedCliente.dataEnvio || '—'}</div>
+                      </div>
+                    </div>
+                  )}
+                  {selectedCliente.resposta && (
+                    <div className="flex items-center gap-3 relative">
+                      <div className={`w-4 h-4 rounded-full border-2 border-white z-10 ${selectedCliente.resposta === 'sim' ? 'bg-emerald-500' : selectedCliente.resposta === 'nao' ? 'bg-red-500' : 'bg-amber-500'}`} />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-gray-900">
+                          {selectedCliente.resposta === 'sim' ? 'Proposta aceite' : selectedCliente.resposta === 'nao' ? 'Proposta recusada' : 'Reagendado'}
+                        </div>
+                        <div className="text-[11px] text-gray-500">{selectedCliente.dataResposta ? new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT") : '—'}</div>
+                      </div>
+                    </div>
+                  )}
+                  {selectedCliente.categoria === 'cliente' && (
+                    <div className="flex items-center gap-3 relative">
+                      <div className="w-4 h-4 rounded-full bg-purple-500 border-2 border-white z-10" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-gray-900">Fechado</div>
+                        <div className="text-[11px] text-gray-500">Cliente ativo</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto } from "../services/firebase";
+import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto, delegarClienteAVendedor, listVendedoresAtivos } from "../services/firebase";
 import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude } from "../services/solicitudes";
 import { Proposal, Solicitude, Cliente } from "../types";
 
@@ -12,6 +12,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   const [solicitudes, setSolicitudes] = useState<Solicitude[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [contactos, setContactos] = useState<Contacto[]>([]);
+  const [vendedores, setVendedores] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
@@ -98,11 +99,31 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     }
   };
 
+  const loadVendedores = async () => {
+    try {
+      const data = await listVendedoresAtivos();
+      setVendedores(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelegarVendedor = async (clienteId: string, vendedorId: string) => {
+    try {
+      await delegarClienteAVendedor(clienteId, vendedorId);
+      loadClientes();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao delegar cliente");
+    }
+  };
+
   const loadAll = () => {
     loadProposals();
     loadSolicitudes();
     loadClientes();
     loadContactos();
+    loadVendedores();
     loadStats();
   };
 
@@ -261,7 +282,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
 
   const handleSalvarCliente = async () => {
     try {
-      await createCliente({ ...clienteFormData, criadoPor: currentUserId });
+      await createCliente({ ...clienteFormData, criadoPor: currentUserId, origem: "Manual" });
       setShowClienteForm(false);
       setClienteFormData(null);
       setClienteSearch("");
@@ -318,6 +339,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     solicitudes,
     clientes,
     contactos,
+    vendedores,
     loading,
     stats,
     editingId,
@@ -326,6 +348,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     handleEdit,
     handleUpdate,
     handleDelete,
+    handleDelegarVendedor,
     handleMarcarEnviada,
     handleRegistrarResposta,
     cancelEdit: () => setEditingId(null),

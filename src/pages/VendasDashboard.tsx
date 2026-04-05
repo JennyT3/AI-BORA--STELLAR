@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { theme } from "../styles/theme";
 import { VendasSidebar } from "../components/admin/VendasSidebar";
-import { getStatsVendedor, updateVendedor, Vendedor } from "../services/vendedores";
+import { getStatsVendedor, updateVendedor, Vendedor, importarClientesParaVendedor } from "../services/vendedores";
 import { listClientes, createCliente, listProposals } from "../services/firebase";
-import { FileText, Users, DollarSign, Plus, TrendingUp } from "lucide-react";
+import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check } from "lucide-react";
 import { VendasClientesTab } from "../components/dashboard/VendasClientesTab";
 import { VendasPropostasTab } from "../components/dashboard/VendasPropostasTab";
 import { VendasFaturacaoTab } from "../components/dashboard/VendasFaturacaoTab";
 import { VendasPerfilTab } from "../components/dashboard/VendasPerfilTab";
 import { Cliente, Proposal } from "../types";
+import * as XLSX from "xlsx";
 
 interface VendasDashboardProps {
   vendedor: Vendedor;
@@ -29,6 +30,75 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   // Form states
   const [showNovoCliente, setShowNovoCliente] = useState(false);
   const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telemovel: "", nif: "", morada: "", empresa: "" });
+
+  // Import modal states
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<number[]>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ sucesso: number; erros: number } | null>(null);
+
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = new Uint8Array(event.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        
+        const validRows = jsonData.slice(0, 5).map((row: any, idx: number) => {
+          const hasNome = row.Nome || row.nome || row.Name || row.NOME;
+          return { ...row, _hasNome: !!hasNome, _index: idx };
+        });
+        
+        setImportPreview(validRows);
+        setImportErrors(validRows.filter(r => !r._hasNome).map(r => r._index));
+      } catch (err) {
+        console.error("Erro ao ler arquivo:", err);
+        alert("Erro ao ler arquivo. Verifique o formato.");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleImport = async () => {
+    if (importPreview.length === 0) return;
+    
+    setIsImporting(true);
+    try {
+      const validRows = importPreview.filter(r => r._hasNome).map(row => ({
+        nome: row.Nome || row.nome || row.Name || row.NOME,
+        email: row.Email || row.email || row.EMAIL || "",
+        telemovel: row.Telemovel || row.telemovel || row.TELEMOVEL || row.Telefone || row.telefone || "",
+        empresa: row.Empresa || row.empresa || row.EMPRESA || "",
+        website: row.Website || row.website || row.WEBSITE || "",
+        origem: row.Origem || row.origem || row.ORIGEM || "Excel",
+        observacoes: row.Observacoes || row.observacoes || row.OBSERVACOES || "",
+      }));
+      
+      const result = await importarClientesParaVendedor(vendedor.id, validRows);
+      setImportResult({ sucesso: result.sucesso, erros: result.erros.length });
+      
+      if (result.sucesso > 0) {
+        loadData();
+      }
+    } catch (err) {
+      console.error("Erro ao importar:", err);
+    }
+    setIsImporting(false);
+  };
+
+  const closeImportModal = () => {
+    setShowImportModal(false);
+    setImportPreview([]);
+    setImportErrors([]);
+    setImportResult(null);
+  };
 
   // Profile states
   const [editProfile, setEditProfile] = useState(false);
@@ -79,7 +149,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
       const clienteId = await createCliente({
         ...novoCliente,
         categoria: "potencial",
-        origem: "Vendas",
+        origem: "Vendedor",
         vendedorId: vendedor.id
       });
       await loadData();
@@ -193,14 +263,24 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
         {/* CLIENTES */}
         {activeTab === "clientes" && (
-          <VendasClientesTab
-            clientes={clientes}
-            showNovoCliente={showNovoCliente}
-            novoCliente={novoCliente}
-            onNovoClienteChange={(field, val) => setNovoCliente({...novoCliente, [field]: val})}
-            onToggleForm={() => setShowNovoCliente(!showNovoCliente)}
-            onSubmit={handleNovoCliente}
-          />
+          <div>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+              <button 
+                onClick={() => setShowImportModal(true)}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+              >
+                <Upload size={16} /> Importar Clientes
+              </button>
+            </div>
+            <VendasClientesTab
+              clientes={clientes}
+              showNovoCliente={showNovoCliente}
+              novoCliente={novoCliente}
+              onNovoClienteChange={(field, val) => setNovoCliente({...novoCliente, [field]: val})}
+              onToggleForm={() => setShowNovoCliente(!showNovoCliente)}
+              onSubmit={handleNovoCliente}
+            />
+          </div>
         )}
 
         {/* PROPOSTAS */}
@@ -248,6 +328,93 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
           />
         )}
       </main>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
+          <div style={{ backgroundColor: "#fff", borderRadius: 20, width: "100%", maxWidth: 600, maxHeight: "90vh", overflow: "auto", padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, fontFamily: "Montserrat, sans-serif" }}>Importar Clientes</h2>
+              <button onClick={closeImportModal} style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {!importResult ? (
+              <>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Arquivo .xlsx ou .csv</label>
+                  <input 
+                    type="file" 
+                    accept=".xlsx,.xls,.csv"
+                    onChange={handleFileUpload}
+                    style={{ width: "100%", padding: 12, border: "2px dashed #e0e0e0", borderRadius: 10 }}
+                  />
+                </div>
+
+                {importPreview.length > 0 && (
+                  <>
+                    <div style={{ fontSize: 12, color: "#666", marginBottom: 12 }}>Preview (primeiras 5 linhas):</div>
+                    <div style={{ border: "1px solid #e0e0e0", borderRadius: 10, overflow: "hidden", marginBottom: 20 }}>
+                      <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+                        <thead>
+                          <tr style={{ backgroundColor: "#f5f5f5" }}>
+                            <th style={{ padding: 10, textAlign: "left", borderBottom: "1px solid #e0e0e0" }}>#</th>
+                            <th style={{ padding: 10, textAlign: "left", borderBottom: "1px solid #e0e0e0" }}>Nome *</th>
+                            <th style={{ padding: 10, textAlign: "left", borderBottom: "1px solid #e0e0e0" }}>Email</th>
+                            <th style={{ padding: 10, textAlign: "left", borderBottom: "1px solid #e0e0e0" }}>Telemóvel</th>
+                            <th style={{ padding: 10, textAlign: "left", borderBottom: "1px solid #e0e0e0" }}>Origem</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importPreview.map((row, idx) => (
+                            <tr key={idx} style={{ backgroundColor: importErrors.includes(idx) ? "#FEE2E2" : "#fff" }}>
+                              <td style={{ padding: 10, borderBottom: "1px solid #e0e0e0" }}>{idx + 1}</td>
+                              <td style={{ padding: 10, borderBottom: "1px solid #e0e0e0" }}>{row.Nome || row.nome || row.Name || "—"}</td>
+                              <td style={{ padding: 10, borderBottom: "1px solid #e0e0e0" }}>{row.Email || row.email || "—"}</td>
+                              <td style={{ padding: 10, borderBottom: "1px solid #e0e0e0" }}>{row.Telemovel || row.telemovel || row.Telefone || "—"}</td>
+                              <td style={{ padding: 10, borderBottom: "1px solid #e0e0e0" }}>{row.Origem || row.origem || "Excel"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {importErrors.length > 0 && (
+                      <div style={{ color: "#dc2626", fontSize: 12, marginBottom: 16 }}>
+                        ⚠️ {importErrors.length} linha(s) sem Nome não serão importadas
+                      </div>
+                    )}
+
+                    <button 
+                      onClick={handleImport}
+                      disabled={isImporting}
+                      style={{ width: "100%", padding: 14, borderRadius: 10, backgroundColor: isImporting ? "#ccc" : theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: isImporting ? "not-allowed" : "pointer" }}
+                    >
+                      {isImporting ? "A importar..." : `Importar ${importPreview.filter(r => r._hasNome).length} clientes`}
+                    </button>
+                  </>
+                )}
+              </>
+            ) : (
+              <div style={{ textAlign: "center", padding: 20 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 24px", borderRadius: 12, backgroundColor: importResult.sucesso > 0 ? "#dcfce7" : "#fee2e2", marginBottom: 16 }}>
+                  {importResult.sucesso > 0 ? <Check size={24} color="#16a34a" /> : <X size={24} color="#dc2626" />}
+                  <span style={{ fontSize: 16, fontWeight: 600, color: importResult.sucesso > 0 ? "#16a34a" : "#dc2626" }}>
+                    {importResult.sucesso} importados, {importResult.erros} com erro
+                  </span>
+                </div>
+                <button 
+                  onClick={closeImportModal}
+                  style={{ padding: "12px 24px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+                >
+                  Fechar
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
