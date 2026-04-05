@@ -1,4 +1,6 @@
 import { getStatusColor, getStatusLabel } from "../../utils/labels";
+import { theme } from "../../styles/theme";
+import { useState, useEffect } from "react";
 
 interface PropostasProps {
   proposals: any[];
@@ -17,19 +19,28 @@ interface PropostasProps {
 }
 
 export function Propostas({ proposals, loading, editingId, editData, onEdit, onSave, onCancel, onUpdateEditData, onDelete, onMarcarEnviada, onRegistrarResposta, onRefresh, onEditOrcamento }: PropostasProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 className="font-black text-[28px] text-gray-900 mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>
             Propostas
           </h1>
-          <p className="text-gray-500 text-sm">{proposals.length} propostas guardadas</p>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{proposals.length} propostas guardadas</p>
         </div>
         <button
           onClick={onRefresh}
-          className="px-5 py-3 rounded-[10px] bg-white text-gray-500 border border-gray-200 font-semibold cursor-pointer text-[13px] hover:bg-gray-50 transition-colors"
+          style={{ padding: '12px 16px', borderRadius: 10, backgroundColor: '#fff', color: theme.colors.text.secondary, border: `1px solid ${theme.colors.border}`, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
         >
           Atualizar
         </button>
@@ -37,64 +48,64 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
 
       {/* States */}
       {loading ? (
-        <div className="text-center py-16 text-gray-400">A carregar...</div>
+        <div style={{ textAlign: 'center', padding: 64, color: theme.colors.text.secondary }}>A carregar...</div>
       ) : proposals.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 bg-white rounded-2xl border border-gray-100">
+        <div style={{ textAlign: 'center', padding: 64, color: theme.colors.text.secondary, backgroundColor: '#fff', borderRadius: 16, border: `1px solid ${theme.colors.border}` }}>
           Nenhuma proposta guardada ainda.
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div style={{ display: 'grid', gap: isMobile ? 12 : 16 }}>
           {proposals.map((p) => (
-            <div key={p.id} className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div key={p.id} style={{ backgroundColor: '#fff', borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
 
               {/* Edit mode */}
               {editingId === p.id ? (
-                <div className="grid grid-cols-4 gap-4">
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 12 }}>
                   <div>
-                    <label className="text-[11px] text-gray-400 block mb-1.5 font-semibold">Cliente</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Cliente</label>
                     <input
                       value={editData.cliente}
                       onChange={(e) => onUpdateEditData({ ...editData, cliente: e.target.value })}
-                      className="w-full px-3 py-3 rounded-lg border border-gray-200 text-[13px] bg-gray-50 text-gray-900 focus:outline-none focus:border-gray-400"
+                      style={{ width: '100%', padding: '12px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, backgroundColor: '#fafafa', color: theme.colors.text.primary, outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-gray-400 block mb-1.5 font-semibold">Valor (€)</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Valor (€)</label>
                     <input
                       type="number"
                       value={editData.valor}
                       onChange={(e) => onUpdateEditData({ ...editData, valor: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-3 rounded-lg border border-gray-200 text-[13px] bg-gray-50 text-gray-900 focus:outline-none focus:border-gray-400"
+                      style={{ width: '100%', padding: '12px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, backgroundColor: '#fafafa', color: theme.colors.text.primary, outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-gray-400 block mb-1.5 font-semibold">Desconto (€)</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Desconto (€)</label>
                     <input
                       type="number"
                       value={editData.desconto}
                       onChange={(e) => onUpdateEditData({ ...editData, desconto: parseFloat(e.target.value) })}
-                      className="w-full px-3 py-3 rounded-lg border border-gray-200 text-[13px] bg-gray-50 text-gray-900 focus:outline-none focus:border-gray-400"
+                      style={{ width: '100%', padding: '12px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, backgroundColor: '#fafafa', color: theme.colors.text.primary, outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-gray-400 block mb-1.5 font-semibold">Marcas</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Marcas</label>
                     <input
                       type="number"
                       value={editData.marcas}
                       onChange={(e) => onUpdateEditData({ ...editData, marcas: parseInt(e.target.value) })}
-                      className="w-full px-3 py-3 rounded-lg border border-gray-200 text-[13px] bg-gray-50 text-gray-900 focus:outline-none focus:border-gray-400"
+                      style={{ width: '100%', padding: '12px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, backgroundColor: '#fafafa', color: theme.colors.text.primary, outline: 'none' }}
                     />
                   </div>
-                  <div className="col-span-4 flex gap-3 mt-2">
+                  <div style={{ gridColumn: isMobile ? '1' : '1 / -1', display: 'flex', gap: 12, marginTop: 8 }}>
                     <button
                       onClick={() => onSave(p.id)}
-                      className="flex-1 py-3 rounded-lg bg-emerald-500 text-white border-none font-semibold cursor-pointer text-[13px] hover:bg-emerald-600 transition-colors"
+                      style={{ flex: 1, padding: '14px', borderRadius: 8, backgroundColor: '#10B981', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}
                     >
                       Guardar
                     </button>
                     <button
                       onClick={onCancel}
-                      className="flex-1 py-3 rounded-lg bg-gray-100 text-gray-500 border-none font-semibold cursor-pointer text-[13px] hover:bg-gray-200 transition-colors"
+                      style={{ flex: 1, padding: '14px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}
                     >
                       Cancelar
                     </button>
@@ -103,20 +114,20 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
 
               ) : (
                 /* View mode */
-                <div className="flex justify-between items-start gap-6">
-                  <div className="flex-1">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: isMobile ? 12 : 24, flexDirection: isMobile ? 'column' : 'row' }}>
+                  <div style={{ flex: 1 }}>
                     {/* Name + status badge */}
-                    <div className="flex items-center gap-3 mb-2.5">
-                      <span
-                        className="font-bold text-[18px] text-gray-900"
-                        style={{ fontFamily: "Montserrat, sans-serif" }}
-                      >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>
                         {p.cliente}
                       </span>
                       <span
-                        className="text-[11px] px-3 py-1.5 rounded-full font-semibold"
                         style={{
-                          backgroundColor: getStatusColor(p) + "15",
+                          fontSize: 11,
+                          padding: '4px 12px',
+                          borderRadius: 20,
+                          fontWeight: 600,
+                          backgroundColor: getStatusColor(p) + '15',
                           color: getStatusColor(p),
                         }}
                       >
@@ -125,72 +136,69 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     </div>
 
                     {/* Meta info */}
-                    <div className="text-[13px] text-gray-500 mb-3 flex flex-wrap gap-4">
+                    <div style={{ fontSize: 13, color: theme.colors.text.secondary, marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       <span>{p.numeroOrcamento}</span>
-                      <span className="text-[#F25C05] font-bold">{p.valor?.toFixed(2)} €</span>
+                      <span style={{ color: '#F25C05', fontWeight: 700 }}>{p.valor?.toFixed(2)} €</span>
                       <span>{p.marcas} marca{p.marcas !== 1 ? "s" : ""}</span>
-                      {p.dataEnvio && <span className="text-[#3498DB]">Enviada: {p.dataEnvio}</span>}
+                      {p.dataEnvio && <span style={{ color: '#3498DB' }}>Enviada: {p.dataEnvio}</span>}
                     </div>
 
                     {/* Serviços tags */}
                     {p.servicos && p.servicos.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                         {p.servicos.slice(0, 4).map((s: string, i: number) => (
-                          <span key={i} className="text-[11px] bg-gray-100 px-3 py-1.5 rounded-full text-gray-500 font-medium">
+                          <span key={i} style={{ fontSize: 11, backgroundColor: '#f3f4f6', padding: '6px 12px', borderRadius: 20, color: theme.colors.text.secondary, fontWeight: 500 }}>
                             {s}
                           </span>
                         ))}
                         {p.servicos.length > 4 && (
-                          <span className="text-[11px] text-gray-400">+{p.servicos.length - 4}</span>
+                          <span style={{ fontSize: 11, color: theme.colors.text.secondary }}>+{p.servicos.length - 4}</span>
                         )}
                       </div>
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2 flex-wrap">
+                  {/* Actions - Botones grandes para touch */}
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: isMobile ? 12 : 0 }}>
                     <a
                       href={`/p/${p.id}`}
                       target="_blank"
-                      className="px-4 py-2.5 rounded-lg bg-[#3498DB] text-white text-[12px] font-semibold no-underline inline-block hover:bg-[#2980b9] transition-colors"
+                      rel="noopener noreferrer"
+                      style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#3498DB', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'inline-block', minHeight: 44, alignItems: 'center' }}
                     >
-                      Ver Proposta
+                      Ver
                     </a>
                     <button
                       onClick={() => { navigator.clipboard.writeText(`https://aibora.pt/p/${p.id}`); alert("Link copiado!"); }}
-                      className="px-4 py-2.5 rounded-lg bg-gray-100 text-gray-500 border-none text-[12px] font-semibold cursor-pointer hover:bg-gray-200 transition-colors"
+                      style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
                       Copiar
                     </button>
                     <button
                       onClick={() => onEditOrcamento(p.id)}
-                      className="px-4 py-2.5 rounded-lg bg-orange-50 text-[#F25C05] border-none text-[12px] font-semibold cursor-pointer hover:bg-orange-100 transition-colors"
+                      style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#fff7ed', color: '#F25C05', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
                       Editar
                     </button>
                     <button
                       onClick={() => onMarcarEnviada(p)}
-                      className={`px-4 py-2.5 rounded-lg border-none text-[12px] font-semibold cursor-pointer transition-colors ${
-                        p.dataEnvio
-                          ? "bg-blue-50 text-[#3498DB] hover:bg-blue-100"
-                          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                      }`}
+                      style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: p.dataEnvio ? '#dbeafe' : '#f3f4f6', color: p.dataEnvio ? '#3498DB' : theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
                       Enviada
                     </button>
 
                     {p.resposta === "sim" ? (
-                      <span className="px-4 py-2.5 rounded-lg bg-emerald-500 text-white text-[12px] font-semibold">
+                      <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#10B981', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
                         ✓ Aceite
                       </span>
                     ) : p.resposta === "nao" ? (
-                      <span className="px-4 py-2.5 rounded-lg bg-red-600 text-white text-[12px] font-semibold">
+                      <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#dc2626', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
                         ✕ Recusado
                       </span>
                     ) : (
                       <button
                         onClick={() => onRegistrarResposta(p)}
-                        className="px-4 py-2.5 rounded-lg bg-gray-100 text-gray-500 border-none text-[12px] font-semibold cursor-pointer hover:bg-gray-200 transition-colors"
+                        style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                       >
                         Resposta
                       </button>
@@ -198,7 +206,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
 
                     <button
                       onClick={() => onDelete(p.id, p.cliente)}
-                      className="px-4 py-2.5 rounded-lg bg-red-50 text-red-600 border-none text-[12px] font-semibold cursor-pointer hover:bg-red-100 transition-colors"
+                      style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#fef2f2', color: '#dc2626', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
                       X
                     </button>

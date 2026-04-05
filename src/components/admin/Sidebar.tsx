@@ -10,7 +10,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  CheckSquare
+  CheckSquare,
+  X
 } from 'lucide-react';
 import { theme } from '../../styles/theme';
 
@@ -24,6 +25,8 @@ interface SidebarProps {
   clienteCount: number;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  isMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export function Sidebar({ 
@@ -36,6 +39,8 @@ export function Sidebar({
   clienteCount,
   collapsed = false,
   onToggleCollapse,
+  isMobile = false,
+  onCloseMobile,
 }: SidebarProps) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -50,7 +55,7 @@ export function Sidebar({
 
   return (
     <aside style={{
-      width: collapsed ? 80 : 260,
+      width: isMobile ? 280 : (collapsed ? 80 : 260),
       backgroundColor: theme.colors.bg.sidebar,
       borderRight: `1px solid ${theme.colors.bg.sidebarBorder}`,
       position: 'fixed',
@@ -60,9 +65,32 @@ export function Sidebar({
       transition: 'width 0.3s ease',
       zIndex: 100,
     }}>
+      {/* Mobile Close Button */}
+      {isMobile && (
+        <div style={{ 
+          padding: '16px', 
+          borderBottom: `1px solid ${theme.colors.bg.sidebarBorder}`, 
+          display: 'flex', 
+          justifyContent: 'flex-end' 
+        }}>
+          <button 
+            onClick={onCloseMobile}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 8,
+              cursor: 'pointer',
+              color: theme.colors.text.sidebar,
+            }}
+          >
+            <X size={24} />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ padding: collapsed ? theme.spacing.md : theme.spacing.xl, borderBottom: `1px solid ${theme.colors.bg.sidebarBorder}`, display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start' }}>
-        {collapsed ? (
+        {collapsed || isMobile ? (
           <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: theme.borderRadius.md }} />
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

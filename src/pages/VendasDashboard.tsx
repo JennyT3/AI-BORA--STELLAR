@@ -20,6 +20,14 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas">("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Data states
   const [stats, setStats] = useState({ totalClientes: 0, propostasEnviadas: 0, propostasAceitas: 0, valorTotalPropostas: 0, comissaoTotal: 0 });
@@ -240,14 +248,22 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         vendedorId={vendedor.id}
       />
 
-      <main style={{ flex: 1, padding: 40, overflow: "auto", backgroundColor: theme.colors.bg.primary, marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease' }}>
+      <main style={{ 
+        flex: 1, 
+        padding: isMobile ? '80px 16px 24px 16px' : 40, 
+        overflow: "auto", 
+        backgroundColor: theme.colors.bg.primary, 
+        marginLeft: sidebarCollapsed ? 80 : 260, 
+        marginTop: isMobile ? 60 : 0,
+        transition: 'margin-left 0.3s ease, padding 0.3s ease' 
+      }}>
         
         {/* DASHBOARD */}
         {activeTab === "dashboard" && (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: isMobile ? 20 : 32, flexWrap: "wrap", gap: 12 }}>
               <div>
-                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Painel de Vendas</h1>
+                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Painel de Vendas</h1>
                 <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Bem-vindo, {vendedor.nome}</p>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -257,35 +273,35 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
             </div>
 
             {/* Stats Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 32 }}>
-              <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", borderLeft: `4px solid ${theme.colors.accent.primary}` }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)", gap: isMobile ? 12 : 20, marginBottom: isMobile ? 20 : 32 }}>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: `4px solid ${theme.colors.accent.primary}` }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                   <Users size={20} color={theme.colors.accent.primary} />
                   <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>MEUS CLIENTES</span>
                 </div>
-                <div style={{ fontSize: 36, fontWeight: 900, color: theme.colors.text.primary }}>{stats.totalClientes}</div>
+                <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: theme.colors.text.primary }}>{stats.totalClientes}</div>
                 <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>Clientes atribuídos</div>
               </div>
 
-              <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #3498DB" }}>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #3498DB" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                   <FileText size={20} color="#3498DB" />
                   <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>PROPOSTAS</span>
                 </div>
-                <div style={{ fontSize: 36, fontWeight: 900, color: "#3498DB" }}>{stats.propostasEnviadas}</div>
+                <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: "#3498DB" }}>{stats.propostasEnviadas}</div>
                 <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.propostasAceitas} aceites</div>
               </div>
 
-              <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #10B981" }}>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #10B981" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                   <DollarSign size={20} color="#10B981" />
                   <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>VALOR VENDAS</span>
                 </div>
-                <div style={{ fontSize: 36, fontWeight: 900, color: "#10B981" }}>{stats.valorTotalPropostas.toFixed(2)}€</div>
+                <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: "#10B981" }}>{stats.valorTotalPropostas.toFixed(2)}€</div>
                 <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>Total propostas</div>
               </div>
 
-              <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #F22283" }}>
+              <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #F22283" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                   <TrendingUp size={20} color="#F22283" />
                   <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>COMISSÃO</span>

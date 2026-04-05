@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight } from "lucide-react";
 import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
+import { theme } from "../../styles/theme";
 
 interface ClientesProps {
   clientes: any[];
@@ -97,7 +98,15 @@ const SERVICOS_TAREFAS: Record<string, { nome: string; descricao: string; icon: 
 
 export function Clientes({ clientes, vendedores, search, onSearchChange, filterCategoria, onFilterCategoriaChange, filterOrigem, onFilterOrigemChange, filterResposta, onFilterRespostaChange, sortBy, onSortByChange, sortOrder, onSortOrderChange, selectedCliente, onSelectCliente, onNovoCliente, onVincularProposta, onVerProposta, onEditarProposta, onFaturar, onEditar, onEliminar, onNavigateFaturacao, onUpdateProcesso, onUpdateTarefas, onDelegarVendedor }: ClientesProps) {
   const [showVendedorDropdown, setShowVendedorDropdown] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const filtered = clientes.filter(c => {
     const searchLower = search.toLowerCase();
     const matchesSearch = !search || c.nome?.toLowerCase().includes(searchLower) || c.email?.toLowerCase().includes(searchLower) || c.nif?.includes(search) || c.telemovel?.includes(search);
@@ -151,27 +160,27 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
 
     return (
       <div>
-        <div className="mb-6">
-          <button onClick={() => onSelectCliente(null)} className="px-4 py-2.5 rounded-lg bg-white text-gray-900 border border-gray-200 text-xs cursor-pointer flex items-center gap-2">
+        <div style={{ marginBottom: 24 }}>
+          <button onClick={() => onSelectCliente(null)} style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#fff', color: theme.colors.text.primary, border: `1px solid ${theme.colors.border}`, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
             ← Voltar
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-              <div className="w-15 h-15 rounded-full bg-[#F25C05] flex items-center justify-center text-white font-bold text-2xl shrink-0">
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? 16 : 24 }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+              <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: '#F25C05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 24, flexShrink: 0 }}>
                 {selectedCliente.nome?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 className="font-sans font-extrabold text-2xl text-gray-900 mb-1">{selectedCliente.nome}</h2>
-                <div className="flex gap-2 items-center">
-                  <span className={`text-[11px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(selectedCliente.categoria)}`}>
+                <h2 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, color: theme.colors.text.primary, marginBottom: 8 }}>{selectedCliente.nome}</h2>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, backgroundColor: getCategoriaClasses(selectedCliente.categoria).split(' ')[0].replace('bg-', 'rgba(').replace('-50', ',0.1)'), color: getCategoriaClasses(selectedCliente.categoria).includes('emerald') ? '#10B981' : getCategoriaClasses(selectedCliente.categoria).includes('amber') ? '#F59E0B' : getCategoriaClasses(selectedCliente.categoria).includes('violet') ? '#8B5CF6' : '#6B7280' }}>
                     {getCategoriaLabel(selectedCliente.categoria)}
                   </span>
                   <button
                     onClick={() => { const currentIndex = PROCESSOS.findIndex(p => p.id === (selectedCliente.processo || "iniciado")); const nextIndex = (currentIndex + 1) % PROCESSOS.length; onUpdateProcesso(selectedCliente.id, PROCESSOS[nextIndex].id); }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-none text-[11px] font-semibold cursor-pointer ${processo.colorClass}`}
+                    style={{ fontSize: 11, padding: '4px 12px', borderRadius: 20, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, backgroundColor: processo.colorClass.includes('violet') ? '#ede9fe' : processo.colorClass.includes('amber') ? '#fef3c7' : processo.colorClass.includes('sky') ? '#e0f2fe' : '#d1fae5', color: processo.colorClass.includes('violet') ? '#7c3aed' : processo.colorClass.includes('amber') ? '#d97706' : processo.colorClass.includes('sky') ? '#0284c7' : '#059669', border: 'none' }}
                   >
                     <ProcessoIcon size={12} />
                     {processo.label}
@@ -180,308 +189,150 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {selectedCliente.categoria === "cliente" && (
-                <button onClick={() => onFaturar(selectedCliente)} className="px-5 py-3 rounded-xl bg-[#F25C05] text-white border-none font-semibold cursor-pointer text-[13px]">Gerar Fatura</button>
+                <button onClick={() => onFaturar(selectedCliente)} style={{ padding: '14px 20px', borderRadius: 12, backgroundColor: '#F25C05', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}>Gerar Fatura</button>
               )}
-              <button onClick={() => onEditar(selectedCliente)} className="px-5 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 font-semibold cursor-pointer text-[13px]">Editar</button>
-              <button onClick={() => { if (confirm("Eliminar cliente?")) onEliminar(selectedCliente.id); }} className="px-5 py-3 rounded-xl bg-red-100 text-red-600 border-none font-semibold cursor-pointer text-[13px]">Eliminar</button>
+              <button onClick={() => onEditar(selectedCliente)} style={{ padding: '14px 20px', borderRadius: 12, backgroundColor: '#fff', color: theme.colors.text.primary, border: `1px solid ${theme.colors.border}`, fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}>Editar</button>
+              <button onClick={() => { if (confirm("Eliminar cliente?")) onEliminar(selectedCliente.id); }} style={{ padding: '14px 20px', borderRadius: 12, backgroundColor: '#fef2f2', color: '#dc2626', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}>Eliminar</button>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Dados de Contacto</h3>
-            <div className="grid gap-3">
-              <div className="flex items-center gap-3">
-                <Phone size={16} className="text-gray-400" />
-                <span className="text-gray-900">{selectedCliente.telemovel || "—"}</span>
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+            <h3 style={{ fontSize: 12, fontWeight: 700, color: theme.colors.text.secondary, textTransform: 'uppercase', marginBottom: 16 }}>Dados de Contacto</h3>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Phone size={16} color="#9CA3AF" />
+                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.telemovel || "—"}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Mail size={16} className="text-gray-400" />
-                <span className="text-gray-900">{selectedCliente.email || "—"}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Mail size={16} color="#9CA3AF" />
+                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.email || "—"}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <MapPin size={16} className="text-gray-400" />
-                <span className="text-gray-900">{selectedCliente.morada || "—"}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <MapPin size={16} color="#9CA3AF" />
+                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.morada || "—"}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <Building size={16} className="text-gray-400" />
-                <span className="text-gray-900">{selectedCliente.nif || "—"} (NIF)</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Building size={16} color="#9CA3AF" />
+                <span style={{ color: theme.colors.text.primary }}>{selectedCliente.nif || "—"} (NIF)</span>
               </div>
-              {selectedCliente.empresa && (
-                <div className="flex items-center gap-3">
-                  <Building size={16} className="text-gray-400" />
-                  <span className="text-gray-900">{selectedCliente.empresa}</span>
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Orçamento</h3>
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+            <h3 style={{ fontSize: 12, fontWeight: 700, color: theme.colors.text.secondary, textTransform: 'uppercase', marginBottom: 16 }}>Orçamento</h3>
             {selectedCliente.propostaNumero ? (
-              <div className="grid gap-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500 text-[13px]">Número</span>
-                  <a href={`/admin/orcamento?edit=${selectedCliente.propostaId}`} target="_blank" className="text-sky-500 font-bold text-sm no-underline">{selectedCliente.propostaNumero}</a>
+              <div style={{ display: 'grid', gap: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Número</span>
+                  <a href={`/admin/orcamento?edit=${selectedCliente.propostaId}`} target="_blank" style={{ color: '#0ea5e9', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>{selectedCliente.propostaNumero}</a>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500 text-[13px]">Valor</span>
-                  <span className="text-[#F25C05] font-bold text-lg">{selectedCliente.propostaValor?.toFixed(2) || "0.00"} €</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Valor</span>
+                  <span style={{ color: '#F25C05', fontWeight: 700, fontSize: 18 }}>{selectedCliente.propostaValor?.toFixed(2) || "0.00"} €</span>
                 </div>
-                {selectedCliente.dataEnvio && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-[13px]">Enviada</span>
-                    <span className="text-sky-500 text-[13px]">{selectedCliente.dataEnvio}</span>
-                  </div>
-                )}
-                {selectedCliente.resposta && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-[13px]">Resposta</span>
-                    <span className={`text-[12px] px-2.5 py-1 rounded-md font-semibold ${selectedCliente?.resposta === "sim" ? "bg-emerald-100 text-emerald-600" : selectedCliente?.resposta === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
-                      {selectedCliente.resposta === "sim" ? "✓ Aceito" : selectedCliente.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
-                    </span>
-                  </div>
-                )}
                 {selectedCliente.propostaId && (
-                  <div style={{ marginTop: 8 }}>
-                    <a href={`/p/${selectedCliente.propostaId}`} target="_blank" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-sky-500 text-white border-none text-xs font-semibold no-underline cursor-pointer">
+                  <div style={{ marginTop: 12 }}>
+                    <a href={`/p/${selectedCliente.propostaId}`} target="_blank" style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#0ea5e9', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
                       <FileText size={14} /> Ver Proposta
                     </a>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-center p-5 text-gray-400">
-                <FileText size={32} className="mb-2 opacity-50" />
-                <div className="text-[13px]">Sem orçamento vinculado</div>
-                <button onClick={() => onVincularProposta(selectedCliente)} className="mt-3 px-4 py-2 rounded-lg bg-amber-500 text-white border-none text-xs font-semibold cursor-pointer">Vincular Proposta</button>
+              <div style={{ textAlign: 'center', padding: 24, color: theme.colors.text.secondary }}>
+                <FileText size={32} style={{ marginBottom: 8, opacity: 0.5 }} />
+                <div style={{ fontSize: 13 }}>Sem orçamento vinculado</div>
+                <button onClick={() => onVincularProposta(selectedCliente)} style={{ marginTop: 12, padding: '12px 16px', borderRadius: 8, backgroundColor: '#f59e0b', color: '#fff', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44 }}>Vincular Proposta</button>
               </div>
             )}
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Histórico</h3>
-            <div className="grid gap-3">
-              <div className="flex items-center gap-3">
-                <Calendar size={16} className="text-gray-400" />
-                <span className="text-gray-500 text-[13px]">Entrada</span>
-                <span className="text-gray-900 text-[13px] ml-auto">
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+            <h3 style={{ fontSize: 12, fontWeight: 700, color: theme.colors.text.secondary, textTransform: 'uppercase', marginBottom: 16 }}>Histórico</h3>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Calendar size={16} color="#9CA3AF" />
+                <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Entrada</span>
+                <span style={{ color: theme.colors.text.primary, fontSize: 13, marginLeft: 'auto' }}>
                   {selectedCliente.createdAt ? new Date(selectedCliente.createdAt).toLocaleDateString("pt-PT") : "—"}
                 </span>
               </div>
               {selectedCliente.origem && (
-                <div className="flex items-center gap-3">
-                  <Building size={16} className="text-gray-400" />
-                  <span className="text-gray-500 text-[13px]">Origem</span>
-                  <span className={`ml-auto text-[11px] px-2.5 py-1 rounded-xl font-semibold ${
-                    selectedCliente.origem === 'Website' ? 'bg-blue-100 text-blue-600' :
-                    selectedCliente.origem === 'Simulador' ? 'bg-purple-100 text-purple-600' :
-                    selectedCliente.origem === 'Instagram' ? 'bg-pink-100 text-pink-600' :
-                    selectedCliente.origem === 'WhatsApp' ? 'bg-green-100 text-green-600' :
-                    selectedCliente.origem === 'Email' ? 'bg-gray-100 text-gray-600' :
-                    selectedCliente.origem === 'Excel' ? 'bg-emerald-100 text-emerald-600' :
-                    selectedCliente.origem === 'Vendedor' ? 'bg-amber-100 text-amber-600' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>{selectedCliente.origem}</span>
-                </div>
-              )}
-              {selectedCliente.vendedorId ? (
-                <div className="flex items-center gap-3">
-                  <User size={16} className="text-gray-400" />
-                  <span className="text-gray-500 text-[13px]">Vendedor</span>
-                  <span className="text-gray-900 text-[13px] ml-auto">{vendedores.find(v => v.id === selectedCliente.vendedorId)?.nome || selectedCliente.vendedorId}</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 mt-3">
-                  <button 
-                    onClick={() => setShowVendedorDropdown(!showVendedorDropdown)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-600 text-xs font-semibold hover:bg-amber-100 transition-colors"
-                  >
-                    <User size={14} /> Delegar a Vendedor
-                  </button>
-                </div>
-              )}
-              {showVendedorDropdown && (
-                <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="text-xs text-gray-500 mb-2">Selecionar vendedor:</div>
-                  <div className="grid gap-1">
-                    {vendedores.filter(v => v.ativo).map(v => (
-                      <button
-                        key={v.id}
-                        onClick={() => { onDelegarVendedor(selectedCliente.id, v.id); setShowVendedorDropdown(false); }}
-                        className="text-left px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-white hover:shadow-sm transition-all"
-                      >
-                        {v.nome}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {selectedCliente.solicitacaoId && (
-                <div className="flex items-center gap-3">
-                  <FileText size={16} className="text-gray-400" />
-                  <span className="text-gray-500 text-[13px]">Solicitação</span>
-                  <span className="text-sky-500 text-[13px] ml-auto font-mono">{selectedCliente.solicitacaoId.slice(0, 12)}...</span>
-                </div>
-              )}
-              {selectedCliente.propostaId && (
-                <div className="flex items-center gap-3">
-                  <FileText size={16} className="text-gray-400" />
-                  <span className="text-gray-500 text-[13px]">Proposta</span>
-                  <span className="text-sky-500 text-[13px] ml-auto font-mono">{selectedCliente.propostaId.slice(0, 12)}...</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Building size={16} color="#9CA3AF" />
+                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Origem</span>
+                  <span style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, fontWeight: 600, marginLeft: 'auto', backgroundColor: '#e0e7ff', color: '#4f46e5' }}>{selectedCliente.origem}</span>
                 </div>
               )}
               {selectedCliente.dataResposta && (
-                <div className="flex items-center gap-3">
-                  <Calendar size={16} className="text-gray-400" />
-                  <span className="text-gray-500 text-[13px]">Data Resposta</span>
-                  <span className="text-gray-900 text-[13px] ml-auto">{new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT")}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Calendar size={16} color="#9CA3AF" />
+                  <span style={{ color: theme.colors.text.secondary, fontSize: 13 }}>Data Resposta</span>
+                  <span style={{ color: theme.colors.text.primary, fontSize: 13, marginLeft: 'auto' }}>{new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT")}</span>
                 </div>
               )}
-            </div>
-
-            {selectedCliente.observacoes && (
-              <div className="mt-5 pt-4 border-t border-gray-200">
-                <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Observações</h4>
-                <p className="text-[13px] text-gray-900 leading-relaxed">{selectedCliente.observacoes}</p>
-              </div>
-            )}
-
-            {/* Timeline */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <h4 className="text-xs font-bold text-gray-500 uppercase mb-4">Timeline</h4>
-              <div className="relative">
-                <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200" />
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 relative">
-                    <div className="w-4 h-4 rounded-full bg-sky-500 border-2 border-white z-10" />
-                    <div className="flex-1">
-                      <div className="text-xs font-semibold text-gray-900">Contacto recebido</div>
-                      <div className="text-[11px] text-gray-500">{selectedCliente.createdAt ? new Date(selectedCliente.createdAt).toLocaleDateString("pt-PT") : '—'}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 relative">
-                    <div className={`w-4 h-4 rounded-full border-2 border-white z-10 ${selectedCliente.categoria ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                    <div className="flex-1">
-                      <div className="text-xs font-semibold text-gray-900">Cliente criado</div>
-                      <div className="text-[11px] text-gray-500">{selectedCliente.categoria ? 'Converter' : 'Pendente'}</div>
-                    </div>
-                  </div>
-                  {selectedCliente.propostaId && (
-                    <div className="flex items-center gap-3 relative">
-                      <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white z-10" />
-                      <div className="flex-1">
-                        <div className="text-xs font-semibold text-gray-900">Proposta enviada</div>
-                        <div className="text-[11px] text-gray-500">{selectedCliente.dataEnvio || '—'}</div>
-                      </div>
-                    </div>
-                  )}
-                  {selectedCliente.resposta && (
-                    <div className="flex items-center gap-3 relative">
-                      <div className={`w-4 h-4 rounded-full border-2 border-white z-10 ${selectedCliente.resposta === 'sim' ? 'bg-emerald-500' : selectedCliente.resposta === 'nao' ? 'bg-red-500' : 'bg-amber-500'}`} />
-                      <div className="flex-1">
-                        <div className="text-xs font-semibold text-gray-900">
-                          {selectedCliente.resposta === 'sim' ? 'Proposta aceite' : selectedCliente.resposta === 'nao' ? 'Proposta recusada' : 'Reagendado'}
-                        </div>
-                        <div className="text-[11px] text-gray-500">{selectedCliente.dataResposta ? new Date(selectedCliente.dataResposta).toLocaleDateString("pt-PT") : '—'}</div>
-                      </div>
-                    </div>
-                  )}
-                  {selectedCliente.categoria === 'cliente' && (
-                    <div className="flex items-center gap-3 relative">
-                      <div className="w-4 h-4 rounded-full bg-purple-500 border-2 border-white z-10" />
-                      <div className="flex-1">
-                        <div className="text-xs font-semibold text-gray-900">Fechado</div>
-                        <div className="text-[11px] text-gray-500">Cliente ativo</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
         {selectedCliente.categoria === "cliente" && (
-          <div className="mt-6 bg-white rounded-2xl p-6 border border-gray-200">
-            <div className="flex justify-between items-center mb-5">
+          <div style={{ marginTop: 24, backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Plano de Trabalho</h3>
-                <p className="text-xs text-gray-500">
+                <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, marginBottom: 4 }}>Plano de Trabalho</h3>
+                <p style={{ fontSize: 12, color: theme.colors.text.secondary }}>
                   {selectedCliente.servicos && selectedCliente.servicos.length > 0
                     ? `Baseado em: ${selectedCliente.servicos.join(", ")}`
                     : "Selecione as tarefas e defina datas"}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="text-xs text-gray-500">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 12, color: theme.colors.text.secondary }}>
                   Progresso: {tarefasAtuais.filter((t: any) => t.concluida).length} / {tarefasAtuais.length}
-                </div>
-                <div className="w-[100px] h-2 bg-gray-200 rounded-sm overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-sm" style={{ width: `${(tarefasAtuais.filter((t: any) => t.concluida).length / tarefasAtuais.length) * 100 || 0}%` }} />
+                </span>
+                <div style={{ width: 100, height: 8, backgroundColor: '#e5e7eb', borderRadius: 4, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', backgroundColor: '#10B981', borderRadius: 4, width: `${(tarefasAtuais.filter((t: any) => t.concluida).length / tarefasAtuais.length) * 100 || 0}%` }} />
                 </div>
               </div>
             </div>
 
-            {processo.id === "publicado" && selectedCliente.publicacaoData && (
-              <div className="bg-emerald-50 rounded-xl p-4 mb-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle size={20} color="#10B981" />
-                  <span className="font-bold text-emerald-500">ProjetoPublicado!</span>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <span className="text-[11px] text-gray-500">Data</span>
-                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoData}</div>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-gray-500">Horário</span>
-                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoHora || "—"}</div>
-                  </div>
-                  <div>
-                    <span className="text-[11px] text-gray-500">Plataforma</span>
-                    <div className="text-sm font-semibold text-gray-900">{selectedCliente.publicacaoPlataforma || "—"}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
               {tarefasAtuais.map((tarefa: any, index: number) => {
                 const Icon = tarefa.icon || FileText;
                 return (
-                  <div key={index} className={`rounded-xl p-4 border-2 transition-colors ${tarefa.concluida ? "bg-emerald-50 border-emerald-500" : "bg-gray-50 border-gray-200"}`}>
-                    <div className="flex items-start gap-3 mb-3">
+                  <div key={index} style={{ borderRadius: 12, padding: 16, border: `2px solid ${tarefa.concluida ? '#10B981' : '#e5e7eb'}`, backgroundColor: tarefa.concluida ? '#ecfdf5' : '#f9fafb' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
                       <button
                         onClick={() => toggleTarefa(index)}
-                        className={`w-6 h-6 rounded-md flex items-center justify-center cursor-pointer shrink-0 transition-colors ${tarefa.concluida ? "bg-emerald-500 border-transparent text-white" : "bg-white border-2 border-gray-200 text-transparent"}`}
+                        style={{ width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: tarefa.concluida ? 'none' : '2px solid #e5e7eb', backgroundColor: tarefa.concluida ? '#10B981' : '#fff' }}
                       >
                         {tarefa.concluida && <Check size={14} color="#fff" />}
                       </button>
                       <div style={{ flex: 1 }}>
-                        <div className={`font-semibold text-[13px] text-gray-900 ${tarefa.concluida ? "line-through opacity-60" : ""}`}>{tarefa.nome}</div>
-                        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>{tarefa.descricao}</div>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: theme.colors.text.primary, textDecoration: tarefa.concluida ? 'line-through' : 'none', opacity: tarefa.concluida ? 0.6 : 1 }}>{tarefa.nome}</div>
+                        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>{tarefa.descricao}</div>
                       </div>
                       <Icon size={18} color={tarefa.concluida ? "#10B981" : "#9CA3AF"} />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                       <div>
-                        <label className="text-[10px] text-gray-500 block mb-1">Data Início</label>
+                        <label style={{ fontSize: 10, color: '#6B7280', display: 'block', marginBottom: 4 }}>Data Início</label>
                         <input
                           type="date"
                           value={tarefa.dataInicio || ""}
                           onChange={(e) => updateDataTarefa(index, "dataInicio", e.target.value)}
-                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
+                          style={{ width: '100%', padding: '8px', borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11 }}
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] text-gray-500 block mb-1">Data Entrega</label>
+                        <label style={{ fontSize: 10, color: '#6B7280', display: 'block', marginBottom: 4 }}>Data Entrega</label>
                         <input
                           type="date"
                           value={tarefa.dataEntrega || ""}
                           onChange={(e) => updateDataTarefa(index, "dataEntrega", e.target.value)}
-                          className="w-full px-2 py-1.5 rounded-md border border-gray-200 text-[11px]"
+                          style={{ width: '100%', padding: '8px', borderRadius: 6, border: `1px solid ${theme.colors.border}`, fontSize: 11 }}
                         />
                       </div>
                     </div>
@@ -489,14 +340,6 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                 );
               })}
             </div>
-
-            {tarefasAtuais.length === 0 && (
-              <div className="text-center p-10 text-gray-400">
-                <FileText size={40} style={{ marginBottom: 12, opacity: 0.5 }} />
-                <div className="text-sm mb-2">Sem tarefas definidas</div>
-                <div className="text-xs">As tarefas são geradas automaticamente com base nos serviços do orçamento</div>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -505,105 +348,161 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 className="font-sans text-2xl md:text-3xl font-black text-gray-900 mb-2">Clientes</h1>
-          <p className="text-gray-500 text-sm">{clientes.length} clientes</p>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Clientes</h1>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{clientes.length} clientes</p>
         </div>
-        <button onClick={onNovoCliente} className="px-5 py-3 rounded-xl bg-[#F25C05] text-white border-none font-semibold cursor-pointer text-[13px]">+ Novo Cliente</button>
+        <button onClick={onNovoCliente} style={{ padding: '14px 20px', borderRadius: 12, backgroundColor: '#F25C05', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}>+ Novo Cliente</button>
       </div>
 
-      <div className="bg-white rounded-2xl p-5 mb-6 border border-gray-200">
-        <div className="flex gap-3 flex-wrap items-center">
-          <input type="text" placeholder="Buscar..." value={search} onChange={(e) => onSearchChange(e.target.value)} className="flex-1 min-w-[150px] px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs" />
-          <select value={filterCategoria} onChange={(e) => onFilterCategoriaChange(e.target.value)} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs min-w-[120px]">
+      {/* Filtros */}
+      <div style={{ backgroundColor: '#fff', borderRadius: 16, padding: isMobile ? 12 : 20, border: `1px solid ${theme.colors.border}`, marginBottom: isMobile ? 16 : 24 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <input 
+            type="text" 
+            placeholder="Buscar..." 
+            value={search} 
+            onChange={(e) => onSearchChange(e.target.value)} 
+            style={{ flex: '1 1 150px', padding: '12px 16px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minHeight: 44, outline: 'none' }} 
+          />
+          <select 
+            value={filterCategoria} 
+            onChange={(e) => onFilterCategoriaChange(e.target.value)} 
+            style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minHeight: 44, minWidth: 120 }}
+          >
             <option value="todos">Todos</option>
             <option value="cliente">Cliente</option>
             <option value="potencial">Potencial</option>
             <option value="curioso">Curioso</option>
           </select>
-          <select value={sortBy} onChange={(e) => onSortByChange(e.target.value)} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 text-xs">
+          <select 
+            value={sortBy} 
+            onChange={(e) => onSortByChange(e.target.value)} 
+            style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minHeight: 44 }}
+          >
             <option value="createdAt">Data</option>
             <option value="nome">Nome</option>
             <option value="propostaValor">Valor</option>
           </select>
-          <button onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")} className="px-3.5 py-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer">{sortOrder === "asc" ? "↑" : "↓"}</button>
+          <button 
+            onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")} 
+            style={{ padding: '12px 16px', borderRadius: 8, border: `1px solid ${theme.colors.border}`, backgroundColor: '#fff', cursor: 'pointer', minHeight: 44, minWidth: 44 }}
+          >
+            {sortOrder === "asc" ? "↑" : "↓"}
+          </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Nome</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Categoria</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Processo</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Telefone</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Email</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Orçamento</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Proposta</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-left">Resposta</th>
-              <th className="px-3.5 py-3 text-[11px] font-semibold text-gray-500 text-center">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((c, i) => {
-              const processo = getProcessoInfo(c.processo || "iniciado");
-              const ProcessoIcon = processo.icon;
-              return (
-                <tr key={`${c.id}-${i}`} onClick={() => onSelectCliente(c)} className="cursor-pointer border-t border-gray-100 bg-white hover:bg-gray-50 transition-colors">
-                  <td className="px-3.5 py-3 text-xs"><div className="font-bold text-gray-900">{c.nome}</div></td>
-                  <td className="px-3.5 py-3"><span className={`text-[10px] px-2.5 py-1 rounded-xl font-semibold ${getCategoriaClasses(c.categoria)}`}>{getCategoriaLabel(c.categoria)}</span></td>
-                  <td className="px-3.5 py-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const currentIndex = PROCESSOS.findIndex(p => p.id === (c.processo || "iniciado"));
-                        const nextIndex = (currentIndex + 1) % PROCESSOS.length;
-                        onUpdateProcesso(c.id, PROCESSOS[nextIndex].id);
-                      }}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border-none text-[11px] font-semibold cursor-pointer ${processo.colorClass}`}
-                    >
-                      <ProcessoIcon size={12} />
-                      {processo.label}
-                    </button>
-                  </td>
-                  <td className="px-3.5 py-3 text-xs text-gray-500">{c.telemovel || "—"}</td>
-                  <td className="px-3.5 py-3 text-xs text-gray-500">{c.email || "—"}</td>
-                  <td className="px-3.5 py-3">
-                    {c.propostaNumero ? (
-                      <a href={`/admin/orcamento?edit=${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} className="text-sky-500 font-semibold text-xs cursor-pointer no-underline hover:text-sky-600 transition-colors">{c.propostaNumero}</a>
-                    ) : <span className="text-xs text-gray-300">—</span>}
-                  </td>
-                  <td className="px-3.5 py-3">
-                    {c.propostaId ? (
-                      <a href={`/p/${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} className="px-3 py-1.5 rounded-md bg-sky-500 text-white border-none text-[11px] font-semibold cursor-pointer no-underline inline-block hover:bg-sky-600 transition-colors">Proposta</a>
-                    ) : (
-                      <button onClick={(e) => { e.stopPropagation(); onVincularProposta(c); }} className="px-2.5 py-1 rounded-md bg-amber-500 text-white border-none text-[10px] font-semibold cursor-pointer hover:bg-amber-600 transition-colors">Vincular</button>
-                    )}
-                  </td>
-                  <td className="px-3.5 py-3">
-                    {c.resposta ? (
-                      <span className={`text-[10px] px-2.5 py-1 rounded-md font-semibold ${selectedCliente?.resposta === "sim" ? "bg-emerald-100 text-emerald-600" : selectedCliente?.resposta === "nao" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
-                        {c.resposta === "sim" ? "✓ Aceito" : c.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
-                      </span>
-                    ) : <span className="text-[10px] px-2 py-1 rounded-sm bg-gray-100 text-gray-400 font-semibold">Pendente</span>}
-                  </td>
-                  <td className="px-3.5 py-3 text-center">
-                    <div className="flex gap-1 justify-center" onClick={(e) => e.stopPropagation()}>
-                      {c.categoria === "cliente" && (
-                        <button onClick={() => onFaturar(c)} title="Faturar" className="px-2 py-1.5 rounded-md bg-emerald-500 text-white border-none text-[11px] cursor-pointer hover:bg-emerald-600 transition-colors">€</button>
-                      )}
-                      <button onClick={() => onEditar(c)} title="Editar" className="px-2 py-1.5 rounded-md bg-gray-100 text-gray-500 border-none text-[11px] cursor-pointer hover:bg-gray-200 transition-colors">✎</button>
-                      <button onClick={() => onEliminar(c.id)} title="Eliminar" className="px-2 py-1.5 rounded-md bg-red-100 text-red-600 border-none text-[11px] cursor-pointer hover:bg-red-200 transition-colors">✕</button>
-                    </div>
-                  </td>
+      {/* Mobile Cards View */}
+      {isMobile ? (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {filtered.map((c, i) => {
+            const processo = getProcessoInfo(c.processo || "iniciado");
+            return (
+              <div 
+                key={`${c.id}-${i}`} 
+                onClick={() => onSelectCliente(c)}
+                style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, border: `1px solid ${theme.colors.border}`, cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: '#F25C05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 16 }}>
+                    {c.nome?.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 14 }}>{c.nome}</div>
+                    <div style={{ fontSize: 12, color: theme.colors.text.secondary }}>{c.email || '—'}</div>
+                  </div>
+                  <span style={{ fontSize: 10, padding: '4px 8px', borderRadius: 20, fontWeight: 600, backgroundColor: '#d1fae5', color: '#059669' }}>
+                    {getCategoriaLabel(c.categoria)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, color: theme.colors.text.secondary }}>{c.telemovel || '—'}</span>
+                  {c.propostaValor ? (
+                    <span style={{ fontWeight: 700, color: '#F25C05', fontSize: 14 }}>{c.propostaValor?.toFixed(2)} €</span>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Desktop Table View */
+        <div style={{ backgroundColor: '#fff', borderRadius: 16, border: `1px solid ${theme.colors.border}`, overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+            <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f9fafb', borderBottom: `1px solid ${theme.colors.border}` }}>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Nome</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Categoria</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Processo</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Telefone</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Email</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Orçamento</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'left' }}>Resposta</th>
+                  <th style={{ padding: '12px 16px', fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: 'center' }}>Ações</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {filtered.map((c, i) => {
+                  const processo = getProcessoInfo(c.processo || "iniciado");
+                  const ProcessoIcon = processo.icon;
+                  return (
+                    <tr 
+                      key={`${c.id}-${i}`} 
+                      onClick={() => onSelectCliente(c)} 
+                      style={{ cursor: 'pointer', borderTop: `1px solid ${theme.colors.border}`, backgroundColor: '#fff' }}
+                    >
+                      <td style={{ padding: '12px 16px', fontSize: 12 }}><div style={{ fontWeight: 700, color: theme.colors.text.primary }}>{c.nome}</div></td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 20, fontWeight: 600, backgroundColor: '#d1fae5', color: '#059669' }}>{getCategoriaLabel(c.categoria)}</span>
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const currentIndex = PROCESSOS.findIndex(p => p.id === (c.processo || "iniciado"));
+                            const nextIndex = (currentIndex + 1) % PROCESSOS.length;
+                            onUpdateProcesso(c.id, PROCESSOS[nextIndex].id);
+                          }}
+                          style={{ fontSize: 11, padding: '6px 12px', borderRadius: 20, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, backgroundColor: '#ede9fe', color: '#7c3aed', border: 'none' }}
+                        >
+                          <ProcessoIcon size={12} />
+                          {processo.label}
+                        </button>
+                      </td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: theme.colors.text.secondary }}>{c.telemovel || "—"}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: theme.colors.text.secondary }}>{c.email || "—"}</td>
+                      <td style={{ padding: '12px 16px' }}>
+                        {c.propostaNumero ? (
+                          <a href={`/admin/orcamento?edit=${c.propostaId}`} target="_blank" onClick={(e) => e.stopPropagation()} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 12, textDecoration: 'none' }}>{c.propostaNumero}</a>
+                        ) : <span style={{ fontSize: 12, color: '#d1d5db' }}>—</span>}
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        {c.resposta ? (
+                          <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, fontWeight: 600, backgroundColor: c.resposta === 'sim' ? '#d1fae5' : c.resposta === 'nao' ? '#fee2e2' : '#fef3c7', color: c.resposta === 'sim' ? '#059669' : c.resposta === 'nao' ? '#dc2626' : '#d97706' }}>
+                            {c.resposta === "sim" ? "✓ Aceito" : c.resposta === "nao" ? "✕ Recusado" : "↻ Reagendado"}
+                          </span>
+                        ) : <span style={{ fontSize: 10, padding: '4px 8px', borderRadius: 4, backgroundColor: '#f3f4f6', color: '#9ca3af', fontWeight: 600 }}>Pendente</span>}
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
+                          {c.categoria === "cliente" && (
+                            <button onClick={() => onFaturar(c)} title="Faturar" style={{ padding: '8px 12px', borderRadius: 6, backgroundColor: '#10b981', color: '#fff', border: 'none', fontSize: 11, cursor: 'pointer', minHeight: 32 }}>€</button>
+                          )}
+                          <button onClick={() => onEditar(c)} title="Editar" style={{ padding: '8px 12px', borderRadius: 6, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontSize: 11, cursor: 'pointer', minHeight: 32 }}>✎</button>
+                          <button onClick={() => onEliminar(c.id)} title="Eliminar" style={{ padding: '8px 12px', borderRadius: 6, backgroundColor: '#fee2e2', color: '#dc2626', border: 'none', fontSize: 11, cursor: 'pointer', minHeight: 32 }}>✕</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

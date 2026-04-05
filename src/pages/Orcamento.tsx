@@ -39,8 +39,16 @@ export function Orcamento() {
   const isAdminMode = window.location.href.includes("/admin");
   const vendedorId = searchParams.get('vendedor');
   const isVendedorOrcamento = isAdminMode && vendedorId && vendedorId !== "true";
-  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao">("orcamento");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const solId = searchParams.get('sol');
   const [loadingSolicitude, setLoadingSolicitude] = useState(false);
   const [propostaId, setPropostaId] = useState<string | null>(null);
@@ -315,12 +323,12 @@ export function Orcamento() {
           vendedorId={vendedorId}
         />
 
-        <main style={{ flex: 1, padding: 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease', height: "100vh" }}>
+        <main style={{ flex: 1, padding: isMobile ? '80px 16px 24px 16px' : 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, marginTop: isMobile ? 60 : 0, transition: 'margin-left 0.3s ease', height: "100vh" }}>
           <div style={{ height: "100%", overflow: "auto", paddingRight: 16 }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
               <div style={{ marginBottom: 32 }}>
                 <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
-                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial para o seu cliente</p>
+                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial</p>
               </div>
               <OrcamentoForm
                 cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
@@ -360,7 +368,7 @@ export function Orcamento() {
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
 
-        <main style={{ flex: 1, padding: 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, transition: 'margin-left 0.3s ease', height: "100vh" }}>
+        <main style={{ flex: 1, padding: isMobile ? '80px 16px 24px 16px' : 40, overflow: "auto", marginLeft: sidebarCollapsed ? 80 : 260, marginTop: isMobile ? 60 : 0, transition: 'margin-left 0.3s ease', height: "100vh" }}>
           <div style={{ height: "100%", overflow: "auto", paddingRight: 16 }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
               <div style={{ marginBottom: 32 }}>

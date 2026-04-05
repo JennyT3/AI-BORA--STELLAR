@@ -7,7 +7,7 @@ export function QuemSomosSection() {
     {
       name: "Jenny Tejedor",
       role: "Founder, CEO & Technical Lead",
-      image: "/jenny-photo.JPG"
+      image: "/jenny-photo.jpg"
     },
     {
       name: "Aylen Fuente",
