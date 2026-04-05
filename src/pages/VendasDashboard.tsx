@@ -173,10 +173,6 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     twitter: vendedor.redesSociais?.twitter || ""
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -187,10 +183,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         listTareas()
       ]);
       
-      // Filter to only this vendor's clients
       const clientesDoVendedor = clientesData.filter(c => c.vendedorId === vendedor.id);
-      
-      // Filter proposals for this vendor's clients
       const clienteIds = clientesDoVendedor.map(c => c.id);
       const propostasDoVendedor = propostasData.filter(p => p.clienteId && clienteIds.includes(p.clienteId));
       
@@ -205,11 +198,20 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     setLoading(false);
   };
 
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleNovoCliente = async () => {
-    if (!novoCliente.nome) return;
+    if (!novoCliente.nome?.trim()) return;
     try {
-      const clienteId = await createCliente({
-        ...novoCliente,
+      await createCliente({
+        nome: novoCliente.nome.trim(),
+        email: novoCliente.email?.trim() || undefined,
+        telemovel: novoCliente.telemovel?.trim() || undefined,
+        empresa: novoCliente.empresa?.trim() || undefined,
         categoria: "potencial",
         origem: "Vendedor",
         vendedorId: vendedor.id
@@ -217,21 +219,31 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
       await loadData();
       setShowNovoCliente(false);
       setNovoCliente({ nome: "", email: "", telemovel: "", nif: "", morada: "", empresa: "" });
+      alert("Cliente criado com sucesso!");
     } catch (err) {
+      console.error(err);
       alert("Erro ao criar cliente");
     }
   };
 
   const navigateTo = (tab: string) => {
     if (tab === "orcamento") {
-      alert("Os orçamentos são criados pelo administrador. Contacte-o para criar um novo orçamento.");
+      window.location.href = `/admin/orcamento?vendedor=${vendedor.id}`;
     } else {
       setActiveTab(tab as any);
     }
   };
 
   if (loading) {
-    return <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary }} />;
+    return (
+      <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 40, height: 40, border: "3px solid #f3f3f3", borderTop: `3px solid ${theme.colors.accent.primary}`, borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>A carregar...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
