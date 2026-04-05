@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function QuemSomosSection() {
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   const teamMembers = [
     {
@@ -20,6 +21,15 @@ export function QuemSomosSection() {
       image: "/bora-photo.JPG"
     }
   ];
+
+  useEffect(() => {
+    teamMembers.forEach((member, index) => {
+      const img = new Image();
+      img.onload = () => setLoadedImages(prev => ({ ...prev, [index]: true }));
+      img.onerror = () => setImageErrors(prev => ({ ...prev, [index]: true }));
+      img.src = member.image;
+    });
+  }, []);
 
   const handleImageError = (index: number) => {
     setImageErrors(prev => ({ ...prev, [index]: true }));
@@ -50,19 +60,25 @@ export function QuemSomosSection() {
           {teamMembers.map((member, index) => (
             <div key={index} className="flex flex-col items-center text-center w-full max-w-xs">
               <div className="w-56 h-56 mb-4 overflow-hidden" style={{ borderRadius: '12px' }}>
-                {!imageErrors[index] ? (
+                {imageErrors[index] ? (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-4xl text-gray-400">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
+                ) : !loadedImages[index] ? (
+                  <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center">
+                    <span className="text-4xl text-gray-300">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
+                ) : (
                   <img 
                     src={member.image}
                     alt={member.name}
                     className="w-full h-full object-cover"
                     onError={() => handleImageError(index)}
                   />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-4xl text-gray-400">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
                 )}
               </div>
               <h4 className="text-xl font-bold text-text-primary" style={{fontFamily:'Montserrat'}}>
