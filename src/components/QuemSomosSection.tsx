@@ -13,12 +13,12 @@ export function QuemSomosSection() {
     {
       name: "Aylen Fuente",
       role: "Co-Founder & Chief Marketing Officer",
-      image: "/aylen-photo.jpeg"
+      image: "/aylen-photo.jpg"
     },
     {
       name: "Bora",
       role: "Customer Experience AI",
-      image: "/bora-photo.JPG"
+      image: "/bora-photo..jpg"
     }
   ];
 
