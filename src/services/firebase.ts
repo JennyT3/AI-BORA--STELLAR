@@ -153,4 +153,42 @@ export async function getClientesByCategoria(categoria: string): Promise<Cliente
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
 }
 
+function generateContactoId() {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+  return 'cont-' + id;
+}
+
+export interface Contacto {
+  id?: string;
+  nome: string;
+  negocio?: string;
+  telemovel?: string;
+  email?: string;
+  mensagem?: string;
+  origem?: string;
+  tipo?: string;
+  status?: string;
+  createdAt?: string;
+}
+
+export async function createContacto(data: Partial<Contacto>): Promise<string> {
+  const id = generateContactoId();
+  await setDoc(doc(db, 'contactos', id), {
+    ...data,
+    origem: data.origem || 'Home',
+    tipo: data.tipo || 'contacto',
+    status: data.status || 'pendente',
+    createdAt: new Date().toISOString(),
+  });
+  return id;
+}
+
+export async function listContactos(limitNum: number = 100): Promise<Contacto[]> {
+  const q = query(collection(db, 'contactos'), orderBy('createdAt', 'desc'), limit(limitNum));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Contacto));
+}
+
 export { app, db };

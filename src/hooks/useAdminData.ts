@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente } from "../services/firebase";
+import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto } from "../services/firebase";
 import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude } from "../services/solicitudes";
 import { Proposal, Solicitude, Cliente } from "../types";
 
@@ -11,6 +11,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [solicitudes, setSolicitudes] = useState<Solicitude[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [contactos, setContactos] = useState<Contacto[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
@@ -88,10 +89,20 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     setLoading(false);
   };
 
+  const loadContactos = async () => {
+    try {
+      const data = await listContactos(100);
+      setContactos(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const loadAll = () => {
     loadProposals();
     loadSolicitudes();
     loadClientes();
+    loadContactos();
     loadStats();
   };
 
@@ -306,6 +317,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     proposals,
     solicitudes,
     clientes,
+    contactos,
     loading,
     stats,
     editingId,
@@ -358,6 +370,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     loadProposals,
     loadSolicitudes,
     loadClientes,
+    loadContactos,
     handleEliminarSolicitude,
   };
 }

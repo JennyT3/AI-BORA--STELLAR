@@ -142,6 +142,7 @@ export function Admin() {
         {activeTab === "solicitacoes" && (
           <Solicitacoes
             solicitudes={admin.solicitudes}
+            contactos={admin.contactos}
             loading={admin.loading}
             onRefresh={admin.loadSolicitudes}
             onCriarProposta={id => navigate(`/admin/orcamento?sol=${id}`)}

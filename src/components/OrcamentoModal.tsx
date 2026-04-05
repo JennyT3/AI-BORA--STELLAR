@@ -66,7 +66,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
         observacoes: formData.observacoes,
         servicos: servicosSelecionados.map(s => s.nome),
         marcas: marcas.filter(m => m.nome.trim()),
-        origem: 'Website',
+        origem: 'Simulador',
       });
 
       try {

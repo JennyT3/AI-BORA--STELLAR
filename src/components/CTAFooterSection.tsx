@@ -4,6 +4,8 @@ import { Check, Loader2 } from 'lucide-react';
 import { useSectionInView } from '../hooks/useSectionInView';
 import { WHATSAPP_LINK, GOOGLE_SCRIPT_URL } from '../lib/constants';
 import { WhatsAppIcon } from './icons/WhatsAppIcon';
+import { createContacto } from '../services/firebase';
+import { sendConfirmationEmail } from '../services/emailService';
 
 export function CTAFooterSection() {
   const { ref, isInView } = useSectionInView();
@@ -23,17 +25,45 @@ export function CTAFooterSection() {
     setSubmitStatus('idle');
 
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          ...formData,
-          origem: 'Formulario Website AIBORA'
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'no-cors'
+      // Save to Firestore
+      await createContacto({
+        nome: formData.nome,
+        negocio: formData.nomeNegocio,
+        telemovel: formData.telefone,
+        email: formData.email,
+        mensagem: formData.mensagem,
+        origem: 'Home',
+        tipo: 'contacto',
+        status: 'pendente',
       });
+
+      // Send confirmation email if email provided
+      if (formData.email) {
+        try {
+          await sendConfirmationEmail({
+            nome: formData.nome,
+            email: formData.email,
+            servicos: ['Pedido de informação'],
+          });
+        } catch (emailErr) {
+          console.error('Erro ao enviar email de confirmação:', emailErr);
+        }
+      }
+
+      // Fallback to Google Script (optional)
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            ...formData,
+            origem: 'Formulario Website AIBORA'
+          }),
+          headers: { 'Content-Type': 'application/json' },
+          mode: 'no-cors'
+        });
+      } catch (googleErr) {
+        // Ignore Google Script errors if Firestore succeeded
+      }
 
       setSubmitStatus('success');
       setFormData({ nome: '', nomeNegocio: '', telefone: '', email: '', mensagem: '' });

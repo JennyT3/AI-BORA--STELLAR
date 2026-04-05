@@ -2,6 +2,7 @@ import { theme } from "../../styles/theme";
 
 interface SolicitacoesProps {
   solicitudes: any[];
+  contactos: any[];
   loading: boolean;
   onRefresh: () => void;
   onCriarProposta: (id: string) => void;
@@ -10,13 +11,50 @@ interface SolicitacoesProps {
   onDelete: (id: string) => void;
 }
 
-export function Solicitacoes({ solicitudes, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete }: SolicitacoesProps) {
+export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete }: SolicitacoesProps) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div><h1 style={{ fontFamily: "Montserrat, sans-serif", fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Solicitações</h1><p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{solicitudes.filter(s => s.status === "pendente").length} pendentes</p></div>
         <button onClick={onRefresh} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: "#ffffff", color: "#666", border: "1px solid #e0e0e0", fontWeight: 600, cursor: "pointer", fontSize: 13 }}>Atualizar</button>
       </div>
+
+      {/* Contactos Section */}
+      {contactos.length > 0 && (
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 18, color: theme.colors.text.primary }}>Contactos do Website</span>
+            <span style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, backgroundColor: "#EDE9FE", color: "#7C3AED", fontWeight: 600 }}>{contactos.length}</span>
+          </div>
+          <div style={{ display: "grid", gap: 12 }}>
+            {contactos.map((c) => (
+              <div key={c.id} style={{ backgroundColor: "#FAF5FF", borderRadius: 12, padding: 16, border: "1px solid #E9D5FF" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 600, fontSize: 14, color: theme.colors.text.primary }}>{c.nome}</span>
+                      {c.status === "pendente" && <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 12, backgroundColor: "#FEF3C7", color: "#D97706", fontWeight: 600 }}>Pendente</span>}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>{c.telemovel} {c.email && `| ${c.email}`}</div>
+                    <div style={{ fontSize: 11, color: "#999", marginBottom: 4 }}>{c.negocio}</div>
+                    {c.mensagem && <div style={{ fontSize: 12, color: theme.colors.text.secondary, fontStyle: "italic", marginTop: 6 }}>"{c.mensagem}"</div>}
+                    <div style={{ fontSize: 11, color: "#999", marginTop: 6 }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString("pt-PT") : ''}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Solicitações Section */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 18, color: theme.colors.text.primary }}>Orçamentos do Simulador</span>
+          <span style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, backgroundColor: "#E0F2FE", color: "#0284C7", fontWeight: 600 }}>{solicitudes.length}</span>
+        </div>
+      </div>
+      
       {loading ? <div style={{ textAlign: "center", padding: 60, color: theme.colors.text.secondary }}>A carregar...</div> : solicitudes.length === 0 ? <div style={{ textAlign: "center", padding: 60, color: theme.colors.text.secondary, backgroundColor: "#ffffff", borderRadius: 16, border: "1px solid #e8e8e8" }}>Nenhuma solicitação ainda.</div> : (
         <div style={{ display: "grid", gap: 16 }}>
           {solicitudes.map((s) => (
