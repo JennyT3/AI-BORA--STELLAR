@@ -5,10 +5,10 @@ import { createSolicitude } from '../services/solicitudes';
 import { GOOGLE_SCRIPT_URL } from '../lib/constants';
 
 const TIPOS_COLABORACAO = [
-  { id: 'vendedor', nome: 'Vendedor/Revendedor', descricao: 'Vende os nossos serviços e ganha comissão', icon: '💰' },
-  { id: 'afiliado', nome: 'Afiliado', descricao: 'Indica clientes e ganha prémios', icon: '🎁' },
-  { id: 'parceiro', nome: 'Parceiro Estratégico', descricao: 'Colaboração B2B entre empresas', icon: '🤝' },
-  { id: 'freelancer', nome: 'Freelancer/Agency', descricao: 'Trabalha connosco em projetos', icon: '💼' },
+  { id: 'vendedor', nome: 'Vendedor/Revendedor', descricao: 'Vende os nossos serviços e ganha comissão', icon: '💼' },
+  { id: 'afiliado', nome: 'Afiliado', descricao: 'Indica clientes e ganha prémios', icon: '🤝' },
+  { id: 'parceiro', nome: 'Parceiro Estratégico', descricao: 'Colaboração B2B entre empresas', icon: '⚡' },
+  { id: 'freelancer', nome: 'Freelancer/Agency', descricao: 'Trabalha connosco em projetos', icon: '🎯' },
 ];
 
 interface Props {

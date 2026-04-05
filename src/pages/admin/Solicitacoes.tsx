@@ -1,6 +1,6 @@
 import { theme } from "../../styles/theme";
 import { useState, useEffect } from "react";
-import { Search, Filter, UserPlus, FileText, Users, X, ChevronDown } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface SolicitacoesProps {
   solicitudes: any[];
@@ -11,8 +11,6 @@ interface SolicitacoesProps {
   onCriarCliente: (s: any) => void;
   onUpdateStatus: (id: string, status: string) => void;
   onDelete: (id: string) => void;
-  vendedores?: any[];
-  onAsignarVendedor?: (solicitudeId: string, vendedorId: string) => void;
 }
 
 const STATUS_OPTIONS = [
@@ -33,13 +31,12 @@ const ORIGEN_OPTIONS = [
   { value: "Contacto Directo", label: "Contacto Directo" },
 ];
 
-export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete, vendedores = [], onAsignarVendedor }: SolicitacoesProps) {
+export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete }: SolicitacoesProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterOrigem, setFilterOrigem] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [showVendedorSelect, setShowVendedorSelect] = useState<string | null>(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -66,11 +63,6 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
       c.telemovel?.includes(searchTerm);
     return matchesSearch;
   });
-
-  const handleAsignarVendedor = (solicitudeId: string, vendedorId: string) => {
-    onAsignarVendedor?.(solicitudeId, vendedorId);
-    setShowVendedorSelect(null);
-  };
 
   const getStatusStyle = (status: string) => {
     const opt = STATUS_OPTIONS.find(o => o.value === status);
@@ -142,6 +134,10 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
                     {c.mensagem && <div style={{ fontSize: 12, color: theme.colors.text.secondary, fontStyle: "italic", marginTop: 6 }}>"{c.mensagem}"</div>}
                     <div style={{ fontSize: 11, color: "#999", marginTop: 6 }}>{c.createdAt ? new Date(c.createdAt).toLocaleDateString("pt-PT") : ''}</div>
                   </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => onCriarCliente(c)} style={{ padding: "10px 14px", borderRadius: 8, backgroundColor: "#E8F4FD", color: "#3498DB", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>Criar Cliente</button>
+                    <button onClick={() => onDelete(c.id)} style={{ padding: "10px 14px", borderRadius: 8, backgroundColor: "#FEE2E2", color: "#dc2626", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>X</button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -174,7 +170,6 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
                       <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: isMobile ? 16 : 18, color: theme.colors.text.primary }}>{s.nome}</span>
                       <span style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, backgroundColor: statusStyle.color, color: statusStyle.text, fontWeight: 600 }}>{statusStyle.label}</span>
                       {s.origem && <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 12, backgroundColor: "#F3F4F6", color: "#666", fontWeight: 600 }}>{s.origem}</span>}
-                      {s.vendedorId && <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 12, backgroundColor: "#ECFDF5", color: "#059669", fontWeight: 600 }}>V: {vendedores.find(v => v.id === s.vendedorId)?.nome || s.vendedorId}</span>}
                     </div>
                     <div style={{ fontSize: 14, color: "#666", marginBottom: 8 }}>{s.telefone} {s.empresa && `| ${s.empresa}`} {s.email && `| ${s.email}`}</div>
                     <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginBottom: 12 }}>{new Date(s.createdAt).toLocaleDateString("pt-PT")}</div>
@@ -199,52 +194,7 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
                     )}
                   </div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: isMobile ? 12 : 0 }}>
-                    <button onClick={() => onCriarProposta(s.id)} style={{ padding: "12px 16px", borderRadius: 8, background: `linear-gradient(135deg, ${theme.colors.accent.primary} 0%, #F22283 100%)`, color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 15px rgba(242,34,131,0.2)", minHeight: 44 }}>Criar Proposta</button>
                     <button onClick={() => onCriarCliente(s)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: "#E8F4FD", color: "#3498DB", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>Criar Cliente</button>
-                    
-                    {/* Botão Assign Vendedor */}
-                    <div style={{ position: "relative" }}>
-                      <button 
-                        onClick={() => setShowVendedorSelect(showVendedorSelect === s.id ? null : s.id)} 
-                        style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: showVendedorSelect === s.id ? "#FEF3C7" : "#F3F4F6", color: showVendedorSelect === s.id ? "#D97706" : "#666", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44, display: "flex", alignItems: "center", gap: 4 }}
-                      >
-                        <Users size={14} />
-                      </button>
-                      {showVendedorSelect === s.id && vendedores.length > 0 && (
-                        <div style={{ position: "absolute", top: "100%", right: 0, marginTop: 4, backgroundColor: "#fff", borderRadius: 8, boxShadow: "0 4px 20px rgba(0,0,0,0.15)", zIndex: 100, minWidth: 160, overflow: "hidden" }}>
-                          {vendedores.map(v => (
-                            <button
-                              key={v.id}
-                              onClick={() => handleAsignarVendedor(s.id, v.id)}
-                              style={{ width: "100%", padding: "10px 12px", border: "none", backgroundColor: s.vendedorId === v.id ? "#ECFDF5" : "#fff", color: "#333", fontSize: 12, textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
-                            >
-                              {s.vendedorId === v.id && <span style={{ color: "#059669", fontWeight: 700 }}>✓</span>}
-                              {v.nome}
-                            </button>
-                          ))}
-                          <button
-                            onClick={() => handleAsignarVendedor(s.id, "")}
-                            style={{ width: "100%", padding: "10px 12px", border: "none", backgroundColor: "#fff", color: "#DC2626", fontSize: 12, textAlign: "left", cursor: "pointer" }}
-                          >
-                            Remover vendedor
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Menu Status */}
-                    <div style={{ position: "relative" }}>
-                      <select
-                        value={s.status || "pendente"}
-                        onChange={e => onUpdateStatus(s.id, e.target.value)}
-                        style={{ padding: "12px 16px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, backgroundColor: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44, color: "#666" }}
-                      >
-                        {STATUS_OPTIONS.map(opt => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
                     <button onClick={() => onDelete(s.id)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: "#FEE2E2", color: "#dc2626", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>X</button>
                   </div>
                 </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useLocation } from "wouter";
 import { updateCliente, listTareas, createTarea, updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga } from "../services/firebase";
 import { getVendedor } from "../services/vendedores";
-import { updateSolicitudeStatus, deleteSolicitude, asignarVendedorASolicitude } from "../services/solicitudes";
+import { updateSolicitudeStatus, deleteSolicitude } from "../services/solicitudes";
 import { Sidebar } from "../components/admin/Sidebar";
 import { theme } from "../styles/theme";
 import { Dashboard } from "./admin/Dashboard";
@@ -152,8 +152,6 @@ export function Admin() {
             onCriarCliente={admin.handleCriarClienteFromSolicitude}
             onUpdateStatus={updateSolicitudeStatus}
             onDelete={admin.handleEliminarSolicitude}
-            vendedores={admin.vendedores}
-            onAsignarVendedor={(id, vid) => asignarVendedorASolicitude(id, vid).then(() => admin.loadSolicitudes())}
           />
         )}
 
