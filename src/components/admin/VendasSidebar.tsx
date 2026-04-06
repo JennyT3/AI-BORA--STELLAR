@@ -6,13 +6,13 @@ import {
   Users, 
   DollarSign, 
   LogOut,
-  ChevronLeft,
-  ChevronRight,
-  User,
   CheckSquare,
+  User,
   Menu,
-  X
+  X,
+  ChevronLeft
 } from 'lucide-react';
+import { theme } from '../../styles/theme';
 
 interface VendasSidebarProps {
   activeTab: string;
@@ -23,6 +23,7 @@ interface VendasSidebarProps {
   clienteCount: number;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  isMobile?: boolean;
   vendedorId?: string;
 }
 
@@ -35,28 +36,13 @@ export function VendasSidebar({
   clienteCount,
   collapsed = false,
   onToggleCollapse,
+  isMobile = false,
   vendedorId,
 }: VendasSidebarProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const handleTabChange = (tab: string) => {
-    onTabChange(tab);
-    if (isMobile) setSidebarOpen(false);
-  };
-
+  
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'orcamento', label: 'Novo Orçamento', icon: FilePlus2, href: vendedorId ? `/admin/orcamento?vendedor=${vendedorId}` : '/admin/orcamento' },
+    { id: 'orcamento', label: 'Novo Orçamento', icon: FilePlus2, href: `/admin/orcamento?vendedor=${vendedorId}` },
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
     { id: 'clientes', label: 'Meus Clientes', icon: Users, count: clienteCount },
     { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
@@ -64,249 +50,181 @@ export function VendasSidebar({
     { id: 'perfil', label: 'Meu Perfil', icon: User },
   ];
 
+  const sidebarWidth = collapsed ? 80 : 260;
+
+  const handleClick = (item: typeof navItems[0]) => {
+    if (item.href) {
+      window.location.href = item.href;
+    } else {
+      onTabChange(item.id);
+    }
+  };
+
+  // En móvil, no renderizamos el sidebar - se maneja desde el componente padre
+  if (isMobile) {
+    return null;
+  }
+
   return (
-    <>
-      {/* Mobile Header */}
-      {isMobile && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 60,
-          backgroundColor: '#1A1A1A',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 16px',
-          zIndex: 200,
-        }}>
-          <button 
-            onClick={() => setSidebarOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 8,
-              cursor: 'pointer',
-              color: '#fff',
-            }}
-          >
-            <Menu size={24} />
-          </button>
-          <span style={{ color: '#fff', fontWeight: 900, fontSize: 18 }}>
-            AI BORA <span style={{ color: '#F22283' }}>Vendas</span>
-          </span>
-          <div style={{ width: 40 }}></div>
-        </div>
-      )}
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && isMobile && (
-        <div 
-          onClick={() => setSidebarOpen(false)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            zIndex: 299,
-          }}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside style={{
-        width: isMobile ? 280 : (collapsed ? 80 : 260),
-        backgroundColor: '#1A1A1A',
-        position: 'fixed',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'width 0.3s ease, transform 0.3s ease',
-        zIndex: isMobile ? 300 : 100,
-        transform: isMobile 
-          ? (sidebarOpen ? 'translateX(0)' : 'translateX(-100%)')
-          : 'translateX(0)',
+    <aside style={{
+      width: sidebarWidth,
+      minWidth: sidebarWidth,
+      backgroundColor: '#1F2937',
+      borderRight: '1px solid #374151',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      zIndex: 100,
+      overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{ 
+        padding: collapsed ? '12px' : '24px', 
+        borderBottom: '1px solid #374151', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        flexShrink: 0
       }}>
-        {/* Mobile Close Button */}
-        {isMobile && (
-          <div style={{ 
-            padding: '16px', 
-            borderBottom: '1px solid #333', 
-            display: 'flex', 
-            justifyContent: 'flex-end' 
-          }}>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 8,
-                cursor: 'pointer',
-                color: '#fff',
-              }}
-            >
-              <X size={24} />
-            </button>
+        {collapsed ? (
+          <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: 8 }} />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: 8 }} />
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#F9FAFB' }}>
+                AI BORA
+              </div>
+              <div style={{ fontSize: 12, color: '#9CA3AF' }}>
+                Área Vendas
+              </div>
+            </div>
           </div>
         )}
+      </div>
 
-        {/* Header */}
-        <div style={{ padding: collapsed || isMobile ? '20px 10px' : '24px 20px', borderBottom: '1px solid #333' }}>
-          {collapsed || isMobile ? (
-            <div style={{ fontSize: 24, fontWeight: 900, color: '#fff', textAlign: 'center' }}>AV</div>
-          ) : (
-            <div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>
-                AI BORA <span style={{ color: '#F22283' }}>Vendas</span>
-              </div>
-              <div style={{ fontSize: 10, color: '#888', marginTop: 2 }}>Área do Vendedor</div>
-            </div>
-          )}
-        </div>
+      {/* Navigation */}
+      <nav style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          const isLink = !!item.href;
 
-        {/* Navigation */}
-        <nav style={{ flex: 1, padding: '16px 12px', overflow: 'auto' }}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            
-            if (item.href) {
-              return (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => isMobile && setSidebarOpen(false)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: collapsed || isMobile ? '12px' : '12px 16px',
-                    borderRadius: 10,
-                    backgroundColor: isActive ? 'rgba(242, 92, 5, 0.15)' : 'transparent',
-                    color: isActive ? '#F25C05' : '#aaa',
-                    textDecoration: 'none',
-                    marginBottom: 4,
-                    justifyContent: collapsed || isMobile ? 'center' : 'flex-start',
-                    fontSize: 13,
-                    fontWeight: isActive ? 600 : 500,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    minHeight: 44,
-                  }}
-                  title={collapsed || isMobile ? item.label : undefined}
-                >
-                  <Icon size={20} style={{ flexShrink: 0 }} />
-                  {!collapsed && !isMobile && <span style={{ flex: 1 }}>{item.label}</span>}
-                </a>
-              );
-            }
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleTabChange(item.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: collapsed || isMobile ? '12px' : '12px 16px',
-                  borderRadius: 10,
-                  backgroundColor: isActive ? 'rgba(242, 92, 5, 0.15)' : 'transparent',
-                  color: isActive ? '#F25C05' : '#aaa',
-                  border: 'none',
-                  width: '100%',
-                  marginBottom: 4,
-                  justifyContent: collapsed || isMobile ? 'center' : 'flex-start',
-                  fontSize: 13,
-                  fontWeight: isActive ? 600 : 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left',
-                  minHeight: 44,
-                }}
-                title={collapsed || isMobile ? item.label : undefined}
-              >
-                <Icon size={20} style={{ flexShrink: 0 }} />
-                {!collapsed && !isMobile && (
-                  <>
-                    <span style={{ flex: 1 }}>{item.label}</span>
-                    {item.count !== undefined && (
-                      <span style={{ 
-                        backgroundColor: isActive ? 'rgba(242, 92, 5, 0.3)' : '#333',
-                        padding: '2px 8px',
-                        borderRadius: 10,
-                        fontSize: 11,
-                        fontWeight: 600
-                      }}>
-                        {item.count}
-                      </span>
-                    )}
-                  </>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Footer */}
-        <div style={{ padding: '16px 12px', borderTop: '1px solid #333' }}>
-          {onToggleCollapse && !isMobile && (
-            <button
-              onClick={onToggleCollapse}
+          return (
+            <button 
+              key={item.id} 
+              onClick={() => handleClick(item)}
               style={{
+                width: '100%',
+                padding: collapsed ? '12px 8px' : '12px 16px',
+                marginBottom: 4,
+                background: isActive ? '#374151' : 'transparent',
+                color: isActive ? '#F9FAFB' : '#9CA3AF',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                padding: '10px',
-                borderRadius: 8,
-                backgroundColor: '#333',
-                color: '#fff',
-                border: 'none',
-                width: '100%',
-                marginBottom: 8,
-                cursor: 'pointer',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: collapsed ? 0 : 12,
+                fontSize: 14,
+                fontWeight: 500,
+                textAlign: 'left' as const,
+                position: 'relative',
+                transition: 'all 0.2s',
               }}
+              title={collapsed ? item.label : undefined}
             >
-              {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 3,
+                  height: 20,
+                  backgroundColor: '#F25C05',
+                  borderRadius: '0 2px 2px 0',
+                }} />
+              )}
+              <Icon size={20} style={{ flexShrink: 0 }} />
+              {!collapsed && <span>{item.label}</span>}
+              {'count' in item && item.count !== undefined && !collapsed && (
+                <span style={{
+                  backgroundColor: '#F25C05',
+                  color: '#FFFFFF',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: 10,
+                  marginLeft: 'auto',
+                }}>
+                  {item.count}
+                </span>
+              )}
             </button>
-          )}
-          
+          );
+        })}
+      </nav>
+
+      {/* Footer */}
+      <div style={{ padding: '16px', borderTop: '1px solid #374151', flexShrink: 0 }}>
+        {!collapsed && (
           <button
-            onClick={onLogout}
+            onClick={onToggleCollapse}
             style={{
+              width: '100%',
+              padding: '10px',
+              marginBottom: 8,
+              background: 'transparent',
+              color: '#9CA3AF',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 12,
-              padding: collapsed || isMobile ? '12px' : '12px 16px',
-              borderRadius: 10,
-              backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              color: '#dc2626',
-              border: 'none',
-              width: '100%',
-              justifyContent: collapsed || isMobile ? 'center' : 'flex-start',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-              minHeight: 44,
+              justifyContent: 'center',
+              gap: 8,
+              fontSize: 14,
             }}
-            title={collapsed || isMobile ? 'Sair' : undefined}
           >
-            <LogOut size={18} />
-            {!collapsed && !isMobile && <span>Sair</span>}
+            <ChevronLeft size={18} />
           </button>
-        </div>
-
-        {(!collapsed || isMobile) && userName && (
-          <div style={{ padding: '12px 20px', borderTop: '1px solid #333', backgroundColor: '#222' }}>
-            <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>Vendedor</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{userName}</div>
-          </div>
         )}
-      </aside>
-    </>
+        
+        <button
+          onClick={onLogout}
+          style={{
+            width: collapsed ? 'auto' : '100%',
+            padding: collapsed ? '12px' : '12px 16px',
+            background: 'transparent',
+            color: '#9CA3AF',
+            border: 'none',
+            borderRadius: 8,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            gap: collapsed ? 0 : 12,
+            fontSize: 14,
+            fontWeight: 500,
+          }}
+        >
+          <LogOut size={18} />
+          {!collapsed && <span>Sair</span>}
+        </button>
+      </div>
+
+      {/* User */}
+      {userName && !collapsed && (
+        <div style={{ padding: '16px', borderTop: '1px solid #374151', backgroundColor: '#374151', flexShrink: 0 }}>
+          <div style={{ fontSize: 11, color: '#9CA3AF' }}>VENDEDOR</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#F9FAFB' }}>{userName}</div>
+        </div>
+      )}
+    </aside>
   );
 }

@@ -115,6 +115,7 @@ export interface Tarea {
   servicoNome?: string;
   clienteId: string;
   clienteNome?: string;
+  clienteEmail?: string;
   propostaId?: string;
   valorCliente?: number;
   porcentagemColaborador?: number;

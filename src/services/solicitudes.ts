@@ -14,6 +14,7 @@ export interface Solicitude {
   marcas: { nome: string; redes: string[] }[];
   origem?: string;
   status: 'pendente' | 'em-analise' | 'proposta-enviada';
+  clienteId?: string;
   createdAt: string;
 }
 
@@ -24,7 +25,7 @@ function generateId() {
   return 'sol-' + id;
 }
 
-export async function createSolicitude(data: Omit<Solicitude, 'id' | 'createdAt' | 'status'>): Promise<string> {
+export async function createSolicitude(data: Partial<Solicitude>): Promise<string> {
   const id = generateId();
   await setDoc(doc(db, 'solicitudes', id), {
     ...data,

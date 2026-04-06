@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { theme } from "../../styles/theme";
-import { UserPlus, Edit, ExternalLink, Phone, Mail } from "lucide-react";
+import { Search, Plus, Download, Upload, X, Phone, Mail, Edit2, Check, Trash2, ExternalLink } from "lucide-react";
 
 export interface VendasClientesTabProps {
   clientes: any[];
@@ -9,6 +9,8 @@ export interface VendasClientesTabProps {
   onNovoClienteChange: (field: string, value: string) => void;
   onToggleForm: () => void;
   onSubmit: () => void;
+  onEditCliente?: (cliente: any) => void;
+  onDeleteCliente?: (id: string) => void;
 }
 
 const CATEGORIAS = [
@@ -17,10 +19,34 @@ const CATEGORIAS = [
   { value: 'inativo', label: 'Inativo', color: '#6B7280' },
   { value: 'sem_interesse', label: 'Sem Interesse', color: '#DC2626' },
   { value: 'proposta_enviada', label: 'Proposta Enviada', color: '#3498DB' },
+  { value: 'curioso', label: 'Curioso', color: '#9CA3AF' },
 ];
 
-export function VendasClientesTab({ clientes, showNovoCliente, novoCliente, onNovoClienteChange, onToggleForm, onSubmit }: VendasClientesTabProps) {
-  
+export function VendasClientesTab({ 
+  clientes, 
+  showNovoCliente, 
+  novoCliente, 
+  onNovoClienteChange, 
+  onToggleForm, 
+  onSubmit,
+  onEditCliente,
+  onDeleteCliente 
+}: VendasClientesTabProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategoria, setFilterCategoria] = useState("all");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<any>({});
+
+  const filteredClientes = clientes.filter(c => {
+    const matchesSearch = !searchTerm || 
+      c.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.telemovel?.includes(searchTerm) ||
+      c.empresa?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCat = filterCategoria === "all" || c.categoria === filterCategoria;
+    return matchesSearch && matchesCat;
+  });
+
   const getCategoriaLabel = (cat?: string) => {
     if (!cat) return 'Curioso';
     const c = CATEGORIAS.find(c => c.value === cat);
@@ -33,221 +59,211 @@ export function VendasClientesTab({ clientes, showNovoCliente, novoCliente, onNo
     return c ? c.color : '#9CA3AF';
   };
 
+  const startEdit = (c: any) => {
+    setEditingId(c.id);
+    setEditData({ ...c });
+  };
+
+  const saveEdit = async () => {
+    if (onEditCliente && editingId) {
+      await onEditCliente({ ...editData, id: editingId });
+    }
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditData({});
+  };
+
   const hasValidProposta = (c: any) => c.propostaId && c.propostaId.trim() !== '';
 
+  const exportToCSV = () => {
+    const headers = ['Nome', 'Categoria', 'Empresa', 'Telefone', 'Email', 'Origem', 'Proposta', 'Resposta', 'Criado em'];
+    const rows = filteredClientes.map(c => [
+      c.nome || '',
+      getCategoriaLabel(c.categoria) || '',
+      c.empresa || '',
+      c.telemovel || '',
+      c.email || '',
+      c.origem || '',
+      c.propostaNumero || c.propostaId || '',
+      c.resposta || '',
+      c.createdAt || '',
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+    <div style={{ paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Meus Clientes</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{clientes.length} clientes atribuídos</p>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 24, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 4 }}>Meus Clientes</h1>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 13 }}>{filteredClientes.length} de {clientes.length} clientes</p>
         </div>
-        <button 
-          onClick={onToggleForm} 
-          style={{ 
-            padding: "12px 20px", 
-            borderRadius: 10, 
-            backgroundColor: showNovoCliente ? theme.colors.bg.secondary : theme.colors.accent.primary, 
-            color: showNovoCliente ? theme.colors.text.primary : "#fff", 
-            border: "none", 
-            fontWeight: 600, 
-            cursor: "pointer", 
-            fontSize: 13,
-            display: "flex",
-            alignItems: "center",
-            gap: 8
-          }}
-        >
-          {showNovoCliente ? 'Cancelar' : <> <UserPlus size={16} /> Novo Cliente</>}
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={exportToCSV} style={{ padding: "8px 12px", borderRadius: 6, backgroundColor: "#fff", color: "#666", border: "1px solid #e0e0e0", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <Download size={14} /> Exportar
+          </button>
+          <button onClick={onToggleForm} style={{ padding: "8px 12px", borderRadius: 6, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+            <Plus size={14} /> Novo
+          </button>
+        </div>
       </div>
 
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", flex: "1 1 200px", minWidth: 180 }}>
+          <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#999" }} />
+          <input
+            type="text"
+            placeholder="Buscar..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            style={{ width: "100%", padding: "8px 10px 8px 30px", borderRadius: 6, border: "1px solid #e0e0e0", fontSize: 13, backgroundColor: "#fff" }}
+          />
+        </div>
+        <select
+          value={filterCategoria}
+          onChange={e => setFilterCategoria(e.target.value)}
+          style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #e0e0e0", fontSize: 13, backgroundColor: "#fff" }}
+        >
+          <option value="all">Todas categorías</option>
+          {CATEGORIAS.map(c => (
+            <option key={c.value} value={c.value}>{c.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Nuevo Cliente Form */}
       {showNovoCliente && (
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", marginBottom: 24 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>Novo Cliente</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+        <div style={{ backgroundColor: "#fff", borderRadius: 10, padding: 16, border: "1px solid #e8e8e8", marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Novo Cliente</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
             <div>
-              <label style={{ fontSize: 11, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Nome *</label>
-              <input 
-                value={novoCliente.nome} 
-                onChange={(e) => onNovoClienteChange('nome', e.target.value)} 
-                placeholder="Nome completo"
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} 
-              />
+              <label style={{ fontSize: 10, color: "#666", display: "block", marginBottom: 3 }}>Nome *</label>
+              <input value={novoCliente.nome} onChange={(e) => onNovoClienteChange('nome', e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Email</label>
-              <input 
-                value={novoCliente.email} 
-                onChange={(e) => onNovoClienteChange('email', e.target.value)}
-                placeholder="email@exemplo.pt"
-                type="email"
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} 
-              />
+              <label style={{ fontSize: 10, color: "#666", display: "block", marginBottom: 3 }}>Email</label>
+              <input value={novoCliente.email} onChange={(e) => onNovoClienteChange('email', e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Telemóvel</label>
-              <input 
-                value={novoCliente.telemovel} 
-                onChange={(e) => onNovoClienteChange('telemovel', e.target.value)}
-                placeholder="+351 9XX XXX XXX"
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} 
-              />
+              <label style={{ fontSize: 10, color: "#666", display: "block", marginBottom: 3 }}>Telemóvel</label>
+              <input value={novoCliente.telemovel} onChange={(e) => onNovoClienteChange('telemovel', e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Empresa</label>
-              <input 
-                value={novoCliente.empresa} 
-                onChange={(e) => onNovoClienteChange('empresa', e.target.value)}
-                placeholder="Nome da empresa"
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} 
-              />
+              <label style={{ fontSize: 10, color: "#666", display: "block", marginBottom: 3 }}>Empresa</label>
+              <input value={novoCliente.empresa} onChange={(e) => onNovoClienteChange('empresa', e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
             </div>
           </div>
-          <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-            <button 
-              onClick={onSubmit} 
-              disabled={!novoCliente.nome?.trim()}
-              style={{ 
-                padding: "12px 24px", 
-                borderRadius: 8, 
-                backgroundColor: novoCliente.nome?.trim() ? theme.colors.accent.primary : '#ccc', 
-                color: "#fff", 
-                border: "none", 
-                fontWeight: 600, 
-                cursor: novoCliente.nome?.trim() ? "pointer" : "not-allowed",
-                opacity: novoCliente.nome?.trim() ? 1 : 0.6
-              }}
-            >
-              Guardar Cliente
+          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+            <button onClick={onSubmit} disabled={!novoCliente.nome?.trim()} style={{ padding: "8px 16px", borderRadius: 4, backgroundColor: novoCliente.nome?.trim() ? theme.colors.accent.primary : '#ccc', color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: novoCliente.nome?.trim() ? "pointer" : "not-allowed" }}>
+              Guardar
             </button>
-            <button 
-              onClick={onToggleForm} 
-              style={{ 
-                padding: "12px 24px", 
-                borderRadius: 8, 
-                backgroundColor: theme.colors.bg.secondary, 
-                color: theme.colors.text.primary, 
-                border: `1px solid ${theme.colors.border}`, 
-                fontWeight: 600, 
-                cursor: "pointer" 
-              }}
-            >
+            <button onClick={onToggleForm} style={{ padding: "8px 16px", borderRadius: 4, backgroundColor: "#f5f5f5", color: "#666", border: "none", fontSize: 12, cursor: "pointer" }}>
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      {/* Stats */}
-      {clientes.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 24 }}>
-          {CATEGORIAS.map(cat => {
-            const count = clientes.filter(c => c.categoria === cat.value).length;
-            return (
-              <div key={cat.value} style={{ backgroundColor: "#fff", borderRadius: 12, padding: 16, border: "1px solid #e8e8e8" }}>
-                <div style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, marginBottom: 4 }}>{cat.label.toUpperCase()}</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: cat.color }}>{count}</div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div style={{ backgroundColor: "#ffffff", borderRadius: 16, border: "1px solid #e8e8e8", overflow: "hidden" }}>
+      {/* Table */}
+      <div style={{ backgroundColor: "#fff", borderRadius: 10, border: "1px solid #e8e8e8", overflow: "hidden" }}>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
             <thead>
               <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-                <th style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Nome</th>
-                <th style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Categoria</th>
-                <th style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Contacto</th>
-                <th style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "left" }}>Orçamento</th>
-                <th style={{ padding: "12px 16px", fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, textAlign: "center" }}>Ações</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Nome</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Categoria</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Empresa</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Telefone</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Email</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Proposta</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {clientes.map((c) => {
-                const catColor = getCategoriaColor(c.categoria);
-                const catLabel = getCategoriaLabel(c.categoria);
-                return (
-                  <tr key={c.id} style={{ borderTop: "1px solid #f0f0f0" }}>
-                    <td style={{ padding: "12px 16px" }}>
-                      <div style={{ fontWeight: 700, color: theme.colors.text.primary }}>{c.nome}</div>
-                      {c.empresa && <div style={{ fontSize: 11, color: "#999" }}>{c.empresa}</div>}
-                    </td>
-                    <td style={{ padding: "12px 16px" }}>
-                      <span style={{ fontSize: 10, backgroundColor: catColor + '20', padding: "4px 10px", borderRadius: 12, color: catColor, fontWeight: 600 }}>
-                        {catLabel}
+              {filteredClientes.map((c) => (
+                <tr key={c.id} style={{ borderTop: "1px solid #f0f0f0" }}>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
+                      <input value={editData.nome || ''} onChange={e => setEditData({...editData, nome: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                    ) : (
+                      <span style={{ fontWeight: 600, fontSize: 13, color: theme.colors.text.primary }}>{c.nome}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
+                      <select value={editData.categoria || ''} onChange={e => setEditData({...editData, categoria: e.target.value})} style={{ padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }}>
+                        {CATEGORIAS.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                      </select>
+                    ) : (
+                      <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, backgroundColor: getCategoriaColor(c.categoria) + '20', color: getCategoriaColor(c.categoria), fontWeight: 600 }}>
+                        {getCategoriaLabel(c.categoria)}
                       </span>
-                    </td>
-                    <td style={{ padding: "12px 16px" }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                        {c.telemovel && (
-                          <a href={`tel:${c.telemovel}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#666", textDecoration: "none" }}>
-                            <Phone size={12} /> {c.telemovel}
-                          </a>
-                        )}
-                        {c.email && (
-                          <a href={`mailto:${c.email}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#666", textDecoration: "none" }}>
-                            <Mail size={12} /> {c.email}
-                          </a>
-                        )}
-                        {!c.telemovel && !c.email && <span style={{ fontSize: 12, color: "#ccc" }}>—</span>}
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
+                      <input value={editData.empresa || ''} onChange={e => setEditData({...editData, empresa: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                    ) : (
+                      <span style={{ fontSize: 12, color: "#666" }}>{c.empresa || '—'}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
+                      <input value={editData.telemovel || ''} onChange={e => setEditData({...editData, telemovel: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                    ) : (
+                      <a href={`tel:${c.telemovel}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.telemovel || '—'}</a>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
+                      <input value={editData.email || ''} onChange={e => setEditData({...editData, email: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                    ) : (
+                      <a href={`mailto:${c.email}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.email || '—'}</a>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {hasValidProposta(c) ? (
+                      <a href={`/p/${c.propostaId}`} target="_blank" style={{ fontSize: 11, color: "#3498DB", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                        {c.propostaNumero || c.propostaId?.slice(0, 8)} <ExternalLink size={10} />
+                      </a>
+                    ) : (
+                      <span style={{ fontSize: 11, color: "#ccc" }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                    {editingId === c.id ? (
+                      <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                        <button onClick={saveEdit} style={{ padding: "4px 8px", borderRadius: 4, backgroundColor: "#10B981", color: "#fff", border: "none", cursor: "pointer" }}><Check size={12} /></button>
+                        <button onClick={cancelEdit} style={{ padding: "4px 8px", borderRadius: 4, backgroundColor: "#dc2626", color: "#fff", border: "none", cursor: "pointer" }}><X size={12} /></button>
                       </div>
-                    </td>
-                    <td style={{ padding: "12px 16px" }}>
-                      {hasValidProposta(c) ? (
-                        <a 
-                          href={`/p/${c.propostaId}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ 
-                            color: "#3498DB", 
-                            fontWeight: 600, 
-                            fontSize: 12, 
-                            textDecoration: "none",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 4
-                          }}
-                        >
-                          {c.propostaNumero || c.propostaId.slice(0, 8)} <ExternalLink size={10} />
-                        </a>
-                      ) : (
-                        <span style={{ fontSize: 12, color: "#d1d5db" }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px 16px", textAlign: "center" }}>
-                      {hasValidProposta(c) ? (
-                        <a 
-                          href={`/admin/orcamento?edit=${c.propostaId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ 
-                            padding: "6px 12px", 
-                            borderRadius: 6, 
-                            backgroundColor: theme.colors.accent.primary, 
-                            color: "#fff", 
-                            border: "none", 
-                            fontSize: 11, 
-                            cursor: "pointer",
-                            textDecoration: "none"
-                          }}
-                        >
-                          Editar
-                        </a>
-                      ) : (
-                        <span style={{ fontSize: 11, color: "#ccc" }}>Sem proposta</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-              {clientes.length === 0 && (
+                    ) : (
+                      <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
+                        <button onClick={() => startEdit(c)} style={{ padding: "4px 8px", borderRadius: 4, backgroundColor: "#f3f4f6", color: "#666", border: "none", cursor: "pointer" }}><Edit2 size={12} /></button>
+                        {onDeleteCliente && (
+                          <button onClick={() => onDeleteCliente(c.id)} style={{ padding: "4px 8px", borderRadius: 4, backgroundColor: "#fee2e2", color: "#dc2626", border: "none", cursor: "pointer" }}><Trash2 size={12} /></button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {filteredClientes.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ padding: 60, textAlign: "center", color: theme.colors.text.secondary }}>
-                    Nenhum cliente atribuído ainda
+                  <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#999" }}>
+                    Nenhum cliente encontrado
                   </td>
                 </tr>
               )}

@@ -11,7 +11,7 @@ import { Solicitacoes } from "./admin/Solicitacoes";
 import { Clientes } from "./admin/Clientes";
 import { Faturacao } from "./admin/Faturacao";
 import { VendoresAdmin } from "./admin/Vendores";
-import { TarefasAdmin } from "./admin/TarefasAdmin";
+import { TarefasKanban } from "./admin/TarefasKanban";
 import { gerarFaturaPDF } from "../services/pdfAdmin";
 import { ClienteFormModal } from "../components/admin/ClienteFormModal";
 import { FaturaModal } from "../components/admin/FaturaModal";
@@ -152,6 +152,7 @@ export function Admin() {
             onCriarCliente={admin.handleCriarClienteFromSolicitude}
             onUpdateStatus={updateSolicitudeStatus}
             onDelete={admin.handleEliminarSolicitude}
+            vendedores={admin.vendedores}
           />
         )}
 
@@ -202,14 +203,12 @@ export function Admin() {
         )}
 
         {activeTab === "tarefas" && (
-          <TarefasAdmin
+          <TarefasKanban
             tareas={admin.tareas}
             clientes={admin.clientes}
             vendedores={admin.vendedores}
-            onCrearTarea={admin.handleCrearTarea}
-            onAsignarTarea={admin.handleAsignarTarea}
-            onAprobarEntrega={admin.handleAprobarEntrega}
-            onMarcarPaga={admin.handleMarcarPaga}
+            isAdmin={true}
+            onRefresh={admin.loadTareas}
           />
         )}
       </main>

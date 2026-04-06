@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
-import { getProposal, isProposalValid } from "../services/firebase";
+import { getProposal, isProposalValid, updateProposal, updateCliente, createTarea } from "../services/firebase";
+import { sendPropostaRespostaEmail } from "../services/emailService";
 import { WHATSAPP_LINK, EMAIL } from "../lib/constants";
 
 export function PropostaPage() {
@@ -9,6 +10,8 @@ export function PropostaPage() {
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [respondendo, setRespondendo] = useState(false);
+  const [respostaEnviada, setRespostaEnviada] = useState<"sim" | "nao" | "reagendar" | null>(null);
 
   useEffect(() => {
     async function loadProposal() {
@@ -38,6 +41,95 @@ export function PropostaPage() {
 
     loadProposal();
   }, [params.id]);
+
+  const handleResposta = async (tipo: "sim" | "nao" | "reagendar") => {
+    if (!proposal || respondendo) return;
+    setRespondendo(true);
+    
+    try {
+      await updateProposal(params.id, {
+        resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
+        dataResposta: new Date().toISOString(),
+      });
+
+      if (proposal.email) {
+        sendPropostaRespostaEmail({
+          nome: proposal.cliente || '',
+          email: proposal.email,
+          resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
+          empresa: proposal.empresa,
+        }).catch(() => {});
+      }
+
+      if (tipo === "sim" && proposal.clienteId) {
+        await updateCliente(proposal.clienteId, {
+          categoria: "cliente",
+          processo: "iniciado",
+          dataResposta: new Date().toISOString(),
+          resposta: "sim",
+        });
+
+        if (proposal.servicos && proposal.servicos.length > 0) {
+          for (const servico of proposal.servicos) {
+            const nomeServico = typeof servico === 'string' ? servico : (servico.nome || servico);
+            const DETALHAMENTO: Record<string, string[]> = {
+              "Gestão de Redes Sociais": ["Planeamento mensal de conteúdo", "Scheduler de publicações", "Relatórios de métricas", "Estratégia de crescimento", "Suporte e engajamento diário"],
+              "Criação de Conteúdo": ["Textos para posts", "Legendas criativas", "Copywriting persuasivo", "Conteúdo para blog", "Newsletters"],
+              "Design de Posts": ["Posts gráficos personalizados", "Carrosséis informativos", "Stories e Reels", "Banners e covers", "Templates de marca"],
+              "Community Management": ["Resposta a comentários", "Mensagens diretas", "Moderação", "Gestão de reviews", "Relatórios de engagement"],
+              "Design de Logotipo": ["3 propostas iniciais", "Revisões ilimitadas", "Múltiplos formatos", "Manual de marca básico", "Uso comercial"],
+              "Identidade Corporativa": ["Logotipo + variações", "Paleta de cores", "Tipografia", "Cartão de visita", "Pasta corporativa"],
+              "Produção de Vídeos": ["Roteiro e storyboard", "Filmagem profissional", "Edição e pós-produção", "Motion graphics", "Entrega em 4K"],
+              "Criação de Reels": ["Conceito criativo", "Roteiro curto", "Edição dinâmica", "Trendy sounds", "Otimização para reach"],
+              "Página Web/Landing": ["Design responsivo", "Otimizado para SEO", "Formulários de contacto", "Integração analytics", "SSL incluído"],
+              "Loja Online": ["Gestão de produtos", "Pagamentos seguros", "Shipping integrado", "Painel administrativo", "Template profissional"],
+              "SEO Local": ["Google Business otimizado", "Palavras-chave locais", "Backlinks locais", "Gestão de avaliações", "Relatórios mensais"],
+              "Google Ads": ["Pesquisa de Keywords", "Criação de campanhas", "Otimização de bids", "Extensões de anúncios", "Relatórios de ROAS"],
+              "Facebook/Instagram Ads": ["Segmentação avançada", "Criação de creatives", "A/B testing", "Pixel setup", "Relatórios de resultados"],
+              "Email Marketing": ["Design de templates", "Automação de emails", "Segmentação de listas", "A/B testing", "Relatórios de abertura"],
+              "Chatbot WhatsApp": ["Respostas automáticas", "Menu interativo", "Agendamento de reuniões", "Integração com CRM", "Chatbot com IA"],
+              "IA & Automação": ["Automação de tarefas", "Integração de apps", "Workflows personalizados", "Relatórios automáticos", "Assistente virtual"],
+              "Fotografia Profissional": ["Sessão de 2h", "20 fotos editadas", "Uso comercial", "Diferentes cenários", "Alta resolução"],
+              "Consultoria Estratégica": ["Análise do negócio", "Estratégia digital", "Plano de ação", "Reuniões mensais", "Suporte prioritário"],
+            };
+            const detalhes = DETALHAMENTO[nomeServico] || [];
+            await createTarea({
+              titulo: nomeServico,
+              servicoNome: nomeServico,
+              descricao: detalhes.length > 0 ? "O que está incluído:\n• " + detalhes.join("\n• ") : '',
+              clienteId: proposal.clienteId,
+              clienteNome: proposal.cliente,
+              clienteEmail: proposal.email || '',
+              estado: "disponivel",
+              periodicidade: "pontual",
+            });
+          }
+        }
+      }
+
+      if (tipo === "reagendar" && proposal.clienteId) {
+        await updateCliente(proposal.clienteId, {
+          resposta: "reagendar",
+          dataResposta: new Date().toISOString(),
+        });
+      }
+
+      if (tipo === "nao" && proposal.clienteId) {
+        await updateCliente(proposal.clienteId, {
+          categoria: "sem_interesse",
+          resposta: "nao",
+          dataResposta: new Date().toISOString(),
+        });
+      }
+
+      setRespostaEnviada(tipo);
+    } catch (err: any) {
+      console.error("Erro ao registar resposta:", err);
+      alert("Erro ao registar resposta. Tenta novamente.");
+    }
+    
+    setRespondendo(false);
+  };
 
   // Dynamic title
   useEffect(() => {
@@ -75,6 +167,64 @@ export function PropostaPage() {
           >
             Voltar ao início
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (respostaEnviada) {
+    const mensagens = {
+      sim: {
+        titulo: "Ótimo! Proposta confirmada.",
+        subtitulo: "Bem-vindo à família AI BORA! Entraremos em contacto nas próximas horas.",
+        cor: "#10B981",
+        emoji: "🎉"
+      },
+      reagendar: {
+        titulo: "Sem problema!",
+        subtitulo: "Vamos rever a proposta e ajustá-la às tuas necessidades. Entraremos em contacto em breve.",
+        cor: "#F25C05",
+        emoji: "↩️"
+      },
+      nao: {
+        titulo: "Obrigado pelo teu tempo.",
+        subtitulo: "Se mudares de ideias, estaremos aqui. Boa sorte no teu negócio!",
+        cor: "#6B7280",
+        emoji: "👋"
+      }
+    };
+    
+    const msg = mensagens[respostaEnviada];
+    
+    return (
+      <div style={{ minHeight: '100vh', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: 'Montserrat, sans-serif' }}>
+        <div style={{ textAlign: 'center', maxWidth: 480 }}>
+          <div style={{ fontSize: 64, marginBottom: 24 }}>{msg.emoji}</div>
+          <div style={{ width: 60, height: 4, backgroundColor: msg.cor, borderRadius: 2, margin: '0 auto 24px' }} />
+          <h1 style={{ fontSize: 28, fontWeight: 900, color: '#ffffff', marginBottom: 16, lineHeight: 1.2 }}>
+            {msg.titulo}
+          </h1>
+          <p style={{ fontSize: 16, color: '#cccccc', lineHeight: 1.6, marginBottom: 32 }}>
+            {msg.subtitulo}
+          </p>
+          {respostaEnviada === "sim" && (
+            <a
+              href={`https://wa.me/${WHATSAPP_LINK.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#25D366', color: '#fff', fontWeight: 700, fontSize: 14, padding: '14px 28px', borderRadius: 50, textDecoration: 'none' }}
+            >
+              Falar pelo WhatsApp
+            </a>
+          )}
+          {respostaEnviada !== "sim" && (
+            <a
+              href="/"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, textDecoration: 'none' }}
+            >
+              ← Voltar ao início
+            </a>
+          )}
         </div>
       </div>
     );
@@ -136,17 +286,29 @@ export function PropostaPage() {
         </p>
         
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button 
-            onClick={() => alert('✅ Obrigada! A sua proposta foi confirmada. Vamos entrar em contacto em breve!')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '10px 20px', borderRadius: 50, textDecoration: 'none', border: '2px solid rgba(255,255,255,0.3)', cursor: 'pointer' }}
+          <button
+            onClick={() => handleResposta("sim")}
+            disabled={respondendo}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#10B981', color: '#fff', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 50, border: 'none', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
           >
-            ✅ Confirmo esta proposta
+            {respondendo ? '...' : '✅ Sim, aceito esta proposta'}
           </button>
-          
-          <a href="WHATSAPP_LINK" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#25D366', color: '#fff', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 50, textDecoration: 'none', boxShadow: '0 4px 15px rgba(37,211,102,0.3)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>
+
+          <button
+            onClick={() => handleResposta("reagendar")}
+            disabled={respondendo}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#F25C05', color: '#fff', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 50, border: 'none', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
+          >
+            ↩ Quero rever a proposta
+          </button>
+
+          <button
+            onClick={() => handleResposta("nao")}
+            disabled={respondendo}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '10px 20px', borderRadius: 50, border: '1px solid rgba(255,255,255,0.3)', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
+          >
+            Não tenho interesse
+          </button>
         </div>
       </section>
 
@@ -274,11 +436,11 @@ export function PropostaPage() {
         </h2>
         
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="WHATSAPP_LINK" target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#25D366', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', boxShadow: '0 8px 32px rgba(37,211,102,0.4)' }}>
+          <a href={WHATSAPP_LINK} target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#25D366', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', boxShadow: '0 8px 32px rgba(37,211,102,0.4)' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
             WhatsApp
           </a>
-          <a href="mailto:EMAIL" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'transparent', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', border: '2px solid rgba(255,255,255,0.3)' }}>
+          <a href={`mailto:${EMAIL}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'transparent', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', border: '2px solid rgba(255,255,255,0.3)' }}>
             ✉️ Email
           </a>
         </div>
@@ -306,7 +468,7 @@ export function PropostaPage() {
         </div>
         
         <div style={{ fontSize: 13, color: '#aaaaaa', lineHeight: 2 }}>
-          <div>EMAIL</div>
+          <div>{EMAIL}</div>
           <div>+351 936 021 747</div>
           <div>www.aibora.pt</div>
         </div>

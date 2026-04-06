@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Trash2, Send, CheckCircle } from 'lucide-react';
 import { createSolicitude } from '../services/solicitudes';
+import { createCliente } from '../services/firebase';
+import { sendConfirmationEmail } from '../services/emailService';
 import { GOOGLE_SCRIPT_URL } from '../lib/constants';
 
 const REDES_SOCIAIS = [
@@ -29,6 +31,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [loading, setLoading] = useState(false);
   const [marcas, setMarcas] = useState<Marca[]>([{ nome: '', redes: [] }]);
+  const vendedorIdFromUrl = new URLSearchParams(window.location.search).get('vendedor') || '';
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
@@ -36,6 +39,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
     email: '',
     website: '',
     observacoes: '',
+    vendedorId: vendedorIdFromUrl,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,6 +61,19 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
     if (!formData.nome.trim() || !formData.telefone.trim()) return;
     setLoading(true);
     try {
+      // Crear cliente automáticamente en Firestore
+      const clienteId = await createCliente({
+        nome: formData.nome,
+        ...(formData.email && { email: formData.email }),
+        telemovel: formData.telefone,
+        ...(formData.empresa && { empresa: formData.empresa }),
+        ...(formData.website && { website: formData.website }),
+        ...(formData.vendedorId && { vendedorId: formData.vendedorId }),
+        categoria: 'potencial',
+        origem: 'Simulador',
+        createdAt: new Date().toISOString(),
+      });
+
       await createSolicitude({
         nome: formData.nome,
         telefone: formData.telefone,
@@ -67,6 +84,8 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
         servicos: servicosSelecionados.map(s => s.nome),
         marcas: marcas.filter(m => m.nome.trim()),
         origem: 'Simulador',
+        clienteId: clienteId,
+        ...(formData.vendedorId && { vendedorId: formData.vendedorId }),
       });
 
       try {
@@ -89,6 +108,14 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
       } catch (_) {}
 
       setStep('success');
+
+      if (formData.email) {
+        sendConfirmationEmail({
+          nome: formData.nome,
+          email: formData.email,
+          servicos: servicosSelecionados.map(s => s.nome),
+        }).catch(() => {});
+      }
     } catch (err: any) {
       alert('Erro ao enviar: ' + err.message);
     }
@@ -104,7 +131,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
     }, 300);
   };
 
-  const canSubmit = formData.nome.trim() && formData.telefone.trim();
+  const canSubmit = formData.nome.trim() && formData.telefone.trim() && formData.email.trim();
 
   return (
     <AnimatePresence>
@@ -232,6 +259,19 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                     <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Website</label>
                     <input id="website" value={formData.website || ''} onChange={handleChange} placeholder="https://www.tuempresa.pt"
                       style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
+                  </div>
+
+                  <div style={{ marginBottom: 24 }}>
+                    <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>
+                      Quem te indicou? <span style={{ fontSize: 10, color: '#999', fontWeight: 400 }}>(opcional)</span>
+                    </label>
+                    <input 
+                      id="vendedorId" 
+                      value={formData.vendedorId} 
+                      onChange={handleChange} 
+                      placeholder="Nome ou código do colaborador"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} 
+                    />
                   </div>
 
                   <div style={{ marginBottom: 24 }}>

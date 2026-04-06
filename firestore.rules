@@ -14,11 +14,15 @@ service cloud.firestore {
 
     match /propostas/{id} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null;
+      allow create, update, delete: if request.auth != null || 
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resposta', 'dataResposta']) && request.resource.data.resposta != null);
     }
 
     match /clientes/{id} {
-      allow read, write: if request.auth != null;
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null || 
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['categoria', 'processo', 'resposta', 'dataResposta']) && request.resource.data.categoria != null);
     }
 
     match /vendedores/{id} {

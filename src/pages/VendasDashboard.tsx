@@ -208,7 +208,8 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 30000);
+    // Auto-refresh every 60 seconds instead of 30 to avoid constant reloading
+    const interval = setInterval(loadData, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -256,6 +257,20 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
   return (
     <div data-theme="dark" style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex" }}>
+      
+      {/* Mobile Overlay - when sidebar is open on mobile */}
+      {isMobile && !sidebarCollapsed && (
+        <div 
+          onClick={() => setSidebarCollapsed(true)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 99,
+          }}
+        />
+      )}
+      
       <VendasSidebar
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab as any)}
@@ -265,17 +280,61 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         clienteCount={clientes.length}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobile={isMobile}
         vendedorId={vendedor.id}
       />
 
+      {/* Mobile Header */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 56,
+          backgroundColor: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          zIndex: 50,
+          borderBottom: '1px solid #e5e7eb',
+        }}>
+          <button 
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            style={{ padding: 8, backgroundColor: 'transparent', border: 'none', cursor: 'pointer' }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <span style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A' }}>
+            {activeTab === 'dashboard' && 'Painel'}
+            {activeTab === 'clientes' && 'Clientes'}
+            {activeTab === 'propostas' && 'Propostas'}
+            {activeTab === 'tarefas' && 'Tarefas'}
+            {activeTab === 'faturacao' && 'Faturação'}
+            {activeTab === 'perfil' && 'Perfil'}
+          </span>
+          <div style={{ width: 24 }}></div>
+        </div>
+      )}
+
       <main style={{ 
         flex: 1, 
-        padding: isMobile ? '80px 16px 24px 16px' : 40, 
-        overflow: "auto", 
-        backgroundColor: theme.colors.bg.primary, 
-        marginLeft: sidebarCollapsed ? 80 : 260, 
-        marginTop: isMobile ? 60 : 0,
-        transition: 'margin-left 0.3s ease, padding 0.3s ease' 
+        padding: isMobile ? '72px 16px 24px 16px' : '40px', 
+        overflowX: "hidden",
+        overflowY: "auto", 
+        backgroundColor: theme.colors.bg.primary,
+        marginLeft: isMobile ? 0 : (sidebarCollapsed ? 80 : 260),
+        marginTop: 0,
+        minHeight: '100vh',
+        transition: 'margin-left 0.3s ease, padding 0.3s ease',
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box'
       }}>
         
         {/* DASHBOARD */}
@@ -437,7 +496,26 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{t.titulo}</div>
-                            <div style={{ fontSize: 12, color: "#666" }}>{t.clienteNome} • {t.servicoNome}</div>
+                            <div style={{ fontSize: 12, color: "#666" }}>{t.servicoNome}</div>
+                            {t.clienteNome && (
+                              <div style={{ fontSize: 12, color: "#444", marginTop: 4 }}>
+                                👤 <strong>{t.clienteNome}</strong>{t.clienteEmpresa ? ` — ${t.clienteEmpresa}` : ''}
+                              </div>
+                            )}
+                            {t.descricao && (
+                              <div style={{ fontSize: 12, color: "#555", marginTop: 6, padding: "8px 10px", backgroundColor: "#F8F7F4", borderRadius: 8, lineHeight: 1.5 }}>
+                                {t.descricao}
+                              </div>
+                            )}
+                            {t.servicos && t.servicos.length > 0 && (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 6 }}>
+                                {t.servicos.map((s: string) => (
+                                  <span key={s} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, backgroundColor: "#F22283" + "15", color: "#F22283", fontWeight: 600 }}>
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                             {t.periodicidade && (
                               <span style={{ fontSize: 11, color: "#9333EA", marginTop: 4, display: "block" }}>
                                 {t.periodicidade === 'mensal' ? '🔄 Mensal' : '📌 Pontual'}

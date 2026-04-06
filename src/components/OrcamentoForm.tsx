@@ -36,6 +36,13 @@ export interface OrcamentoFormProps {
   podeGerarProposta: boolean;
   
   isPublicView?: boolean;
+  
+  // Nuevas props para selector de cliente CRM
+  clientesCRM?: any[];
+  clienteIdSeleccionado?: string | null;
+  setClienteIdSeleccionado?: (val: string | null) => void;
+  showClienteDropdown?: boolean;
+  setShowClienteDropdown?: (val: boolean) => void;
 }
 
 export function OrcamentoForm(props: OrcamentoFormProps) {
@@ -47,7 +54,8 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
     descontoValor, setDescontoValor,
     subtotalComDesconto, descuentoAplicado, ivaComDesconto, totalConDescuento,
     propostaId, gerarPDF, handleGuardarProposta, podeGerarProposta,
-    isPublicView
+    isPublicView,
+    clientesCRM, clienteIdSeleccionado, setClienteIdSeleccionado, showClienteDropdown, setShowClienteDropdown
   } = props;
 
   const bgColor = isPublicView ? "#F5F2F0" : theme.colors.bg.secondary;
@@ -55,6 +63,7 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
   const inputBg = isPublicView ? "#ffffff" : theme.colors.bg.primary;
   const inputBorder = isPublicView ? "1px solid #ddd" : `2px solid ${theme.colors.text.primary}`;
   const textColor = isPublicView ? "#1A1A1A" : theme.colors.text.primary;
+  const [searchValue, setSearchValue] = React.useState("");
   
   return (
     <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "flex-start", width: "100%" }}>
@@ -63,6 +72,50 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
           <h3 style={{ fontFamily: isPublicView ? "Montserrat, sans-serif" : theme.fontFamily.sans, fontWeight: 700, fontSize: isPublicView ? 18 : 16, color: textColor, margin: "0 0 16px" }}>
             {isPublicView ? "👤 Dados do Cliente" : "Dados do Cliente"}
           </h3>
+          
+          {/* Selector de cliente existente del CRM */}
+          {!isPublicView && (
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>
+                Selecionar cliente existente (opcional)
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  placeholder="Buscar cliente no CRM..."
+                  onChange={e => {
+                    setSearchValue(e.target.value);
+                    if (setShowClienteDropdown) setShowClienteDropdown(e.target.value.length > 0);
+                  }}
+                  style={{ width: "100%", padding: "8px 12px", borderRadius: 6, border: inputBorder, fontSize: 12, backgroundColor: inputBg, color: textColor }}
+                />
+                {showClienteDropdown && (
+                  <div style={{ position: "absolute", top: "100%", left: 0, right: 0, backgroundColor: bgColor, border: `1px solid ${theme.colors.border}`, borderRadius: 6, zIndex: 100, maxHeight: 200, overflow: "auto", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                    {(clientesCRM || [])
+                      .filter(c => c.nome?.toLowerCase().includes(searchValue.toLowerCase()))
+                      .slice(0, 8)
+                      .map(c => (
+                        <div
+                          key={c.id}
+                          onClick={() => {
+                            setCliente({ nome: c.nome || "", empresa: c.empresa || "", email: c.email || "", telefone: c.telemovel || "", nif: c.nif || "", morada: c.morada || "" });
+                            if (setClienteIdSeleccionado) setClienteIdSeleccionado(c.id);
+                            if (setShowClienteDropdown) setShowClienteDropdown(false);
+                          }}
+                          style={{ padding: "10px 14px", cursor: "pointer", fontSize: 12, borderBottom: `1px solid ${theme.colors.border}`, color: textColor }}
+                          onMouseOver={e => (e.currentTarget.style.backgroundColor = theme.colors.bg.secondary)}
+                          onMouseOut={e => (e.currentTarget.style.backgroundColor = bgColor)}
+                        >
+                          <div style={{ fontWeight: 600 }}>{c.nome}</div>
+                          <div style={{ fontSize: 10, color: theme.colors.text.secondary }}>{c.email} · {c.categoria}</div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div style={{ display: "grid", gridTemplateColumns: isPublicView ? "1fr 1fr" : "repeat(3, 1fr)", gap: 10 }}>
             <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Nome *</label><input value={cliente.nome} onChange={(e) => setCliente({...cliente, nome: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: inputBorder, fontSize: 12, backgroundColor: inputBg, color: textColor }} /></div>
             <div><label style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Empresa</label><input value={cliente.empresa} onChange={(e) => setCliente({...cliente, empresa: e.target.value})} style={{ width: "100%", padding: "8px", borderRadius: 6, border: inputBorder, fontSize: 12, backgroundColor: inputBg, color: textColor }} /></div>

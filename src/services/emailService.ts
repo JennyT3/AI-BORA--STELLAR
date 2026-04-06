@@ -165,3 +165,48 @@ export async function sendPropostaRespostaEmail(data: PropostaRespostaEmailData)
     return false;
   }
 }
+
+export interface PropostaLinkEmailData {
+  nome: string;
+  email: string;
+  link: string;
+  empresa?: string;
+}
+
+export async function sendPropostaLinkEmail(data: PropostaLinkEmailData) {
+  const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
+  if (!RESEND_API_KEY) return false;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`
+      },
+      body: JSON.stringify({
+        from: 'AIBORA <geral@aibora.pt>',
+        to: [data.email],
+        subject: 'A sua proposta personalizada — AIBORA',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+            <h2 style="color: #1a1a1a;">Olá ${data.nome},</h2>
+            <p>Preparámos uma proposta personalizada${data.empresa ? ` para ${data.empresa}` : ''} especialmente para si.</p>
+            <p style="margin: 32px 0;">
+              <a href="${data.link}" style="background-color: #F22283; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px;">
+                Ver a minha proposta
+              </a>
+            </p>
+            <p style="font-size: 13px; color: #888;">Ou copia este link: <a href="${data.link}" style="color: #F22283;">${data.link}</a></p>
+            <p>A proposta é válida por 10 dias. Se tiver alguma questão, contacte-nos em <a href="mailto:geral@aibora.pt">geral@aibora.pt</a>.</p>
+            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
+            <p style="font-size: 14px; color: #666;">A equipa AIBORA<br /><a href="https://aibora.pt" style="color: #666;">aibora.pt</a></p>
+          </div>
+        `
+      })
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}

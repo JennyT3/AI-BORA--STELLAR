@@ -12,6 +12,7 @@ import { Download, Mail, User, FileText, Check, X, Plus, Trash2, Calculator, Sav
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { createProposal } from "../services/firebase";
+import { sendPropostaLinkEmail } from "../services/emailService";
 
 import { OrcamentoForm } from '../components/OrcamentoForm';
 
@@ -69,6 +70,9 @@ export function Orcamento() {
   const [descontoValor, setDescontoValor] = useState<number>(0);
   const [marcas, setMarcas] = useState<MarcaData[]>([{ id: "1", nome: "", redes: [], servicos: [] }]);
   const [cliente, setCliente] = useState<ClienteData>({ nome: "", empresa: "", email: "", telefone: "", nif: "", morada: "" });
+  const [clientesCRM, setClientesCRM] = useState<any[]>([]);
+  const [clienteIdSeleccionado, setClienteIdSeleccionado] = useState<string | null>(null);
+  const [showClienteDropdown, setShowClienteDropdown] = useState(false);
 
   const dataCriacao = new Date();
   const dataValidade = new Date(dataCriacao.getTime() + 10 * 24 * 60 * 60 * 1000);
@@ -84,6 +88,9 @@ export function Orcamento() {
             const sol = await getSolicitude(solId);
             if (sol) {
               setCliente({ nome: sol.nome || "", empresa: sol.empresa || "", email: sol.email || "", telefone: sol.telefone || "", nif: "", morada: "" });
+              if (sol.clienteId) {
+                setClienteIdSeleccionado(sol.clienteId);
+              }
               if (sol.marcas && sol.marcas.length > 0) {
                 setMarcas(sol.marcas.map((m: any, i: number) => ({ id: (i + 1).toString(), nome: m.nome || "", redes: m.redes || [], servicos: sol.servicos || [] })));
               } else if (sol.servicos && sol.servicos.length > 0) {
@@ -129,6 +136,18 @@ export function Orcamento() {
       });
     }
   }, [solId]);
+
+  useEffect(() => {
+    import("../services/firebase").then(async ({ listClientes }) => {
+      try {
+        const lista = await listClientes(200);
+        console.log("clientesCRM cargados:", lista?.length);
+        setClientesCRM(lista || []);
+      } catch (e) {
+        console.error("Erro ao carregar clientes CRM:", e);
+      }
+    });
+  }, []);
 
   const toggleRede = (marcaId: string, redeId: string) => {
     setMarcas(prev => prev.map(m => m.id !== marcaId ? m : { ...m, redes: m.redes.includes(redeId) ? m.redes.filter(r => r !== redeId) : [...m.redes, redeId] }));
@@ -261,6 +280,7 @@ export function Orcamento() {
         empresa: cliente.empresa || '', 
         email: cliente.email || '', 
         telefone: cliente.telefone || '', 
+        clienteId: clienteIdSeleccionado || null, 
         valor: totalConDescuento, 
         subtotal: subtotalComDesconto, 
         iva: ivaComDesconto, 
@@ -278,6 +298,9 @@ export function Orcamento() {
       const id = await createProposal(proposalData);
       setPropostaId(id);
       const link = `https://aibora.pt/p/${id}`;
+      if (cliente.email) {
+        sendPropostaLinkEmail({ nome: cliente.nome, email: cliente.email, link, empresa: cliente.empresa }).catch(() => {});
+      }
       navigator.clipboard.writeText(link).then(() => { const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); setTimeout(() => { alert(`✅ Proposta guardada!\n\nLink único copiado:\n${link}`); }, 500); });
     } catch (err) { console.error(err); alert("Erro ao guardar proposta: " + err.message); }
   };
@@ -330,7 +353,7 @@ export function Orcamento() {
                 <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
                 <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial</p>
               </div>
-              <OrcamentoForm
+<OrcamentoForm
                 cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
                 adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
                 numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
@@ -339,6 +362,8 @@ export function Orcamento() {
                 subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
                 propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
                 isPublicView={false}
+                clientesCRM={clientesCRM} clienteIdSeleccionado={clienteIdSeleccionado} setClienteIdSeleccionado={setClienteIdSeleccionado}
+                showClienteDropdown={showClienteDropdown} setShowClienteDropdown={setShowClienteDropdown}
               />
             </div>
           </div>
@@ -406,16 +431,18 @@ export function Orcamento() {
 
         <section style={{ backgroundColor: "#ffffff", padding: "48px 16px" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
-            <OrcamentoForm
-              cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
-              adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
-              numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
-              precoTotal={precoTotal} setPrecoTotal={setPrecoTotal} descontoPercent={descontoPercent} setDescontoPercent={setDescontoPercent}
-              descontoValor={descontoValor} setDescontoValor={setDescontoValor}
-              subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
-              propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
-              isPublicView={true}
-            />
+<OrcamentoForm
+                cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
+                adicionarMarca={adicionarMarca} removerMarca={removerMarca} toggleRede={toggleRede} toggleServico={toggleServico}
+                numeroOrcamentoInput={numeroOrcamentoInput} setNumeroOrcamentoInput={setNumeroOrcamentoInput} isEditingProposta={isEditingProposta}
+                precoTotal={precoTotal} setPrecoTotal={setPrecoTotal} descontoPercent={descontoPercent} setDescontoPercent={setDescontoPercent}
+                descontoValor={descontoValor} setDescontoValor={setDescontoValor}
+                subtotalComDesconto={subtotalComDesconto} descuentoAplicado={descuentoAplicado} ivaComDesconto={ivaComDesconto} totalConDescuento={totalConDescuento}
+                propostaId={propostaId} gerarPDF={gerarPDF} handleGuardarProposta={handleGuardarProposta} podeGerarProposta={podeGerarProposta}
+                isPublicView={false}
+                clientesCRM={clientesCRM} clienteIdSeleccionado={clienteIdSeleccionado} setClienteIdSeleccionado={setClienteIdSeleccionado}
+                showClienteDropdown={showClienteDropdown} setShowClienteDropdown={setShowClienteDropdown}
+              />
           </div>
         </section>
         <CTAFooterSection />

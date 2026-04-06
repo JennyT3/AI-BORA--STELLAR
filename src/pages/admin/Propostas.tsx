@@ -195,6 +195,10 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                       <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#dc2626', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
                         ✕ Recusado
                       </span>
+                    ) : p.resposta === "rehacer" ? (
+                      <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#F25C05', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
+                        ↩ Rever
+                      </span>
                     ) : (
                       <button
                         onClick={() => onRegistrarResposta(p)}

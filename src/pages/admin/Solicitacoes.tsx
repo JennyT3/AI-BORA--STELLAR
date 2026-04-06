@@ -11,6 +11,7 @@ interface SolicitacoesProps {
   onCriarCliente: (s: any) => void;
   onUpdateStatus: (id: string, status: string) => void;
   onDelete: (id: string) => void;
+  vendedores?: any[];
 }
 
 const STATUS_OPTIONS = [
@@ -31,7 +32,7 @@ const ORIGEN_OPTIONS = [
   { value: "Contacto Directo", label: "Contacto Directo" },
 ];
 
-export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete }: SolicitacoesProps) {
+export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCriarProposta, onCriarCliente, onUpdateStatus, onDelete, vendedores = [] }: SolicitacoesProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -170,6 +171,11 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
                       <span style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: isMobile ? 16 : 18, color: theme.colors.text.primary }}>{s.nome}</span>
                       <span style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, backgroundColor: statusStyle.color, color: statusStyle.text, fontWeight: 600 }}>{statusStyle.label}</span>
                       {s.origem && <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 12, backgroundColor: "#F3F4F6", color: "#666", fontWeight: 600 }}>{s.origem}</span>}
+                      {s.vendedorId && (
+                        <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 12, backgroundColor: "#ECFDF5", color: "#059669", fontWeight: 600 }}>
+                          V: {vendedores.find(v => v.id === s.vendedorId)?.nome || s.vendedorId.slice(0, 8)}
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: 14, color: "#666", marginBottom: 8 }}>{s.telefone} {s.empresa && `| ${s.empresa}`} {s.email && `| ${s.email}`}</div>
                     <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginBottom: 12 }}>{new Date(s.createdAt).toLocaleDateString("pt-PT")}</div>
@@ -194,6 +200,7 @@ export function Solicitacoes({ solicitudes, contactos, loading, onRefresh, onCri
                     )}
                   </div>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: isMobile ? 12 : 0 }}>
+                    <button onClick={() => onCriarProposta(s.id)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: "#FFF7ED", color: "#F25C05", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>Criar Proposta</button>
                     <button onClick={() => onCriarCliente(s)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: "#E8F4FD", color: "#3498DB", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>Criar Cliente</button>
                     <button onClick={() => onDelete(s.id)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: "#FEE2E2", color: "#dc2626", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>X</button>
                   </div>
