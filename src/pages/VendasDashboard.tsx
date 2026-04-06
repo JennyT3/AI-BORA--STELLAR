@@ -28,6 +28,14 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab && ['dashboard', 'orcamento', 'clientes', 'propostas', 'faturacao', 'perfil', 'tarefas'].includes(tab)) {
+      setActiveTab(tab as any);
+    }
+  }, []);
   
   // Data states
   const [stats, setStats] = useState({ totalClientes: 0, propostasEnviadas: 0, propostasAceitas: 0, valorTotalPropostas: 0, comissaoTotal: 0 });
