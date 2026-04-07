@@ -5,6 +5,11 @@ export interface Vendedor {
   telemovel?: string;
   ativo: boolean;
   criadoEm?: string;
+  // Referral system
+  referidoPor?: string;
+  referidosInvitados?: string[];
+  referidosConvertidos?: number;
+  bonusProximoCliente?: boolean;
 }
 
 export interface Marca {
@@ -129,6 +134,28 @@ export interface Tarea {
   prazo?: string;
   entregaUrl?: string;
   entregaNota?: string;
+  comissaoColaboradorValor?: number;
+  comissaoColaboradorTipo?: 'fixo' | 'percentagem';
   criadoEm?: string;
   atualizadoEm?: string;
+}
+
+export interface FaturaRecorrente {
+  id: string;
+  clienteId: string;
+  valor: number;
+  dataEmissao: string;
+  dueDate: string;
+  status: "pendente" | "pago_notificado" | "pago" | "atrasada";
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface RegistoEmail {
+  id: string;
+  clienteId: string;
+  tipo: "confirmacao" | "proposta" | "fatura" | "entrega" | "reminder";
+  destinatario: string;
+  assunto: string;
+  dataEnvio: string;
 }

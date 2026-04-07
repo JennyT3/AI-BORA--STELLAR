@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   LayoutDashboard, 
-  FilePlus2, 
   FileText, 
-  MessageSquare, 
   Users, 
   DollarSign, 
   LogOut, 
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
   CheckSquare,
-  X
+  X,
+  Settings,
+  Plus,
+  Target,
+  Megaphone
 } from 'lucide-react';
-import { theme } from '../../styles/theme';
 
 interface SidebarProps {
   activeTab: string;
@@ -32,252 +30,203 @@ interface SidebarProps {
 export function Sidebar({ 
   activeTab, 
   onTabChange, 
-  userName, 
   onLogout,
   proposalCount,
   solicitudCount,
   clienteCount,
   collapsed = false,
-  onToggleCollapse,
   isMobile = false,
   onCloseMobile,
 }: SidebarProps) {
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'orcamento', label: 'Novo Orçamento', icon: FilePlus2, href: '/admin/orcamento' },
+    { id: 'dashboard', label: 'Painel Principal', icon: LayoutDashboard },
+    { id: 'clientes', label: 'CRM Clientes', icon: Users, count: clienteCount },
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
-    { id: 'solicitacoes', label: 'Solicitações', icon: MessageSquare, count: solicitudCount },
-    { id: 'clientes', label: 'Clientes', icon: Users, count: clienteCount },
-    { id: 'faturacao', label: 'Faturação', icon: DollarSign },
     { id: 'vendedores', label: 'Vendedores', icon: Users },
     { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
+    { id: 'faturacao', label: 'Faturação', icon: DollarSign },
+    { id: 'marketing', label: 'Marketing', icon: Megaphone },
   ];
 
+  const sidebarWidth = isMobile ? 280 : (collapsed ? 80 : 280);
+  const isHidden = isMobile && collapsed;
+
   return (
-    <aside style={{
-      width: isMobile ? 280 : (collapsed ? 80 : 260),
-      backgroundColor: theme.colors.bg.sidebar,
-      borderRight: `1px solid ${theme.colors.bg.sidebarBorder}`,
-      position: 'fixed',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      transition: 'width 0.3s ease',
-      zIndex: 100,
-    }}>
-      {/* Mobile Close Button */}
-      {isMobile && (
-        <div style={{ 
-          padding: '16px', 
-          borderBottom: `1px solid ${theme.colors.bg.sidebarBorder}`, 
-          display: 'flex', 
-          justifyContent: 'flex-end' 
-        }}>
-          <button 
-            onClick={onCloseMobile}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 8,
-              cursor: 'pointer',
-              color: theme.colors.text.sidebar,
-            }}
-          >
-            <X size={24} />
-          </button>
-        </div>
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && !collapsed && (
+        <div 
+          onClick={onCloseMobile}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 999,
+          }}
+        />
       )}
 
-      {/* Header */}
-      <div style={{ padding: collapsed ? theme.spacing.md : theme.spacing.xl, borderBottom: `1px solid ${theme.colors.bg.sidebarBorder}`, display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start' }}>
-        {collapsed || isMobile ? (
-          <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: theme.borderRadius.md }} />
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: theme.borderRadius.md }} />
-            <div>
-              <div style={{ fontSize: 16, fontWeight: theme.fontWeight.extrabold, color: theme.colors.text.sidebarActive, fontFamily: theme.fontFamily.sans }}>
-                AI BORA
-              </div>
-              <div style={{ fontSize: 12, color: theme.colors.text.sidebar, fontWeight: theme.fontWeight.semibold }}>
-                Admin Panel
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav style={{ flex: 1, padding: theme.spacing.lg, overflowY: 'auto' }}>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          const isLink = !!item.href;
-
-          const buttonStyle: React.CSSProperties = {
-            width: '100%',
-            padding: collapsed ? '12px' : '12px 16px',
-            marginBottom: 4,
-            background: isActive ? theme.colors.bg.sidebarHover : 'transparent',
-            color: isActive ? theme.colors.text.sidebarActive : theme.colors.text.sidebar,
-            border: 'none',
-            borderRadius: theme.borderRadius.md,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: collapsed ? 0 : 12,
-            fontSize: theme.fontSize.md,
-            fontWeight: theme.fontWeight.medium,
-            fontFamily: theme.fontFamily.sans,
-            textAlign: 'left' as const,
-            position: 'relative',
-            transition: 'all 0.2s',
-          };
-
-          const handleClick = () => {
-            if (isLink && item.href) {
-              window.location.href = item.href;
-            } else {
-              onTabChange(item.id);
-            }
-          };
-
-          return (
-            <button key={item.id} onClick={handleClick} style={buttonStyle} title={collapsed ? item.label : undefined}>
-              {isActive && (
-                <div style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 3,
-                  height: 20,
-                  backgroundColor: theme.colors.accent.primary,
-                  borderRadius: '0 2px 2px 0',
-                }} />
-              )}
-              <Icon size={20} style={{ flexShrink: 0 }} />
-              {!collapsed && <span>{item.label}</span>}
-              {'count' in item && item.count !== undefined && !collapsed && (
-                <span style={{
-                  backgroundColor: isActive ? 'rgba(255,255,255,0.2)' : theme.colors.accent.primary,
-                  color: '#FFFFFF',
-                  fontSize: theme.fontSize.xs,
-                  fontWeight: theme.fontWeight.bold,
-                  padding: '2px 8px',
-                  borderRadius: theme.borderRadius.full,
-                  marginLeft: 'auto',
-                }}>
-                  {item.count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-
-        {/* Ver Site button */}
-        <button 
-          onClick={() => window.location.href = '/'}
-          style={{
-            width: '100%',
-            padding: collapsed ? '12px' : '12px 16px',
-            marginTop: theme.spacing.sm,
-            marginBottom: 4,
-            background: 'transparent',
-            color: theme.colors.text.sidebar,
-            border: collapsed ? 'none' : `1px solid ${theme.colors.bg.sidebarBorder}`,
-            borderRadius: theme.borderRadius.md,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: collapsed ? 0 : 12,
-            fontSize: theme.fontSize.md,
-            fontWeight: theme.fontWeight.medium,
-            fontFamily: theme.fontFamily.sans,
-          }}
-          title={collapsed ? 'Ver Site' : undefined}
-        >
-          <ExternalLink size={20} />
-          {!collapsed && <span>Ver Site</span>}
-        </button>
-      </nav>
-
-      {/* User Section */}
-      <div style={{ padding: collapsed ? theme.spacing.sm : theme.spacing.lg, borderTop: `1px solid ${theme.colors.bg.sidebarBorder}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'flex-start', gap: 12, marginBottom: theme.spacing.md }}>
-          <div style={{
-            width: 36,
-            height: 36,
-            backgroundColor: theme.colors.accent.primary,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: theme.fontWeight.bold,
-            color: '#FFFFFF',
-            fontSize: 14,
-          }}>
-            {userName[0]}
+      <aside style={{
+        width: sidebarWidth,
+        backgroundColor: '#ffffff',
+        borderRight: '1px solid #e5e7eb',
+        position: 'fixed',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'transform 0.3s ease, width 0.3s ease',
+        zIndex: 1000,
+        left: 0,
+        top: 0,
+        transform: isHidden ? 'translateX(-100%)' : 'translateX(0)',
+        fontFamily: 'Montserrat, sans-serif',
+        boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
+      }}>
+        {/* Logo Section */}
+        <div style={{ padding: '32px 24px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img 
+              src="/logo.png" 
+              alt="AI BORA" 
+              style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 12 }}
+            />
           </div>
           {!collapsed && (
-            <div>
-              <div style={{ fontSize: theme.fontSize.md, fontWeight: theme.fontWeight.semibold, color: theme.colors.text.sidebarActive }}>{userName}</div>
-              <div style={{ fontSize: theme.fontSize.sm, color: theme.colors.text.sidebar }}>Administrador</div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: 16, fontWeight: 900, color: '#1b1c1b', letterSpacing: '-0.5px' }}>
+                AI <span style={{ color: '#F25C05' }}>BORA</span>
+              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#a23a00', textTransform: 'uppercase', opacity: 0.7 }}>
+                Admin Suite
+              </span>
             </div>
           )}
+          {isMobile && (
+            <button onClick={onCloseMobile} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#666' }}>
+              <X size={20} />
+            </button>
+          )}
         </div>
-        <button
-          onClick={onLogout}
-          style={{
-            width: '100%',
-            padding: 10,
-            background: 'transparent',
-            border: collapsed ? 'none' : `1px solid ${theme.colors.bg.sidebarBorder}`,
-            borderRadius: theme.borderRadius.md,
-            color: theme.colors.text.sidebar,
-            fontSize: theme.fontSize.md,
-            cursor: 'pointer',
-            fontFamily: theme.fontFamily.sans,
-            fontWeight: theme.fontWeight.medium,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: 8,
-          }}
-          title={collapsed ? 'Terminar sessão' : undefined}
-        >
-          <LogOut size={16} />
-          {!collapsed && <span>Terminar sessão</span>}
-        </button>
-      </div>
 
-      {/* Collapse Toggle */}
-      {onToggleCollapse && (
-        <button
-          onClick={onToggleCollapse}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            right: -12,
-            transform: 'translateY(-50%)',
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            backgroundColor: theme.colors.bg.sidebarHover,
-            border: `1px solid ${theme.colors.bg.sidebarBorder}`,
-            color: theme.colors.text.sidebar,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 101,
-          }}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-      )}
-    </aside>
+        {/* Navigation */}
+        <nav style={{ flex: 1, padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+
+            return (
+              <button 
+                key={item.id} 
+                onClick={() => onTabChange(item.id)} 
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: isActive ? 'rgba(242, 92, 5, 0.08)' : 'transparent',
+                  color: isActive ? '#F25C05' : '#4b5563',
+                  border: 'none',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                  gap: 12,
+                  fontSize: 14,
+                  fontWeight: isActive ? 700 : 500,
+                  transition: 'all 0.2s',
+                }}
+              >
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                {!collapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
+                {'count' in item && item.count !== undefined && item.count > 0 && !collapsed && (
+                  <span style={{
+                    backgroundColor: isActive ? '#F25C05' : '#f3f4f6',
+                    color: isActive ? '#fff' : '#6b7280',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: 100,
+                    marginLeft: 'auto',
+                  }}>
+                    {item.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+
+          {!collapsed && (
+            <div style={{ marginTop: 24, padding: '0 8px' }}>
+              <button 
+                onClick={() => window.location.href = '/admin/orcamento'}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 16,
+                  fontWeight: 800,
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  boxShadow: '0 8px 16px rgba(242, 92, 5, 0.2)',
+                }}
+              >
+                <Plus size={18} strokeWidth={3} />
+                Criar Novo
+              </button>
+            </div>
+          )}
+        </nav>
+
+        {/* Footer */}
+        <div style={{ padding: '24px 16px', borderTop: '1px solid #f3f4f6', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <button 
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              background: 'transparent',
+              color: '#6b7280',
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            <Settings size={18} />
+            {!collapsed && <span>Definições</span>}
+          </button>
+
+          <button 
+            onClick={onLogout}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              background: 'transparent',
+              color: '#ef4444',
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            <LogOut size={18} />
+            {!collapsed && <span>Sair</span>}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

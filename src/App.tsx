@@ -7,6 +7,7 @@ import { Privacidade } from "./pages/Privacidade";
 import { Termos } from "./pages/Termos";
 import { Orcamento } from "./pages/Orcamento";
 import { PropostaPage } from "./pages/Proposta";
+import { ClienteFicha } from "./pages/ClienteFicha";
 import { Admin } from "./pages/Admin";
 import { VendasLogin } from "./pages/VendasLogin";
 import { VendasDashboard } from "./pages/VendasDashboard";
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/orcamento" component={Orcamento} />
         <Route path="/admin/orcamento" component={Orcamento} />
         <Route path="/p/:id" component={PropostaPage} />
+        <Route path="/c/:id" component={ClienteFicha} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
         <Route>

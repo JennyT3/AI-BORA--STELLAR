@@ -28,7 +28,7 @@ export function PropostaPage() {
         
         if (!data) {
           setError("Proposta não encontrada");
-        } else if (!isProposalValid(data)) {
+        } else if (!isProposalValid(id)) {
           setError("Esta proposta expirou (válida por 10 dias)");
         } else {
           setProposal(data);
@@ -58,6 +58,7 @@ export function PropostaPage() {
           email: proposal.email,
           resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
           empresa: proposal.empresa,
+          fichaUrl: tipo === 'sim' ? `${window.location.origin}/c/${proposal.clienteId}` : undefined,
         }).catch(() => {});
       }
 
@@ -67,6 +68,7 @@ export function PropostaPage() {
           processo: "iniciado",
           dataResposta: new Date().toISOString(),
           resposta: "sim",
+          fichaUrl: `${window.location.origin}/c/${proposal.clienteId}`
         });
 
         if (proposal.servicos && proposal.servicos.length > 0) {

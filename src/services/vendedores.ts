@@ -6,7 +6,7 @@ export interface Vendedor {
   nome: string;
   email: string;
   telefone?: string;
-  password: string;
+  // password eliminado — Firebase Auth gestiona autenticación
   comissaoPercent: number; // % de comisión (ej: 20 = 20%)
   ativo: boolean;
   createdAt: string;
@@ -18,6 +18,10 @@ export interface Vendedor {
     linkedin?: string;
     twitter?: string;
   };
+  referidoPor?: string;
+  referidosInvitados?: string[];
+  referidosConvertidos?: number;
+  bonusProximoCliente?: boolean;
 }
 
 // ========== VENDEDORES ==========

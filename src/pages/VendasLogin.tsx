@@ -1,6 +1,6 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { theme } from "../styles/theme";
-import { getVendedorByEmail, Vendedor } from "../services/vendedores";
+import { getVendedorByEmail, getVendedor, Vendedor } from "../services/vendedores";
 
 interface VendasLoginProps {
   onLogin: (vendedor: Vendedor) => void;
@@ -11,17 +11,59 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+
+  // Auto-login cuando viene ?v=vendedorId desde admin
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const vendedorId = params.get("v");
+    if (vendedorId) {
+      autoLoginWithId(vendedorId);
+    }
+  }, []);
+
+  const autoLoginWithId = async (vendedorId: string) => {
+    setLoading(true);
+    try {
+      const vendedor = await getVendedor(vendedorId);
+      if (vendedor && vendedor.ativo) {
+        onLogin(vendedor);
+      } else {
+        setError("Vendedor não encontrado ou inativo.");
+      }
+    } catch {
+      setError("Erro ao aceder ao painel.");
+    }
+    setLoading(false);
+  };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+    if (isLocked) return;
+    
     setError("");
     setLoading(true);
 
     try {
       const vendedor = await getVendedorByEmail(email);
       
-      if (!vendedor) {
-        setError("Utilizador não encontrado");
+      // Usar mensaje genérico para no revelar si el email existe
+      if (!vendedor || vendedor.password !== password) {
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        
+        if (newAttempts >= 5) {
+          setIsLocked(true);
+          setError("Demasiadas tentativas. Tente novamente em 30 segundos.");
+          setTimeout(() => {
+            setIsLocked(false);
+            setLoginAttempts(0);
+            setError("");
+          }, 30000);
+        } else {
+          setError("Utilizador ou password incorretos.");
+        }
         setLoading(false);
         return;
       }
@@ -32,17 +74,11 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
         return;
       }
 
-      if (vendedor.password !== password) {
-        setError("Password incorreta");
-        setLoading(false);
-        return;
-      }
-
       // Login successful - save to localStorage
       localStorage.setItem("vendedorUser", JSON.stringify(vendedor));
       onLogin(vendedor);
     } catch (err: any) {
-      setError("Erro ao fazer login: " + err.message);
+      setError("Erro ao fazer login. Tente novamente.");
     }
     
     setLoading(false);

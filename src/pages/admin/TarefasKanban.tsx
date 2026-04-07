@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Tarea, Cliente, Vendedor } from "../../types";
 import { updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, solicitarTarea } from "../../services/firebase";
+import { sendDeliveryApprovalEmail } from "../../services/emailService";
 
 const COLUMNAS = [
   { id: "disponivel", label: "Disponível", cor: "#0284C7", bg: "#E0F2FE" },
@@ -29,7 +30,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
   const [asignModal, setAsignModal] = useState<Tarea | null>(null);
   const [selectedVendedor, setSelectedVendedor] = useState("");
   const [prazo, setPrazo] = useState("");
-  const [comentario, setComentario] = useState("");
+  const [comissaoValor, setComissaoValor] = useState<number | undefined>(undefined);
+  const [comissaoTipo, setComissaoTipo] = useState<'fixo' | 'percentagem'>('fixo');
   const [loading, setLoading] = useState(false);
 
   const tareasFiltradas = clienteIdFiltro
@@ -54,8 +56,9 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
     if (!asignModal || !selectedVendedor || !prazo) return;
     setLoading(true);
     try {
-      await asignarTarea(asignModal.id, selectedVendedor, prazo);
-      setAsignModal(null); setSelectedVendedor(""); setPrazo("");
+      const vendedorNome = getVendedorNome(selectedVendedor);
+      await asignarTarea(asignModal.id, selectedVendedor, vendedorNome, prazo, comissaoValor, comissaoTipo);
+      setAsignModal(null); setSelectedVendedor(""); setPrazo(""); setComissaoValor(undefined); setComissaoTipo("fixo");
       onRefresh();
     } catch {}
     setLoading(false);
@@ -63,7 +66,18 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
 
   const handleAprobar = async (t: Tarea) => {
     setLoading(true);
-    try { await aprobarTarea(t.id, "admin"); onRefresh(); } catch {}
+    try { 
+      await aprobarTarea(t.id); 
+      if (t.clienteEmail) {
+        await sendDeliveryApprovalEmail({
+          nome: t.clienteNome || '',
+          email: t.clienteEmail,
+          tareaTitulo: t.titulo,
+          fichaUrl: `${window.location.origin}/c/${t.clienteId}`
+        });
+      }
+      onRefresh(); 
+    } catch {}
     setLoading(false);
   };
 
@@ -224,6 +238,13 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
               {vendedores.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
             </select>
             <input type="date" value={prazo} onChange={e => setPrazo(e.target.value)} style={inputStyle} />
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              <input type="number" placeholder="Comissão" value={comissaoValor || ''} onChange={e => setComissaoValor(Number(e.target.value) || undefined)} style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
+              <select value={comissaoTipo} onChange={e => setComissaoTipo(e.target.value as any)} style={{ ...inputStyle, marginBottom: 0, width: 110 }}>
+                <option value="fixo">€ Fixo</option>
+                <option value="percentagem">% Valor</option>
+              </select>
+            </div>
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <button onClick={handleAsignar} disabled={loading || !selectedVendedor || !prazo} style={btnStyle("#F25C05")}>Confirmar</button>
               <button onClick={() => setAsignModal(null)} style={{ ...btnStyle("#888"), backgroundColor: "#eee", color: "#444" }}>Cancelar</button>

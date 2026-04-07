@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { DollarSign, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { DollarSign, FileText, CheckCircle, Clock, AlertCircle, Search, Filter, X } from "lucide-react";
 import { theme } from "../../styles/theme";
+import { listFaturasAll, updateFatura, pagarFatura, Fatura, calcularEstatisticasFaturas } from "../../services/faturas";
+import { getCliente } from "../../services/firebase";
 
 interface FaturacaoProps {
   clientes: any[];
@@ -9,9 +11,16 @@ interface FaturacaoProps {
 }
 
 export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: FaturacaoProps) {
+  const [faturas, setFaturas] = useState<Fatura[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const clientesAtivos = clientes.filter(c => c.categoria === "cliente");
-  const totalFaturado = clientesAtivos.reduce((sum, c) => sum + (c.propostaValor || 0), 0);
+  const [filterEstado, setFilterEstado] = useState<string>('');
+  const [filterCliente, setFilterCliente] = useState<string>('');
+  const [filterDataInicio, setFilterDataInicio] = useState<string>('');
+  const [filterDataFim, setFilterDataFim] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [clientesMap, setClientesMap] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -19,7 +28,89 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
+  useEffect(() => {
+    loadFaturas();
+    loadClientesMap();
+  }, []);
+
+  const loadClientesMap = async () => {
+    const map: Record<string, any> = {};
+    for (const c of clientes) {
+      map[c.id] = c;
+    }
+    setClientesMap(map);
+  };
+
+  const loadFaturas = async () => {
+    setLoading(true);
+    try {
+      const faturasData = await listFaturasAll();
+      setFaturas(faturasData);
+    } catch (err) {
+      console.error('Erro ao carregar faturas:', err);
+    }
+    setLoading(false);
+  };
+
+  const stats = calcularEstatisticasFaturas(faturas);
+
+  const filteredFaturas = faturas.filter(f => {
+    if (filterEstado && f.estado !== filterEstado) return false;
+    if (filterCliente && f.clienteId !== filterCliente) return false;
+    if (filterDataInicio && new Date(f.dataEmissao) < new Date(filterDataInicio)) return false;
+    if (filterDataFim && new Date(f.dataEmissao) > new Date(filterDataFim)) return false;
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      const clienteNome = clientesMap[f.clienteId]?.nome || f.clienteNome || '';
+      if (!clienteNome.toLowerCase().includes(search) && !f.numero?.toLowerCase().includes(search)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const handlePagarFatura = async (faturaId: string) => {
+    setProcessingId(faturaId);
+    try {
+      const fatura = faturas.find(f => f.id === faturaId);
+      if (!fatura) return;
+      
+      const vendedor = clientesMap[fatura.clienteId]?.vendedorId;
+      
+      await pagarFatura(faturaId, 'transferencia', vendedor ? {
+        vendedorId: vendedor,
+        colaboradorId: undefined
+      } : undefined);
+      
+      await loadFaturas();
+    } catch (err) {
+      console.error('Erro ao processar pagamento:', err);
+      alert('Erro ao processar pagamento');
+    }
+    setProcessingId(null);
+  };
+
+  const clearFilters = () => {
+    setFilterEstado('');
+    setFilterCliente('');
+    setFilterDataInicio('');
+    setFilterDataFim('');
+    setSearchTerm('');
+  };
+
+  const getEstadoColor = (estado: string) => {
+    switch (estado) {
+      case 'paga': return '#10B981';
+      case 'pendente': return '#F59E0B';
+      case 'vencida': return '#EF4444';
+      case 'cancelada': return '#6B7280';
+      default: return '#6B7280';
+    }
+  };
+
+  const hasFilters = filterEstado || filterCliente || filterDataInicio || filterDataFim || searchTerm;
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 12 }}>
@@ -35,44 +126,159 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(16, 185, 129, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <DollarSign size={20} color="#10B981" />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total Faturado</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total Cobrado</span>
           </div>
-          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#10B981" }}>{totalFaturado.toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>Este ano</div>
+          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#10B981" }}>{stats.totalPago.toFixed(2)} €</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPago} faturas pagas</div>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(52, 152, 219, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <CheckCircle size={20} color="#3498DB" />
+            <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(245, 158, 11, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Clock size={20} color="#F59E0B" />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Faturas Pagas</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Por Cobrar</span>
           </div>
-          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#3498DB" }}>0</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>Este mês</div>
+          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#F59E0B" }}>{stats.totalPendente.toFixed(2)} €</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPendente} faturas pendentes</div>
+        </div>
+
+        <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(239, 68, 68, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <AlertCircle size={20} color="#EF4444" />
+            </div>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Vencidas</span>
+          </div>
+          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#EF4444" }}>{stats.totalVencido.toFixed(2)} €</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemVencido} faturas vencidas</div>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(242, 92, 5, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Clock size={20} color={theme.colors.accent.primary} />
+              <FileText size={20} color={theme.colors.accent.primary} />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Faturas Pendentes</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total Geral</span>
           </div>
-          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.accent.primary }}>{clientesAtivos.length}</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>Por cobrar</div>
+          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.accent.primary }}>{stats.totalGeral.toFixed(2)} €</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{faturas.length} total de faturas</div>
+        </div>
+      </div>
+
+      <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}`, marginBottom: 24 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+          <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Faturas</h3>
+          {hasFilters && (
+            <button onClick={clearFilters} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: theme.colors.accent.primary, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+              <X size={14} /> Limpar filtros
+            </button>
+          )}
         </div>
 
-        <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(242, 34, 131, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <AlertCircle size={20} color="#F22283" />
-            </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>IVA a Pagar</span>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
+          <div style={{ position: "relative", flex: "1 1 200px" }}>
+            <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#999" }} />
+            <input
+              type="text"
+              placeholder="Buscar fatura ou cliente..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: "100%", padding: "10px 12px 10px 38px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
+            />
           </div>
-          <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#F22283" }}>{(totalFaturado * 0.23).toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>23% do total</div>
+          <select
+            value={filterEstado}
+            onChange={(e) => setFilterEstado(e.target.value)}
+            style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minWidth: 140 }}
+          >
+            <option value="">Todos os estados</option>
+            <option value="pendente">Pendente</option>
+            <option value="paga">Paga</option>
+            <option value="vencida">Vencida</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+          <select
+            value={filterCliente}
+            onChange={(e) => setFilterCliente(e.target.value)}
+            style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minWidth: 160 }}
+          >
+            <option value="">Todos os clientes</option>
+            {clientes.map(c => (
+              <option key={c.id} value={c.id}>{c.nome}</option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={filterDataInicio}
+            onChange={(e) => setFilterDataInicio(e.target.value)}
+            style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
+            placeholder="Data início"
+          />
+          <input
+            type="date"
+            value={filterDataFim}
+            onChange={(e) => setFilterDataFim(e.target.value)}
+            style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
+            placeholder="Data fim"
+          />
         </div>
+
+        {loading ? (
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <div style={{ width: 30, height: 30, border: "3px solid #eee", borderTop: `3px solid ${theme.colors.accent.primary}`, borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto" }}></div>
+            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+          </div>
+        ) : filteredFaturas.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.secondary }}>
+            <FileText size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
+            <div>{hasFilters ? "Nenhuma fatura encontrada com os filtros aplicados" : "Nenhuma fatura registada"}</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: 12 }}>
+            {filteredFaturas.map(fat => {
+              const clienteNome = clientesMap[fat.clienteId]?.nome || fat.clienteNome || 'Cliente';
+              const isVencida = fat.estado === 'pendente' && new Date(fat.dataVencimento) < new Date();
+              
+              return (
+                <div key={fat.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: isMobile ? 12 : "16px 20px", backgroundColor: "#fafafa", borderRadius: 12, border: `1px solid ${theme.colors.border}`, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: isVencida ? "rgba(239,68,68,0.1)" : theme.colors.accent.primary, display: "flex", alignItems: "center", justifyContent: "center", color: isVencida ? "#EF4444" : "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                      {fat.numero?.split('-')[2] || '#'}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 15 }}>{fat.numero}</div>
+                      <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginTop: 2 }}>{clienteNome}</div>
+                      <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+                        Emissão: {fat.dataEmissao ? new Date(fat.dataEmissao).toLocaleDateString('pt-PT') : '—'} • Venc: {fat.dataVencimento ? new Date(fat.dataVencimento).toLocaleDateString('pt-PT') : '—'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 16, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
+                    <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
+                      <div style={{ fontWeight: 800, color: theme.colors.accent.primary, fontSize: isMobile ? 16 : 18 }}>{fat.valorTotal?.toFixed(2) || "0.00"} €</div>
+                      <div style={{ fontSize: 11, color: "#999" }}>IVA: {fat.valorIVA?.toFixed(2) || "0.00"} €</div>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 100, backgroundColor: `${getEstadoColor(fat.estado)}20`, color: getEstadoColor(fat.estado), textTransform: "uppercase" }}>
+                        {fat.estado}
+                      </span>
+                      {fat.estado === 'pendente' && (
+                        <button 
+                          onClick={() => handlePagarFatura(fat.id)}
+                          disabled={processingId === fat.id}
+                          style={{ padding: "8px 14px", borderRadius: 8, backgroundColor: "#10B981", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
+                        >
+                          {processingId === fat.id ? 'A processar...' : 'Marcar como Paga'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
@@ -81,7 +287,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
           <button onClick={onNavigateClientes} style={{ fontSize: 12, color: theme.colors.accent.primary, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Ver todos os clientes →</button>
         </div>
 
-        {clientesAtivos.length === 0 ? (
+        {clientes.filter(c => c.categoria === "cliente").length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.secondary }}>
             <FileText size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
             <div>Nenhum cliente ativo para faturar</div>
@@ -91,8 +297,8 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
           </div>
         ) : (
           <div style={{ display: "grid", gap: 12 }}>
-            {clientesAtivos.slice(0, 10).map(c => (
-              <div key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: isMobile ? 12 : "16px 20px", backgroundColor: "#fafafa", borderRadius: isMobile ? 12 : 12, border: `1px solid ${theme.colors.border}`, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 16 }}>
+            {clientes.filter(c => c.categoria === "cliente").slice(0, 5).map(c => (
+              <div key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: isMobile ? 12 : "16px 20px", backgroundColor: "#fafafa", borderRadius: 12, border: `1px solid ${theme.colors.border}`, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 16 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1 }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", backgroundColor: theme.colors.accent.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
                     {c.nome?.charAt(0).toUpperCase()}

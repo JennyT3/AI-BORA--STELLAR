@@ -1,169 +1,30 @@
+import emailjs from '@emailjs/browser';
+
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || '';
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+const TEMPLATE_CONFIRMATION = import.meta.env.VITE_EMAILJS_TEMPLATE_CONFIRMATION || 'confirmation_template';
+const TEMPLATE_PROPOSTA = import.meta.env.VITE_EMAILJS_TEMPLATE_PROPOSTA || 'proposta_template';
+const TEMPLATE_ACEITE = import.meta.env.VITE_EMAILJS_TEMPLATE_ACEITE || 'resposta_aceite_template';
+const TEMPLATE_NAO = import.meta.env.VITE_EMAILJS_TEMPLATE_NAO || 'resposta_nao_template';
+const TEMPLATE_REAGENDAR = import.meta.env.VITE_EMAILJS_TEMPLATE_REAGENDAR || 'resposta_reagendar_template';
+const TEMPLATE_ENTREGA = import.meta.env.VITE_EMAILJS_TEMPLATE_ENTREGA || 'template_entrega';
+const TEMPLATE_MARKETING = import.meta.env.VITE_EMAILJS_TEMPLATE_MARKETING || 'marketing_template';
+
+const isConfigured = PUBLIC_KEY && SERVICE_ID && PUBLIC_KEY !== 'tu_public_key_real';
+
+if (isConfigured) {
+  emailjs.init({
+    publicKey: PUBLIC_KEY,
+  });
+  console.log('✅ EmailJS inicializado correctamente');
+} else {
+  console.warn('⚠️ EmailJS NO configurado. Los emails no se enviarán hasta que configures las credenciales en .env');
+}
+
 export interface ConfirmationEmailData {
   nome: string;
   email: string;
   servicos: string[];
-}
-
-export async function sendConfirmationEmail(data: ConfirmationEmailData) {
-  const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-
-  if (!RESEND_API_KEY) {
-    console.warn("Resend API key missing. Não foi possível enviar o email de confirmação.");
-    return false;
-  }
-
-  const htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-      <h2 style="color: #1a1a1a;">Olá ${data.nome},</h2>
-      <p>Recebemos o seu pedido com sucesso! A nossa equipa irá analisar a sua submissão e entraremos em contacto em menos de <strong>24 horas</strong>.</p>
-      
-      <p>Os serviços solicitados foram:</p>
-      <ul>
-        ${data.servicos.map(s => `<li>${s}</li>`).join('')}
-      </ul>
-
-      <p>Se tiver alguma questão adicional ou urgência, não hesite em contactar-nos diretamente através do email <a href="mailto:geral@aibora.pt">geral@aibora.pt</a>.</p>
-      
-      <br />
-      <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-      <p style="font-size: 14px; color: #666;">
-        A equipa AIBORA<br />
-        <a href="https://aibora.pt" style="color: #666; text-decoration: none;">aibora.pt</a>
-      </p>
-    </div>
-  `;
-
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`
-      },
-      body: JSON.stringify({
-        from: 'AIBORA <geral@aibora.pt>',
-        to: [data.email],
-        subject: 'Recebemos o seu pedido — AIBORA',
-        html: htmlContent
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Erro ao enviar email via Resend:', errorData);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Erro na requisição para a API do Resend:', error);
-    return false;
-  }
-}
-
-export interface PropostaRespostaEmailData {
-  nome: string;
-  email: string;
-  resposta: 'sim' | 'nao' | 'reagendar';
-  empresa?: string;
-}
-
-export async function sendPropostaRespostaEmail(data: PropostaRespostaEmailData) {
-  const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-
-  if (!RESEND_API_KEY) {
-    console.warn("Resend API key missing. Não foi possível enviar o email de resposta.");
-    return false;
-  }
-
-  let subject = '';
-  let htmlContent = '';
-
-  if (data.resposta === 'sim') {
-    subject = '🎉 O seu orçamento foi aprovado! — AIBORA';
-    htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-        <h2 style="color: #10B981;">Parabéns ${data.nome}!</h2>
-        <p>Recebemos a confirmação do seu orçamento${data.empresa ? ` para ${data.empresa}` : ''}. Vamos começar a trabalhar!</p>
-        
-        <p>A nossa equipa irá contactá-lo em <strong>menos de 24 horas</strong> para dar início ao processo.</p>
-
-        <p>Se tiver alguma questão adicional ou urgência, não hesite em contactar-nos diretamente através do email <a href="mailto:geral@aibora.pt">geral@aibora.pt</a> ou pelo WhatsApp.</p>
-        
-        <br />
-        <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-        <p style="font-size: 14px; color: #666;">
-          A equipa AIBORA<br />
-          <a href="https://aibora.pt" style="color: #666; text-decoration: none;">aibora.pt</a>
-        </p>
-      </div>
-    `;
-  } else if (data.resposta === 'nao') {
-    subject = 'Entendemos a sua decisão — AIBORA';
-    htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-        <h2 style="color: #1a1a1a;">Olá ${data.nome},</h2>
-        <p>Recebemos a sua resposta${data.empresa ? ` sobre o orçamento para ${data.empresa}` : ''}. Respeitamos a sua decisão.</p>
-        
-        <p>Caso mude de ideias no futuro ou precise de mais informações, estamos sempre disponíveis para ajudar.</p>
-
-        <p>Não hesite em contactar-nos através do email <a href="mailto:geral@aibora.pt">geral@aibora.pt</a> se precisar de algo no futuro.</p>
-        
-        <br />
-        <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-        <p style="font-size: 14px; color: #666;">
-          A equipa AIBORA<br />
-          <a href="https://aibora.pt" style="color: #666; text-decoration: none;">aibora.pt</a>
-        </p>
-      </div>
-    `;
-  } else if (data.resposta === 'reagendar') {
-    subject = 'Vamos remarcar a nossa reunião — AIBORA';
-    htmlContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-        <h2 style="color: #F25C05;">Olá ${data.nome},</h2>
-        <p>Entendemos que precisa de remarcar${data.empresa ? ` a reunião sobre o orçamento para ${data.empresa}` : ''}.</p>
-        
-        <p>A nossa equipa irá contactá-lo em <strong>menos de 24 horas</strong> para combinar uma nova data e hora.</p>
-
-        <p>Se preferir, pode também contactar-nos diretamente através do email <a href="mailto:geral@aibora.pt">geral@aibora.pt</a>.</p>
-        
-        <br />
-        <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-        <p style="font-size: 14px; color: #666;">
-          A equipa AIBORA<br />
-          <a href="https://aibora.pt" style="color: #666; text-decoration: none;">aibora.pt</a>
-        </p>
-      </div>
-    `;
-  }
-
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`
-      },
-      body: JSON.stringify({
-        from: 'AIBORA <geral@aibora.pt>',
-        to: [data.email],
-        subject,
-        html: htmlContent
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Erro ao enviar email via Resend:', errorData);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Erro na requisição para a API do Resend:', error);
-    return false;
-  }
 }
 
 export interface PropostaLinkEmailData {
@@ -173,40 +34,125 @@ export interface PropostaLinkEmailData {
   empresa?: string;
 }
 
-export async function sendPropostaLinkEmail(data: PropostaLinkEmailData) {
-  const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-  if (!RESEND_API_KEY) return false;
+export interface PropostaRespostaEmailData {
+  nome: string;
+  email: string;
+  resposta: 'sim' | 'nao' | 'reagendar';
+  empresa?: string;
+  fichaUrl?: string;
+}
 
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`
-      },
-      body: JSON.stringify({
-        from: 'AIBORA <geral@aibora.pt>',
-        to: [data.email],
-        subject: 'A sua proposta personalizada — AIBORA',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-            <h2 style="color: #1a1a1a;">Olá ${data.nome},</h2>
-            <p>Preparámos uma proposta personalizada${data.empresa ? ` para ${data.empresa}` : ''} especialmente para si.</p>
-            <p style="margin: 32px 0;">
-              <a href="${data.link}" style="background-color: #F22283; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px;">
-                Ver a minha proposta
-              </a>
-            </p>
-            <p style="font-size: 13px; color: #888;">Ou copia este link: <a href="${data.link}" style="color: #F22283;">${data.link}</a></p>
-            <p>A proposta é válida por 10 dias. Se tiver alguma questão, contacte-nos em <a href="mailto:geral@aibora.pt">geral@aibora.pt</a>.</p>
-            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-            <p style="font-size: 14px; color: #666;">A equipa AIBORA<br /><a href="https://aibora.pt" style="color: #666;">aibora.pt</a></p>
-          </div>
-        `
-      })
-    });
-    return response.ok;
-  } catch {
+async function sendEmail(templateId: string, templateParams: Record<string, string>): Promise<boolean> {
+  if (!isConfigured) {
+    console.warn('📧 Email simulado (EmailJS no configurado):', { templateId, ...templateParams });
+    console.warn('📧 → No se envió realmente. Configura EmailJS en https://emailjs.com');
     return false;
   }
+  
+  try {
+    await emailjs.send(SERVICE_ID, templateId, templateParams);
+    console.log('✅ Email enviado:', templateId);
+    return true;
+  } catch (error) {
+    console.error('❌ Error enviando email:', error);
+    return false;
+  }
+}
+
+export async function sendConfirmationEmail(data: ConfirmationEmailData): Promise<boolean> {
+  return sendEmail(TEMPLATE_CONFIRMATION, {
+    nome: data.nome,
+    email: data.email,
+    servicos: data.servicos.join(', '),
+  });
+}
+
+export async function sendPropostaLinkEmail(data: PropostaLinkEmailData): Promise<boolean> {
+  return sendEmail(TEMPLATE_PROPOSTA, {
+    nome: data.nome,
+    email: data.email,
+    link: data.link,
+    empresa: data.empresa || '',
+  });
+}
+
+export async function sendPropostaRespostaEmail(data: PropostaRespostaEmailData): Promise<boolean> {
+  const templateMap = {
+    'sim': TEMPLATE_ACEITE,
+    'nao': TEMPLATE_NAO,
+    'reagendar': TEMPLATE_REAGENDAR,
+  };
+  
+  const template = templateMap[data.resposta] || TEMPLATE_NAO;
+  
+  return sendEmail(template, {
+    nome: data.nome,
+    email: data.email,
+    empresa: data.empresa || '',
+    ficha_url: data.fichaUrl || '',
+  });
+}
+
+export async function sendVendedorAccessEmail(data: { nome: string; email: string; password: string }): Promise<boolean> {
+  return sendEmail('vendedor_access_template', {
+    nome: data.nome,
+    email: data.email,
+    password: data.password,
+  });
+}
+
+export interface DeliveryApprovalEmailData {
+  nome: string;
+  email: string;
+  tareaTitulo: string;
+  fichaUrl: string;
+}
+
+export async function sendDeliveryApprovalEmail(data: DeliveryApprovalEmailData): Promise<boolean> {
+  return sendEmail(TEMPLATE_ENTREGA, {
+    nome: data.nome,
+    email: data.email,
+    tarea_titulo: data.tareaTitulo,
+    ficha_url: data.fichaUrl,
+  });
+}
+
+export interface MarketingEmailData {
+  nome: string;
+  email: string;
+  assunto: string;
+  mensagemHtml: string;
+}
+
+export async function sendMarketingCampaignEmail(data: MarketingEmailData): Promise<boolean> {
+  return sendEmail(TEMPLATE_MARKETING, {
+    to_name: data.nome,
+    to_email: data.email,
+    subject: data.assunto,
+    message_html: data.mensagemHtml,
+  });
+}
+
+export interface FaturaEmailData {
+  nome: string;
+  email: string;
+  numeroFatura: string;
+  valorTotal: string;
+  dataVencimento: string;
+  linkFatura?: string;
+  linkPagar?: string;
+}
+
+const TEMPLATE_FATURA = import.meta.env.VITE_EMAILJS_TEMPLATE_FATURA || 'fatura_template';
+
+export async function sendFaturaEmail(data: FaturaEmailData): Promise<boolean> {
+  return sendEmail(TEMPLATE_FATURA, {
+    nome: data.nome,
+    email: data.email,
+    numero_fatura: data.numeroFatura,
+    valor_total: data.valorTotal,
+    data_vencimento: data.dataVencimento,
+    link_fatura: data.linkFatura || '',
+    link_pagar: data.linkPagar || '',
+  });
 }

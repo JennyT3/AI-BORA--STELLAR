@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 export interface VendasPropostasTabProps {
   propostas: any[];
   vendedor: any;
+  isMobile?: boolean;
   onNavigateTo: (tab: string) => void;
 }
 
@@ -16,7 +17,7 @@ const STATUS_FILTERS = [
   { value: 'nao', label: 'Recusadas' },
 ];
 
-export function VendasPropostasTab({ propostas, vendedor, onNavigateTo }: VendasPropostasTabProps) {
+export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo }: VendasPropostasTabProps) {
   const [filterStatus, setFilterStatus] = useState('all');
 
   const filteredPropostas = propostas.filter(p => {
@@ -63,7 +64,7 @@ export function VendasPropostasTab({ propostas, vendedor, onNavigateTo }: Vendas
       </div>
 
       {filteredPropostas.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
           <div style={{ backgroundColor: "#fff", borderRadius: 10, padding: 12, border: "1px solid #e8e8e8", textAlign: 'center' }}>
             <div style={{ fontSize: 10, color: theme.colors.text.secondary, fontWeight: 600, marginBottom: 2 }}>TOTAL</div>
             <div style={{ fontSize: 18, fontWeight: 800, color: theme.colors.text.primary }}>{filteredPropostas.length}</div>

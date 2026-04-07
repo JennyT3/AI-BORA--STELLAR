@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   LayoutDashboard, 
   FilePlus2, 
@@ -8,11 +8,10 @@ import {
   LogOut,
   CheckSquare,
   User,
-  Menu,
   X,
-  ChevronLeft
+  Plus,
+  TrendingUp
 } from 'lucide-react';
-import { theme } from '../../styles/theme';
 
 interface VendasSidebarProps {
   activeTab: string;
@@ -35,131 +34,129 @@ export function VendasSidebar({
   proposalCount,
   clienteCount,
   collapsed = false,
-  onToggleCollapse,
   isMobile = false,
+  onCloseMobile,
   vendedorId,
-}: VendasSidebarProps) {
+}: VendasSidebarProps & { onCloseMobile?: () => void }) {
   
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'orcamento', label: 'Novo Orçamento', icon: FilePlus2, href: `/admin/orcamento?vendedor=${vendedorId}` },
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
     { id: 'clientes', label: 'Meus Clientes', icon: Users, count: clienteCount },
-    { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
-    { id: 'faturacao', label: 'Faturação', icon: DollarSign },
+    { id: 'tarefas', label: 'Minhas Tarefas', icon: CheckSquare },
+    { id: 'faturacao', label: 'Comissões', icon: DollarSign },
     { id: 'perfil', label: 'Meu Perfil', icon: User },
   ];
 
-  const sidebarWidth = collapsed ? 80 : 260;
-
-  const handleClick = (item: typeof navItems[0]) => {
-    if (item.href) {
-      window.location.href = item.href;
-    } else {
-      onTabChange(item.id);
-    }
-  };
-
-  // En móvil, no renderizamos el sidebar - se maneja desde el componente padre
-  if (isMobile) {
-    return null;
-  }
+  const sidebarWidth = isMobile ? 280 : (collapsed ? 80 : 280);
+  const isHidden = isMobile && collapsed;
 
   return (
-    <aside style={{
-      width: sidebarWidth,
-      minWidth: sidebarWidth,
-      backgroundColor: '#1F2937',
-      borderRight: '1px solid #374151',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      zIndex: 100,
-      overflow: 'hidden',
-    }}>
-      {/* Header */}
-      <div style={{ 
-        padding: collapsed ? '12px' : '24px', 
-        borderBottom: '1px solid #374151', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        flexShrink: 0
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && !collapsed && (
+        <div 
+          onClick={onCloseMobile}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 999,
+          }}
+        />
+      )}
+
+      <aside style={{
+        width: 280,
+        backgroundColor: '#1b1c1b',
+        borderRight: '1px solid rgba(242, 92, 5, 0.2)',
+        position: 'fixed',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 1000,
+        left: 0,
+        top: 0,
+        fontFamily: 'Montserrat, sans-serif',
       }}>
-        {collapsed ? (
-          <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: 8 }} />
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <img src="/logo.png" alt="AI BORA" style={{ width: 40, height: 40, borderRadius: 8 }} />
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#F9FAFB' }}>
-                AI BORA
-              </div>
-              <div style={{ fontSize: 12, color: '#9CA3AF' }}>
-                Área Vendas
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Header / Logo - Static approach */}
+      <div style={{ padding: '32px 24px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <img src="/logo.png" alt="AI BORA" style={{ width: 36, height: 36, borderRadius: 8 }} />
+        <span style={{ fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>AI BORA</span>
       </div>
 
+      {/* Motivation Badge */}
+      {!collapsed && (
+        <div style={{ padding: '0 24px 24px' }}>
+          <div style={{ 
+            background: 'rgba(242, 92, 5, 0.1)', 
+            border: '1px solid rgba(242, 92, 5, 0.2)', 
+            borderRadius: 12, 
+            padding: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <TrendingUp size={16} color="#F25C05" />
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#F25C05' }}>BORA VENDER MAIS!</span>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
+      <nav style={{ flex: 1, padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
-          const isLink = !!item.href;
 
           return (
             <button 
               key={item.id} 
-              onClick={() => handleClick(item)}
+              onClick={() => {
+                onTabChange(item.id);
+                if (isMobile && onCloseMobile) {
+                  onCloseMobile();
+                }
+              }} 
               style={{
                 width: '100%',
-                padding: collapsed ? '12px 8px' : '12px 16px',
-                marginBottom: 4,
-                background: isActive ? '#374151' : 'transparent',
-                color: isActive ? '#F9FAFB' : '#9CA3AF',
+                padding: '12px 16px',
+                background: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                color: isActive ? '#fff' : '#94a3b8',
                 border: 'none',
-                borderRadius: 8,
+                borderRadius: 12,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: collapsed ? 0 : 12,
+                gap: 12,
                 fontSize: 14,
-                fontWeight: 500,
-                textAlign: 'left' as const,
-                position: 'relative',
+                fontWeight: isActive ? 700 : 500,
                 transition: 'all 0.2s',
+                position: 'relative',
               }}
-              title={collapsed ? item.label : undefined}
             >
               {isActive && (
                 <div style={{
                   position: 'absolute',
                   left: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 3,
+                  width: 4,
                   height: 20,
-                  backgroundColor: '#F25C05',
-                  borderRadius: '0 2px 2px 0',
+                  background: 'linear-gradient(to bottom, #F25C05, #F22283)',
+                  borderRadius: '0 4px 4px 0'
                 }} />
               )}
-              <Icon size={20} style={{ flexShrink: 0 }} />
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
               {!collapsed && <span>{item.label}</span>}
-              {'count' in item && item.count !== undefined && !collapsed && (
+              {'count' in item && item.count !== undefined && item.count > 0 && !collapsed && (
                 <span style={{
-                  backgroundColor: '#F25C05',
-                  color: '#FFFFFF',
-                  fontSize: 11,
-                  fontWeight: 600,
+                  backgroundColor: isActive ? '#F22283' : 'rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  fontSize: 10,
+                  fontWeight: 800,
                   padding: '2px 8px',
-                  borderRadius: 10,
+                  borderRadius: 100,
                   marginLeft: 'auto',
                 }}>
                   {item.count}
@@ -168,63 +165,92 @@ export function VendasSidebar({
             </button>
           );
         })}
+
+        {/* Action Button */}
+        {!collapsed && (
+          <div style={{ marginTop: 24, padding: '0 8px' }}>
+            <button 
+              onClick={() => window.location.href = `/admin/orcamento?vendedor=${vendedorId}`}
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 16,
+                fontWeight: 800,
+                fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                boxShadow: '0 10px 20px rgba(242, 92, 5, 0.2)',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <Plus size={18} strokeWidth={3} />
+              Novo Orçamento
+            </button>
+          </div>
+        )}
       </nav>
 
-      {/* Footer */}
-      <div style={{ padding: '16px', borderTop: '1px solid #374151', flexShrink: 0 }}>
-        {!collapsed && (
-          <button
-            onClick={onToggleCollapse}
-            style={{
-              width: '100%',
-              padding: '10px',
-              marginBottom: 8,
-              background: 'transparent',
-              color: '#9CA3AF',
-              border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              fontSize: 14,
-            }}
-          >
-            <ChevronLeft size={18} />
-          </button>
-        )}
+      {/* User Profile Section */}
+      <div style={{ padding: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.2)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ 
+            width: 40, 
+            height: 40, 
+            borderRadius: 12, 
+            background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            color: '#fff',
+            fontSize: 16,
+            fontWeight: 800,
+            border: '2px solid rgba(255,255,255,0.1)'
+          }}>
+            {userName[0]}
+          </div>
+          {!collapsed && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{userName}</span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#94a3b8' }}>Sales Professional</span>
+            </div>
+          )}
+        </div>
         
-        <button
+        <button 
           onClick={onLogout}
           style={{
-            width: collapsed ? 'auto' : '100%',
-            padding: collapsed ? '12px' : '12px 16px',
-            background: 'transparent',
-            color: '#9CA3AF',
+            width: '100%',
+            padding: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            color: '#ef4444',
             border: 'none',
-            borderRadius: 8,
+            borderRadius: 10,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            gap: collapsed ? 0 : 12,
-            fontSize: 14,
-            fontWeight: 500,
+            gap: 10,
+            fontSize: 13,
+            fontWeight: 600,
+            transition: 'all 0.2s'
           }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
         >
           <LogOut size={18} />
-          {!collapsed && <span>Sair</span>}
+          {!collapsed && <span>Terminar Sessão</span>}
         </button>
       </div>
-
-      {/* User */}
-      {userName && !collapsed && (
-        <div style={{ padding: '16px', borderTop: '1px solid #374151', backgroundColor: '#374151', flexShrink: 0 }}>
-          <div style={{ fontSize: 11, color: '#9CA3AF' }}>VENDEDOR</div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#F9FAFB' }}>{userName}</div>
-        </div>
-      )}
     </aside>
+    </>
   );
 }
+

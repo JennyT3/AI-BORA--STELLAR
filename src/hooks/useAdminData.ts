@@ -142,7 +142,8 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
 
   const handleAsignarTarea = async (tareaId: string, vendedorId: string, prazo: string) => {
     try {
-      await asignarTarea(tareaId, vendedorId, prazo);
+      const v = vendedores.find(v => v.id === vendedorId);
+      await asignarTarea(tareaId, vendedorId, v?.nome || "Colaborador", prazo);
       loadTareas();
     } catch (err) {
       console.error(err);
@@ -152,7 +153,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
 
   const handleAprobarEntrega = async (tareaId: string) => {
     try {
-      await aprobarTarea(tareaId, 'admin');
+      await aprobarTarea(tareaId);
       loadTareas();
     } catch (err) {
       console.error(err);

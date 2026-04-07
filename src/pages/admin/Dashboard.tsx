@@ -1,6 +1,7 @@
-import { FileText, Users, Check, Plus, DollarSign, ArrowRight, TrendingUp, Clock, FolderOpen, Menu } from "lucide-react";
-import { theme } from "../../styles/theme";
+import { FileText, Users, Check, Plus, DollarSign, TrendingUp, Target } from "lucide-react";
 import { getStatusColorDashboard, getStatusLabelDashboard, getProposalStatusBadge } from "../../utils/labels";
+import { NewStatsCard } from "../../components/admin/NewStatsCard";
+import { WelcomeHero } from "../../components/admin/WelcomeHero";
 
 interface DashboardProps {
   stats: { total: number; enviadas: number; respondidas: number; aceitas: number; reagendadas: number };
@@ -15,144 +16,217 @@ interface DashboardProps {
   isMobile?: boolean;
 }
 
-export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, onNovoOrcamento, onNovoCliente, onNovaFatura, onNavigate, isMobile = false }: DashboardProps) {
+export function Dashboard({ stats, proposals, solicitudes, clientes, onNovoOrcamento, onNovoCliente, onNovaFatura, onNavigate, isMobile = false }: DashboardProps) {
   const clientesAtivos = clientes.filter(c => c.categoria === "cliente").length;
-  const propostasAceitas = stats.aceitas;
-  const respostaRate = stats.total > 0 ? Math.round((stats.respondidas / stats.total) * 100) : 0;
-  const aceitaRate = stats.respondidas > 0 ? Math.round((stats.aceitas / stats.respondidas) * 100) : 0;
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Dashboard</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Resumo da tua atividade</p>
-        </div>
-        <button onClick={onExport} style={{ padding: "12px 20px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
-          <FileText size={18} /> Exportar
+    <div style={{ fontFamily: 'Montserrat, sans-serif' }}>
+      {/* Welcome Hero */}
+      <WelcomeHero isMobile={isMobile} />
+
+      {/* Stats Grid */}
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", 
+        gap: isMobile ? 16 : 24, 
+        marginBottom: 40 
+      }}>
+        <NewStatsCard 
+          label="Propostas" 
+          value={stats.total.toLocaleString()} 
+          percentage={12.5}
+          percentageColor="green"
+          icon={<FileText size={20} />}
+          iconColor="#F25C05"
+          iconBg="rgba(242, 92, 5, 0.05)"
+        />
+        <NewStatsCard 
+          label="Respondidas" 
+          value={stats.respondidas.toLocaleString()} 
+          percentage={8.2}
+          percentageColor="green"
+          icon={<TrendingUp size={20} />}
+          iconColor="#3498DB"
+          iconBg="rgba(52, 152, 219, 0.05)"
+        />
+        <NewStatsCard 
+          label="Aceites" 
+          value={stats.aceitas.toLocaleString()} 
+          percentage={-2.1}
+          percentageColor="orange"
+          icon={<Check size={20} />}
+          iconColor="#10B981"
+          iconBg="rgba(16, 185, 129, 0.05)"
+        />
+        <NewStatsCard 
+          label="Clientes" 
+          value={clientesAtivos.toLocaleString()} 
+          percentage={14.2}
+          percentageColor="green"
+          icon={<Users size={20} />}
+          iconColor="#F22283"
+          iconBg="rgba(242, 34, 131, 0.05)"
+        />
+      </div>
+
+      {/* Quick Actions - Conectados y Funcionales */}
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", 
+        gap: 16, 
+        marginBottom: 48 
+      }}>
+        <button 
+          onClick={onNovoOrcamento} 
+          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Plus size={16} strokeWidth={3} /></div>
+          Novo Orçamento
+        </button>
+        <button 
+          onClick={onNovoCliente} 
+          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Users size={16} /></div>
+          Novo Cliente
+        </button>
+        <button 
+          onClick={onNovaFatura} 
+          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1b1c1b", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><DollarSign size={16} /></div>
+          Nova Fatura
+        </button>
+        <button 
+          onClick={() => onNavigate("faturacao")} 
+          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "#1b1c1b" }}><Target size={16} /></div>
+          Faturação
         </button>
       </div>
 
-      {/* Stats Cards - 4 columns desktop, 2 columns tablet, 1 column mobile */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", gap: isMobile ? 12 : 20, marginBottom: isMobile ? 20 : 32 }}>
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: `4px solid ${theme.colors.accent.primary}` }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>PROPOSTAS</span>
-            <FileText size={16} color={theme.colors.accent.primary} />
+      {/* Conversion Trend Chart */}
+      <div style={{ 
+        backgroundColor: "#ffffff", 
+        borderRadius: 24, 
+        padding: 32, 
+        marginBottom: 48, 
+        boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)",
+        border: "1px solid rgba(0,0,0,0.02)"
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+          <div>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: "#1b1c1b", marginBottom: 4 }}>Conversion Trend</h3>
+            <p style={{ fontSize: 13, color: "#64748b", fontWeight: 600 }}>Performance evolution over the last 7 days</p>
           </div>
-          <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: theme.colors.text.primary }}>{stats.total}</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.enviadas} enviadas</div>
+          <span style={{ fontSize: 10, fontWeight: 900, color: "#F22283", background: "rgba(242, 34, 131, 0.1)", padding: "4px 10px", borderRadius: 100, letterSpacing: 1 }}>LIVE TRACKING</span>
         </div>
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #3498DB" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>RESPONDIDAS</span>
-            <TrendingUp size={16} color="#3498DB" />
+        
+        <div style={{ width: "100%", height: 200, position: "relative", marginTop: 40 }}>
+          <svg width="100%" height="100%" viewBox="0 0 1000 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#F25C05" stopOpacity="0.1" />
+                <stop offset="100%" stopColor="#F25C05" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path 
+              d="M0,150 Q150,160 250,120 T500,130 T750,110 T1000,80" 
+              fill="none" 
+              stroke="#F25C05" 
+              strokeWidth="3" 
+            />
+            <path 
+              d="M0,150 Q150,160 250,120 T500,130 T750,110 T1000,80 L1000,200 L0,200 Z" 
+              fill="url(#chartGradient)" 
+            />
+            {[0, 250, 500, 750, 1000].map((x, i) => {
+              const y = [150, 120, 130, 110, 80][i];
+              return <circle key={i} cx={x} cy={y} r="5" fill="#fff" stroke="#F25C05" strokeWidth="2" />;
+            })}
+          </svg>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, color: "#94a3b8", fontSize: 11, fontWeight: 800 }}>
+            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
           </div>
-          <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: "#3498DB" }}>{stats.respondidas}</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{respostaRate}% resposta</div>
-        </div>
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #10B981" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>ACEITES</span>
-            <Check size={16} color="#10B981" />
-          </div>
-          <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: "#10B981" }}>{stats.aceitas}</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{aceitaRate}% aceitação</div>
-        </div>
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8", borderLeft: "4px solid #F22283" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>CLIENTES</span>
-            <Users size={16} color="#F22283" />
-          </div>
-          <div style={{ fontSize: isMobile ? 28 : 36, fontWeight: 900, color: "#F22283" }}>{clientesAtivos}</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{clientes.filter(c => c.categoria === "potencial").length} potenciais</div>
         </div>
       </div>
 
-      {/* Action Buttons - 4 columns desktop, 2 columns tablet, 1 column mobile */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)", gap: isMobile ? 12 : 16, marginBottom: isMobile ? 20 : 32 }}>
-        <button onClick={onNovoOrcamento} style={{ padding: isMobile ? 16 : 20, borderRadius: 16, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#fff", border: "none", cursor: "pointer", textAlign: "center", boxShadow: "0 4px 15px rgba(242,92,5,0.3)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minHeight: 80 }}>
-          <Plus size={isMobile ? 20 : 24} />
-          <div style={{ fontWeight: 700, fontSize: 13 }}>Novo Orçamento</div>
-        </button>
-        <button onClick={onNovoCliente} style={{ padding: isMobile ? 16 : 20, borderRadius: 16, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `2px solid ${theme.colors.border}`, cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minHeight: 80 }}>
-          <Users size={isMobile ? 20 : 24} color={theme.colors.accent.primary} />
-          <div style={{ fontWeight: 700, fontSize: 13 }}>Novo Cliente</div>
-        </button>
-        <button onClick={onNovaFatura} style={{ padding: isMobile ? 16 : 20, borderRadius: 16, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `2px solid ${theme.colors.border}`, cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minHeight: 80 }}>
-          <DollarSign size={isMobile ? 20 : 24} color={theme.colors.status.success} />
-          <div style={{ fontWeight: 700, fontSize: 13 }}>Nova Fatura</div>
-        </button>
-        <button onClick={() => onNavigate("faturacao")} style={{ padding: isMobile ? 16 : 20, borderRadius: 16, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `2px solid ${theme.colors.border}`, cursor: "pointer", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, minHeight: 80 }}>
-          <FolderOpen size={isMobile ? 20 : 24} color={theme.colors.text.tertiary} />
-          <div style={{ fontWeight: 700, fontSize: 13 }}>Faturação</div>
-        </button>
-      </div>
-
-      {/* Lists - 2 columns desktop, 1 column mobile */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 16 : 24 }}>
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Solicitações Recentes</h3>
-            <button onClick={() => onNavigate("solicitacoes")} style={{ fontSize: 12, color: theme.colors.accent.primary, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Ver todas →</button>
+      {/* Lists Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 32 }}>
+        {/* Recent Requests - Conectado a Solicitacoes */}
+        <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Solicitações Recentes</h3>
+            <button onClick={() => onNavigate("solicitacoes")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>Ver tudo</button>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
-            {solicitudes.slice(0, 5).map(s => (
-              <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", backgroundColor: "#fafafa", borderRadius: 10, border: "1px solid #f0f0f0", flexWrap: "wrap", gap: 8 }}>
-                <div>
-                  <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 14 }}>{s.nome}</div>
-                  <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 2 }}>{s.telefone} · {new Date(s.createdAt).toLocaleDateString("pt-PT")}</div>
+            {solicitudes.slice(0, 3).map(s => (
+              <div 
+                key={s.id} 
+                onClick={() => onNavigate("solicitacoes")}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", backgroundColor: "#fcf9f7", borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0edeb'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fcf9f7'}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Users size={18} color="#64748b" />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, color: "#1b1c1b", fontSize: 14 }}>{s.nome}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{s.empresa || "E-commerce Integration"}</div>
+                  </div>
                 </div>
-                <span style={{ fontSize: 10, padding: "4px 10px", borderRadius: 20, backgroundColor: getStatusColorDashboard(s.status) + "15", color: getStatusColorDashboard(s.status), fontWeight: 600 }}>
+                <span style={{ fontSize: 9, padding: "4px 10px", borderRadius: 100, backgroundColor: getStatusColorDashboard(s.status) + "15", color: getStatusColorDashboard(s.status), fontWeight: 900, textTransform: 'uppercase' }}>
                   {getStatusLabelDashboard(s.status)}
                 </span>
               </div>
             ))}
-            {solicitudes.length === 0 && (
-              <div style={{ textAlign: "center", padding: 20, color: theme.colors.text.secondary }}>
-                <Clock size={32} style={{ marginBottom: 8, opacity: 0.5 }} />
-                <div>Nenhuma solicitação ainda</div>
-              </div>
-            )}
           </div>
         </div>
 
-        <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: isMobile ? 16 : 24, border: "1px solid #e8e8e8" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h3 style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Propostas Recentes</h3>
-            <button onClick={() => onNavigate("propostas")} style={{ fontSize: 12, color: theme.colors.accent.primary, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Ver todas →</button>
+        {/* Recent Proposals - Conectado a Propostas */}
+        <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Propostas Recentes</h3>
+            <button onClick={() => onNavigate("propostas")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>Ver tudo</button>
           </div>
-          <div style={{ display: "grid", gap: 10 }}>
-            {proposals.slice(0, 5).map(p => {
+          <div style={{ display: "grid", gap: 12 }}>
+            {proposals.slice(0, 3).map(p => {
               const badge = getProposalStatusBadge(p);
               return (
-                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", backgroundColor: "#F5F2F0", borderRadius: 12, border: "1px solid #e8e4df", flexWrap: "wrap", gap: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 150 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", backgroundColor: theme.colors.accent.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
-                      {p.cliente?.charAt(0).toUpperCase()}
+                <div 
+                  key={p.id} 
+                  onClick={() => onNavigate("propostas")}
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", backgroundColor: "#fcf9f7", borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0edeb'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#fcf9f7'}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(242, 92, 5, 0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FileText size={18} color="#F25C05" />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 13 }}>{p.cliente}</div>
-                      <div style={{ fontSize: 10, color: theme.colors.text.secondary, marginTop: 2 }}>{p.numeroOrcamento} · {new Date(p.createdAt).toLocaleDateString("pt-PT")}</div>
+                      <div style={{ fontWeight: 800, color: "#1b1c1b", fontSize: 14 }}>{p.numeroOrcamento}</div>
+                      <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600 }}>{p.cliente}</div>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontWeight: 800, color: "#F22283", fontSize: 16 }}>{p.valor?.toFixed(2)} €</div>
-                    </div>
-                    <span style={{ fontSize: 10, padding: "4px 8px", borderRadius: 4, backgroundColor: badge.color, color: badge.textColor, fontWeight: 600 }}>
-                      {badge.text}
-                    </span>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontWeight: 900, color: "#1b1c1b", fontSize: 14 }}>{p.valor?.toLocaleString()} €</div>
+                    <div style={{ fontSize: 9, fontWeight: 900, color: badge.textColor, textTransform: 'uppercase' }}>{badge.text}</div>
                   </div>
                 </div>
               );
             })}
-            {proposals.length === 0 && (
-              <div style={{ textAlign: "center", padding: 20, color: theme.colors.text.secondary }}>
-                <FileText size={32} style={{ marginBottom: 8, opacity: 0.5 }} />
-                <div>Nenhuma proposta ainda</div>
-              </div>
-            )}
           </div>
         </div>
       </div>

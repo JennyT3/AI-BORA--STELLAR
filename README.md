@@ -1,20 +1,31 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# AI BORA - Proposal and Client Management System
 
-# Run and deploy your AI Studio app
+AI BORA is a web platform developed to manage budgets, handle client work, manage tasks, and provide a "Client Area" where clients can track the status of their requested services.
 
-This contains everything you need to run your app locally.
+## 🚀 Main Technologies
+- **Frontend**: React 19, Vite, Tailwind CSS v4, Framer Motion
+- **Backend / BaaS**: Firebase (Auth, Firestore, Storage)
+- **Language**: TypeScript
+- **Routing**: Wouter
 
-View your app in AI Studio: https://ai.studio/apps/5e882758-5ac5-436f-99a6-90c06071bbb8
+## ⚙️ Application Structure
+- **Sales/Collab Dashboard:** (`/vendas`).
+- **Admin Dashboard:** (`/admin`).
+- **Client Portal:** (`/c/:id`) where the client views task progress, descriptions, and deliverable links.
+- **Portfolio / Landing:** Various pages such as `/servicos`, `/packs`, `/prompts`, `/orcamento`.
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## 🛠️ Local Setup
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Environment Variables:
+   Copy the base environment content (or what you have configured in Firebase/EmailJS) to your local `.env` file.
+
+3. Run the Project:
+   ```bash
+   npm run dev
+   ```
+   The server will start on local port 3000.
