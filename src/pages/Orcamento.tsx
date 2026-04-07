@@ -160,11 +160,13 @@ export function Orcamento() {
   const adicionarMarca = () => setMarcas(prev => [...prev, { id: Date.now().toString(), nome: "", redes: [], servicos: [] }]);
   const removerMarca = (id: string) => { if (marcas.length > 1) setMarcas(prev => prev.filter(m => m.id !== id)); };
 
-  const total = precoTotal;
+const total = precoTotal;
   const descuentoAplicado = (total * (descontoPercent / 100)) + descontoValor;
   const totalConDescuento = total - descuentoAplicado;
-  const subtotalComDesconto = totalConDescuento / (1 + IVA_TAXA);
-  const ivaComDesconto = totalConDescuento - subtotalComDesconto;
+  // Calcular IVA sobre el total CON descuento (no sobre el total original)
+  const ivaBase = totalConDescuento / (1 + IVA_TAXA);
+  const ivaComDesconto = totalConDescuento - ivaBase;
+  const subtotalComDesconto = ivaBase;
   const porMarcaSemIVA = marcas.length > 0 ? subtotalComDesconto / marcas.length : 0;
 
   const podeGerar = !!cliente.nome && totalConDescuento > 0;

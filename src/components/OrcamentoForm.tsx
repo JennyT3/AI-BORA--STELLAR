@@ -151,6 +151,34 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
                   ); 
                 })}
               </div>
+              {!isPublicView && (
+                <>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: theme.colors.text.secondary, marginBottom: 6, marginTop: 10 }}>Serviços:</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
+                      const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria as string];
+                      return (
+                        <div key={categoria} style={{ width: "100%", marginBottom: 4 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
+                            <span style={{ fontSize: 10 }}>{catIcon}</span>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: textColor }}>{categoria}</span>
+                          </div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                            {(servicos as string[]).map((s) => { 
+                              const sel = marca.servicos.includes(s); 
+                              return (
+                                <button key={s} onClick={() => toggleServico(marca.id, s)} style={{ fontSize: 8, fontWeight: 600, backgroundColor: sel ? theme.colors.accent.primary : inputBg, color: sel ? "#ffffff" : textColor, border: sel ? `1px solid ${theme.colors.accent.primary}` : `1px solid rgba(0,0,0,0.10)`, borderRadius: 12, padding: "2px 6px", cursor: "pointer" }}>
+                                  {sel ? "✓ " : ""}{s}
+                                </button>
+                              ); 
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           ))}
           {isPublicView && (
@@ -158,35 +186,6 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
               <Plus size={16} /> Adicionar Marca
             </button>
           )}
-        </div>
-
-        <div>
-          <div style={{ marginBottom: 12 }}>
-            <h2 style={{ fontFamily: isPublicView ? "Montserrat, sans-serif" : theme.fontFamily.sans, fontWeight: 900, fontSize: "clamp(16px, 3vw, 22px)", color: textColor, margin: "0 0 4px" }}>
-              Seleciona os Serviços
-            </h2>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: isPublicView ? "repeat(auto-fill, minmax(240px, 1fr))" : "repeat(2, 1fr)", gap: 12 }}>
-            {Object.entries(SERVICOS_POR_CATEGORIA).map(([categoria, servicos]) => {
-              const catIcon = { "Marketing": "📱", "Design": "🎨", "Web": "💻", "Multimédia": "🎬", "Publicidade": "📢", "Automação": "⚡", "Consultoria": "📊" }[categoria as string];
-              return (
-                <div key={categoria} style={{ backgroundColor: bgColor, borderRadius: 12, padding: isPublicView ? 20 : 12, display: "flex", flexDirection: "column", gap: 8, border: cardBorder }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: isPublicView ? 24 : 18 }}>{catIcon}</span><span style={{ fontWeight: 700, fontSize: isPublicView ? 15 : 12, color: textColor }}>{categoria}</span></div>
-                  <div style={{ height: 1, backgroundColor: theme.colors.border }} />
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {(servicos as string[]).map((s) => { 
-                      const sel = marcas[0]?.servicos.includes(s); 
-                      return (
-                        <button key={s} onClick={() => marcas.length === 1 && toggleServico(marcas[0].id, s)} style={{ fontSize: 9, fontWeight: 600, backgroundColor: sel ? theme.colors.accent.primary : inputBg, color: sel ? "#ffffff" : textColor, border: sel ? `1px solid ${theme.colors.accent.primary}` : `1px solid rgba(0,0,0,0.10)`, borderRadius: 20, padding: "3px 8px", cursor: "pointer" }}>
-                          {sel ? "✓ " : ""}{s}
-                        </button>
-                      ); 
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </div>
 
@@ -196,7 +195,7 @@ export function OrcamentoForm(props: OrcamentoFormProps) {
             {isPublicView ? "📋 Resumo do Orçamento" : "Resumo do Orçamento"}
           </h3>
           <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Nº Orçamento</label><input type="text" value={numeroOrcamentoInput} onChange={e => !isEditingProposta && setNumeroOrcamentoInput(e.target.value.toUpperCase())} placeholder="ORC-0001" disabled={isEditingProposta} style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: inputBorder, fontSize: 14, fontWeight: 700, textAlign: "center", backgroundColor: isEditingProposta ? theme.colors.bg.tertiary : inputBg, color: textColor }} /></div>
-          <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Valor Total (com IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: inputBorder, fontSize: 18, fontWeight: 700, textAlign: "right", backgroundColor: inputBg, color: textColor }} /><span style={{ fontWeight: 700, fontSize: 18, color: textColor }}>€</span></div></div>
+          <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Valor Total (COM IVA)</label><div style={{ display: "flex", alignItems: "center", gap: 8 }}><input type="number" value={precoTotal || ""} onChange={e => setPrecoTotal(Number(e.target.value))} placeholder="0.00" style={{ flex: 1, padding: "12px", borderRadius: 8, border: inputBorder, fontSize: 18, fontWeight: 700, textAlign: "right", backgroundColor: inputBg, color: textColor }} /><span style={{ fontWeight: 700, fontSize: 18, color: textColor }}>€</span></div></div>
           <div style={{ marginBottom: 16 }}><label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 6 }}>Desconto</label><div style={{ display: "flex", gap: 8 }}><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoPercent || ""} onChange={e => setDescontoPercent(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: isPublicView ? "1px solid #ddd" : `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: inputBg, color: textColor }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>%</span></div><div style={{ flex: 1, display: "flex", alignItems: "center", gap: 4 }}><input type="number" value={descontoValor || ""} onChange={e => setDescontoValor(Number(e.target.value))} placeholder="0" style={{ width: "100%", padding: "10px", borderRadius: 8, border: isPublicView ? "1px solid #ddd" : `1px solid ${theme.colors.border}`, fontSize: 13, textAlign: "right", backgroundColor: inputBg, color: textColor }} /><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>€</span></div></div></div>
           <div style={{ backgroundColor: isPublicView ? "#ffffff" : theme.colors.bg.primary, borderRadius: 12, padding: 16, marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px dashed ${theme.colors.border}` }}><span style={{ fontSize: 12, color: theme.colors.text.secondary }}>Subtotal (sem IVA)</span><span style={{ fontSize: 12, fontWeight: 600, color: textColor }}>{subtotalComDesconto.toFixed(2)} €</span></div>
