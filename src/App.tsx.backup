@@ -11,7 +11,6 @@ import { ClienteFicha } from "./pages/ClienteFicha";
 import { Admin } from "./pages/Admin";
 import { VendasLogin } from "./pages/VendasLogin";
 import { VendasDashboard } from "./pages/VendasDashboard";
-import Academia from "./pages/academia";
 import { Analytics } from "@vercel/analytics/react";
 
 import { useAuth } from "./hooks/useAuth";
@@ -46,7 +45,6 @@ export default function App() {
         <Route path="/c/:id" component={ClienteFicha} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
-        <Route path="/academia" component={Academia} />
         <Route>
           <div className="min-h-screen bg-bg flex items-center justify-center text-text-primary">
             <div className="text-center">

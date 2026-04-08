@@ -1,19 +1,42 @@
 import { useState, useEffect } from 'react';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { getVendedor, Vendedor } from '../services/vendedores';
-import { app } from '../services/firebase';
-
-const auth = getAuth(app);
+import { 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged, 
+  User as FirebaseUser 
+} from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../services/firebase';
+import { getVendedor } from '../services/vendedores';
+import { 
+  createSessionToken, 
+  saveSession, 
+  getSession, 
+  clearSession, 
+  isVendedorSession,
+  SessionToken 
+} from '../lib/auth';
 
 export interface User {
   id: string;
   nome: string;
-  role: "admin" | "user";
+  role: "admin" | "vendedor";
   email: string;
+}
+
+export interface Vendedor {
+  id: string;
+  nome: string;
+  email?: string;
+  telefone?: string;
+  comissaoPercent?: number;
+  ativo?: boolean;
+  fotoPerfil?: string;
 }
 
 export function useAuth() {
   const [vendedor, setVendedor] = useState<Vendedor | null>(null);
+  const [sessionToken, setSessionToken] = useState<SessionToken | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
@@ -21,45 +44,63 @@ export function useAuth() {
   const [vendedorReady, setVendedorReady] = useState(false);
 
   useEffect(() => {
-    const initVendedor = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const adminMode = params.get("admin") === "true";
-      const vendedorId = params.get("vendedor");
-      const savedVendedor = localStorage.getItem("vendedorUser");
-
-      if (adminMode && vendedorId) {
+    // Verificar sessão JWT primeiro (para vendedores)
+    const initVendedorFromSession = async () => {
+      const savedSession = getSession();
+      
+      if (savedSession && isVendedorSession(savedSession)) {
         try {
-          const v = await getVendedor(vendedorId);
-          if (v) {
+          const v = await getVendedor(savedSession.id);
+          if (v && v.ativo) {
             setVendedor(v);
-            localStorage.setItem("vendedorUser", JSON.stringify(v));
+            setSessionToken(savedSession);
+          } else {
+            clearSession();
           }
-        } catch (err) {
-          console.error("Erro ao carregar vendedor:", err);
-        }
-      } else if (savedVendedor) {
-        try {
-          setVendedor(JSON.parse(savedVendedor));
         } catch {
-          console.warn("Dados de vendedor corrompidos — a limpar localStorage");
-          localStorage.removeItem("vendedorUser");
+          clearSession();
         }
       }
 
       setVendedorReady(true);
     };
 
-    initVendedor();
+    initVendedorFromSession();
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+    // Listener do Firebase Auth (para admin e vendedor)
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        setAuthenticated(true);
-        setCurrentUser({
-          id: firebaseUser.uid,
-          nome: firebaseUser.email?.split('@')[0] || 'Admin',
-          role: 'admin',
-          email: firebaseUser.email || ''
-        });
+        // Verificar se é admin ou vendedor
+        const vendedorDoc = await getDoc(doc(db, 'vendedores', firebaseUser.uid));
+        
+        if (vendedorDoc.exists()) {
+          // É vendedor - carregar dados do Firestore
+          const vendedorData = vendedorDoc.data();
+          setAuthenticated(true);
+          setCurrentUser({
+            id: firebaseUser.uid,
+            nome: vendedorData?.nome || firebaseUser.email?.split('@')[0] || 'Vendedor',
+            role: 'vendedor',
+            email: firebaseUser.email || ''
+          });
+          
+          // Se ainda não temos o vendedor no estado, adicionar
+          if (!vendedor) {
+            setVendedor({
+              id: firebaseUser.uid,
+              ...vendedorData
+            } as Vendedor);
+          }
+        } else {
+          // É admin (não tem documento em vendedores)
+          setAuthenticated(true);
+          setCurrentUser({
+            id: firebaseUser.uid,
+            nome: firebaseUser.email?.split('@')[0] || 'Admin',
+            role: 'admin',
+            email: firebaseUser.email || ''
+          });
+        }
       } else {
         setAuthenticated(false);
         setCurrentUser(null);
@@ -82,8 +123,21 @@ export function useAuth() {
         return { success: false, error: msg };
       }
     } else if (type === 'vendedor') {
+      // data contém o objeto vendedor retornado pelo login (do authService)
       setVendedor(data);
-      localStorage.setItem("vendedorUser", JSON.stringify(data));
+      
+      // Criar token JWT seguro (sem password!)
+      const token = createSessionToken({
+        id: data.id,
+        nome: data.nome,
+        email: data.email || '',
+        role: 'vendedor'
+      });
+      
+      // Salvar apenas o token (não o objeto vendedor completo!)
+      saveSession(token);
+      setSessionToken(token);
+      
       return { success: true };
     }
   };
@@ -92,10 +146,22 @@ export function useAuth() {
     if (type === 'admin') {
       await signOut(auth);
     } else {
-      localStorage.removeItem("vendedorUser");
+      // Limpar sessão JWT e logout do Firebase
+      clearSession();
+      setSessionToken(null);
       setVendedor(null);
+      await signOut(auth).catch(console.error);
     }
   };
 
-  return { vendedor, vendedorReady, authenticated, currentUser, login, logout, loading };
+  return { 
+    vendedor, 
+    vendedorReady, 
+    sessionToken,
+    authenticated, 
+    currentUser, 
+    login, 
+    logout, 
+    loading 
+  };
 }

@@ -72,6 +72,19 @@ export async function listVendedores(): Promise<Vendedor[]> {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Vendedor));
 }
 
+export async function listVendedoresAtivos(): Promise<Vendedor[]> {
+  const q = query(collection(db, 'vendedores'), where('ativo', '==', true));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Vendedor));
+}
+
+export async function delegarClienteAVendedor(clienteId: string, vendedorId: string): Promise<void> {
+  const { updateDoc, doc } = await import('firebase/firestore');
+  await updateDoc(doc(db, 'clientes', clienteId), {
+    vendedorId
+  });
+}
+
 // ========== ASIGNAR CLIENTES A VENDEDOR ==========
 
 export async function asignarClientesAVendedor(vendedorId: string, clientesIds: string[]): Promise<void> {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { IVA_TAXA, REDES, SERVICOS_POR_CATEGORIA } from '../config/constants';
+import { IVA_TAXA, REDES, SERVICOS_POR_CATEGORIA } from '../lib/constants';
 import { useSearchParams } from "wouter";
 import { Navbar } from "../components/Navbar";
 import { CTAFooterSection } from "../components/CTAFooterSection";
@@ -340,7 +340,10 @@ const total = precoTotal;
             else if (tab === 'perfil') window.location.href = `/vendas?admin=true&vendedor=${vendedorId}&tab=perfil`;
           }}
           userName={vendedorNome}
-          onLogout={() => { localStorage.removeItem("vendedorUser"); window.location.href = "/vendas"; }}
+          onLogout={() => { 
+            import('../lib/auth').then(m => m.clearSession()); 
+            window.location.href = "/vendas"; 
+          }}
           proposalCount={0}
           clienteCount={0}
           collapsed={sidebarCollapsed}
@@ -387,7 +390,10 @@ const total = precoTotal;
             else if (tab === 'faturacao') window.location.href = '/admin?tab=faturacao';
           }}
           userName="Admin"
-          onLogout={() => { localStorage.removeItem("adminUser"); window.location.href = "/admin"; }}
+          onLogout={() => { 
+            import('../lib/auth').then(m => m.clearSession()); 
+            window.location.href = "/admin"; 
+          }}
           proposalCount={0}
           solicitudCount={0}
           clienteCount={0}

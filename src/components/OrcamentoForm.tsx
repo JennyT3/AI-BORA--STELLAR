@@ -1,6 +1,6 @@
 import React from 'react';
 import { theme } from "../styles/theme";
-import { REDES, SERVICOS_POR_CATEGORIA } from '../config/constants';
+import { REDES, SERVICOS_POR_CATEGORIA } from '../lib/constants';
 import { Plus } from "lucide-react";
 
 export interface OrcamentoFormProps {

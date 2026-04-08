@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, Target, Search, Filter, AlignJustify, Grid, DollarSign } from "lucide-react";
+import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, AlignJustify, Grid, DollarSign, Search, Filter } from "lucide-react";
 import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
 import { theme } from "../../styles/theme";
 

@@ -1,7 +1,1 @@
-{
-  "projects": {
-    "Ai Bora": "aibora-propostas"
-  },
-  "targets": {},
-  "etags": {}
-}
+{"projects":{"default":"aibora-propostas"}}
