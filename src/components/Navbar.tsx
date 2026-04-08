@@ -50,6 +50,7 @@ export function Navbar() {
           <button onClick={() => scrollToSection('processo')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">Como Funciona</button>
           <button onClick={() => scrollToSection('faq')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">FAQ</button>
           <Link href="/prompts" className="text-sm font-bold text-[#F25C05] hover:text-[#F22283] transition-colors">Prompts AI</Link>
+          <Link href="/academia" className="text-sm font-bold text-[#F25C05] hover:text-[#F22283] transition-colors">Bora Lá</Link>
           <motion.button
             onClick={() => scrollToSection('contacto')}
             whileHover={{ scale: 1.03 }}
@@ -81,6 +82,7 @@ export function Navbar() {
           <button onClick={() => scrollToSection('processo')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">Como Funciona</button>
           <button onClick={() => scrollToSection('faq')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">FAQ</button>
           <Link href="/prompts" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#F25C05]">Prompts AI</Link>
+          <Link href="/academia" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#F25C05]">Bora Lá</Link>
           <button
             onClick={() => scrollToSection('contacto')}
             className="text-white font-bold px-8 py-4 rounded-full text-lg shadow-lg"

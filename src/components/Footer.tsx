@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { Mail, Phone } from 'lucide-react';
+import { Mail, Phone, Menu } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -56,12 +56,18 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal - MÁS COMPACTO */}
+          {/* Consultoria - NUEVA SECCIÓN */}
           <div>
-            <h4 className="font-semibold text-text-primary mb-3 uppercase tracking-wider text-xs">Legal</h4>
+            <h4 className="font-semibold text-text-primary mb-3 uppercase tracking-wider text-xs">Consultoria</h4>
             <ul className="space-y-2">
-              <li><Link href="/privacidade" className="text-sm font-normal text-text-secondary hover:text-fuchsia-brand transition-colors">Política de Privacidade</Link></li>
-              <li><Link href="/termos" className="text-sm font-normal text-text-secondary hover:text-fuchsia-brand transition-colors">Termos de Serviço</Link></li>
+              <li><Link href="/servicos" className="text-sm font-normal text-text-secondary hover:text-fuchsia-brand transition-colors">Estratégia Digital</Link></li>
+              <li><Link href="/servicos" className="text-sm font-normal text-text-secondary hover:text-fuchsia-brand transition-colors">Análise de Negócio</Link></li>
+              <li>
+                <button className="flex items-center gap-2 text-sm font-normal text-text-secondary hover:text-fuchsia-brand transition-colors" title="Menu de utilidades">
+                  <Menu size={16} className="text-fuchsia-brand shrink-0" />
+                  <span>Menu</span>
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -84,7 +90,7 @@ export function Footer() {
 
         <div className="text-center pt-6 border-t border-black/5">
           <p className="text-xs text-text-muted font-normal">
-            © {new Date().getFullYear()} AI BORA · Todos os direitos reservados · Feito com ❤️ pela equipa AI BORA
+            © {new Date().getFullYear()} AI BORA · Todos os direitos reservados · Feito con ❤️ pela equipa AI BORA
           </p>
         </div>
 
