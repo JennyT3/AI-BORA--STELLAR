@@ -8,3 +8,17 @@ coverage/
 !.env.example
 .vercel
 .env*.local
+
+# AI tool artifacts
+.aider.*
+.aider/
+.aider.tags.cache.v4/
+
+# Backup files
+*.backup
+*.bak
+
+# Legacy build scripts
+optimizar.sh
+optimizar_imagenes.sh
+
