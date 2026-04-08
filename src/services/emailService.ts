@@ -85,3 +85,13 @@ export async function sendFaturaEmail(clienteEmail: string, clienteNome: string,
 
 // Función eliminada por seguridad - ya no se usa
 // export async function sendVendedorAccessEmail(...) - ELIMINADA
+
+// Função específica: Campanha de marketing
+export async function sendMarketingCampaignEmail(destinatarioEmail: string, titulo: string, mensagem: string, link?: string, nomeDestinatario?: string) {
+  return sendEmail(destinatarioEmail, 'campanha-marketing', {
+    titulo,
+    mensagem,
+    link,
+    nomeDestinatario,
+  });
+}
