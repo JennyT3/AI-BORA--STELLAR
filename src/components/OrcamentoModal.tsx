@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Trash2, Send, CheckCircle } from 'lucide-react';
 import { createSolicitude } from '../services/solicitudes';
 import { createCliente } from '../services/firebase';
-import { sendConfirmationEmail } from '../services/emailService';
+import { sendOrcamentoConfirmacao } from '../services/emailService';
 import { GOOGLE_SCRIPT_URL } from '../lib/constants';
 
 const REDES_SOCIAIS = [
@@ -110,11 +110,11 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
       setStep('success');
 
       if (formData.email) {
-        sendConfirmationEmail({
-          nome: formData.nome,
-          email: formData.email,
-          servicos: servicosSelecionados.map(s => s.nome),
-        }).catch(() => {});
+        sendOrcamentoConfirmacao(
+          formData.email,
+          formData.nome,
+          servicosSelecionados.map(s => s.nome)
+        ).catch(() => {});
       }
     } catch (err: any) {
       alert('Erro ao enviar: ' + err.message);

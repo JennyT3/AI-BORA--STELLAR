@@ -1,6 +1,6 @@
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, limit } from 'firebase/firestore';
 import { db } from './firebase';
-import { sendConfirmationEmail } from './emailService';
+import { sendOrcamentoConfirmacao } from './emailService';
 
 export interface Solicitude {
   id?: string;
@@ -36,11 +36,7 @@ export async function createSolicitude(data: Partial<Solicitude>): Promise<strin
 
   if (data.email) {
     try {
-      await sendConfirmationEmail({
-        nome: data.nome,
-        email: data.email,
-        servicos: data.servicos || []
-      });
+      await sendOrcamentoConfirmacao(data.email, data.nome, data.servicos);
     } catch (e) {
       console.error("Erro ao enviar email de confirmação:", e);
     }

@@ -5,7 +5,7 @@ import { useSectionInView } from '../hooks/useSectionInView';
 import { WHATSAPP_LINK, GOOGLE_SCRIPT_URL } from '../lib/constants';
 import { WhatsAppIcon } from './icons/WhatsAppIcon';
 import { createContacto } from '../services/firebase';
-import { sendConfirmationEmail } from '../services/emailService';
+import { sendMensagemConfirmacao } from '../services/emailService';
 
 export function CTAFooterSection() {
   const { ref, isInView } = useSectionInView();
@@ -40,11 +40,7 @@ export function CTAFooterSection() {
       // Send confirmation email if email provided
       if (formData.email) {
         try {
-          await sendConfirmationEmail({
-            nome: formData.nome,
-            email: formData.email,
-            servicos: ['Pedido de informação'],
-          });
+          await sendMensagemConfirmacao(formData.email, formData.nome);
         } catch (emailErr) {
           console.error('Erro ao enviar email de confirmação:', emailErr);
         }

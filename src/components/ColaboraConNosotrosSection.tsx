@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Send, CheckCircle, Users, Briefcase, Globe } from 'lucide-react';
 import { createSolicitude } from '../services/solicitudes';
 import { GOOGLE_SCRIPT_URL } from '../lib/constants';
+import { sendColaboradorConfirmacao } from '../services/emailService';
 
 const TIPOS_COLABORACAO = [
   { id: 'vendedor', nome: 'Vendedor/Revendedor', descricao: 'Vende os nossos serviços e ganha comissão', icon: '💼' },
@@ -68,6 +69,10 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
           mode: 'no-cors',
         });
       } catch (_) {}
+
+      if (formData.email) {
+        sendColaboradorConfirmacao(formData.email, formData.nome).catch(() => {});
+      }
 
       setStep('success');
     } catch (err: any) {

@@ -26,13 +26,27 @@ export async function sendEmail(to: string, templateId: string, templateData: an
   }
 }
 
-// Función específica: Confirmación de orçamento
-export async function sendConfirmationEmail(clienteEmail: string, clienteNome: string, orcamentoId: string, tipoProjeto: string) {
-  return sendEmail(clienteEmail, 'confirmacao-orcamento', {
-    clienteNome,
-    solicitacaoId: orcamentoId,
+// Función específica: Confirmación de mensaje del home
+export async function sendMensagemConfirmacao(email: string, nome: string) {
+  return sendEmail(email, 'confirmacao-mensagem', {
+    clienteNome: nome,
+  });
+}
+
+// Función específica: Confirmación de orçamento/solicitud
+export async function sendOrcamentoConfirmacao(email: string, nome: string, servicos?: string[]) {
+  return sendEmail(email, 'confirmacao-orcamento', {
+    clienteNome: nome,
+    solicitacaoId: Math.random().toString(36).substring(2, 10).toUpperCase(),
     data: new Date().toLocaleDateString('pt-PT'),
-    tipoProjeto: tipoProjeto || 'Projeto',
+    tipoProjeto: servicos?.join(', ') || 'Projeto',
+  });
+}
+
+// Función específica: Confirmación de colaborador
+export async function sendColaboradorConfirmacao(email: string, nome: string) {
+  return sendEmail(email, 'confirmacao-colaborador', {
+    clienteNome: nome,
   });
 }
 
