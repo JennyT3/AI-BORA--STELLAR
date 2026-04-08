@@ -65,26 +65,6 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
     `
   }),
   
-  'link-proposta': (data) => ({
-    subject: 'Sua proposta exclusiva - Aibora',
-    html: `
-      <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-        <h2 style="color: #667eea; margin-bottom: 20px;">Olá ${data.clienteNome},</h2>
-        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
-          Preparamos uma proposta exclusiva para si.
-        </p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${data.linkProposta}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 6px;">
-            Ver Proposta
-          </a>
-        </div>
-        <p style="color: #718096; font-size: 12px;">
-          Link válido até: ${data.validade}
-        </p>
-      </div>
-    `
-  }),
-  
   'resposta-proposta': (data) => ({
     subject: 'Resposta recebida - Aibora',
     html: `
