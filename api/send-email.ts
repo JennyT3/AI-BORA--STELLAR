@@ -171,3 +171,127 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+,
+  'link-proposta': (data) => ({
+    subject: `✦ Proposta exclusiva ✦, ${data.clienteNome}`,
+    html: `
+<!DOCTYPE html>
+<html lang="pt">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#e8e8e8;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#e8e8e8;padding:32px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+  <!-- HEADER -->
+  <tr><td style="background:#000000;padding:32px 40px;text-align:center;">
+    <img src="https://aibora.pt/logo.png" alt="Ai Bora" height="56" style="display:block;margin:0 auto;height:56px;width:auto;" />
+  </td></tr>
+
+  <!-- GRADIENT BAR -->
+  <tr><td style="height:4px;background:linear-gradient(90deg,#cb1a74 0%,#fb4a50 50%,#ff6f2e 100%);font-size:0;line-height:0;">&nbsp;</td></tr>
+
+  <!-- BODY -->
+  <tr><td style="padding:48px 40px 16px;">
+    <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Proposta Exclusiva ✦</p>
+    <h1 style="font-size:26px;font-weight:700;color:#111111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
+    <p style="font-size:15px;color:#444444;line-height:1.75;margin:0 0 16px;">
+      Preparámos uma proposta pensada especialmente para si e para o seu projeto. Pode ver todos os detalhes e dar o seu feedback diretamente pelo link abaixo.
+    </p>
+    <p style="font-size:15px;color:#444444;line-height:1.75;margin:0 0 36px;">
+      Tem alguma questão? Responda a este email ou contacte-nos diretamente — estamos aqui para ajudar.
+    </p>
+
+    <!-- CTA -->
+    <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
+      <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;letter-spacing:0.3px;">Ver a minha proposta →</a>
+    </td></tr></table>
+
+    <!-- INFO BOX -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;">
+    <tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
+      <p style="font-size:12px;color:#999999;margin:0 0 2px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Válida até</p>
+      <p style="font-size:15px;color:#111111;margin:0;font-weight:600;">${data.validade}</p>
+    </td></tr></table>
+
+    <!-- FIRMA -->
+    <p style="font-size:15px;color:#444444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
+    <p style="font-size:15px;font-weight:700;color:#111111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+  </td></tr>
+
+  <!-- DIVIDER -->
+  <tr><td style="padding:0 40px;"><div style="height:1px;background:#eeeeee;"></div></td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background:#000000;padding:32px 40px 28px;">
+
+    <!-- NAV -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+    <tr><td align="center" style="line-height:2.4;">
+      <a href="https://aibora.pt/" style="font-size:12px;color:#aaaaaa;text-decoration:none;margin:0 8px;">Sobre nós</a>
+      <span style="color:#333;">|</span>
+      <a href="https://aibora.pt/servicos" style="font-size:12px;color:#aaaaaa;text-decoration:none;margin:0 8px;">Serviços</a>
+      <span style="color:#333;">|</span>
+      <a href="https://aibora.pt/privacidade" style="font-size:12px;color:#aaaaaa;text-decoration:none;margin:0 8px;">Política de Privacidade</a>
+      <span style="color:#333;">|</span>
+      <a href="https://aibora.pt/unsubscribe" style="font-size:12px;color:#aaaaaa;text-decoration:none;margin:0 8px;">Cancelar subscrição</a>
+    </td></tr></table>
+
+    <!-- REDES SOCIAIS -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+    <tr><td align="center">
+      <table cellpadding="0" cellspacing="0"><tr>
+
+        <td style="padding:0 6px;">
+          <a href="https://www.instagram.com/aibora.pt/" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#E1306C;text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="18" height="18" alt="Instagram" style="display:block;" />
+          </a>
+        </td>
+
+        <td style="padding:0 6px;">
+          <a href="https://www.linkedin.com/company/aibora-pt" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#0A66C2;text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3536/3536505.png" width="18" height="18" alt="LinkedIn" style="display:block;" />
+          </a>
+        </td>
+
+        <td style="padding:0 6px;">
+          <a href="https://x.com/boraweb3" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#000000;border:1px solid #444444;text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968830.png" width="16" height="16" alt="X" style="display:block;" />
+          </a>
+        </td>
+
+        <td style="padding:0 6px;">
+          <a href="https://www.facebook.com/aibora.ptt/" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#1877F2;text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="18" height="18" alt="Facebook" style="display:block;" />
+          </a>
+        </td>
+
+        <td style="padding:0 6px;">
+          <a href="https://www.youtube.com/@AiBora_pt" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#FF0000;text-decoration:none;">
+            <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" width="18" height="18" alt="YouTube" style="display:block;" />
+          </a>
+        </td>
+
+      </tr></table>
+    </td></tr></table>
+
+    <!-- CONTACTO -->
+    <p style="font-size:12px;color:#666666;text-align:center;margin:0 0 4px;">
+      <a href="https://aibora.pt" style="color:#ff6f2e;text-decoration:none;">aibora.pt</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:geral@aibora.pt" style="color:#ff6f2e;text-decoration:none;">geral@aibora.pt</a>
+      &nbsp;·&nbsp;
+      <a href="tel:+351936021747" style="color:#aaaaaa;text-decoration:none;">+351 936 021 747</a>
+    </p>
+    <p style="font-size:11px;color:#444444;text-align:center;margin:16px 0 0;">
+      © 2026 Ai Bora. Todos os direitos reservados.
+    </p>
+
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body>
+</html>
+    `
+  })
