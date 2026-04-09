@@ -223,23 +223,37 @@ export async function upsertCliente(data: {
   importadoPor?: string;
 }, vendedorId: string): Promise<UpsertClienteResult> {
   
-  // Validar campos obligatorios
-  if (!data.nome?.trim()) {
+  // Normalizar campos para evitar erros com números vindos do Excel
+  const nome = data.nome != null ? String(data.nome).trim() : '';
+  const email = data.email != null ? String(data.email).trim().toLowerCase() : '';
+  const telemovel = data.telemovel != null ? String(data.telemovel).trim() : '';
+  const nif = data.nif != null ? String(data.nif).trim() : '';
+  const codigoPostal = data.codigoPostal != null ? String(data.codigoPostal).trim() : '';
+  const origem = data.origem != null ? String(data.origem).trim() : '';
+
+  // Validar campos obrigatórios
+  if (!nome) {
     throw new Error('Nome é obrigatório');
   }
-  if (!data.origem?.trim()) {
+  if (!origem) {
     throw new Error('Origem é obrigatória');
   }
   
   const now = new Date().toISOString();
   
-  // Buscar cliente existente
-  const existente = await findClienteByKeys(data.nif, data.email, data.telemovel);
+  // Buscar cliente existente usando variáveis normalizadas
+  const existente = await findClienteByKeys(nif, email, telemovel);
   
   if (existente) {
     // Actualizar cliente existente
     const updateData: Partial<Cliente> = {
       ...data,
+      nome,
+      email: email || undefined,
+      telemovel: telemovel || undefined,
+      nif: nif || undefined,
+      codigoPostal: codigoPostal || undefined,
+      origem,
       updatedAt: now,
       // Actualizar notas pero no borrar las existentes
       notasVendedor: existente.notasVendedor 
@@ -262,19 +276,19 @@ export async function upsertCliente(data: {
     const id = generateId();
     const newData: Cliente = {
       id,
-      nome: data.nome.trim(),
-      email: data.email?.trim().toLowerCase() || undefined,
-      telemovel: data.telemovel?.trim() || undefined,
-      nif: data.nif?.trim() || undefined,
-      empresa: data.empresa?.trim() || undefined,
-      website: data.website?.trim() || undefined,
-      morada: data.morada?.trim() || undefined,
-      codigoPostal: data.codigoPostal?.trim() || undefined,
-      cidade: data.cidade?.trim() || undefined,
+      nome,
+      email: email || undefined,
+      telemovel: telemovel || undefined,
+      nif: nif || undefined,
+      empresa: data.empresa != null ? String(data.empresa).trim() : undefined,
+      website: data.website != null ? String(data.website).trim() : undefined,
+      morada: data.morada != null ? String(data.morada).trim() : undefined,
+      codigoPostal: codigoPostal || undefined,
+      cidade: data.cidade != null ? String(data.cidade).trim() : undefined,
       categoria: data.categoria || 'potencial',
       processo: data.processo || 'sem_processo',
-      origem: data.origem.trim(),
-      notasVendedor: data.notasVendedor?.trim() || undefined,
+      origem,
+      notasVendedor: data.notasVendedor != null ? String(data.notasVendedor).trim() : undefined,
       dataUltimoContacto: data.dataUltimoContacto || now,
       servicos: data.servicos || [],
       vendedorId,

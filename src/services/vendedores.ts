@@ -125,22 +125,28 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
   
   for (const cliente of clientesData) {
     try {
+      // Normalizar campos que pueden venir como números desde Excel
+      const nome = cliente.nome != null ? String(cliente.nome).trim() : '';
+      const email = cliente.email != null ? String(cliente.email).trim().toLowerCase() : '';
+      const telemovel = (cliente.telemovel || cliente.telefone) != null ? String(cliente.telemovel || cliente.telefone).trim() : '';
+      const nif = cliente.nif != null ? String(cliente.nif).trim() : '';
+      const codigoPostal = cliente.codigoPostal != null ? String(cliente.codigoPostal).trim() : '';
+      
       // Usar la función de upsert con deduplicación
       const result = await upsertCliente({
-        nome: cliente.nome,
-        email: cliente.email,
-        telemovel: cliente.telemovel || cliente.telefone,
-        nif: cliente.nif,
-        empresa: cliente.empresa,
-        website: cliente.website,
-        morada: cliente.morada,
-        codigoPostal: cliente.codigoPostal,
-        cidade: cliente.cidade,
-        // Solo clientes pueden cambiar de categoría
-        categoria: 'potencial', // Por defecto potencial para nuevas importaciones
+        nome,
+        email: email || undefined,
+        telemovel: telemovel || undefined,
+        nif: nif || undefined,
+        empresa: cliente.empresa?.trim(),
+        website: cliente.website?.trim(),
+        morada: cliente.morada?.trim(),
+        codigoPostal: codigoPostal || undefined,
+        cidade: cliente.cidade?.trim(),
+        categoria: 'potencial',
         processo: 'sem_processo',
         origem: cliente.origem || 'Importado',
-        notasVendedor: cliente.notasVendedor,
+        notasVendedor: cliente.notasVendedor?.trim(),
         dataUltimoContacto: cliente.dataUltimoContacto,
         servicos: (() => {
           if (Array.isArray(cliente.servicos)) return cliente.servicos;
