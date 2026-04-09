@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, AlignJustify, Grid, DollarSign, Search, Filter, Target, Globe, MessageSquare } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, AlignJustify, Grid, DollarSign, Search, Filter, Target, Globe, MessageSquare, Download } from "lucide-react";
 import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
 import { theme } from "../../styles/theme";
+import { listVendedoresAtivos } from "../../services/vendedores";
+import * as XLSX from "xlsx";
 
 interface ClientesProps {
   clientes: any[];
@@ -111,20 +113,77 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const filtered = clientes.filter(c => {
-    const searchLower = search.toLowerCase();
-    const matchesSearch = !search || c.nome?.toLowerCase().includes(searchLower) || c.email?.toLowerCase().includes(searchLower) || c.nif?.includes(search) || c.telemovel?.includes(search);
-    const matchesCategoria = filterCategoria === "todos" || c.categoria === filterCategoria;
-    const matchesOrigem = filterOrigem === "todos" || c.origem === filterOrigem;
-    const matchesResposta = filterResposta === "todos" || (filterResposta === "pendente" ? !c.resposta : c.resposta === filterResposta);
-    return matchesSearch && matchesCategoria && matchesOrigem && matchesResposta;
-  }).sort((a, b) => {
-    let comparison = 0;
-    if (sortBy === "nome") comparison = (a.nome || "").localeCompare(b.nome || "");
-    else if (sortBy === "createdAt") comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-    else if (sortBy === "propostaValor") comparison = (a.propostaValor || 0) - (b.propostaValor || 0);
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
+  // Estados locales para filtros adicionales
+  const [filterVendedor, setFilterVendedor] = useState<string>("todos");
+  const [filterDataDesde, setFilterDataDesde] = useState<string>("");
+  const [filterDataHasta, setFilterDataHasta] = useState<string>("");
+  const [vendedoresLista, setVendedoresLista] = useState<any[]>([]);
+
+  // Cargar vendedores para el filtro
+  useEffect(() => { listVendedoresAtivos().then(setVendedoresLista).catch(console.error); }, []);
+
+  // Filtrar clientes con todos los filtros en cadena usando useMemo
+  const clientesFiltrados = useMemo(() => {
+    return clientes.filter(c => {
+      const searchLower = search.toLowerCase();
+      const matchesSearch = !search || c.nome?.toLowerCase().includes(searchLower) || c.email?.toLowerCase().includes(searchLower) || c.nif?.includes(search) || c.telemovel?.includes(search) || c.empresa?.toLowerCase().includes(searchLower);
+      const matchesCategoria = filterCategoria === "todos" || c.categoria === filterCategoria;
+      const matchesOrigem = filterOrigem === "todos" || c.origem === filterOrigem;
+      const matchesResposta = filterResposta === "todos" || (filterResposta === "pendente" ? !c.resposta : c.resposta === filterResposta);
+      const matchesVendedor = filterVendedor === "todos" || c.vendedorId === filterVendedor;
+      
+      let matchesFecha = true;
+      if (c.dataUltimoContacto) {
+        const fecha = c.dataUltimoContacto.split('T')[0];
+        if (filterDataDesde && fecha < filterDataDesde) matchesFecha = false;
+        if (filterDataHasta && fecha > filterDataHasta) matchesFecha = false;
+      }
+      
+      return matchesSearch && matchesCategoria && matchesOrigem && matchesResposta && matchesVendedor && matchesFecha;
+    }).sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "nome") comparison = (a.nome || "").localeCompare(b.nome || "");
+      else if (sortBy === "createdAt") comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+      else if (sortBy === "propostaValor") comparison = (a.propostaValor || 0) - (b.propostaValor || 0);
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+  }, [clientes, search, filterCategoria, filterOrigem, filterResposta, filterVendedor, filterDataDesde, filterDataHasta, sortBy, sortOrder]);
+
+  // Funciones de exportación
+  const exportarExcelFiltrados = () => {
+    const data = clientesFiltrados.map(c => ({
+      nome: c.nome || '', email: c.email || '', telemovel: c.telemovel || '', nif: c.nif || '',
+      empresa: c.empresa || '', website: c.website || '', morada: c.morada || '',
+      codigoPostal: c.codigoPostal || '', cidade: c.cidade || '', categoria: c.categoria || '',
+      origem: c.origem || '', processo: c.processo || '', notasVendedor: c.notasVendedor || '',
+      dataUltimoContacto: c.dataUltimoContacto || '',
+      servicos: Array.isArray(c.servicos) ? c.servicos.join('; ') : (c.servicos || '')
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+    const fecha = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `clientes_filtrados_${fecha}.xlsx`);
+  };
+
+  const exportarBackupTotal = () => {
+    const data = clientes.map(c => ({
+      nome: c.nome || '', email: c.email || '', telemovel: c.telemovel || '', nif: c.nif || '',
+      empresa: c.empresa || '', website: c.website || '', morada: c.morada || '',
+      codigoPostal: c.codigoPostal || '', cidade: c.cidade || '', categoria: c.categoria || '',
+      origem: c.origem || '', processo: c.processo || '', notasVendedor: c.notasVendedor || '',
+      dataUltimoContacto: c.dataUltimoContacto || '',
+      servicos: Array.isArray(c.servicos) ? c.servicos.join('; ') : (c.servicos || '')
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Clientes");
+    const fecha = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `clientes_backup_${fecha}.xlsx`);
+  };
+
+  // Alias for backwards compatibility
+  const filtered = clientesFiltrados;
 
   if (selectedCliente) {
     const currentProcesso = getProcessoInfo(selectedCliente.processo || "iniciado");
@@ -384,17 +443,28 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
       </div>
 
       {/* Filters Bento Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(12, 1fr)', gap: 16, marginBottom: 32 }}>
-        <div style={{ gridColumn: isMobile ? 'span 1' : 'span 6', backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 32, alignItems: 'center' }}>
+        <div style={{ flex: '1 1 300px', backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
           <Search size={18} color="#8e7165" />
           <input 
-            placeholder="Procurar por nome, e-mail ou NIF..." 
+            placeholder="Procurar por nome, e-mail, empresa, NIF ou telemovel..." 
             value={search} 
             onChange={(e) => onSearchChange(e.target.value)} 
             style={{ width: '100%', border: 'none', padding: '14px', fontSize: 14, fontWeight: 600, outline: 'none', color: '#1b1c1b' }} 
           />
         </div>
-        <div style={{ gridColumn: isMobile ? 'span 1' : 'span 2', backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
+        
+        {/* Filtro Vendedor */}
+        <div style={{ backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)', minWidth: 200 }}>
+          <User size={18} color="#8e7165" />
+          <select value={filterVendedor} onChange={(e) => setFilterVendedor(e.target.value)} style={{ width: '100%', border: 'none', padding: '14px', fontSize: 13, fontWeight: 700, outline: 'none', color: '#5a4137', background: 'transparent' }}>
+            <option value="todos">Todos os vendedores</option>
+            {vendedoresLista.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
+          </select>
+        </div>
+        
+        {/* Filtro Categoria */}
+        <div style={{ backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
           <Filter size={18} color="#8e7165" />
           <select value={filterCategoria} onChange={(e) => onFilterCategoriaChange(e.target.value)} style={{ width: '100%', border: 'none', padding: '14px', fontSize: 13, fontWeight: 700, outline: 'none', color: '#5a4137', background: 'transparent' }}>
             <option value="todos">Categoria: Todas</option>
@@ -403,20 +473,44 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
             <option value="curioso">Curioso</option>
           </select>
         </div>
-        <div style={{ gridColumn: isMobile ? 'span 1' : 'span 2', backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
+        
+        {/* Filtro Ordenar */}
+        <div style={{ backgroundColor: '#fff', borderRadius: 20, padding: '4px 16px', display: 'flex', alignItems: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.02)' }}>
           <BarChart3 size={18} color="#8e7165" />
           <select value={sortBy} onChange={(e) => onSortByChange(e.target.value)} style={{ width: '100%', border: 'none', padding: '14px', fontSize: 13, fontWeight: 700, outline: 'none', color: '#5a4137', background: 'transparent' }}>
             <option value="createdAt">Ordenar: Data</option>
             <option value="nome">Ordenar: Nome</option>
-            <option value="propostaValor">Ordenar: Valor</option>
           </select>
         </div>
+        
         <button 
           onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")} 
-          style={{ gridColumn: isMobile ? 'span 1' : 'span 2', borderRadius: 20, border: '1px solid rgba(0,0,0,0.02)', backgroundColor: '#fff', cursor: 'pointer', fontWeight: 800, color: '#F25C05', fontSize: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
+          style={{ padding: '14px 20px', borderRadius: 20, border: '1px solid rgba(0,0,0,0.02)', backgroundColor: '#fff', cursor: 'pointer', fontWeight: 800, color: '#F25C05', fontSize: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}
         >
           {sortOrder === "asc" ? "↑ ASC" : "↓ DESC"}
         </button>
+      </div>
+      
+      {/* Filtros de fecha */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#5a4137' }}>Desde:</span>
+          <input type="date" value={filterDataDesde} onChange={(e) => setFilterDataDesde(e.target.value)} style={{ padding: '10px 14px', borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 13 }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#5a4137' }}>Até:</span>
+          <input type="date" value={filterDataHasta} onChange={(e) => setFilterDataHasta(e.target.value)} style={{ padding: '10px 14px', borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 13 }} />
+        </div>
+        <button onClick={() => { setFilterDataDesde(''); setFilterDataHasta(''); }} style={{ padding: '10px 14px', borderRadius: 12, border: '1px solid #e5e7eb', background: '#fff', fontSize: 12, fontWeight: 600, color: '#666', cursor: 'pointer' }}>Limpar datas</button>
+        
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <button onClick={exportarExcelFiltrados} style={{ padding: '10px 16px', borderRadius: 12, backgroundColor: '#10b981', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Download size={14} /> Exportar filtrados ({clientesFiltrados.length})
+          </button>
+          <button onClick={exportarBackupTotal} style={{ padding: '10px 16px', borderRadius: 12, backgroundColor: '#6366f1', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Download size={14} /> Backup Total ({clientes.length})
+          </button>
+        </div>
       </div>
 
       {/* List / Table View */}
