@@ -47,6 +47,11 @@ export default function AcademiaQuiz() {
     return <Redirect href="/academia/login" />;
   }
 
+  // FIXED: Añadido guard de onboarding
+  if (!academiaUser?.onboarding_completo) {
+    return <Redirect href="/academia/onboarding" />;
+  }
+
   if (!quiz) {
     return (
       <div style={styles.container}>

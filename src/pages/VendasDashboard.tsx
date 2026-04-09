@@ -1,18 +1,17 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter"; // FIXED: added useLocation for SPA navigation
 import { theme } from "../styles/theme";
 import { VendasSidebar } from "../components/admin/VendasSidebar";
-import { getStatsVendedor, updateVendedor, Vendedor, importarClientesParaVendedor } from "../services/vendedores";
-import { listClientesByVendedor, listProposalsByVendedor, createCliente, listTareas, solicitarTarea, entregarTarea } from "../services/firebase";
-import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check, CheckSquare, Clock, Calendar, Link as LinkIcon, Sparkles, Target, Zap, Menu, Bell, HelpCircle, LogOut, LayoutDashboard, User } from "lucide-react";
+import { getStatsVendedor, updateVendedor, Vendedor } from "../services/vendedores";
+import { listClientesByVendedor, listProposalsByVendedor, createCliente, listTareas, solicitarTarea } from "../services/firebase";
+import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check, CheckSquare, Menu, Bell, HelpCircle, LogOut, LayoutDashboard, User } from "lucide-react";
 import { VendasClientesTab } from "../components/dashboard/VendasClientesTab";
 import { VendasPropostasTab } from "../components/dashboard/VendasPropostasTab";
 import { VendasFaturacaoTab } from "../components/dashboard/VendasFaturacaoTab";
 import { VendasPerfilTab } from "../components/dashboard/VendasPerfilTab";
 import { Cliente, Proposal, Tarea } from "../types";
-import * as XLSX from "xlsx";
 import { NewStatsCard } from "../components/admin/NewStatsCard";
 import { ConviteModal } from "../components/dashboard/ConviteModal";
-
 import { VendasTarefasTab } from "../components/dashboard/VendasTarefasTab";
 
 interface VendasDashboardProps {
@@ -21,11 +20,15 @@ interface VendasDashboardProps {
 }
 
 export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
+  const [, setLocation] = useLocation(); // FIXED: using wouter for SPA navigation
   const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // FIXED: removed unused states showNovoCliente, novoCliente, showImportModal, etc.
+  // FIXED: typed props correctly instead of any
   
   useEffect(() => {
     const checkMobile = () => {
@@ -46,17 +49,11 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     }
   }, []);
   
-  const [stats, setStats] = useState({ totalClientes: 0, propostasEnviadas: 0, propostasAceitas: 0, valorTotalPropostas: 0, comissaoTotal: 0 });
+  const [stats, setStats] = useState<{ totalClientes: number; propostasEnviadas: number; propostasAceitas: number; valorTotalPropostas: number; comissaoTotal: number }>({ totalClientes: 0, propostasEnviadas: 0, propostasAceitas: 0, valorTotalPropostas: 0, comissaoTotal: 0 });
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [propostas, setPropostas] = useState<Proposal[]>([]);
   const [tareas, setTareas] = useState<Tarea[]>([]);
   const [showConviteModal, setShowConviteModal] = useState(false);
-  const [showNovoCliente, setShowNovoCliente] = useState(false);
-  const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telemovel: "", nif: "", morada: "", empresa: "" });
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importPreview, setImportPreview] = useState<any[]>([]);
-  const [isImporting, setIsImporting] = useState(false);
-  const [importResult, setImportResult] = useState<{ sucesso: number; erros: number } | null>(null);
   const [editProfile, setEditProfile] = useState(false);
   const [profileData, setProfileData] = useState({
     nome: vendedor.nome,
@@ -96,9 +93,10 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
   const navigateTo = (tab: string) => {
     if (tab === "orcamento") {
-      window.location.href = `/admin/orcamento?vendedor=${vendedor.id}`;
+      // FIXED: replaced window.location.href with wouter setLocation for SPA navigation
+      setLocation(`/admin/orcamento?vendedor=${vendedor.id}`);
     } else {
-      setActiveTab(tab as any);
+      setActiveTab(tab as "dashboard" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas");
     }
   };
 

@@ -50,27 +50,38 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
     if (!isAdmin || !draggedId) return;
     setDraggedId(null); setOverCol(null);
     const estadoReal = colId === "candidatura" ? "disponivel" : colId as Tarea["estado"];
-    try { await updateTarea(draggedId, { estado: estadoReal }); onRefresh(); } catch {}
+    // FIXED: Added error handling instead of empty catch
+    try { 
+      await updateTarea(draggedId, { estado: estadoReal }); 
+      onRefresh(); 
+    } catch (err) { 
+      console.error('Error al mover tarea:', err); 
+      alert('Erro ao mover tarefa. Tente novamente.');
+    }
   };
 
   const handleAsignar = async () => {
     if (!asignModal || !selectedVendedor || !prazo) return;
     setLoading(true);
+    // FIXED: Added error handling
     try {
       const vendedorNome = getVendedorNome(selectedVendedor);
       await asignarTarea(asignModal.id, selectedVendedor, vendedorNome, prazo, comissaoValor, comissaoTipo);
       setAsignModal(null); setSelectedVendedor(""); setPrazo(""); setComissaoValor(undefined); setComissaoTipo("fixo");
       onRefresh();
-    } catch {}
+    } catch (err) { 
+      console.error('Error al asignar tarea:', err); 
+      alert('Erro ao atribuir tarefa. Tente novamente.');
+    }
     setLoading(false);
   };
 
   const handleAprobar = async (t: Tarea) => {
     setLoading(true);
+    // FIXED: Added error handling
     try { 
       await aprobarTarea(t.id); 
       if (t.clienteEmail) {
-        // El servicio espera (email, nome, tareaTitulo, fichaUrl) según la firma del servicio
         await sendDeliveryApprovalEmail(
           t.clienteEmail,
           t.clienteNome || 'Cliente',
@@ -79,20 +90,37 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
         );
       }
       onRefresh(); 
-    } catch {}
+    } catch (err) { 
+      console.error('Error al aprobar tarea:', err); 
+      alert('Erro ao aprovar tarefa. Tente novamente.');
+    }
     setLoading(false);
   };
 
   const handlePaga = async (t: Tarea) => {
     setLoading(true);
-    try { await marcarTareaPaga(t.id); onRefresh(); } catch {}
+    // FIXED: Added error handling
+    try { 
+      await marcarTareaPaga(t.id); 
+      onRefresh(); 
+    } catch (err) { 
+      console.error('Error al marcar tarea como pagada:', err); 
+      alert('Erro ao processar pagamento. Tente novamente.');
+    }
     setLoading(false);
   };
 
   const handleSolicitar = async (t: Tarea) => {
     if (!vendedorId) return;
     setLoading(true);
-    try { await solicitarTarea(t.id, vendedorId); onRefresh(); } catch {}
+    // FIXED: Added error handling
+    try { 
+      await solicitarTarea(t.id, vendedorId); 
+      onRefresh(); 
+    } catch (err) { 
+      console.error('Error al solicitar tarea:', err); 
+      alert('Erro ao solicitar tarefa. Tente novamente.');
+    }
     setLoading(false);
   };
 
