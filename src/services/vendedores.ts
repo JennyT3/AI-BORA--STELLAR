@@ -142,19 +142,19 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
       // Usar la función de upsert con deduplicación
       const result = await upsertCliente({
         nome,
-        email: email || undefined,
-        telemovel: telemovel || undefined,
-        nif: nif || undefined,
-        empresa: empresa || undefined,
-        website: website || undefined,
-        morada: morada || undefined,
-        codigoPostal: codigoPostal || undefined,
-        cidade: cidade || undefined,
+        email: email,
+        telemovel: telemovel,
+        nif: nif,
+        empresa: empresa,
+        website: website,
+        morada: morada,
+        codigoPostal: codigoPostal,
+        cidade: cidade,
         categoria: 'potencial',
         processo: 'sem_processo',
         origem,
-        notasVendedor: notasVendedor || undefined,
-        dataUltimoContacto: dataUltimoContacto || undefined,
+        notasVendedor: notasVendedor,
+        dataUltimoContacto: dataUltimoContacto,
         servicos: (() => {
           if (Array.isArray(cliente.servicos)) return cliente.servicos;
           if (typeof cliente.servicos === 'string' && cliente.servicos.trim() !== '') {

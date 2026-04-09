@@ -249,18 +249,16 @@ export async function upsertCliente(data: {
     const updateData: Partial<Cliente> = {
       ...data,
       nome,
-      email: email || undefined,
-      telemovel: telemovel || undefined,
-      nif: nif || undefined,
-      codigoPostal: codigoPostal || undefined,
+      email,
+      telemovel,
+      nif,
+      codigoPostal,
       origem,
       updatedAt: now,
-      // Actualizar notas pero no borrar las existentes
       notasVendedor: existente.notasVendedor 
         ? `${existente.notasVendedor}\n[${now}] ${data.notasVendedor || ''}`
         : data.notasVendedor,
       dataUltimoContacto: data.dataUltimoContacto || now,
-      // Asignar vendedor si no lo tenía
       vendedorId: existente.vendedorId || vendedorId
     };
     
@@ -277,18 +275,18 @@ export async function upsertCliente(data: {
     const newData: Cliente = {
       id,
       nome,
-      email: email || undefined,
-      telemovel: telemovel || undefined,
-      nif: nif || undefined,
-      empresa: data.empresa != null ? String(data.empresa).trim() : undefined,
-      website: data.website != null ? String(data.website).trim() : undefined,
-      morada: data.morada != null ? String(data.morada).trim() : undefined,
-      codigoPostal: codigoPostal || undefined,
-      cidade: data.cidade != null ? String(data.cidade).trim() : undefined,
+      email,
+      telemovel,
+      nif,
+      empresa: data.empresa != null ? String(data.empresa).trim() : '',
+      website: data.website != null ? String(data.website).trim() : '',
+      morada: data.morada != null ? String(data.morada).trim() : '',
+      codigoPostal,
+      cidade: data.cidade != null ? String(data.cidade).trim() : '',
       categoria: data.categoria || 'potencial',
       processo: data.processo || 'sem_processo',
       origem,
-      notasVendedor: data.notasVendedor != null ? String(data.notasVendedor).trim() : undefined,
+      notasVendedor: data.notasVendedor != null ? String(data.notasVendedor).trim() : '',
       dataUltimoContacto: data.dataUltimoContacto || now,
       servicos: data.servicos || [],
       vendedorId,
