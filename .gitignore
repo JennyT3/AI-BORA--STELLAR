@@ -60,3 +60,5 @@ npm-debug.log*
 coverage/
 .nyc_output/
 .env.local
+node_modules/
+*.mjs
