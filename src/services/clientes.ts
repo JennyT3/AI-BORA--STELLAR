@@ -4,43 +4,78 @@ import { generateId } from './firebase';
 
 export type ClienteCategoria = 'potencial' | 'cliente' | 'curioso' | 'sem_interesse' | 'ativo' | 'inativo' | 'proposta_enviada';
 
+export type ClienteProcesso = 'sem_processo' | 'inicio' | 'em_progresso' | 'em_revisao' | 'aprovado' | 'feito' | 'concluido';
+
 export interface Cliente {
   id: string;
+  
+  // Datos obligatorios para cualquier contacto
   nome: string;
   email?: string;
-  telemovel?: string;
-  empresa?: string;
-  nif?: string;
-  morada?: string;
-  website?: string;
-  categoria: ClienteCategoria;
-  processo?: string;
   origem?: string;
+  
+  // Datos opcionales de contacto
+  telemovel?: string;
+  nif?: string;
+  empresa?: string;
+  website?: string;
+  morada?: string;
+  codigoPostal?: string;
+  cidade?: string;
+  
+  // Clasificación - solo cambia para clientes
+  categoria: ClienteCategoria;
+  processo: ClienteProcesso;
+  
+  // Notas y seguimiento
   observacoes?: string;
+  notasVendedor?: string;
+  dataUltimoContacto?: string;
+  
+  // Relaciones con documentos
   vendedorId?: string;
+  criadoPor?: string;
+  solicitacaoId?: string;
+  orcamentoIds?: string[];
+  propostaIds?: string[];
+  faturaIds?: string[];
+  servicoIds?: string[];
+  
+  // Respuesta del cliente
   resposta?: string;
   dataResposta?: string;
-  solicitacaoId?: string;
-  propostaId?: string;
-  tarefas?: string[];
+  
+  // Metadatos
   servicos?: string[];
-  criadoPor?: string;
+  tarefas?: string[];
   criadoEm?: string;
   createdAt: string;
   updatedAt?: string;
   fichaUrl?: string;
+  
+  // Métricas
   totalFacturado?: number;
   numeroOrcamentos?: number;
+  
+  // Auditoría de importación
+  importadoPor?: string;
+  dataImportacao?: string;
 }
 
 export async function createCliente(data: Partial<Cliente>): Promise<string> {
   const id = generateId();
+  const now = new Date().toISOString();
   const docData = {
     ...data,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
+    processo: data.processo || 'sem_processo',
     totalFacturado: 0,
     numeroOrcamentos: 0,
-    estado: data.categoria || "curioso"
+    orcamentoIds: [],
+    propostaIds: [],
+    faturaIds: [],
+    servicoIds: []
   };
   await setDoc(doc(db, 'clientes', id), docData);
   return id;
@@ -115,4 +150,227 @@ export async function delegarClienteAVendedor(clienteId: string, vendedorId: str
   await updateDoc(doc(db, 'clientes', clienteId), {
     vendedorId
   });
+}
+
+// ============================================
+// IMPORTACIÓN CON DEDUPLICACIÓN (UPSERT)
+// ============================================
+
+export interface UpsertClienteResult {
+  clienteId: string;
+  wasCreated: boolean;
+  wasUpdated: boolean;
+}
+
+export interface ImportResult {
+  sucesso: number;
+  atualizados: number;
+  criados: number;
+  erros: number;
+  detalles: { nome: string; email: string; resultado: string; erro?: string }[];
+}
+
+// Función de deduplicación mejorada: nif → email → telemovel
+async function findClienteByKeys(nif?: string, email?: string, telemovel?: string): Promise<Cliente | null> {
+  // 1. Buscar por NIF (prioridad más alta)
+  if (nif) {
+    const qNif = query(collection(db, 'clientes'), where('nif', '==', nif), limit(1));
+    const snapNif = await getDocs(qNif);
+    if (!snapNif.empty) {
+      return { id: snapNif.docs[0].id, ...snapNif.docs[0].data() } as Cliente;
+    }
+  }
+  
+  // 2. Buscar por email
+  if (email) {
+    const qEmail = query(collection(db, 'clientes'), where('email', '==', email), limit(1));
+    const snapEmail = await getDocs(qEmail);
+    if (!snapEmail.empty) {
+      return { id: snapEmail.docs[0].id, ...snapEmail.docs[0].data() } as Cliente;
+    }
+  }
+  
+  // 3. Buscar por telemovel
+  if (telemovel) {
+    const qTel = query(collection(db, 'clientes'), where('telemovel', '==', telemovel), limit(1));
+    const snapTel = await getDocs(qTel);
+    if (!snapTel.empty) {
+      return { id: snapTel.docs[0].id, ...snapTel.docs[0].data() } as Cliente;
+    }
+  }
+  
+  return null;
+}
+
+// Función principal de upsert para importar clientes
+export async function upsertCliente(data: {
+  nome: string;
+  email?: string;
+  telemovel?: string;
+  nif?: string;
+  empresa?: string;
+  website?: string;
+  morada?: string;
+  codigoPostal?: string;
+  cidade?: string;
+  categoria?: ClienteCategoria;
+  processo?: ClienteProcesso;
+  origem: string;
+  notasVendedor?: string;
+  dataUltimoContacto?: string;
+  servicos?: string[];
+  vendedorId: string;
+  importadoPor?: string;
+}, vendedorId: string): Promise<UpsertClienteResult> {
+  
+  // Validar campos obligatorios
+  if (!data.nome?.trim()) {
+    throw new Error('Nome é obrigatório');
+  }
+  if (!data.origem?.trim()) {
+    throw new Error('Origem é obrigatória');
+  }
+  
+  const now = new Date().toISOString();
+  
+  // Buscar cliente existente
+  const existente = await findClienteByKeys(data.nif, data.email, data.telemovel);
+  
+  if (existente) {
+    // Actualizar cliente existente
+    const updateData: Partial<Cliente> = {
+      ...data,
+      updatedAt: now,
+      // Actualizar notas pero no borrar las existentes
+      notasVendedor: existente.notasVendedor 
+        ? `${existente.notasVendedor}\n[${now}] ${data.notasVendedor || ''}`
+        : data.notasVendedor,
+      dataUltimoContacto: data.dataUltimoContacto || now,
+      // Asignar vendedor si no lo tenía
+      vendedorId: existente.vendedorId || vendedorId
+    };
+    
+    await updateDoc(doc(db, 'clientes', existente.id), updateData);
+    
+    return {
+      clienteId: existente.id,
+      wasCreated: false,
+      wasUpdated: true
+    };
+  } else {
+    // Crear nuevo cliente
+    const id = generateId();
+    const newData: Cliente = {
+      id,
+      nome: data.nome.trim(),
+      email: data.email?.trim().toLowerCase() || undefined,
+      telemovel: data.telemovel?.trim() || undefined,
+      nif: data.nif?.trim() || undefined,
+      empresa: data.empresa?.trim() || undefined,
+      website: data.website?.trim() || undefined,
+      morada: data.morada?.trim() || undefined,
+      codigoPostal: data.codigoPostal?.trim() || undefined,
+      cidade: data.cidade?.trim() || undefined,
+      categoria: data.categoria || 'potencial',
+      processo: data.processo || 'sem_processo',
+      origem: data.origem.trim(),
+      notasVendedor: data.notasVendedor?.trim() || undefined,
+      dataUltimoContacto: data.dataUltimoContacto || now,
+      servicos: data.servicos || [],
+      vendedorId,
+      criadoPor: data.importadoPor || 'importacao',
+      importadoPor: data.importadoPor,
+      dataImportacao: now,
+      createdAt: now,
+      updatedAt: now,
+      orcamentoIds: [],
+      propostaIds: [],
+      faturaIds: [],
+      servicoIds: [],
+      totalFacturado: 0,
+      numeroOrcamentos: 0
+    };
+    
+    await setDoc(doc(db, 'clientes', id), newData);
+    
+    return {
+      clienteId: id,
+      wasCreated: true,
+      wasUpdated: false
+    };
+  }
+}
+
+// Función para importar múltiples clientes con deduplicación
+export async function importarClientes(
+  clientesData: Array<{
+    nome: string;
+    email?: string;
+    telemovel?: string;
+    nif?: string;
+    empresa?: string;
+    website?: string;
+    morada?: string;
+    codigoPostal?: string;
+    cidade?: string;
+    categoria?: ClienteCategoria;
+    origem?: string;
+    notasVendedor?: string;
+    servicos?: string[];
+  }>,
+  vendedorId: string,
+  importadoPor?: string
+): Promise<ImportResult> {
+  const result: ImportResult = {
+    sucesso: 0,
+    atualizados: 0,
+    criados: 0,
+    erros: 0,
+    detalles: []
+  };
+  
+  for (const data of clientesData) {
+    try {
+      // Validar campos obligatorios
+      if (!data.nome?.trim()) {
+        throw new Error('Nome é obrigatório');
+      }
+      if (!data.origem?.trim()) {
+        throw new Error('Origem é obrigatória');
+      }
+      
+      const upsertResult = await upsertCliente(
+        { ...data, origem: data.origem || 'Importação', vendedorId, importadoPor },
+        vendedorId
+      );
+      
+      if (upsertResult.wasCreated) {
+        result.criados++;
+        result.sucesso++;
+        result.detalles.push({
+          nome: data.nome,
+          email: data.email || '',
+          resultado: 'criado'
+        });
+      } else {
+        result.atualizados++;
+        result.sucesso++;
+        result.detalles.push({
+          nome: data.nome,
+          email: data.email || '',
+          resultado: 'atualizado'
+        });
+      }
+    } catch (err: any) {
+      result.erros++;
+      result.detalles.push({
+        nome: data.nome,
+        email: data.email || '',
+        resultado: 'erro',
+        erro: err.message
+      });
+    }
+  }
+  
+  return result;
 }

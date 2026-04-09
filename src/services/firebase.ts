@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut as firebaseSignOut, User } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -60,7 +60,7 @@ import { collection, setDoc } from 'firebase/firestore';
 
 export async function createRegistoEmail(data: Partial<any>): Promise<string> {
   const id = 'email-' + generateId();
-  await setDoc(doc(db, 'registos_email'), {
+  await setDoc(doc(db, 'registos_email', id), {
     ...data,
     id,
     dataEnvio: new Date().toISOString()

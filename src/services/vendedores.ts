@@ -22,6 +22,7 @@ export interface Vendedor {
   referidosInvitados?: string[];
   referidosConvertidos?: number;
   bonusProximoCliente?: boolean;
+  ultimaImportacao?: string; // Timestamp de última importación
 }
 
 // ========== VENDEDORES ==========
@@ -111,54 +112,63 @@ export async function removeClienteDeVendedor(vendedorId: string, clienteId: str
 
 // ========== IMPORTAR CLIENTES DESDE EXCEL (Asignar a vendedor) ==========
 
-export async function importarClientesParaVendedor(vendedorId: string, clientesData: any[]): Promise<{ sucesso: number; erros: string[] }> {
+export async function importarClientesParaVendedor(vendedorId: string, clientesData: any[], importadoPor?: string): Promise<{ sucesso: number; erros: string[]; atualizados: number; criados: number }> {
+  // Importar la función de clientes
+  const { upsertCliente } = await import('./clientes');
+  
   let sucesso = 0;
+  let atualizados = 0;
+  let criados = 0;
   const erros: string[] = [];
   
-  // Primeiro, importar os clientes para Firestore
+  const now = new Date().toISOString();
+  
   for (const cliente of clientesData) {
     try {
-      // Verificar se cliente já existe pelo email ou telemovel
-      const q = query(collection(db, 'clientes'), where('email', '==', cliente.email || cliente.email));
-      const existing = await getDocs(q);
+      // Usar la función de upsert con deduplicación
+      const result = await upsertCliente({
+        nome: cliente.nome,
+        email: cliente.email,
+        telemovel: cliente.telemovel || cliente.telefone,
+        nif: cliente.nif,
+        empresa: cliente.empresa,
+        website: cliente.website,
+        morada: cliente.morada,
+        codigoPostal: cliente.codigoPostal,
+        cidade: cliente.cidade,
+        // Solo clientes pueden cambiar de categoría
+        categoria: 'potencial', // Por defecto potencial para nuevas importaciones
+        processo: 'sem_processo',
+        origem: cliente.origem || 'Importado',
+        notasVendedor: cliente.notasVendedor,
+        dataUltimoContacto: cliente.dataUltimoContacto,
+        servicos: cliente.servicos ? cliente.servicos.split(';').map((s: string) => s.trim()) : undefined,
+        vendedorId,
+        importadoPor
+      }, vendedorId);
       
-      let clienteId: string;
-      
-      if (!existing.empty) {
-        // Cliente já existe, usar ID existente
-        clienteId = existing.docs[0].id;
-        // Atualizar com origem do vendedor
-        await updateDoc(doc(db, 'clientes', clienteId), {
-          vendedorId,
-          origem: cliente.origem || 'Importado',
-        });
+      if (result.wasCreated) {
+        criados++;
       } else {
-        // Criar novo cliente
-        clienteId = generateProposalId();
-        const docData = {
-          nome: cliente.nome,
-          email: cliente.email || '',
-          telemovel: cliente.telemovel || cliente.telefone || '',
-          nif: cliente.nif || '',
-          morada: cliente.morada || '',
-          empresa: cliente.empresa || '',
-          categoria: 'potencial',
-          origem: cliente.origem || 'Importado',
-          vendedorId,
-          createdAt: new Date().toISOString(),
-        };
-        await setDoc(doc(db, 'clientes', clienteId), docData);
+        atualizados++;
       }
+      sucesso++;
       
       // Adicionar ID do cliente ao vendedor
-      await addClienteAVendedor(vendedorId, clienteId);
-      sucesso++;
+      await addClienteAVendedor(vendedorId, result.clienteId);
     } catch (err: any) {
-      erros.push(`Erro ao importar ${cliente.nome}: ${err.message}`);
+      erros.push(`Erro ao importar ${cliente.nome || 'sem nome'}: ${err.message}`);
     }
   }
   
-  return { sucesso, erros };
+  // Actualizar timestamp de última importación
+  if (sucesso > 0) {
+    await updateDoc(doc(db, 'vendedores', vendedorId), {
+      ultimaImportacao: now
+    });
+  }
+  
+  return { sucesso, erros, atualizados, criados };
 }
 
 // ========== STATS DEL VENDEDOR ==========
