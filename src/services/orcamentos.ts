@@ -1,12 +1,12 @@
 import { db, generateProposalId } from './firebase';
 import { collection, doc, setDoc, getDoc, updateDoc, getDocs, query, where, runTransaction } from 'firebase/firestore';
 
-// ========== NUMERAÇÃO DE ORÇAMENTOS ==========
+// ========== QUOTE NUMBERING ==========
 
 const ORCAMENTO_COUNTER_KEY = 'orçamento_counter';
 
 export async function getNextNumeroOrcamento(): Promise<string> {
-  // Usar transacción para garantir número único
+  // Use a transaction to ensure a unique number
   const counterRef = doc(db, 'counters', 'orcamentos');
   
   try {
@@ -22,7 +22,7 @@ export async function getNextNumeroOrcamento(): Promise<string> {
         currentYear = data.ano || currentYear;
       }
       
-      // Se mudou de ano, resetar contador
+      // New year: reset counter
       const now = new Date().getFullYear();
       if (currentYear !== now) {
         currentCount = 1;
@@ -31,7 +31,7 @@ export async function getNextNumeroOrcamento(): Promise<string> {
       
       const numero = `ORC-${currentYear}-${String(currentCount).padStart(4, '0')}`;
       
-      // Atualizar contador
+      // Update counter
       transaction.set(counterRef, { 
         count: currentCount, 
         ano: currentYear,
@@ -43,7 +43,7 @@ export async function getNextNumeroOrcamento(): Promise<string> {
     
     return novoNumero;
   } catch (err) {
-    // Fallback simple se transação falhar
+    // Simple fallback if the transaction fails
     const year = new Date().getFullYear();
     const random = Math.floor(Math.random() * 9999) + 1;
     return `ORC-${year}-${String(random).padStart(4, '0')}`;
@@ -79,12 +79,12 @@ export async function resetContadorOrcamento(novoCount: number, novoAno?: number
   });
 }
 
-// ========== PROPOSTAS COM VENDEDOR ==========
+// ========== PROPOSTAS WITH VENDEDOR ==========
 
 export async function createProposal(data: any): Promise<string> {
   const id = generateProposalId();
   
-  // Se tem vendedor, pegar o próximo número automaticamente
+  // If vendedor is set, assign the next number automatically
   let numeroOrcamento = data.numeroOrcamento;
   if (data.vendedorId && !numeroOrcamento) {
     numeroOrcamento = await getNextNumeroOrcamento();
@@ -101,7 +101,7 @@ export async function createProposal(data: any): Promise<string> {
   return id;
 }
 
-// Listar propostas de um vendedor específico
+// List propostas for a specific vendedor
 export async function listProposalsByVendedor(vendedorId: string): Promise<any[]> {
   const q = query(
     collection(db, 'propostas'), 
@@ -111,7 +111,7 @@ export async function listProposalsByVendedor(vendedorId: string): Promise<any[]
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-// Listar todas as propostas (para admin)
+// List all propostas (admin)
 export async function listAllProposals(): Promise<any[]> {
   const snapshot = await getDocs(collection(db, 'propostas'));
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));

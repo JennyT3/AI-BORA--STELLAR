@@ -6,24 +6,24 @@ service cloud.firestore {
     // HELPER FUNCTIONS
     // ============================================
     
-    // Verificar se está autenticado
+    // Check if the user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Verificar se é admin (role no documento do vendedor)
+    // Check if the user is admin (role on the vendedor document)
     function isAdmin() {
       return isAuthenticated() && 
         exists(/databases/$(database)/documents/vendedores/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/vendedores/$(request.auth.uid)).data.role == 'admin';
     }
     
-    // Verificar se é o próprio vendedor
+    // Check if the user is the owner vendedor
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
     
-    // Verificar se o vendedor tem acesso ao cliente
+    // Check if the vendedor can access the cliente
     function canAccessCliente() {
       return isAdmin() || 
         (isAuthenticated() && resource.data.vendedorId == request.auth.uid);
@@ -33,31 +33,31 @@ service cloud.firestore {
     // ACADEMIA BORA LÁ
     // ============================================
     
-    // Usuarios Academia: solo su propio documento
+    // Academia users: only their own document
     match /academia_users/{userId} {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Progresso: solo el usuario dono
+    // Progress: only the owning user
     match /academia_progresso/{docId} {
       allow read: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
       allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
     }
     
-    // Certificados: lectura pública para verificación, escritura solo dueño
+    // Certificates: public read for verification, write only by owner
     match /academia_certificados/{docId} {
       allow read: if true;
       allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
     }
     
-    // Quizzes: lectura pública (preguntas), escritura admin
+    // Quizzes: public read (questions), writes disabled
     match /academia_quizzes/{quizId} {
       allow read: if true;
       allow write: if false;
     }
 
     // ============================================
-    // SOLICITUDES (público - qualquer pessoa pode criar)
+    // SOLICITUDES (public - anyone can create)
     // ============================================
     match /solicitudes/{id} {
       allow create: if request.resource.data.keys().hasAll(['nome', 'telefone']);
@@ -66,7 +66,7 @@ service cloud.firestore {
     }
 
     // ============================================
-    // CLIENTES (protegido)
+    // CLIENTES (protected)
     // ============================================
     match /clientes/{clienteId} {
       allow read, write: if isAdmin();
@@ -74,12 +74,12 @@ service cloud.firestore {
         && request.resource.data.vendedorId == request.auth.uid;
       allow read, update: if request.auth != null 
         && resource.data.vendedorId == request.auth.uid;
-      // Só admins podem eliminar
+      // Only admins may delete
       allow delete: if isAdmin();
     }
 
     // ============================================
-    // PROPOSTAS (protegido)
+    // PROPOSTAS (protected)
     // ============================================
     match /propostas/{id} {
       // Authenticated users can read
@@ -94,17 +94,17 @@ service cloud.firestore {
     }
 
     // ============================================
-    // VENDEDORES (muito sensível)
+    // VENDEDORES (highly sensitive)
     // ============================================
     match /vendedores/{id} {
-      // Só o próprio vendedor pode ler os seus dados
+      // Only the vendedor may read their own data
       allow read: if isAuthenticated() && request.auth.uid == id;
-      // Só admins podem criar/editar
+      // Only admins can create/edit
       allow write: if isAdmin();
     }
 
     // ============================================
-    // TAREFAS (protegido)
+    // TAREFAS (protected)
     // ============================================
     match /tareas/{id} {
       // Authenticated can read
@@ -119,7 +119,7 @@ service cloud.firestore {
     }
 
     // ============================================
-    // FATURAS (muito sensível - só admin)
+    // FATURAS (highly sensitive - admin only)
     // ============================================
     match /faturas/{id} {
       allow read, write, delete: if isAdmin();
@@ -130,33 +130,33 @@ service cloud.firestore {
     }
 
     // ============================================
-    // CONTACTOS (público criar, protegido ler)
+    // CONTACTOS (public create, protected read)
     // ============================================
     match /contactos/{id} {
-      // Qualquer pessoa pode criar (sem auth) para formulários públicos
+      // Anyone may create (no auth) for public forms
       allow create: if request.resource.data.keys().hasAll(['nome', 'email']);
-      // Só autenticados podem ler
+      // Only authenticated users may read
       allow read: if isAuthenticated();
-      // Só admins podem editar/eliminar
+      // Only admins may update/delete
       allow update, delete: if isAdmin();
     }
 
     // ============================================
-    // REGISTOS DE EMAIL (logs - só admin)
+    // EMAIL LOGS (admin only)
     // ============================================
     match /registos_email/{id} {
       allow read, write, delete: if isAdmin();
     }
 
     // ============================================
-    // COMISSÕES (muito sensível - só admin)
+    // COMISSÕES (highly sensitive - admin only)
     // ============================================
     match /comisiones/{id} {
       allow read, write, delete: if isAdmin();
     }
 
     // ============================================
-    // DEFAULT DENY (segurança máxima)
+    // DEFAULT DENY (maximum security)
     // ============================================
     match /{document=**} {
       allow read, write: if false;

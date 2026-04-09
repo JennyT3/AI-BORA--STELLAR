@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 const quotes = [
-  "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
-  "Não existe elevador para o sucesso. Vais ter de usar as escadas.",
-  "As oportunidades não acontecem, és tu que as crias.",
-  "O único lugar onde o sucesso vem antes do trabalho é no dicionário.",
-  "A persistência realiza o impossível."
+  "Success is the sum of small efforts repeated day after day.",
+  "There is no elevator to success — you have to take the stairs.",
+  "Opportunities do not happen; you create them.",
+  "The only place success comes before work is in the dictionary.",
+  "Persistence accomplishes the impossible."
 ];
 
 interface VendasWelcomeProps {
@@ -18,9 +18,9 @@ export function VendasWelcome({ nome }: VendasWelcomeProps) {
 
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Bom dia');
-    else if (hour < 20) setGreeting('Boa tarde');
-    else setGreeting('Boa noite');
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 20) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
 
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     setQuote(randomQuote);

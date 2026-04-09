@@ -46,15 +46,15 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
   doc.setTextColor(26, 26, 26); doc.setFontSize(17); doc.setFont("helvetica", "bold"); doc.text("AI BORA", 40, 18);
   doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.setTextColor(140, 140, 140); doc.text("Marketing Digital & Criativo", 40, 24);
 
-  const tipoLabel = dados.tipo === 'colaborador' ? "RECIBO DE COMISSÃO" : "FATURA";
+  const tipoLabel = dados.tipo === 'colaborador' ? "COMMISSION RECEIPT" : "INVOICE";
   doc.setTextColor(26, 26, 26); doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text(tipoLabel, 198, 13, { align: "right" });
   doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(90, 90, 90);
-  doc.text("Nº " + dados.numeroFatura, 198, 20, { align: "right" });
-  doc.text("Data: " + dados.dataEmissao, 198, 26, { align: "right" });
+  doc.text("No. " + dados.numeroFatura, 198, 20, { align: "right" });
+  doc.text("Date: " + dados.dataEmissao, 198, 26, { align: "right" });
 
   let y = 46;
 
-  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("EMITIDO POR", 14, y);
+  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("ISSUED BY", 14, y);
   doc.setDrawColor(242, 92, 5); doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5);
   y += 5; doc.setFillColor(247, 245, 243); doc.rect(14, y, 182, 20, "F");
   doc.setFontSize(8.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26);
@@ -63,7 +63,7 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
   doc.text("NIF: 319918645  |  geral@aibora.pt  |  +351 936 021 747  |  www.aibora.pt", 18, y + 13);
   y += 28;
 
-  const destinatarioLabel = dados.tipo === 'colaborador' ? "COLABORADOR" : "DADOS DO CLIENTE";
+  const destinatarioLabel = dados.tipo === 'colaborador' ? "COLLABORATOR" : "CLIENT DETAILS";
   doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text(destinatarioLabel, 14, y);
   doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5);
   y += 5; doc.setFillColor(247, 245, 243); doc.rect(14, y, 182, 28, "F");
@@ -74,26 +74,26 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
   };
 
   if (dados.tipo === 'colaborador') {
-    lbl("Nome:", dados.colaboradorNome || dados.cliente, 18, y + 8);
-    lbl("NIF:", dados.colaboradorNif || "—", 18, y + 16);
+    lbl("Name:", dados.colaboradorNome || dados.cliente, 18, y + 8);
+    lbl("Tax ID:", dados.colaboradorNif || "—", 18, y + 16);
     lbl("Email:", dados.email || "—", 107, y + 8);
   } else {
-    lbl("Nome:", dados.cliente, 18, y + 8);
-    lbl("Empresa:", dados.empresa || "—", 107, y + 8);
-    lbl("NIF:", dados.nif || "—", 18, y + 16);
+    lbl("Name:", dados.cliente, 18, y + 8);
+    lbl("Company:", dados.empresa || "—", 107, y + 8);
+    lbl("Tax ID:", dados.nif || "—", 18, y + 16);
     lbl("Email:", dados.email || "—", 107, y + 16);
-    lbl("Telefone:", dados.telefone || "—", 18, y + 24);
-    lbl("Morada:", dados.morada || "—", 107, y + 24);
+    lbl("Phone:", dados.telefone || "—", 18, y + 24);
+    lbl("Address:", dados.morada || "—", 107, y + 24);
   }
   y += dados.tipo === 'colaborador' ? 36 : 40;
 
   doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5);
-  doc.text(dados.tipo === 'colaborador' ? "SERVIÇOS EXECUTADOS" : "DESCRIÇÃO DOS SERVIÇOS", 14, y);
+  doc.text(dados.tipo === 'colaborador' ? "SERVICES PERFORMED" : "SERVICE DESCRIPTION", 14, y);
   doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5); y += 7;
 
   autoTable(doc, {
     startY: y,
-    head: [["#", "Descrição", "Valor"]],
+    head: [["#", "Description", "Amount"]],
     body: dados.tipo === 'colaborador'
       ? dados.servicos.map((s, i) => [(i + 1).toString(), s, ""])
       : dados.servicos.map((s, i) => [(i + 1).toString(), s, i === 0 ? dados.subtotal.toFixed(2) + " €" : ""]),
@@ -108,12 +108,12 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
   y = (doc as any).lastAutoTable?.finalY + 12;
 
   if (y > 235) { doc.addPage(); y = 18; }
-  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("RESUMO FINANCEIRO", 14, y);
+  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("FINANCIAL SUMMARY", 14, y);
   doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5); y += 7;
 
   doc.setFillColor(242, 92, 5); doc.roundedRect(120, y, 76, 22, 3, 3, "F");
   doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text(dados.tipo === 'colaborador' ? "COMISSÃO TOTAL (c/ IVA)" : "TOTAL A PAGAR (c/ IVA 23%)", 158, y + 7, { align: "center" });
+  doc.text(dados.tipo === 'colaborador' ? "TOTAL COMMISSION (incl. VAT)" : "TOTAL DUE (incl. 23% VAT)", 158, y + 7, { align: "center" });
   doc.setFontSize(17); doc.setFont("helvetica", "bold");
   doc.text(dados.total.toFixed(2) + " €", 194, y + 18, { align: "right" });
 
@@ -125,25 +125,25 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
   };
 
   if (dados.tipo === 'colaborador') {
-    linhaFin("Serviços executados:", dados.comissaoValor ? (dados.comissaoValor / (1 - (dados.comissaoPercent || 0) / 100)).toFixed(2) + " €" : "—", false, [80, 80, 80]);
-    linhaFin("Comissão (" + (dados.comissaoPercent || 0) + "%):", dados.comissaoValor?.toFixed(2) + " €" || "—", false, [242, 92, 5]);
-    linhaFin("IVA (23%):", dados.iva.toFixed(2) + " €", false, [80, 80, 80]);
-    linhaFin("TOTAL A RECEBER:", dados.total.toFixed(2) + " €", true, [242, 92, 5]);
+    linhaFin("Services performed:", dados.comissaoValor ? (dados.comissaoValor / (1 - (dados.comissaoPercent || 0) / 100)).toFixed(2) + " €" : "—", false, [80, 80, 80]);
+    linhaFin("Commission (" + (dados.comissaoPercent || 0) + "%):", dados.comissaoValor?.toFixed(2) + " €" || "—", false, [242, 92, 5]);
+    linhaFin("VAT (23%):", dados.iva.toFixed(2) + " €", false, [80, 80, 80]);
+    linhaFin("TOTAL TO RECEIVE:", dados.total.toFixed(2) + " €", true, [242, 92, 5]);
   } else {
-    linhaFin("Subtotal (sem IVA):", dados.subtotal.toFixed(2) + " €", false, [80, 80, 80]);
-    if (dados.desconto && dados.desconto > 0) linhaFin("Desconto:", "- " + dados.desconto.toFixed(2) + " €", false, [242, 92, 5]);
-    linhaFin("IVA (23%):", dados.iva.toFixed(2) + " €", false, [80, 80, 80]);
-    linhaFin("TOTAL A PAGAR:", dados.total.toFixed(2) + " €", true, [242, 92, 5]);
+    linhaFin("Subtotal (excl. VAT):", dados.subtotal.toFixed(2) + " €", false, [80, 80, 80]);
+    if (dados.desconto && dados.desconto > 0) linhaFin("Discount:", "- " + dados.desconto.toFixed(2) + " €", false, [242, 92, 5]);
+    linhaFin("VAT (23%):", dados.iva.toFixed(2) + " €", false, [80, 80, 80]);
+    linhaFin("TOTAL DUE:", dados.total.toFixed(2) + " €", true, [242, 92, 5]);
   }
 
   ty += 6;
   if (ty > 238) { doc.addPage(); ty = 18; }
   doc.setFillColor(247, 245, 243); doc.rect(14, ty, 182, 30, "F");
-  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26); doc.text("DADOS DE PAGAMENTO", 18, ty + 8);
+  doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26); doc.text("PAYMENT DETAILS", 18, ty + 8);
   doc.setDrawColor(242, 92, 5); doc.setLineWidth(0.3); doc.line(18, ty + 10, 192, ty + 10);
   doc.setFontSize(7.8); doc.setFont("helvetica", "normal"); doc.setTextColor(60, 60, 60);
-  doc.text("IBAN: PT50 0000 0000 0000 0000 0000 0  |  Banco: —  |  Referência: " + dados.numeroFatura, 18, ty + 18);
-  doc.text("Pagamento por transferência bancária até 5 dias úteis após emissão desta fatura.", 18, ty + 25);
+  doc.text("IBAN: PT50 0000 0000 0000 0000 0000 0  |  Bank: —  |  Reference: " + dados.numeroFatura, 18, ty + 18);
+  doc.text("Payment by bank transfer within 5 business days of this invoice date.", 18, ty + 25);
 
   const totalPages = (doc as any).internal.getNumberOfPages();
   for (let p = 1; p <= totalPages; p++) {
@@ -152,7 +152,7 @@ export async function gerarFaturaPDF(dados: DadosFatura): Promise<jsPDF> {
     doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.setFont("helvetica", "normal");
     doc.text("AI BORA, Lda  |  NIF: 319918645  |  geral@aibora.pt  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 12, { align: "center" });
     doc.setFontSize(6.5); doc.setTextColor(160, 160, 160);
-    doc.text("Documento processado por computador.", 105, pH - 7, { align: "center" });
+    doc.text("Computer-generated document.", 105, pH - 7, { align: "center" });
     doc.setTextColor(190, 190, 190); doc.text(p + " / " + totalPages, 196, pH - 7, { align: "right" });
   }
 

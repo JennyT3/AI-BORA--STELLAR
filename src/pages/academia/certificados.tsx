@@ -36,7 +36,7 @@ export default function AcademiaCertificados() {
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${colors.orange}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>A carregar certificados...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading certificates…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -75,18 +75,18 @@ export default function AcademiaCertificados() {
     pdf.setFontSize(12);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
-    pdf.text('Certificamos que', width / 2, 70, { align: 'center' });
+    pdf.text('This certifies that', width / 2, 70, { align: 'center' });
     
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(28, 27, 27);
-    const nome = academiaUser?.nome || 'Estudante';
+    const nome = academiaUser?.nome || 'Learner';
     pdf.text(nome, width / 2, 90, { align: 'center' });
     
     pdf.setFontSize(12);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(100, 100, 100);
-    pdf.text('concluiu com sucesso a trilha', width / 2, 110, { align: 'center' });
+    pdf.text('successfully completed the learning path', width / 2, 110, { align: 'center' });
     
     pdf.setFontSize(20);
     pdf.setFont('helvetica', 'bold');
@@ -96,21 +96,21 @@ export default function AcademiaCertificados() {
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(150, 150, 150);
-    const data = new Date(cert.data_conclusao).toLocaleDateString('pt-PT', { 
+    const data = new Date(cert.data_conclusao).toLocaleDateString('en-GB', { 
       day: 'numeric', month: 'long', year: 'numeric' 
     });
-    pdf.text(`Emitido em ${data}`, width / 2, 155, { align: 'center' });
+    pdf.text(`Issued on ${data}`, width / 2, 155, { align: 'center' });
     
     pdf.setFontSize(8);
     pdf.setTextColor(180, 180, 180);
-    pdf.text(`Código de Verificação: ${cert.codigo_verificacao}`, width / 2, 180, { align: 'center' });
+    pdf.text(`Verification code: ${cert.codigo_verificacao}`, width / 2, 180, { align: 'center' });
     
-    pdf.save(`certificado-${cert.trilha_nome.replace(/\s+/g, '-')}.pdf`);
+    pdf.save(`certificate-${cert.trilha_nome.replace(/\s+/g, '-')}.pdf`);
   };
 
   const handleEnviarEmail = async (cert: AcademiaCertificado) => {
     if (!academiaUser?.email) {
-      alert('Email não encontrado no seu perfil.');
+      alert('No email address on your profile.');
       return;
     }
     
@@ -124,7 +124,7 @@ export default function AcademiaCertificados() {
           templateData: {
             nomeEstudante: academiaUser.nome,
             nomeTrilha: cert.trilha_nome,
-            dataConclusao: new Date(cert.data_conclusao).toLocaleDateString('pt-PT'),
+            dataConclusao: new Date(cert.data_conclusao).toLocaleDateString('en-GB'),
             codigoVerificacao: cert.codigo_verificacao,
             linkVerificacao: `https://aibora.pt/academia/verificar/${cert.codigo_verificacao}`
           }
@@ -132,13 +132,13 @@ export default function AcademiaCertificados() {
       });
       
       if (response.ok) {
-        alert('Certificado enviado para o seu email!');
+        alert('Certificate sent to your email.');
       } else {
-        alert('Erro ao enviar email. Tente novamente.');
+        alert('Could not send email. Please try again.');
       }
     } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao enviar email. Tente novamente.');
+      console.error('Error:', error);
+      alert('Could not send email. Please try again.');
     }
   };
 
@@ -158,10 +158,10 @@ export default function AcademiaCertificados() {
             animate={{ opacity: 1, y: 0 }}
             style={{ fontSize: 'clamp(32px, 5vw, 42px)', fontWeight: 900, color: colors.dark, marginBottom: 16, letterSpacing: '-0.03em' }}
           >
-            As Tuas <span style={{ color: colors.magenta }}>Conquistas</span>
+            Your <span style={{ color: colors.magenta }}>achievements</span>
           </motion.h1>
           <p style={{ color: '#666', fontSize: 18, maxWidth: 600, margin: '0 auto' }}>
-            Certificados oficiais da Bora Lá Estudar. Valida o teu conhecimento no mercado.
+            Official Bora Lá certificates. Prove your skills in the market.
           </p>
         </div>
 
@@ -174,13 +174,13 @@ export default function AcademiaCertificados() {
             <div style={{ width: 100, height: 100, borderRadius: '50%', background: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
               <Award size={48} color="#ccc" />
             </div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.dark, marginBottom: 16 }}>Ainda não tens certificados</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.dark, marginBottom: 16 }}>No certificates yet</h2>
             <p style={{ color: '#666', marginBottom: 32, maxWidth: 400, margin: '0 auto 32px', lineHeight: 1.6 }}>
-              Completa uma das nossas trilhas de aprendizagem para desbloquear o teu primeiro certificado oficial.
+              Complete a learning path to unlock your first official certificate.
             </p>
             <Link href="/academia/trilhas">
               <button style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '16px 36px', background: colors.dark, color: '#fff', border: 'none', borderRadius: 16, fontWeight: 800, fontSize: 15, cursor: 'pointer' }}>
-                Explorar Trilhas <Zap size={18} fill="white" />
+                Browse paths <Zap size={18} fill="white" />
               </button>
             </Link>
           </motion.div>
@@ -201,10 +201,10 @@ export default function AcademiaCertificados() {
                   <h3 style={{ fontSize: 20, fontWeight: 900, color: colors.dark, marginBottom: 8, letterSpacing: '-0.01em' }}>{cert.trilha_nome}</h3>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
                     <p style={{ fontSize: 13, color: '#888', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6, margin: 0 }}>
-                      <Calendar size={14} /> {new Date(cert.data_conclusao).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      <Calendar size={14} /> {new Date(cert.data_conclusao).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                     <p style={{ fontSize: 12, color: colors.magenta, fontWeight: 700, background: `${colors.magenta}10`, padding: '4px 10px', borderRadius: 6, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <ShieldCheck size={14} /> Verificado
+                      <ShieldCheck size={14} /> Verified
                     </p>
                   </div>
                   <p style={{ fontSize: 11, color: '#bbb', marginTop: 12, fontFamily: 'monospace', letterSpacing: '0.05em' }}>ID: {cert.codigo_verificacao}</p>
@@ -212,14 +212,14 @@ export default function AcademiaCertificados() {
                 <div style={{ display: 'flex', gap: 12, width: '100%', flexWrap: 'wrap' }}>
                   <Link href={`/academia/verificar/${cert.codigo_verificacao}`}>
                     <button style={{ padding: '12px 20px', background: '#f9f9f9', color: colors.dark, border: '1px solid #eee', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <ExternalLink size={14} /> Validar
+                      <ExternalLink size={14} /> Validate
                     </button>
                   </Link>
                   <button onClick={() => handleDownload(cert)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: colors.dark, color: '#fff', border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                    <Download size={14} /> Baixar PDF
+                    <Download size={14} /> Download PDF
                   </button>
                   <button onClick={() => handleEnviarEmail(cert)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: 'transparent', color: colors.orange, border: `1px solid ${colors.orange}`, borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                    <Mail size={14} /> Enviar Email
+                    <Mail size={14} /> Email me
                   </button>
                   <button onClick={() => handleShareLinkedIn(cert)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 20px', background: '#0077b5', color: '#fff', border: 'none', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                     <Share2 size={14} /> LinkedIn
@@ -237,9 +237,9 @@ export default function AcademiaCertificados() {
           style={{ marginTop: 80, padding: 48, background: colors.dark, borderRadius: 32, color: '#fff', textAlign: 'center', position: 'relative', overflow: 'hidden' }}
         >
           <div style={{ position: 'relative', zIndex: 1 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12, letterSpacing: '-0.02em' }}>Verificar Autenticidade</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 900, marginBottom: 12, letterSpacing: '-0.02em' }}>Verify authenticity</h2>
             <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 32, maxWidth: 500, margin: '0 auto 32px' }}>
-              Qualquer pessoa ou empresa pode validar um certificado da Bora Lá Estudar usando o código único.
+              Anyone can validate a Bora Lá certificate using its unique code.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, maxWidth: 500, margin: '0 auto', justifyContent: 'center' }}>
               <div style={{ position: 'relative', flex: 1, minWidth: 260 }}>
@@ -248,13 +248,13 @@ export default function AcademiaCertificados() {
                   type="text" 
                   value={verifyCode}
                   onChange={(e) => setVerifyCode(e.target.value)}
-                  placeholder="Código de Verificação" 
+                  placeholder="Verification code" 
                   style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: 16, border: 'none', fontSize: 15, fontFamily: 'Montserrat, sans-serif', outline: 'none', background: '#fff', color: colors.dark, boxSizing: 'border-box' }}
                 />
               </div>
               <Link href={`/academia/verificar/${verifyCode}`}>
                 <button disabled={!verifyCode} style={{ padding: '16px 32px', background: colors.orange, color: '#fff', border: 'none', borderRadius: 16, fontWeight: 800, fontSize: 15, cursor: verifyCode ? 'pointer' : 'not-allowed', opacity: verifyCode ? 1 : 0.5 }}>
-                  Verificar Agora
+                  Verify now
                 </button>
               </Link>
             </div>

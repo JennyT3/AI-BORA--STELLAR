@@ -6,11 +6,11 @@ export interface Vendedor {
   nome: string;
   email: string;
   telefone?: string;
-  // password eliminado — Firebase Auth gestiona autenticación
-  comissaoPercent: number; // % de comisión (ej: 20 = 20%)
+  // password removed — Firebase Auth handles authentication
+  comissaoPercent: number; // commission % (e.g. 20 = 20%)
   ativo: boolean;
   createdAt: string;
-  clientesIds?: string[]; // IDs de clientes asignados a este vendedor
+  clientesIds?: string[]; // cliente IDs assigned to this vendedor
   fotoPerfil?: string;
   redesSociais?: {
     instagram?: string;
@@ -86,7 +86,7 @@ export async function delegarClienteAVendedor(clienteId: string, vendedorId: str
   });
 }
 
-// ========== ASIGNAR CLIENTES A VENDEDOR ==========
+// ========== ASSIGN CLIENTES TO VENDEDOR ==========
 
 export async function asignarClientesAVendedor(vendedorId: string, clientesIds: string[]): Promise<void> {
   await updateVendedor(vendedorId, { clientesIds });
@@ -110,7 +110,7 @@ export async function removeClienteDeVendedor(vendedorId: string, clienteId: str
   }
 }
 
-// ========== IMPORTAR CLIENTES DESDE EXCEL (Asignar a vendedor) ==========
+// ========== IMPORT CLIENTES FROM EXCEL (assign to vendedor) ==========
 
 export interface DuplicadoInfo {
   clienteImportadoNome: string;
@@ -123,7 +123,7 @@ export interface DuplicadoInfo {
 
 export async function importarClientesParaVendedor(vendedorId: string, clientesData: any[], importadoPor?: string): Promise<{ sucesso: number; erros: string[]; atualizados: number; criados: number; duplicados: DuplicadoInfo[] }> {
   if (!vendedorId) {
-    throw new Error('Vendedor ID é obrigatório. Faça login novamente.');
+    throw new Error('Vendedor ID is required. Please sign in again.');
   }
 
   const { upsertCliente } = await import('./clientes');
@@ -196,7 +196,7 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
         await addClienteAVendedor(vendedorId, result.clienteId);
       }
     } catch (err: any) {
-      erros.push(`Erro ao importar ${cliente.nome || 'sem nome'}: ${err.message}`);
+      erros.push(`Failed to import ${cliente.nome || 'unnamed'}: ${err.message}`);
     }
   }
   
@@ -209,7 +209,7 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
   return { sucesso, erros, atualizados, criados, duplicados };
 }
 
-// ========== STATS DEL VENDEDOR ==========
+// ========== VENDEDOR STATS ==========
 
 export async function getStatsVendedor(vendedorId: string): Promise<{
   totalClientes: number;
@@ -228,7 +228,7 @@ export async function getStatsVendedor(vendedorId: string): Promise<{
   let propostasAceitas = 0;
   let valorTotalPropostas = 0;
   
-  // Buscar propostas dos clientes deste vendedor
+  // Load propostas for this vendedor's clientes
   if (clientesIds.length > 0) {
     for (const clienteId of clientesIds) {
       const q = query(collection(db, 'propostas'), where('clienteId', '==', clienteId));

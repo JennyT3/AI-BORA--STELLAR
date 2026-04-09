@@ -9,12 +9,12 @@ export type ClienteProcesso = 'sem_processo' | 'inicio' | 'em_progresso' | 'em_r
 export interface Cliente {
   id: string;
   
-  // Datos obligatorios para cualquier contacto
+  // Required fields for any contact
   nome: string;
   email?: string;
   origem?: string;
   
-  // Datos opcionales de contacto
+  // Optional contact fields
   telemovel?: string;
   nif?: string;
   empresa?: string;
@@ -23,16 +23,16 @@ export interface Cliente {
   codigoPostal?: string;
   cidade?: string;
   
-  // Clasificación - solo cambia para clientes
+  // Classification — mainly for clients
   categoria: ClienteCategoria;
   processo: ClienteProcesso;
   
-  // Notas y seguimiento
+  // Notes and follow-up
   observacoes?: string;
   notasVendedor?: string;
   dataUltimoContacto?: string;
   
-  // Relaciones con documentos
+  // Links to other documents
   vendedorId?: string;
   criadoPor?: string;
   solicitacaoId?: string;
@@ -41,11 +41,11 @@ export interface Cliente {
   faturaIds?: string[];
   servicoIds?: string[];
   
-  // Respuesta del cliente
+  // Client response
   resposta?: string;
   dataResposta?: string;
   
-  // Metadatos
+  // Metadata
   servicos?: string[];
   tarefas?: string[];
   criadoEm?: string;
@@ -53,11 +53,11 @@ export interface Cliente {
   updatedAt?: string;
   fichaUrl?: string;
   
-  // Métricas
+  // Metrics
   totalFacturado?: number;
   numeroOrcamentos?: number;
   
-  // Auditoría de importación
+  // Import audit fields
   importadoPor?: string;
   dataImportacao?: string;
 }
@@ -106,8 +106,8 @@ export async function listClientes(limitNum = 100): Promise<Cliente[]> {
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente));
   } catch (error) {
-    console.error("Erro ao listar clientes com ordenação:", error);
-    // Fallback: tentar listar sem ordenação (caso falte o índice)
+    console.error('Failed to list clientes with ordering:', error);
+    // Fallback: list without ordering if index is missing
     const q = query(collection(db, 'clientes'), limit(limitNum));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente))
@@ -153,7 +153,7 @@ export async function delegarClienteAVendedor(clienteId: string, vendedorId: str
 }
 
 // ============================================
-// IMPORTACIÓN CON DEDUPLICACIÓN (UPSERT)
+// IMPORT WITH DEDUPLICATION (UPSERT)
 // ============================================
 
 export interface UpsertClienteResult {
@@ -173,9 +173,9 @@ export interface ImportResult {
   detalles: { nome: string; email: string; resultado: string; erro?: string }[];
 }
 
-// Función de deduplicación mejorada: nif → email → telemovel
+// Deduplication: nif → email → telemovel
 async function findClienteByKeys(nif?: string, email?: string, telemovel?: string): Promise<Cliente | null> {
-  // 1. Buscar por NIF (prioridad más alta)
+  // 1. Match by NIF (highest priority)
   if (nif) {
     const qNif = query(collection(db, 'clientes'), where('nif', '==', nif), limit(1));
     const snapNif = await getDocs(qNif);
@@ -184,7 +184,7 @@ async function findClienteByKeys(nif?: string, email?: string, telemovel?: strin
     }
   }
   
-  // 2. Buscar por email
+  // 2. Match by email
   if (email) {
     const qEmail = query(collection(db, 'clientes'), where('email', '==', email), limit(1));
     const snapEmail = await getDocs(qEmail);
@@ -193,7 +193,7 @@ async function findClienteByKeys(nif?: string, email?: string, telemovel?: strin
     }
   }
   
-  // 3. Buscar por telemovel
+  // 3. Match by telemovel
   if (telemovel) {
     const qTel = query(collection(db, 'clientes'), where('telemovel', '==', telemovel), limit(1));
     const snapTel = await getDocs(qTel);
@@ -205,7 +205,7 @@ async function findClienteByKeys(nif?: string, email?: string, telemovel?: strin
   return null;
 }
 
-// Función principal de upsert para importar clientes
+// Main upsert for importing clientes
 export async function upsertCliente(data: {
   nome: string;
   email?: string;
@@ -226,7 +226,7 @@ export async function upsertCliente(data: {
   importadoPor?: string;
 }, vendedorId: string): Promise<UpsertClienteResult> {
   
-  // Normalizar campos para evitar erros com números vindos do Excel
+  // Normalize fields to avoid issues with numbers from Excel
   const nome = data.nome != null ? String(data.nome).trim() : '';
   const email = data.email != null ? String(data.email).trim().toLowerCase() : '';
   const telemovel = data.telemovel != null ? String(data.telemovel).trim() : '';
@@ -234,31 +234,30 @@ export async function upsertCliente(data: {
   const codigoPostal = data.codigoPostal != null ? String(data.codigoPostal).trim() : '';
   const origem = data.origem != null ? String(data.origem).trim() : '';
 
-  // Validar campos obrigatórios
   if (!nome) {
-    throw new Error('Nome é obrigatório');
+    throw new Error('Name is required');
   }
   if (!origem) {
-    throw new Error('Origem é obrigatória');
+    throw new Error('Origin is required');
   }
   
   const now = new Date().toISOString();
   
-  // Buscar cliente existente usando variáveis normalizadas
+  // Find existing cliente using normalized fields
   const existente = await findClienteByKeys(nif, email, telemovel);
   
   if (existente) {
-    // Retornar info do duplicado para possível solicitação de delegação
+    // Return duplicate info for possible delegation request
     return {
       clienteId: existente.id,
       wasCreated: false,
       wasUpdated: false,
       isDuplicate: true,
       existingVendedorId: existente.vendedorId,
-      existingVendedorNome: existente.vendedorId ? 'Vendedor ID: ' + existente.vendedorId : 'Desconhecido'
+      existingVendedorNome: existente.vendedorId ? 'Vendedor ID: ' + existente.vendedorId : 'Unknown'
     };
   } else {
-    // Crear nuevo cliente
+    // Create new cliente
     const id = generateId();
     const newData: Cliente = {
       id,
@@ -301,7 +300,7 @@ export async function upsertCliente(data: {
   }
 }
 
-// Función para importar múltiples clientes con deduplicación
+// Import multiple clientes with deduplication
 export async function importarClientes(
   clientesData: Array<{
     nome: string;
@@ -331,12 +330,11 @@ export async function importarClientes(
   
   for (const data of clientesData) {
     try {
-      // Validar campos obligatorios
       if (!data.nome?.trim()) {
-        throw new Error('Nome é obrigatório');
+        throw new Error('Name is required');
       }
       if (!data.origem?.trim()) {
-        throw new Error('Origem é obrigatória');
+        throw new Error('Origin is required');
       }
       
       const upsertResult = await upsertCliente(
@@ -350,7 +348,7 @@ export async function importarClientes(
         result.detalles.push({
           nome: data.nome,
           email: data.email || '',
-          resultado: 'criado'
+          resultado: 'created'
         });
       } else {
         result.atualizados++;
@@ -358,7 +356,7 @@ export async function importarClientes(
         result.detalles.push({
           nome: data.nome,
           email: data.email || '',
-          resultado: 'atualizado'
+          resultado: 'updated'
         });
       }
     } catch (err: any) {
@@ -366,7 +364,7 @@ export async function importarClientes(
       result.detalles.push({
         nome: data.nome,
         email: data.email || '',
-        resultado: 'erro',
+        resultado: 'error',
         erro: err.message
       });
     }

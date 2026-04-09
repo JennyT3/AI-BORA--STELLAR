@@ -15,7 +15,7 @@ const colors = {
 export default function Consultoria() {
   const { isLoaded, isSignedIn, academiaUser } = useAcademiaAuth();
 
-  // FIXED: Añadido guard de autenticación
+  // Auth guard
   if (!isLoaded) {
     return (
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -30,38 +30,38 @@ export default function Consultoria() {
 
   const servicos = [
     {
-      titulo: 'Consultoria IA paraPMEs',
-      descricao: 'Implementação de soluções de IA no teu negócio com acompanhamento personalizado.',
+      titulo: 'AI consulting for SMBs',
+      descricao: 'Hands-on AI implementation in your business with personalised support.',
       preco: '299€/mês',
-      funcionalidades: ['Análise do negócio', '2 sessões/mês', 'Relatórios mensais', 'Suporte prioritário'],
+      funcionalidades: ['Business analysis', '2 sessions/month', 'Monthly reports', 'Priority support'],
       popular: true,
     },
     {
-      titulo: 'Audit Marketing Digital',
-      descricao: 'Análise completa da tua presença digital com plano de ação personalizado.',
+      titulo: 'Digital marketing audit',
+      descricao: 'Full review of your digital presence with a tailored action plan.',
       preco: '499€',
-      funcionalidades: ['Análise completa', 'Relatório detalhado', 'Plano de ação', 'Reunião de apresentação'],
+      funcionalidades: ['Full analysis', 'Detailed report', 'Action plan', 'Presentation call'],
     },
     {
-      titulo: 'Mentoria Intensiva',
-      descricao: 'Programa de 3 meses com acompanhamento diário para escalar o teu negócio.',
+      titulo: 'Intensive mentorship',
+      descricao: 'A 3-month programme with close support to scale your business.',
       preco: '1.499€',
-      funcionalidades: ['12 sessões', 'AcessoSlack', 'Recursos exclusivos', 'Certificado'],
+      funcionalidades: ['12 sessions', 'Slack access', 'Exclusive resources', 'Certificate'],
     },
   ];
 
   const faqs = [
     {
-      pergunta: 'Como funciona a consultoria?',
-      resposta: 'Depois de escolheres o plano, agendamos uma chamada inicial para entender o teu negócio. A partir daí, definimos objetivos e marcamos as sessões regulares.',
+      pergunta: 'How does consulting work?',
+      resposta: 'After you choose a plan, we schedule an intro call to understand your business. Then we set goals and book regular sessions.',
     },
     {
-      pergunta: 'Posso cancelar a qualquer momento?',
-      resposta: 'Sim, podes cancelar com 30 dias de antecedência. Não há penalties nem taxas adicionais.',
+      pergunta: 'Can I cancel anytime?',
+      resposta: 'Yes. Cancel with 30 days notice. No penalties or extra fees.',
     },
     {
-      pergunta: 'As sessões são online ou presenciais?',
-      resposta: 'Todas as sessões são online via Zoom, gravadas para que possas rever quando quiseres.',
+      pergunta: 'Are sessions online or in person?',
+      resposta: 'All sessions are online via Zoom and recorded so you can rewatch anytime.',
     },
   ];
 
@@ -78,14 +78,14 @@ export default function Consultoria() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
             <Sparkles size={24} color={colors.orange} />
             <span style={{ fontSize: 12, fontWeight: 800, color: colors.orange, textTransform: 'uppercase', letterSpacing: 2 }}>
-              AI BORA Consultoria
+              AI BORA consulting
             </span>
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, color: colors.dark, marginBottom: 16, letterSpacing: '-0.03em' }}>
-            Transforma o teu negócio com <span style={{ color: colors.orange }}>Inteligência Artificial</span>
+            Grow your business with <span style={{ color: colors.orange }}>artificial intelligence</span>
           </h1>
           <p style={{ color: '#666', fontSize: 18, maxWidth: 600 }}>
-            Sessions de consultoria personalizadas para PMEs que querem inovar e escalar com IA.
+            Personalised consulting for SMBs that want to innovate and scale with AI.
           </p>
         </motion.div>
 
@@ -118,7 +118,7 @@ export default function Consultoria() {
                   borderRadius: 100,
                   textTransform: 'uppercase',
                 }}>
-                  Mais Popular
+                  Most popular
                 </div>
               )}
               <h3 style={{ fontSize: 20, fontWeight: 800, color: colors.dark, marginBottom: 8 }}>
@@ -149,7 +149,7 @@ export default function Consultoria() {
                 fontSize: 14,
                 cursor: 'pointer',
               }}>
-                Solicitar Orçamento
+                Request a quote
               </button>
             </motion.div>
           ))}
@@ -169,9 +169,9 @@ export default function Consultoria() {
           }}
         >
           <Bot size={48} style={{ marginBottom: 20 }} />
-          <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Precisas de ajuda imediata?</h2>
+          <h2 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12 }}>Need help right away?</h2>
           <p style={{ fontSize: 16, opacity: 0.8, marginBottom: 24, maxWidth: 500, margin: '0 auto 24px' }}>
-            Agenda uma chamada gratuita de 30 minutos para discutires as tuas necessidades.
+            Book a free 30-minute call to talk through your needs.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button style={{
@@ -188,7 +188,7 @@ export default function Consultoria() {
               cursor: 'pointer',
             }}>
               <Calendar size={18} />
-              Agendar Chamada
+              Book a call
             </button>
             <button style={{
               display: 'flex',
@@ -204,7 +204,7 @@ export default function Consultoria() {
               cursor: 'pointer',
             }}>
               <Mail size={18} />
-              Contactar por Email
+              Email us
             </button>
           </div>
         </motion.div>
@@ -214,7 +214,7 @@ export default function Consultoria() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.dark, marginBottom: 24 }}>Perguntas Frequentes</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: colors.dark, marginBottom: 24 }}>FAQ</h2>
           <div style={{ display: 'grid', gap: 16 }}>
             {faqs.map((faq, idx) => (
               <div key={idx} style={{

@@ -6,7 +6,7 @@ interface WelcomeHeroProps {
 }
 
 export function WelcomeHero({ 
-  descricao = "O teu ecossistema está a processar 4.2k pedidos hoje. Todos os sistemas operacionais.",
+  descricao = "Your ecosystem is processing 4.2k requests today. All systems operational.",
   badgeText = "OVERVIEW SYSTEM",
   isMobile 
 }: WelcomeHeroProps) {
@@ -60,7 +60,7 @@ export function WelcomeHero({
           lineHeight: 1.1,
           marginBottom: 16,
         }}>
-          Bem-vindo de volta,<br />
+          Welcome back,<br />
           <span 
             style={{
               background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)",

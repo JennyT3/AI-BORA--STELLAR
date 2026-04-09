@@ -41,7 +41,7 @@ export default function AcademiaVerificar() {
   if (loading) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>Verificando certificado...</div>
+        <div style={styles.loading}>Verifying certificate…</div>
       </div>
     );
   }
@@ -51,49 +51,49 @@ export default function AcademiaVerificar() {
       <div style={styles.container}>
         <div style={styles.card}>
           <div style={{ ...styles.icon, background: "#ffebee" }}>✕</div>
-          <h2 style={styles.title}>Certificado Não Encontrado</h2>
+          <h2 style={styles.title}>Certificate not found</h2>
           <p style={styles.text}>
-            O código de verificação informado não corresponde a nenhum certificado válido em nosso sistema.
+            This verification code does not match any valid certificate in our system.
           </p>
-          <a href="/academia" style={styles.button}>Voltar para Academia</a>
+          <a href="/academia" style={styles.button}>Back to Academy</a>
         </div>
       </div>
     );
   }
 
   const dataEmissao = certificado.data_emissao?.toDate?.() 
-    ? certificado.data_emissao.toDate().toLocaleDateString("pt-BR")
-    : new Date(certificado.data_emissao).toLocaleDateString("pt-BR");
+    ? certificado.data_emissao.toDate().toLocaleDateString("en-GB")
+    : new Date(certificado.data_emissao).toLocaleDateString("en-GB");
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={{ ...styles.icon, background: "#e8f5e9" }}>✓</div>
-        <h2 style={styles.title}>Certificado Válido</h2>
+        <h2 style={styles.title}>Valid certificate</h2>
         
         <div style={styles.certInfo}>
           <div style={styles.field}>
-            <span style={styles.label}>Nome do Aluno</span>
+            <span style={styles.label}>Learner name</span>
             <span style={styles.value}>{certificado.nome}</span>
           </div>
           
           <div style={styles.field}>
-            <span style={styles.label}>Curso</span>
+            <span style={styles.label}>Course</span>
             <span style={styles.value}>{certificado.trilha_nome}</span>
           </div>
           
           <div style={styles.field}>
-            <span style={styles.label}>Data de Emissão</span>
+            <span style={styles.label}>Issue date</span>
             <span style={styles.value}>{dataEmissao}</span>
           </div>
           
           <div style={styles.field}>
-            <span style={styles.label}>Código de Verificação</span>
+            <span style={styles.label}>Verification code</span>
             <span style={styles.code}>{certificado.codigo_verificacao}</span>
           </div>
         </div>
 
-        <a href="/academia" style={styles.button}>Conhecer Academia Bora Lá</a>
+        <a href="/academia" style={styles.button}>Explore Bora Lá Academy</a>
       </div>
     </div>
   );

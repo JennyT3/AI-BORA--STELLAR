@@ -16,32 +16,32 @@ const colors = {
 const cursosEmDestaque = [
   {
     id: 1,
-    titulo: 'Dominar Prompts',
-    descricao: 'Aprende a linguagem das máquinas para obter resultados perfeitos em segundos.',
+    titulo: 'Master prompts',
+    descricao: 'Learn how to talk to models so you get polished results in seconds.',
     duracao: '2h 30min',
     aulas: 12,
-    nivel: 'Iniciante',
-    categoria: 'IA',
+    nivel: 'Beginner',
+    categoria: 'AI',
     cor: colors.orange
   },
   {
     id: 2,
-    titulo: 'Automatização de Tarefas',
-    descricao: 'Zapier, Make e Python básico para delegar as tuas tarefas repetitivas.',
+    titulo: 'Task automation',
+    descricao: 'Zapier, Make and basic Python to offload repetitive work.',
     duracao: '3h 15min',
     aulas: 8,
-    nivel: 'Intermédio',
-    categoria: 'Automação',
+    nivel: 'Intermediate',
+    categoria: 'Automation',
     cor: colors.magenta
   },
   {
     id: 3,
-    titulo: 'IA para Criadores',
-    descricao: 'Gera vídeo, áudio e imagens de alta qualidade com ferramentas generativas.',
+    titulo: 'AI for creators',
+    descricao: 'Generate video, audio and images with leading generative tools.',
     duracao: '4h',
     aulas: 15,
-    nivel: 'Iniciante',
-    categoria: 'Criação',
+    nivel: 'Beginner',
+    categoria: 'Creation',
     cor: colors.coral
   }
 ];
@@ -63,7 +63,7 @@ export default function Academia() {
                 style={{ backgroundColor: `${colors.orange}15`, color: colors.orange }}
               >
                 <Zap className="w-4 h-4 mr-2" />
-                Bora Lá Estudar
+                Bora Lá — learn
               </motion.div>
               
               <motion.h1 
@@ -72,9 +72,9 @@ export default function Academia() {
                 transition={{ delay: 0.1 }}
                 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] text-[#1c1b1b]"
               >
-                Aprende rápido.<br />
-                Aplica hoje.<br />
-                <span className="text-[#ff6f2e]">Menos teoria, mais ação.</span>
+                Learn fast.<br />
+                Apply today.<br />
+                <span className="text-[#ff6f2e]">Less theory, more action.</span>
               </motion.h1>
               
               <motion.p 
@@ -83,7 +83,7 @@ export default function Academia() {
                 transition={{ delay: 0.2 }}
                 className="text-xl text-gray-600 max-w-xl leading-relaxed"
               >
-                Domina as ferramentas que estão a transformar o mundo. Inteligência Artificial e Automação desenhadas para resultados imediatos no teu negócio.
+                Master the tools reshaping how we work. Practical AI and automation focused on immediate outcomes for your business.
               </motion.p>
               
               <motion.div 
@@ -97,12 +97,12 @@ export default function Academia() {
                     style={{ background: `linear-gradient(135deg, ${colors.orange} 0%, ${colors.magenta} 100%)` }}
                   >
                     <Play className="w-5 h-5 mr-2 fill-white" />
-                    Começar a Estudar
+                    Start learning
                   </div>
                 </Link>
                 <Link href="/academia/trilhas">
                   <div className="px-10 py-5 rounded-2xl border-2 border-gray-200 text-gray-700 font-bold text-lg hover:border-[#ff6f2e] hover:text-[#ff6f2e] transition-all flex items-center justify-center cursor-pointer">
-                    Ver Trilhas
+                    Browse paths
                   </div>
                 </Link>
               </motion.div>
@@ -118,7 +118,7 @@ export default function Academia() {
               >
                 <img 
                   src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=1000&fit=crop" 
-                  alt="Estudante a usar IA" 
+                  alt="Learner using AI" 
                   className="w-full h-auto object-cover"
                 />
               </motion.div>
@@ -130,8 +130,8 @@ export default function Academia() {
         <section className="py-32 bg-[#fcf9f8] px-8">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-20">
-              <h2 className="text-4xl font-black text-[#1c1b1b] mb-6">Porquê estudar connosco?</h2>
-              <p className="text-gray-500 text-lg max-w-2xl mx-auto">Focamos no que realmente importa: a tua produtividade e o crescimento do teu negócio.</p>
+              <h2 className="text-4xl font-black text-[#1c1b1b] mb-6">Why learn with us?</h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">We focus on what moves the needle: your productivity and business growth.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -139,36 +139,36 @@ export default function Academia() {
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform" style={{ backgroundColor: `${colors.orange}15` }}>
                   <Zap className="w-8 h-8" style={{ color: colors.orange }} />
                 </div>
-                <h3 className="text-3xl font-black mb-6 text-[#1c1b1b]">IA para o mundo real</h3>
+                <h3 className="text-3xl font-black mb-6 text-[#1c1b1b]">AI for the real world</h3>
                 <p className="text-gray-600 text-xl leading-relaxed max-w-xl">
-                  Não te ensinamos a filosofar sobre IA. Ensinamos-te a usá-la para redigir, desenhar e analisar em minutos o que antes demorava horas.
+                  We do not teach you to debate AI in the abstract. We teach you to draft, design and analyse in minutes what used to take hours.
                 </p>
               </div>
 
               <div className="bg-[#1c1b1b] p-12 rounded-[32px] text-white flex flex-col justify-between hover:scale-[1.02] transition-all shadow-2xl">
                 <Award className="w-12 h-12 mb-8" style={{ color: colors.orange }} />
                 <div>
-                  <h3 className="text-2xl font-black mb-4">Certificados Oficiais</h3>
-                  <p className="text-gray-400 leading-relaxed">Valida o teu conhecimento com certificados verificáveis e partilha no teu LinkedIn.</p>
+                  <h3 className="text-2xl font-black mb-4">Official certificates</h3>
+                  <p className="text-gray-400 leading-relaxed">Validate your skills with verifiable certificates you can share on LinkedIn.</p>
                 </div>
               </div>
 
               <div className="bg-white p-10 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-lg transition-all">
                 <Users className="w-10 h-10 mb-6" style={{ color: colors.magenta }} />
-                <h3 className="text-xl font-black mb-4">Comunidade Ativa</h3>
-                <p className="text-gray-600">Aprende com outros empreendedores e partilha as tuas melhores automações.</p>
+                <h3 className="text-xl font-black mb-4">Active community</h3>
+                <p className="text-gray-600">Learn alongside other founders and share your best automations.</p>
               </div>
 
               <div className="bg-white p-10 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-lg transition-all">
                 <BookOpen className="w-10 h-10 mb-6" style={{ color: colors.coral }} />
-                <h3 className="text-xl font-black mb-4">Trilhas Guiadas</h3>
-                <p className="text-gray-600">Percursos estruturados do zero ao avançado, sem perder tempo com o que não interessa.</p>
+                <h3 className="text-xl font-black mb-4">Guided learning paths</h3>
+                <p className="text-gray-600">Structured journeys from zero to advanced—without filler.</p>
               </div>
 
               <div className="bg-white p-10 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-lg transition-all">
                 <MessageSquare className="w-10 h-10 mb-6" style={{ color: colors.orange }} />
-                <h3 className="text-xl font-black mb-4">Suporte Direto</h3>
-                <p className="text-gray-600">Dúvidas técnicas? A nossa equipa de especialistas está pronta para te ajudar.</p>
+                <h3 className="text-xl font-black mb-4">Direct support</h3>
+                <p className="text-gray-600">Stuck on something technical? Our specialists are here to help.</p>
               </div>
             </div>
           </div>
@@ -178,13 +178,13 @@ export default function Academia() {
         <section className="py-32 px-8 bg-white">
           <div className="max-w-5xl mx-auto rounded-[48px] p-16 text-center relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${colors.dark} 0%, #333 100%)` }}>
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-black text-white mb-8">Pronto para o próximo nível?</h2>
-              <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">Junta-te a centenas de profissionais que já estão a usar a IA para ganhar tempo e dinheiro.</p>
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-8">Ready to level up?</h2>
+              <p className="text-gray-400 text-xl mb-12 max-w-2xl mx-auto">Join hundreds of professionals already using AI to save time and grow revenue.</p>
               <Link href="/academia/login">
                 <div className="inline-flex px-12 py-6 rounded-2xl font-black text-xl text-white shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
                   style={{ background: colors.orange }}
                 >
-                  Bora Lá Estudar! 🚀
+                  Start with Bora Lá 🚀
                 </div>
               </Link>
             </div>

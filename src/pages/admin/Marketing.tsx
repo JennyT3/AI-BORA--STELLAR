@@ -23,15 +23,15 @@ export function Marketing({ clientes }: MarketingProps) {
 
   const handleSend = async () => {
     if (!assunto.trim() || !mensagemHtml.trim()) {
-      alert("Por favor, preencha o assunto e a mensagem.");
+      alert("Please enter a subject and message.");
       return;
     }
     if (targetClients.length === 0) {
-      alert("Nenhum cliente selecionado com e-mail válido para este filtro.");
+      alert("No contacts with a valid email match this filter.");
       return;
     }
 
-    const confirmar = window.confirm(`Atenção: Você está prestes a enviar este e-mail para ${targetClients.length} contatos. Continuar?`);
+    const confirmar = window.confirm(`You are about to send this email to ${targetClients.length} contacts. Continue?`);
     if (!confirmar) return;
 
     setEnviando(true);
@@ -40,7 +40,7 @@ export function Marketing({ clientes }: MarketingProps) {
 
     for (const cliente of targetClients) {
       try {
-        // El servicio espera (email, assunto, mensagem, link?, nome?)
+        // Service expects (email, subject, message, link?, name?)
         await sendMarketingCampaignEmail(
           cliente.email!,
           assunto,
@@ -53,12 +53,12 @@ export function Marketing({ clientes }: MarketingProps) {
         erros++;
       }
       
-      // Delay pequeno para não bater rate limit excessivamente
+      // Short delay to reduce rate limiting
       await new Promise(r => setTimeout(r, 500));
     }
 
     setEnviando(false);
-    alert(`Campanha finalizada!\nSucesso: ${sucessos}\nErros: ${erros}`);
+    alert(`Campaign finished.\nSent: ${sucessos}\nErrors: ${erros}`);
     setAssunto("");
     setMensagemHtml("");
   };
@@ -66,8 +66,8 @@ export function Marketing({ clientes }: MarketingProps) {
   return (
     <div>
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 8 }}>Marketing & Campanhas</h1>
-        <p style={{ color: theme.colors.text.secondary }}>Envie mensagens em massa para seus leads e clientes diretamente pelo AIBORA.</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 8 }}>Marketing & campaigns</h1>
+        <p style={{ color: theme.colors.text.secondary }}>Send bulk messages to your leads and clients from AIBORA.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 350px", gap: 32, alignItems: "start" }}>
@@ -75,36 +75,36 @@ export function Marketing({ clientes }: MarketingProps) {
         {/* Composer */}
         <div style={{ background: "#fff", padding: 32, borderRadius: 24, boxShadow: "0 10px 30px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#333" }}>De (App AI BORA)</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#333" }}>From (AI BORA app)</label>
             <input 
               type="text" 
-              value="Será enviado usando a configuração do seu EmailJS"
+              value="Sent using your EmailJS configuration"
               disabled
               style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid #e0e0e0", fontSize: 14, background: "#f5f5f5", color: "#888" }}
             />
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Assunto do E-mail</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Email subject</label>
             <input 
               type="text" 
               value={assunto}
               onChange={e => setAssunto(e.target.value)}
-              placeholder="Ex: Oferta exclusiva para o seu negócio..."
+              placeholder="e.g. Exclusive offer for your business..."
               style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif" }}
             />
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Corpo da Mensagem</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Message body</label>
             <textarea 
               rows={12}
               value={mensagemHtml}
               onChange={e => setMensagemHtml(e.target.value)}
-              placeholder="Escreva sua mensagem aqui..."
+              placeholder="Write your message here..."
               style={{ width: "100%", padding: "16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "inherit", resize: "vertical" }}
             />
-            <p style={{ fontSize: 11, color: "#888", marginTop: 8 }}> Dica: O EmailJS enviará isso formatado em texto/html plano. Evite HTML complexo, pois dependerá do template configurado no painel.</p>
+            <p style={{ fontSize: 11, color: "#888", marginTop: 8 }}>Tip: EmailJS sends this as plain HTML. Avoid complex markup; behaviour depends on your dashboard template.</p>
           </div>
 
           <div style={{ borderTop: "1px solid #eee", paddingTop: 20, display: "flex", justifyContent: "flex-end" }}>
@@ -126,7 +126,7 @@ export function Marketing({ clientes }: MarketingProps) {
               }}
             >
               <Send size={18} />
-              {enviando ? "A enviar..." : `Enviar para ${targetClients.length} contatos`}
+              {enviando ? "Sending..." : `Send to ${targetClients.length} contacts`}
             </button>
           </div>
         </div>
@@ -137,20 +137,20 @@ export function Marketing({ clientes }: MarketingProps) {
             <div style={{ width: 40, height: 40, background: "#F25C0515", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", color: "#F25C05" }}>
               <Users size={20} />
             </div>
-            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Público-Alvo</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Audience</h3>
           </div>
 
-          <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Filtrar para envio:</label>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8, color: "#1b1c1b" }}>Filter recipients:</label>
           <select 
             value={filtro}
             onChange={e => setFiltro(e.target.value)}
             style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", marginBottom: 24 }}
           >
-            <option value="todos">Todos os Contactos</option>
-            <option value="cliente">Clientes Ativos</option>
-            <option value="leads">Leads (Potenciais/Propostas)</option>
-            <option value="sem_interesse">Sem Interesse</option>
-            <option value="curioso">Curiosos</option>
+            <option value="todos">All contacts</option>
+            <option value="cliente">Active clients</option>
+            <option value="leads">Leads (potential / proposals)</option>
+            <option value="sem_interesse">Not interested</option>
+            <option value="curioso">Browsing</option>
           </select>
 
           <div style={{ background: "#f8FAF4", padding: 16, borderRadius: 16, border: "1px dashed #ccc" }}>
@@ -158,14 +158,14 @@ export function Marketing({ clientes }: MarketingProps) {
               {targetClients.length}
             </div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#666" }}>
-              Destinatários selecionados validamente com email.
+              Recipients with a valid email for this filter.
             </div>
           </div>
           
           <div style={{ marginTop: 24, padding: "16px", background: "#fdf2f8", borderRadius: 12, border: "1px solid #fce7f3" }}>
-            <h4 style={{ fontSize: 12, fontWeight: 800, color: "#be185d", marginBottom: 8 }}>IMPORTANTE:</h4>
+            <h4 style={{ fontSize: 12, fontWeight: 800, color: "#be185d", marginBottom: 8 }}>Important</h4>
             <p style={{ fontSize: 11, color: "#9d174d", lineHeight: 1.5 }}>
-              Certifique-se de ter configurado o "Marketing Template" no seu EmailJS. As variáveis esperadas pelo template são: <code>{`{{to_name}}`}</code>, <code>{`{{subject}}`}</code> e <code>{`{{message_html}}`}</code>.
+              Configure the &quot;Marketing Template&quot; in EmailJS. Expected variables: <code>{`{{to_name}}`}</code>, <code>{`{{subject}}`}</code>, and <code>{`{{message_html}}`}</code>.
             </p>
           </div>
         </div>

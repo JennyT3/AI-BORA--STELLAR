@@ -4,15 +4,15 @@ import { updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, solicitarTare
 import { sendDeliveryApprovalEmail } from "../../services/emailService";
 
 const COLUMNAS = [
-  { id: "disponivel", label: "Disponível", cor: "#22c55e", bg: "#dcfce7" },
-  { id: "pendente_atribuicao", label: "Aguardando Aprovação", cor: "#f59e0b", bg: "#fef3c7" },
-  { id: "atribuida", label: "Atribuída", cor: "#3b82f6", bg: "#dbeafe" },
-  { id: "em_analise", label: "Em Análise", cor: "#8b5cf6", bg: "#ede9fe" },
-  { id: "em_execucao", label: "Em Execução", cor: "#ec4899", bg: "#fce7f3" },
-  { id: "em_revisao", label: "Em Revisão", cor: "#14b8a6", bg: "#ccfbf1" },
-  { id: "aprovada", label: "Aprovada", cor: "#10b981", bg: "#d1fae5" },
-  { id: "entregue", label: "Entregue", cor: "#f97316", bg: "#ffedd5" },
-  { id: "paga", label: "Paga", cor: "#65a30d", bg: "#ecfccb" },
+  { id: "disponivel", label: "Available", cor: "#22c55e", bg: "#dcfce7" },
+  { id: "pendente_atribuicao", label: "Awaiting approval", cor: "#f59e0b", bg: "#fef3c7" },
+  { id: "atribuida", label: "Assigned", cor: "#3b82f6", bg: "#dbeafe" },
+  { id: "em_analise", label: "In analysis", cor: "#8b5cf6", bg: "#ede9fe" },
+  { id: "em_execucao", label: "In progress", cor: "#ec4899", bg: "#fce7f3" },
+  { id: "em_revisao", label: "In review", cor: "#14b8a6", bg: "#ccfbf1" },
+  { id: "aprovada", label: "Approved", cor: "#10b981", bg: "#d1fae5" },
+  { id: "entregue", label: "Delivered", cor: "#f97316", bg: "#ffedd5" },
+  { id: "paga", label: "Paid", cor: "#65a30d", bg: "#ecfccb" },
 ];
 
 interface Props {
@@ -59,8 +59,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await updateTarea(draggedId, { estado: colId as TareaEstado }); 
       onRefresh(); 
     } catch (err) { 
-      console.error('Error al mover tarea:', err); 
-      alert('Erro ao mover tarefa. Tente novamente.');
+      console.error('Error moving task:', err); 
+      alert('Could not move task. Please try again.');
     }
   };
 
@@ -70,21 +70,21 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await aprobarSolicitudTarea(tarea.id, vendedorId, vendedorNome);
       onRefresh();
     } catch (err) {
-      console.error('Error ao aprovar solicitação:', err);
-      alert('Erro ao aprovar solicitação.');
+      console.error('Error approving request:', err);
+      alert('Could not approve request.');
     }
     setLoading(false);
   };
 
   const handleRechazarSolicitud = async (tarea: Tarea, vendedorId: string, vendedorNome: string) => {
-    const motivo = prompt('Motivo da rejeição (opcional):');
+    const motivo = prompt('Rejection reason (optional):');
     setLoading(true);
     try {
       await rechazarSolicitudTarea(tarea.id, vendedorId, vendedorNome, motivo || undefined);
       onRefresh();
     } catch (err) {
-      console.error('Error ao rejeitar solicitação:', err);
-      alert('Erro ao rejeitar solicitação.');
+      console.error('Error rejecting request:', err);
+      alert('Could not reject request.');
     }
     setLoading(false);
   };
@@ -95,8 +95,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await enviarAoCliente(tarea.id);
       onRefresh();
     } catch (err) {
-      console.error('Error ao enviar ao cliente:', err);
-      alert('Erro ao enviar ao cliente.');
+      console.error('Error sending to client:', err);
+      alert('Could not send to client.');
     }
     setLoading(false);
   };
@@ -107,22 +107,22 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await aprobarEntregaTarea(tarea.id);
       onRefresh();
     } catch (err) {
-      console.error('Error ao aprobar entrega:', err);
-      alert('Erro ao aprobar entrega.');
+      console.error('Error approving delivery:', err);
+      alert('Could not approve delivery.');
     }
     setLoading(false);
   };
 
   const handleSolicitarAlteracoes = async (tarea: Tarea) => {
-    const nota = prompt('Que alterações são necessárias?');
+    const nota = prompt('What changes are needed?');
     if (!nota) return;
     setLoading(true);
     try {
       await solicitarAlteracoes(tarea.id, nota);
       onRefresh();
     } catch (err) {
-      console.error('Error ao solicitar alterações:', err);
-      alert('Erro ao solicitar alterações.');
+      console.error('Error requesting changes:', err);
+      alert('Could not request changes.');
     }
     setLoading(false);
   };
@@ -137,8 +137,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       setAsignModal(null); setSelectedVendedor(""); setPrazo(""); setComissaoValor(undefined); setComissaoTipo("fixo");
       onRefresh();
     } catch (err) { 
-      console.error('Error al asignar tarea:', err); 
-      alert('Erro ao atribuir tarefa. Tente novamente.');
+      console.error('Error assigning task:', err); 
+      alert('Could not assign task. Please try again.');
     }
     setLoading(false);
   };
@@ -151,15 +151,15 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       if (t.clienteEmail) {
         await sendDeliveryApprovalEmail(
           t.clienteEmail,
-          t.clienteNome || 'Cliente',
+          t.clienteNome || 'Client',
           t.titulo,
           `${window.location.origin}/c/${t.clienteId}`
         );
       }
       onRefresh(); 
     } catch (err) { 
-      console.error('Error al aprobar tarea:', err); 
-      alert('Erro ao aprovar tarefa. Tente novamente.');
+      console.error('Error approving task:', err); 
+      alert('Could not approve task. Please try again.');
     }
     setLoading(false);
   };
@@ -171,8 +171,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await marcarTareaPaga(t.id); 
       onRefresh(); 
     } catch (err) { 
-      console.error('Error al marcar tarea como pagada:', err); 
-      alert('Erro ao processar pagamento. Tente novamente.');
+      console.error('Error marking task as paid:', err); 
+      alert('Could not process payment. Please try again.');
     }
     setLoading(false);
   };
@@ -185,8 +185,8 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
       await solicitarTarea(t.id, vendedorId, vendedorNome); 
       onRefresh(); 
     } catch (err) { 
-      console.error('Error al solicitar tarea:', err); 
-      alert('Erro ao solicitar tarefa. Tente novamente.');
+      console.error('Error requesting task:', err); 
+      alert('Could not request task. Please try again.');
     }
     setLoading(false);
   };
@@ -256,7 +256,7 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
                     )}
                     {isAdmin && t.solicitantes && t.solicitantes.length > 0 && !t.asignadaA && (
                       <div style={{ fontSize: 10, color: "#D97706", fontWeight: 700, marginBottom: 4 }}>
-                        🙋‍♂️ {t.solicitantes.length} solicitantes
+                        🙋‍♂️ {t.solicitantes.length} applicants
                       </div>
                     )}
                     {t.prazo && (
@@ -264,14 +264,14 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
                     )}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
                       <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 20, backgroundColor: col.bg, color: col.cor, fontWeight: 600 }}>
-                        {t.periodicidade === "mensal" ? "🔄 Mensal" : "📌 Pontual"}
+                        {t.periodicidade === "mensal" ? "🔄 Monthly" : "📌 One-off"}
                       </span>
                       {!isAdmin && col.id === "disponivel" && (
                         <button
                           onClick={e => { e.stopPropagation(); handleSolicitar(t); }}
                           style={{ ...btnStyle("#F25C05"), padding: "4px 10px", fontSize: 10 }}
                         >
-                          {yaSolicito ? "Solicitado" : "Solicitar"}
+                          {yaSolicito ? "Requested" : "Request"}
                         </button>
                       )}
                     </div>
@@ -283,7 +283,7 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
         })}
       </div>
 
-      {/* MODAL DETALLE */}
+      {/* Task detail modal */}
       {modalTarea && (
         <div onClick={() => setModalTarea(null)} style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
           <div onClick={e => e.stopPropagation()} style={{ backgroundColor: "#fff", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, maxHeight: "85vh", overflowY: "auto" }}>
@@ -293,17 +293,17 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
             </div>
 
             <div style={{ fontSize: 13, color: "#444", marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-              👤 Cliente: <strong>{modalTarea.clienteNome}</strong>
+              👤 Client: <strong>{modalTarea.clienteNome}</strong>
               <button 
                 onClick={() => { setModalTarea(null); onVerFicha?.(modalTarea.clienteId); }} 
                 style={{ background: 'none', border: 'none', color: '#F25C05', cursor: 'pointer', fontSize: 11, fontWeight: 700, textDecoration: 'underline' }}
               >
-                Ver Ficha
+                View profile
               </button>
             </div>
-            {modalTarea.asignadoNome && <div style={{ fontSize: 13, color: "#444", marginBottom: 8 }}>🛠 Colaborador: <strong>{modalTarea.asignadoNome}</strong></div>}
-            {modalTarea.prazo && <div style={{ fontSize: 13, color: "#F25C05", marginBottom: 8 }}>📅 Prazo: <strong>{modalTarea.prazo}</strong></div>}
-            {modalTarea.periodicidade && <div style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>🔁 {modalTarea.periodicidade === "mensal" ? "Mensal" : "Pontual"}</div>}
+            {modalTarea.asignadoNome && <div style={{ fontSize: 13, color: "#444", marginBottom: 8 }}>🛠 Collaborator: <strong>{modalTarea.asignadoNome}</strong></div>}
+            {modalTarea.prazo && <div style={{ fontSize: 13, color: "#F25C05", marginBottom: 8 }}>📅 Due: <strong>{modalTarea.prazo}</strong></div>}
+            {modalTarea.periodicidade && <div style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>🔁 {modalTarea.periodicidade === "mensal" ? "Monthly" : "One-off"}</div>}
 
             {modalTarea.descricao && (
               <div style={{ backgroundColor: "#F8F7F4", borderRadius: 10, padding: 12, marginBottom: 12, fontSize: 12, color: "#444", lineHeight: 1.7, whiteSpace: "pre-line" }}>
@@ -313,7 +313,7 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
 
             {modalTarea.entregaUrl && (
               <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>Entrega:</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>Delivery:</div>
                 <a href={modalTarea.entregaUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#2563EB" }}>{modalTarea.entregaUrl}</a>
               </div>
             )}
@@ -324,13 +324,13 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
             {isAdmin && (
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
                 {modalTarea.estado === "disponivel" && (
-                  <button onClick={() => { setAsignModal(modalTarea); setModalTarea(null); }} style={btnStyle("#F25C05")}>Atribuir colaborador</button>
+                  <button onClick={() => { setAsignModal(modalTarea); setModalTarea(null); }} style={btnStyle("#F25C05")}>Assign collaborator</button>
                 )}
                 {modalTarea.estado === "entregue" && (
-                  <button onClick={() => { handleAprobar(modalTarea); setModalTarea(null); }} style={btnStyle("#059669")}>Aprovar entrega</button>
+                  <button onClick={() => { handleAprobar(modalTarea); setModalTarea(null); }} style={btnStyle("#059669")}>Approve delivery</button>
                 )}
                 {modalTarea.estado === "aprovada_cliente" && (
-                  <button onClick={() => { handlePaga(modalTarea); setModalTarea(null); }} style={btnStyle("#9333EA")}>Marcar como paga</button>
+                  <button onClick={() => { handlePaga(modalTarea); setModalTarea(null); }} style={btnStyle("#9333EA")}>Mark as paid</button>
                 )}
               </div>
             )}
@@ -338,26 +338,26 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
         </div>
       )}
 
-      {/* MODAL ASIGNAR */}
+      {/* Assign collaborator modal */}
       {asignModal && (
         <div onClick={() => setAsignModal(null)} style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 16 }}>
           <div onClick={e => e.stopPropagation()} style={{ backgroundColor: "#fff", borderRadius: 16, padding: 24, width: "100%", maxWidth: 380 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Atribuir — {asignModal.titulo}</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Assign — {asignModal.titulo}</h3>
             <select value={selectedVendedor} onChange={e => setSelectedVendedor(e.target.value)} style={inputStyle}>
-              <option value="">Selecionar colaborador...</option>
+              <option value="">Select collaborator…</option>
               {vendedores.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
             </select>
             <input type="date" value={prazo} onChange={e => setPrazo(e.target.value)} style={inputStyle} />
             <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-              <input type="number" placeholder="Comissão" value={comissaoValor || ''} onChange={e => setComissaoValor(Number(e.target.value) || undefined)} style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
+              <input type="number" placeholder="Commission" value={comissaoValor || ''} onChange={e => setComissaoValor(Number(e.target.value) || undefined)} style={{ ...inputStyle, marginBottom: 0, flex: 1 }} />
               <select value={comissaoTipo} onChange={e => setComissaoTipo(e.target.value as any)} style={{ ...inputStyle, marginBottom: 0, width: 110 }}>
-                <option value="fixo">€ Fixo</option>
-                <option value="percentagem">% Valor</option>
+                <option value="fixo">Fixed €</option>
+                <option value="percentagem">% of value</option>
               </select>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <button onClick={handleAsignar} disabled={loading || !selectedVendedor || !prazo} style={btnStyle("#F25C05")}>Confirmar</button>
-              <button onClick={() => setAsignModal(null)} style={{ ...btnStyle("#888"), backgroundColor: "#eee", color: "#444" }}>Cancelar</button>
+              <button onClick={handleAsignar} disabled={loading || !selectedVendedor || !prazo} style={btnStyle("#F25C05")}>Confirm</button>
+              <button onClick={() => setAsignModal(null)} style={{ ...btnStyle("#888"), backgroundColor: "#eee", color: "#444" }}>Cancel</button>
             </div>
           </div>
         </div>

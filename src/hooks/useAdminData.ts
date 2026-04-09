@@ -116,7 +116,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       loadClientes();
     } catch (err) {
       console.error(err);
-      alert("Erro ao delegar cliente");
+      alert("Failed to assign client to vendedor");
     }
   };
 
@@ -133,41 +133,41 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     try {
       await createTarea(tareaData);
       loadTareas();
-      alert("Tarefa criada com sucesso!");
+      alert("Task created successfully.");
     } catch (err) {
       console.error(err);
-      alert("Erro ao criar tarefa");
+      alert("Failed to create task");
     }
   };
 
   const handleAsignarTarea = async (tareaId: string, vendedorId: string, prazo: string) => {
     try {
       const v = vendedores.find(v => v.id === vendedorId);
-      await asignarTarea(tareaId, vendedorId, v?.nome || "Colaborador", prazo);
+      await asignarTarea(tareaId, vendedorId, v?.nome || "Collaborator", prazo);
       loadTareas();
     } catch (err) {
       console.error(err);
-      alert("Erro ao atribuir tarefa");
+      alert("Failed to assign task");
     }
   };
 
   const handleAprobarEntrega = async (tareaId: string) => {
     try {
       await aprobarTarea(tareaId);
-      // Email ao cliente a avisar que a entrega foi aprovada pelo admin
+      // Email client that admin approved the delivery
       const tarea = tareas.find(t => t.id === tareaId);
       if (tarea?.clienteEmail) {
         sendDeliveryApprovalEmail(
           tarea.clienteEmail,
           tarea.clienteNome || '',
-          tarea.titulo || tarea.servicoNome || 'Serviço',
+          tarea.titulo || tarea.servicoNome || 'Service',
           new Date().toLocaleDateString('pt-PT')
         ).catch(() => {});
       }
       loadTareas();
     } catch (err) {
       console.error(err);
-      alert("Erro ao aprobar entrega");
+      alert("Failed to approve delivery");
     }
   };
 
@@ -177,7 +177,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       loadTareas();
     } catch (err) {
       console.error(err);
-      alert("Erro ao marcar como paga");
+      alert("Failed to mark as paid");
     }
   };
 
@@ -224,26 +224,26 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       });
       setEditingId(null);
       loadProposals();
-      alert("Proposta atualizada!");
+      alert("Proposal updated.");
     } catch (err: any) {
-      alert("Erro: " + err.message);
+      alert("Error: " + err.message);
     }
   };
 
   const handleDelete = async (id: string, cliente: string) => {
-    if (!confirm(`Eliminar proposta de ${cliente}?`)) return;
+    if (!confirm(`Delete proposal for ${cliente}?`)) return;
     try {
       await deleteProposal(id);
       loadProposals();
-      alert("Proposta eliminada");
+      alert("Proposal deleted");
     } catch (err: any) {
-      alert("Erro: " + err.message);
+      alert("Error: " + err.message);
     }
   };
 
   const handleMarcarEnviada = async (proposal: Proposal) => {
     const dataEnvio = prompt(
-      "Data de envio (DD/MM/AAAA):",
+      "Sent date (DD/MM/YYYY):",
       new Date().toLocaleDateString("pt-PT")
     );
     if (!dataEnvio) return;
@@ -251,14 +251,14 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       await updateProposal(proposal.id, { dataEnvio, enviadoPor: currentUserId });
       loadProposals();
     } catch (e) {
-      alert("Erro: " + e);
+      alert("Error: " + e);
     }
   };
 
   const handleRegistrarResposta = async (proposal: Proposal) => {
-    const resposta = prompt("Resposta do cliente (sim/nao/reagendar):", proposal.resposta || "");
+    const resposta = prompt("Client response (sim/nao/reagendar):", proposal.resposta || "");
     if (!resposta || (resposta !== "sim" && resposta !== "nao" && resposta !== "reagendar")) {
-      alert("Resposta deve ser 'sim', 'nao' ou 'reagendar'");
+      alert("Response must be 'sim', 'nao', or 'reagendar'");
       return;
     }
     try {
@@ -268,7 +268,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
         atualizadoPor: currentUserId,
       });
 
-      // Enviar email automático de resposta
+      // Send automatic response email
       if (proposal.email) {
         try {
           await sendPropostaRespostaEmail({
@@ -278,7 +278,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
             empresa: proposal.empresa,
           });
         } catch (emailErr) {
-          console.error("Erro ao enviar email de resposta:", emailErr);
+          console.error("Failed to send response email:", emailErr);
         }
       }
       
@@ -292,7 +292,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
         loadClientes();
       }
       
-      // Crear tareas automáticamente si proposta foi aceita
+      // Create tareas automatically if proposal was accepted
       if (resposta === "sim" && proposal.servicos && proposal.servicos.length > 0) {
         const cliente = await getClienteByPropostaId(proposal.id);
         if (cliente) {
@@ -316,7 +316,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       
       loadProposals();
     } catch (e) {
-      alert("Erro: " + e);
+      alert("Error: " + e);
     }
   };
 
@@ -333,7 +333,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
 
     if (existingByProposta) {
       alert(
-        `Cliente já criado e vinculado a esta proposta: ${existingByProposta.nome}. Pode editá-lo na aba Clientes.`
+        `Client already created and linked to this proposal: ${existingByProposta.nome}. You can edit them in the Clients tab.`
       );
       setSelectedCliente(existingByProposta);
       onNavigateClientes();
@@ -343,7 +343,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     if (existingByContact) {
       if (
         confirm(
-          `Cliente "${existingByContact.nome}" já existe. Deseja vincular esta proposta a este cliente?`
+          `Client "${existingByContact.nome}" already exists. Link this proposal to this client?`
         )
       ) {
         updateCliente(existingByContact.id, {
@@ -356,7 +356,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
               : existingByContact.categoria,
         }).then(() => {
           loadClientes();
-          alert("Cliente atualizado com sucesso!");
+          alert("Client updated successfully.");
         });
       }
       return;
@@ -392,7 +392,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       website: sol.website || "",
       categoria: "potencial",
       origem: sol.origem || "Website",
-      observacoes: `Solicitação: ${sol.servicos?.join(", ")}`,
+      observacoes: `Request: ${sol.servicos?.join(", ")}`,
       solicitacaoId: sol.id,
       servicos: sol.servicos || [],
       criadoPor: currentUserId,
@@ -408,9 +408,9 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
       setClienteSearch("");
       setShowClienteSuggestions(false);
       loadClientes();
-      alert("Cliente criado com sucesso!");
+      alert("Client created successfully.");
     } catch (err: any) {
-      alert("Erro: " + err.message);
+      alert("Error: " + err.message);
     }
   };
 
@@ -422,21 +422,21 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
         p.telefone === c.telemovel
     );
     if (proposta) {
-      if (confirm(`Vincular a proposta?`)) {
+      if (confirm(`Link the proposal?`)) {
         updateCliente(c.id, {
           propostaId: proposta.id,
         }).then(() => {
           loadClientes();
-          alert("Proposta vinculada!");
+          alert("Proposal linked.");
         });
       }
     } else {
-      alert("Nenhuma proposta encontrada para este cliente.");
+      alert("No proposal found for this client.");
     }
   };
 
   const handleEliminarCliente = (id: string) => {
-    if (confirm("Eliminar cliente?")) {
+    if (confirm("Delete client?")) {
       deleteCliente(id).then(() => loadClientes());
     }
   };
@@ -448,7 +448,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   };
 
   const handleEliminarSolicitude = async (id: string) => {
-    if (confirm("Eliminar solicitação?")) {
+    if (confirm("Delete request?")) {
       await deleteSolicitude(id);
       loadSolicitudes();
     }

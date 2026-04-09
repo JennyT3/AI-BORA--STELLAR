@@ -28,7 +28,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
 
-  // Auto-login quando vem ?v=vendedorId desde admin
+  // Auto-login when opening with ?v=vendedorId from admin
   useEffect(() => {
     const autoLogin = async () => {
       const params = new URLSearchParams(window.location.search);
@@ -38,7 +38,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
       if (vendedorId && isAdmin) {
         setLoading(true);
         try {
-          // Importar dinamicamente para evitar dependências circulares se houver
+          // Dynamic import to avoid circular dependencies
           const { getVendedor } = await import("../services/vendedores");
           const vendedorData = await getVendedor(vendedorId);
           
@@ -53,11 +53,11 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
             saveSession(token);
             onLogin(vendedorData);
           } else {
-            setError("Vendedor não encontrado ou inativo.");
+            setError("Sales rep not found or inactive.");
           }
         } catch (err) {
-          console.error("Erro no auto-login:", err);
-          setError("Erro ao aceder ao painel do vendedor.");
+          console.error("Auto-login error:", err);
+          setError("Could not open the sales dashboard.");
         }
         setLoading(false);
       }
@@ -82,20 +82,20 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
         
         if (newAttempts >= 5) {
           setIsLocked(true);
-          setError("Demasiadas tentativas. Tente novamente em 30 segundos.");
+          setError("Too many attempts. Please try again in 30 seconds.");
           setTimeout(() => {
             setIsLocked(false);
             setLoginAttempts(0);
             setError("");
           }, 30000);
         } else {
-          setError(result.error || "Utilizador ou password incorretos.");
+          setError(result.error || "Incorrect email or password.");
         }
         setLoading(false);
         return;
       }
 
-      // Login bem-sucedido - criar token JWT (NUNCA guardar password!)
+      // Successful login — create JWT (never store password)
       if (result.vendedor) {
         const token = createSessionToken({
           id: result.vendedor.id,
@@ -108,7 +108,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
         onLogin(result.vendedor);
       }
     } catch (err: any) {
-      setError("Erro ao fazer login. Tente novamente.");
+      setError("Could not sign in. Please try again.");
       console.error('Login error:', err);
     }
     
@@ -125,24 +125,24 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
     if (result.success) {
       setResetSent(true);
     } else {
-      setError(result.error || "Erro ao enviar email de recuperação");
+      setError(result.error || "Could not send recovery email");
     }
     setLoading(false);
   };
 
-  // Renderização do formulário de recuperação de password
+  // Password recovery form
   if (showForgotPassword) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.bg.primary }}>
         <div style={{ width: "100%", maxWidth: 400, padding: 20 }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>
-              Recuperar <span style={{ color: "#F22283" }}>Password</span>
+              Reset <span style={{ color: "#F22283" }}>password</span>
             </h1>
             <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>
               {resetSent 
-                ? "Enviámos um email com instruções para redefinir a sua password."
-                : "Introduza o seu email para receber instruções de recuperação."}
+                ? "We sent an email with instructions to reset your password."
+                : "Enter your email to receive recovery instructions."}
             </p>
           </div>
 
@@ -155,7 +155,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
                     type="email" 
                     value={forgotPasswordEmail}
                     onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                    placeholder="seu@email.com"
+                    placeholder="you@example.com"
                     required
                     style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: `2px solid ${theme.colors.border}`, fontSize: 14, backgroundColor: theme.colors.bg.secondary }}
                   />
@@ -172,7 +172,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
                   disabled={loading}
                   style={{ width: "100%", padding: "16px", borderRadius: 12, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#ffffff", border: "none", fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}
                 >
-                  {loading ? "A enviar..." : "Enviar Email de Recuperação"}
+                  {loading ? "Sending..." : "Send recovery email"}
                 </button>
               </form>
             </div>
@@ -183,7 +183,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
               onClick={() => { setShowForgotPassword(false); setResetSent(false); setError(""); }}
               style={{ background: "none", border: "none", fontSize: 12, color: theme.colors.text.tertiary, cursor: "pointer", textDecoration: "none" }}
             >
-              ← Voltar ao login
+              ← Back to sign in
             </button>
           </div>
         </div>
@@ -191,7 +191,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
     );
   }
 
-  // Renderização normal - formulário de login
+  // Standard sign-in form
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: theme.colors.bg.primary }}>
       <div style={{ width: "100%", maxWidth: 400, padding: 20 }}>
@@ -199,7 +199,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
           <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 36, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>
             AI BORA <span style={{ color: "#F22283" }}>Vendas</span>
           </h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Área do vendedor</p>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Sales area</p>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: 20, padding: 32, boxShadow: "0 4px 30px rgba(0,0,0,0.1)" }}>
@@ -210,7 +210,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder="you@example.com"
                 required
                 style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: `2px solid ${theme.colors.border}`, fontSize: 14, backgroundColor: theme.colors.bg.secondary }}
               />
@@ -239,7 +239,7 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
               disabled={loading}
               style={{ width: "100%", padding: "16px", borderRadius: 12, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#ffffff", border: "none", fontSize: 14, fontWeight: 700, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}
             >
-              {loading ? "A entrar..." : "Entrar"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
@@ -248,14 +248,14 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
               onClick={() => setShowForgotPassword(true)}
               style={{ background: "none", border: "none", fontSize: 13, color: theme.colors.text.tertiary, cursor: "pointer", textDecoration: "none" }}
             >
-              Esqueceu a password?
+              Forgot your password?
             </button>
           </div>
         </div>
 
         <div style={{ textAlign: "center", marginTop: 24 }}>
           <a href="/admin" style={{ fontSize: 12, color: theme.colors.text.tertiary, textDecoration: "none" }}>
-            ← Voltar ao painel Admin
+            ← Back to admin
           </a>
         </div>
       </div>

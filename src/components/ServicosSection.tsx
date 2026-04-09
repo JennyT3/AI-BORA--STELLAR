@@ -15,9 +15,9 @@ export function ServicosSection() {
           lineHeight: 1.2,
           margin: "0 0 8px"
         }}>
-          Packs de presença digital
+          Digital presence packs
           <br />
-          <span style={{ color: "#F22283" }}>pagamento único</span>
+          <span style={{ color: "#F22283" }}>one-time payment</span>
         </h2>
         <p style={{
           fontFamily: "Montserrat, sans-serif",
@@ -27,10 +27,10 @@ export function ServicosSection() {
           margin: "0 0 12px",
           lineHeight: 1.4
         }}>
-          Investimento <span style={{ textDecoration: "underline", textDecorationColor: "#F25C05" }}>único</span>. Sem mensalidades. Sem surpresas.
+          <span style={{ textDecoration: "underline", textDecorationColor: "#F25C05" }}>One-time</span> investment. No monthly fees. No surprises.
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6 }}>
-          {["Sem Contratos", "Pagamento Único", "Sem Taxas Ocultas"].map(t => (
+          {["No contracts", "One-time payment", "No hidden fees"].map(t => (
             <span key={t} style={{
               fontFamily: "Montserrat, sans-serif",
               fontWeight: 700,
@@ -80,7 +80,7 @@ export function ServicosSection() {
               </div>
             )}
  
-            {/* SEM o label "Pagamento único" no card — já está no cabeçalho */}
+            {/* No per-card "one-time payment" label — covered in header */}
  
             <span style={{
               fontFamily: "Montserrat, sans-serif", fontWeight: 700,
@@ -117,7 +117,7 @@ export function ServicosSection() {
                 fontFamily: "Montserrat, sans-serif", fontWeight: 700,
                 fontSize: 10, color: pack.domain ? "#25D366" : "#F25C05"
               }}>
-                {pack.domain ? "Domínio próprio" : "Sem domínio próprio"}
+                {pack.domain ? "Custom domain" : "No custom domain"}
               </span>
             </div>
  
@@ -140,7 +140,7 @@ export function ServicosSection() {
             </ul>
  
             <a
-              href={`${WHATSAPP_LINK}?text=Olá, tenho interesse no ${pack.label} de €${pack.price}.`}
+              href={`${WHATSAPP_LINK}?text=Hi, I am interested in the ${pack.label} at €${pack.price}.`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

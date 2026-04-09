@@ -22,3 +22,41 @@ coverage/
 optimizar.sh
 optimizar_imagenes.sh
 
+ 
+# Environment variables
+.env
+.env.local
+.env.*.local
+ 
+# Sensitive files
+*.key
+*.pem
+credentials.json
+firebase-key.json
+ 
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+ 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+ 
+# OS
+.DS_Store
+Thumbs.db
+ 
+# Logs
+logs/
+*.log
+npm-debug.log*
+ 
+# Testing
+coverage/
+.nyc_output/
+.env.local

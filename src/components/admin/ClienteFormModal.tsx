@@ -51,7 +51,7 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
             <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
               <User size={20} strokeWidth={2.5} />
             </div>
-            {isEditing ? "Editar Cliente" : "Novo Cliente"}
+            {isEditing ? "Edit client" : "New client"}
           </h3>
           <button onClick={onClose} style={{ border: "none", background: "#f6f3f1", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#8e7165" }}>
             <X size={18} />
@@ -60,13 +60,13 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
 
         <div style={{ display: "grid", gap: 20 }}>
           
-          {/* IDENTIFICAÇÃO */}
+          {/* Identification */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><User size={14} /> Identificação</div>
+            <div style={sectionTitleStyle}><User size={14} /> Identification</div>
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
               <div style={{ position: "relative" }}>
-                <label style={labelStyle}>Nome Completo *</label>
-                <input type="text" value={clienteFormData.nome} onChange={(e) => { onFieldChange("nome", e.target.value); onClienteSearchChange(e.target.value); }} style={inputStyle} placeholder="Nome do cliente" />
+                <label style={labelStyle}>Full name *</label>
+                <input type="text" value={clienteFormData.nome} onChange={(e) => { onFieldChange("nome", e.target.value); onClienteSearchChange(e.target.value); }} style={inputStyle} placeholder="Client name" />
                 {showClienteSuggestions && clienteSearch.length > 0 && (
                   <div style={{ position: "absolute", top: "100%", left: 0, right: 0, backgroundColor: "#fff", border: "1px solid #f0edeb", borderRadius: 10, boxShadow: "0 10px 25px rgba(0,0,0,0.1)", zIndex: 100, maxHeight: 150, overflow: "auto", marginTop: 4 }}>
                     {clientes.filter(c => c.nome?.toLowerCase().includes(clienteSearch.toLowerCase())).slice(0, 5).map(c => (
@@ -76,28 +76,28 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
                 )}
               </div>
               <div>
-                <label style={labelStyle}>Origem *</label>
+                <label style={labelStyle}>Source *</label>
                 <select value={clienteFormData.origem || ""} onChange={(e) => onFieldChange("origem", e.target.value)} style={selectStyle}>
-                  <option value="">Selecionar...</option>
+                  <option value="">Select...</option>
                   <option value="Instagram">Instagram</option>
                   <option value="Facebook">Facebook</option>
                   <option value="TikTok">TikTok</option>
                   <option value="LinkedIn">LinkedIn</option>
-                  <option value="Recomendado">Recomendado</option>
+                  <option value="Recomendado">Referral</option>
                   <option value="Website">Website</option>
-                  <option value="Formulario">Formulário</option>
-                  <option value="Importado">Importado</option>
-                  <option value="Outro">Outro</option>
+                  <option value="Formulario">Form</option>
+                  <option value="Importado">Imported</option>
+                  <option value="Outro">Other</option>
                 </select>
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
               <div>
                 <label style={labelStyle}>Email</label>
-                <input type="email" value={clienteFormData.email || ""} onChange={(e) => onFieldChange("email", e.target.value)} style={inputStyle} placeholder="email@exemplo.pt" />
+                <input type="email" value={clienteFormData.email || ""} onChange={(e) => onFieldChange("email", e.target.value)} style={inputStyle} placeholder="you@example.com" />
               </div>
               <div>
-                <label style={labelStyle}>Telemóvel</label>
+                <label style={labelStyle}>Mobile</label>
                 <input type="tel" value={clienteFormData.telemovel || ""} onChange={(e) => onFieldChange("telemovel", e.target.value)} style={inputStyle} placeholder="+351..." />
               </div>
             </div>
@@ -107,13 +107,13 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
             </div>
           </div>
 
-          {/* EMPRESA */}
+          {/* Company */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><Building size={14} /> Empresa</div>
+            <div style={sectionTitleStyle}><Building size={14} /> Company</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label style={labelStyle}>Empresa</label>
-                <input type="text" value={clienteFormData.empresa || ""} onChange={(e) => onFieldChange("empresa", e.target.value)} style={inputStyle} placeholder="Nome da empresa" />
+                <label style={labelStyle}>Company</label>
+                <input type="text" value={clienteFormData.empresa || ""} onChange={(e) => onFieldChange("empresa", e.target.value)} style={inputStyle} placeholder="Company name" />
               </div>
               <div>
                 <label style={labelStyle}>Website</label>
@@ -122,106 +122,106 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
             </div>
           </div>
 
-          {/* LOCALIZAÇÃO */}
+          {/* Location */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><MapPin size={14} /> Localização</div>
+            <div style={sectionTitleStyle}><MapPin size={14} /> Location</div>
             <div>
-              <label style={labelStyle}>Morada</label>
-              <input type="text" value={clienteFormData.morada || ""} onChange={(e) => onFieldChange("morada", e.target.value)} style={inputStyle} placeholder="Rua, número, andar..." />
+              <label style={labelStyle}>Address</label>
+              <input type="text" value={clienteFormData.morada || ""} onChange={(e) => onFieldChange("morada", e.target.value)} style={inputStyle} placeholder="Street, number, floor..." />
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
               <div>
-                <label style={labelStyle}>Código Postal</label>
+                <label style={labelStyle}>Postal code</label>
                 <input type="text" value={clienteFormData.codigoPostal || ""} onChange={(e) => onFieldChange("codigoPostal", e.target.value)} style={inputStyle} placeholder="0000-000" />
               </div>
               <div>
-                <label style={labelStyle}>Cidade</label>
-                <input type="text" value={clienteFormData.cidade || ""} onChange={(e) => onFieldChange("cidade", e.target.value)} style={inputStyle} placeholder="Lisboa, Porto..." />
+                <label style={labelStyle}>City</label>
+                <input type="text" value={clienteFormData.cidade || ""} onChange={(e) => onFieldChange("cidade", e.target.value)} style={inputStyle} placeholder="Lisbon, Porto..." />
               </div>
             </div>
           </div>
 
-          {/* CLASSIFICAÇÃO */}
+          {/* Classification */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><Tag size={14} /> Classificação</div>
+            <div style={sectionTitleStyle}><Tag size={14} /> Classification</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label style={labelStyle}>Categoria</label>
+                <label style={labelStyle}>Category</label>
                 <select value={clienteFormData.categoria || "curioso"} onChange={(e) => onFieldChange("categoria", e.target.value)} style={selectStyle}>
-                  <option value="curioso">Curioso</option>
-                  <option value="potencial">Potencial</option>
-                  <option value="proposta_enviada">Proposta Enviada</option>
-                  <option value="cliente">Cliente Ativo</option>
-                  <option value="inativo">Inativo</option>
-                  <option value="sem_interesse">Sem Interesse</option>
+                  <option value="curioso">Browsing</option>
+                  <option value="potencial">Lead</option>
+                  <option value="proposta_enviada">Proposal sent</option>
+                  <option value="cliente">Active client</option>
+                  <option value="inativo">Inactive</option>
+                  <option value="sem_interesse">Not interested</option>
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Processo</label>
+                <label style={labelStyle}>Pipeline</label>
                 <select value={clienteFormData.processo || "sem_processo"} onChange={(e) => onFieldChange("processo", e.target.value)} style={selectStyle}>
-                  <option value="sem_processo">Sem Processo</option>
-                  <option value="inicio">Início</option>
-                  <option value="em_progresso">Em Progresso</option>
-                  <option value="em_revisao">Em Revisão</option>
-                  <option value="aprovado">Aprovado</option>
-                  <option value="feito">Feito</option>
-                  <option value="concluido">Concluído</option>
+                  <option value="sem_processo">No process</option>
+                  <option value="inicio">Started</option>
+                  <option value="em_progresso">In progress</option>
+                  <option value="em_revisao">In review</option>
+                  <option value="aprovado">Approved</option>
+                  <option value="feito">Done</option>
+                  <option value="concluido">Closed</option>
                 </select>
               </div>
             </div>
             <div style={{ marginTop: 12 }}>
-              <label style={labelStyle}>Último Contacto</label>
+              <label style={labelStyle}>Last contact</label>
               <input type="date" value={clienteFormData.dataUltimoContacto ? clienteFormData.dataUltimoContacto.split("T")[0] : ""} onChange={(e) => onFieldChange("dataUltimoContacto", e.target.value ? e.target.value + "T00:00:00.000Z" : "")} style={inputStyle} />
             </div>
           </div>
 
-          {/* NOTAS */}
+          {/* Notes */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><MessageSquare size={14} /> Notas</div>
+            <div style={sectionTitleStyle}><MessageSquare size={14} /> Notes</div>
             <div>
-              <label style={labelStyle}>Notas do Vendedor</label>
-              <textarea value={clienteFormData.notasVendedor || ""} onChange={(e) => onFieldChange("notasVendedor", e.target.value)} rows={2} style={{ ...inputStyle, fontFamily: "inherit", resize: "vertical" }} placeholder="Notas privadas..." />
+              <label style={labelStyle}>Seller notes</label>
+              <textarea value={clienteFormData.notasVendedor || ""} onChange={(e) => onFieldChange("notasVendedor", e.target.value)} rows={2} style={{ ...inputStyle, fontFamily: "inherit", resize: "vertical" }} placeholder="Internal notes..." />
             </div>
             <div style={{ marginTop: 12 }}>
-              <label style={labelStyle}>Observações</label>
-              <textarea value={clienteFormData.observacoes || ""} onChange={(e) => onFieldChange("observacoes", e.target.value)} rows={2} style={{ ...inputStyle, fontFamily: "inherit", resize: "vertical" }} placeholder="Notas visíveis ao cliente..." />
+              <label style={labelStyle}>Client-visible notes</label>
+              <textarea value={clienteFormData.observacoes || ""} onChange={(e) => onFieldChange("observacoes", e.target.value)} rows={2} style={{ ...inputStyle, fontFamily: "inherit", resize: "vertical" }} placeholder="Notes visible to the client..." />
             </div>
           </div>
 
-          {/* ATRIBUIÇÃO */}
+          {/* Assignment */}
           <div style={sectionStyle}>
-            <div style={sectionTitleStyle}><User size={14} /> Atribuição</div>
+            <div style={sectionTitleStyle}><User size={14} /> Assignment</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label style={labelStyle}>Vendedor</label>
+                <label style={labelStyle}>Sales rep</label>
                 <select value={clienteFormData.vendedorId || ""} onChange={(e) => onFieldChange("vendedorId", e.target.value)} style={selectStyle}>
-                  <option value="">Sem vendedor</option>
+                  <option value="">Unassigned</option>
                   {vendedoresLista.map(v => <option key={v.id} value={v.id}>{v.nome}</option>)}
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Criado por</label>
-                <input type="text" value={clienteFormData.criadoPor || ""} onChange={(e) => onFieldChange("criadoPor", e.target.value)} style={inputStyle} placeholder="admin, importacao..." />
+                <label style={labelStyle}>Created by</label>
+                <input type="text" value={clienteFormData.criadoPor || ""} onChange={(e) => onFieldChange("criadoPor", e.target.value)} style={inputStyle} placeholder="admin, import..." />
               </div>
             </div>
           </div>
 
-          {/* DOCUMENTOS VINCULADOS - Solo lectura */}
+          {/* Linked documents (read-only) */}
           {hasDocumentos && (
             <div style={{ backgroundColor: "#fcf9f7", borderRadius: 16, padding: 20 }}>
-              <div style={sectionTitleStyle}><FileText size={14} /> Documentos Vinculados</div>
+              <div style={sectionTitleStyle}><FileText size={14} /> Linked documents</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {clienteFormData.solicitacaoId && (
-                  <span style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#5a4137" }}>Solicitação: {clienteFormData.solicitacaoId}</span>
+                  <span style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#5a4137" }}>Request: {clienteFormData.solicitacaoId}</span>
                 )}
                 {clienteFormData.orcamentoIds?.map((id: string, i: number) => (
-                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#F25C05" }}>Orçamento: {id}</span>
+                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#F25C05" }}>Quote: {id}</span>
                 ))}
                 {clienteFormData.propostaIds?.map((id: string, i: number) => (
-                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#10b981" }}>Proposta: {id}</span>
+                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#10b981" }}>Proposal: {id}</span>
                 ))}
                 {clienteFormData.faturaIds?.map((id: string, i: number) => (
-                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#6366f1" }}>Fatura: {id}</span>
+                  <span key={i} style={{ padding: "6px 12px", backgroundColor: "#fff", borderRadius: 8, fontSize: 11, fontWeight: 700, color: "#6366f1" }}>Invoice: {id}</span>
                 ))}
               </div>
             </div>
@@ -232,10 +232,10 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
         <div style={{ display: "flex", gap: 16, marginTop: 32 }}>
           <button onClick={onSave} style={{ flex: 1, padding: "16px", borderRadius: 16, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#fff", border: "none", fontWeight: 800, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
             <Save size={18} />
-            {isEditing ? "Guardar Alterações" : "Criar Cliente"}
+            {isEditing ? "Save changes" : "Create client"}
           </button>
           <button onClick={onClose} style={{ flex: 1, padding: "16px", borderRadius: 16, backgroundColor: "#fcf9f7", color: "#5a4137", border: "1px solid rgba(0,0,0,0.05)", fontWeight: 700, fontSize: 15, cursor: "pointer" }}>
-            Cancelar
+            Cancel
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ export function Footer() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
 
-          {/* Logo + Texto AI BORA + Descrição */}
+          {/* Logo + AI BORA + description */}
           <div className="space-y-4">
             <Link href="/">
               <div className="cursor-pointer flex items-center gap-3">
@@ -17,9 +17,9 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-sm text-text-secondary leading-relaxed font-normal line-clamp-3">
-              Ajudamos negócios locais em Portugal a crescerem com Inteligência Artificial. Sem jargões, apenas resultados reais.
+              We help local businesses grow with artificial intelligence. No jargon—just real results.
             </p>
-            {/* Redes Sociais */}
+            {/* Social links */}
             <div className="flex items-center gap-3 pt-1">
               <a href="https://instagram.com/aibora.pt" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center hover:border-fuchsia-brand hover:text-fuchsia-brand transition-colors text-text-secondary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,35 +39,35 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Links Rápidos */}
+          {/* Quick links */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Explorar</h4>
+            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Explore</h4>
             <ul className="space-y-2">
-              <li><Link href="/servicos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Serviços</Link></li>
-              <li><Link href="/prompts" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Prompts AI</Link></li>
-              <li><a href="/#quem-somos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Quem Somos</a></li>
-              <li><a href="/#processo" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Como Funciona</a></li>
+              <li><Link href="/servicos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Services</Link></li>
+              <li><Link href="/prompts" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">AI prompts</Link></li>
+              <li><a href="/#quem-somos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">About us</a></li>
+              <li><a href="/#processo" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">How it works</a></li>
             </ul>
           </div>
 
-          {/* Academia - BORA LÁ ESTUDAR */}
+          {/* Academy */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Educação</h4>
+            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Learning</h4>
             <ul className="space-y-3">
               <li>
                 <Link href="/academia" className="flex items-center gap-2 text-sm font-black text-[#F22283] hover:text-[#F25C05] transition-colors">
-                  <GraduationCap size={16} /> Bora Lá Estudar
+                  <GraduationCap size={16} /> Bora Lá Academy
                 </Link>
               </li>
-              <li><Link href="/academia/trilhas" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Trilhas de IA</Link></li>
-              <li><Link href="/academia/certificados" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Certificados</Link></li>
-              <li><Link href="/academia/consultoria" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Ser Professor</Link></li>
+              <li><Link href="/academia/trilhas" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">AI learning paths</Link></li>
+              <li><Link href="/academia/certificados" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Certificates</Link></li>
+              <li><Link href="/academia/consultoria" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Teach with us</Link></li>
             </ul>
           </div>
 
-          {/* Contactos */}
+          {/* Contact */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Contactos</h4>
+            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm font-medium text-text-secondary">
                 <Mail size={16} className="text-fuchsia-brand shrink-0 mt-0.5" />
@@ -84,7 +84,7 @@ export function Footer() {
 
         <div className="text-center pt-8 border-t border-black/5">
           <p className="text-xs text-text-muted font-medium">
-            © {new Date().getFullYear()} AI BORA · Todos os direitos reservados · Feito com ❤️ pela equipa AI BORA
+            © {new Date().getFullYear()} AI BORA · All rights reserved · Made with ❤️ by the AI BORA team
           </p>
         </div>
 

@@ -38,7 +38,7 @@ export default function AcademiaQuiz() {
   if (!isLoaded) {
     return (
       <div style={styles.container}>
-        <div style={styles.loading}>Carregando...</div>
+        <div style={styles.loading}>Loading…</div>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function AcademiaQuiz() {
     return <Redirect href="/academia/login" />;
   }
 
-  // FIXED: Añadido guard de onboarding
+  // Onboarding guard
   if (!academiaUser?.onboarding_completo) {
     return <Redirect href="/academia/onboarding" />;
   }
@@ -56,10 +56,10 @@ export default function AcademiaQuiz() {
     return (
       <div style={styles.container}>
         <div style={styles.card}>
-          <h2 style={styles.title}>Quiz Não Encontrado</h2>
-          <p style={styles.text}>Este quiz ainda não está disponível.</p>
+          <h2 style={styles.title}>Quiz not found</h2>
+          <p style={styles.text}>This quiz is not available yet.</p>
           <a href="/academia/trilhas" style={styles.button}>
-            Voltar às Trilhas
+            Back to learning paths
           </a>
         </div>
       </div>
@@ -105,23 +105,23 @@ export default function AcademiaQuiz() {
     
     try {
       if (aprovado) {
-        // 1. Salvar progresso do quiz
+        // 1. Save quiz progress
         await saveProgresso(
           user.id,
           `quiz-${trilhaId}`,
           trilhaId,
           quiz.titulo,
-          'Avaliação Final',
+          'Final assessment',
           true,
           100
         );
         
-        // 2. Criar certificado automaticamente
+        // 2. Create certificate
         await criarCertificado(user.id, trilhaId, quiz.titulo);
-        console.log('Certificado gerado com sucesso!');
+        console.log('Certificate created successfully.');
       }
     } catch (err) {
-      console.error("Erro ao salvar progresso ou gerar certificado:", err);
+      console.error("Error saving progress or creating certificate:", err);
     }
     
     setSalvando(false);
@@ -134,19 +134,19 @@ export default function AcademiaQuiz() {
       </div>
       
       <h2 style={styles.title}>
-        {aprovado ? "Parabéns!" : "Não foi dessa vez"}
+        {aprovado ? "Congratulations!" : "Not quite there"}
       </h2>
       
       <p style={styles.text}>
         {aprovado
-          ? `Você acertou ${acertos} de ${perguntas.length} perguntas (${Math.round(percentual)}%)`
-          : `Você acertou ${acertos} de ${perguntas.length} perguntas. O mínimo é 70%.`}
+          ? `You got ${acertos} of ${perguntas.length} correct (${Math.round(percentual)}%)`
+          : `You got ${acertos} of ${perguntas.length} correct. You need 70% to pass.`}
       </p>
       
       <div style={styles.stats}>
         <div style={styles.statItem}>
           <span style={styles.statValue}>{Math.round(percentual)}%</span>
-          <span style={styles.statLabel}>Aproveitamento</span>
+          <span style={styles.statLabel}>Score</span>
         </div>
         <div style={styles.statItem}>
           <span style={styles.statValue}>{acertos}/{perguntas.length}</span>
@@ -154,7 +154,7 @@ export default function AcademiaQuiz() {
         </div>
         <div style={styles.statItem}>
           <span style={styles.statValue}>{tentativas}</span>
-          <span style={styles.statLabel}>Tentativas</span>
+          <span style={styles.statLabel}>Attempts</span>
         </div>
       </div>
       
@@ -162,25 +162,25 @@ export default function AcademiaQuiz() {
         {aprovado ? (
           <>
             <a href="/academia/certificados" style={styles.buttonSuccess} onClick={handleConcluirQuiz}>
-              Ver Certificado
+              View certificate
             </a>
             <button onClick={() => window.location.reload()} style={styles.buttonSecondary}>
-              Refazer Quiz
+              Retake quiz
             </button>
           </>
         ) : (
           <>
             <button onClick={() => window.location.reload()} style={styles.button}>
-              Tentar Novamente
+              Try again
             </button>
             <a href="/academia/trilhas" style={styles.buttonSecondary}>
-              Voltar às Trilhas
+              Back to learning paths
             </a>
           </>
         )}
       </div>
       
-      {salvando && <p style={styles.salvando}>Salvando progresso...</p>}
+      {salvando && <p style={styles.salvando}>Saving progress…</p>}
     </div>
   );
 
@@ -189,7 +189,7 @@ export default function AcademiaQuiz() {
       <div style={styles.card}>
         <div style={styles.header}>
           <a href={`/academia/trilha/${trilhaId}`} style={styles.backLink}>
-            ← Voltar à Trilha
+            ← Back to path
           </a>
           <h1 style={styles.quizTitle}>{quiz.titulo}</h1>
         </div>
@@ -200,7 +200,7 @@ export default function AcademiaQuiz() {
               <div style={{ ...styles.progressFill, width: `${progresso}%` }} />
             </div>
             <div style={styles.progressText}>
-              Pergunta {perguntaAtual + 1} de {perguntas.length}
+              Question {perguntaAtual + 1} of {perguntas.length}
             </div>
 
             <div style={styles.pergunta}>
@@ -237,7 +237,7 @@ export default function AcademiaQuiz() {
                 ...styles.feedback,
                 background: respostaSelecionada === pergunta.resposta_correta ? '#e8f5e9' : '#ffebee'
               }}>
-                <strong>{respostaSelecionada === pergunta.resposta_correta ? "Correto! ✓" : "Incorreto ✗"}</strong>
+                <strong>{respostaSelecionada === pergunta.resposta_correta ? "Correct ✓" : "Incorrect ✗"}</strong>
                 <p style={styles.feedbackTexto}>{pergunta.explicacao}</p>
               </div>
             )}
@@ -253,11 +253,11 @@ export default function AcademiaQuiz() {
                     cursor: respostaSelecionada ? 'pointer' : 'not-allowed'
                   }}
                 >
-                  Confirmar Resposta
+                  Confirm answer
                 </button>
               ) : (
                 <button onClick={handleProxima} style={styles.button}>
-                  {perguntaAtual < perguntas.length - 1 ? "Próxima Pergunta" : "Ver Resultado"}
+                  {perguntaAtual < perguntas.length - 1 ? "Next question" : "See results"}
                 </button>
               )}
             </div>

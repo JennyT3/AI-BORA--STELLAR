@@ -76,14 +76,14 @@ export function Admin() {
       
       if (newAttempts >= 5) {
         setIsLocked(true);
-        setError("Demasiadas tentativas. Tente novamente em 30 segundos.");
+        setError("Too many attempts. Please try again in 30 seconds.");
         setTimeout(() => {
           setIsLocked(false);
           setLoginAttempts(0);
           setError("");
         }, 30000);
       } else {
-        setError("Utilizador ou password incorretos.");
+        setError("Incorrect username or password.");
       }
     }
   };
@@ -106,11 +106,11 @@ export function Admin() {
             <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: 28, color: theme.colors.text.primary, marginBottom: 8 }}>
               AI BORA <span style={{ color: "#F22283" }}>Admin</span>
             </h1>
-            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: theme.colors.text.secondary }}>Gestão de Propostas</p>
+            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: theme.colors.text.secondary }}>Proposal management</p>
           </div>
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Utilizador</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 8 }}>Username</label>
               <input type="email" value={username} onChange={e => setUsername(e.target.value)} placeholder="Email"
                 style={{ width: "100%", padding: "14px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", backgroundColor: "#fafafa", color: theme.colors.text.primary }} />
             </div>
@@ -122,7 +122,7 @@ export function Admin() {
             {error && <p style={{ color: "#F22283", fontSize: 13, marginBottom: 20, textAlign: "center", fontWeight: 600 }}>{error}</p>}
             <button type="submit"
               style={{ width: "100%", padding: "16px", borderRadius: 12, background: `linear-gradient(135deg, ${theme.colors.accent.primary} 0%, #F22283 100%)`, color: "#fff", border: "none", fontWeight: 700, cursor: "pointer", fontSize: 14, fontFamily: "Montserrat, sans-serif", boxShadow: "0 4px 20px rgba(242,34,131,0.3)" }}>
-              Entrar
+              Sign in
             </button>
           </form>
         </div>
@@ -301,7 +301,7 @@ export function Admin() {
         </main>
       </div>
 
-      {/* Modales de Creación Restaurados */}
+      {/* Client and invoice modals */}
       {admin.showClienteForm && admin.clienteFormData && (
         <ClienteFormModal
           clienteFormData={admin.clienteFormData}
@@ -324,7 +324,7 @@ export function Admin() {
           faturaData={admin.faturaData}
           numeroFatura={admin.numeroFatura}
           onNumeroFaturaChange={admin.setNumeroFatura}
-          onConfirm={() => { alert('Fatura gerada com sucesso nas rotinas de background.'); admin.closeFaturaModal(); }}
+          onConfirm={() => { alert('Invoice generated successfully in background routines.'); admin.closeFaturaModal(); }}
           onClose={admin.closeFaturaModal}
         />
       )}

@@ -1,5 +1,5 @@
 // ============================================
-// SERVICO DE AUTENTICAÇÃO FIREBASE
+// FIREBASE AUTHENTICATION SERVICE
 // ============================================
 
 import { 
@@ -29,67 +29,62 @@ export interface AuthResult {
 }
 
 // ============================================
-// LOGIN DE VENDEDOR
+// VENDEDOR LOGIN
 // ============================================
 
 export async function loginVendedor(email: string, password: string): Promise<AuthResult> {
   try {
-    // Validar inputs
     if (!email || !password) {
-      return { success: false, error: 'Email e password são obrigatórios' };
+      return { success: false, error: 'Email and password are required' };
     }
 
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     
-    // Obter dados do vendedor no Firestore
     const vendedorDoc = await getDoc(doc(db, 'vendedores', userCredential.user.uid));
     
     if (!vendedorDoc.exists()) {
-      // Usuário existe no Auth mas não tem documento no Firestore
       await signOut(auth);
-      return { success: false, error: 'Dados do vendedor não encontrados. Contacte o administrador.' };
+      return { success: false, error: 'Vendor data not found. Contact the administrator.' };
     }
 
     const vendedorData = vendedorDoc.data();
 
-    // Verificar se está ativo
     if (!vendedorData.ativo) {
       await signOut(auth);
-      return { success: false, error: 'Utilizador inativo. Contacte o administrador.' };
+      return { success: false, error: 'Account inactive. Contact the administrator.' };
     }
 
     return { 
       success: true, 
       user: userCredential.user,
-      // Retornar dados do vendedor para sessão
       vendedor: {
         id: userCredential.user.uid,
         ...vendedorData
       }
     };
   } catch (error: any) {
-    console.error('Erro no login:', error.code);
+    console.error('Login error:', error.code);
     
-    let errorMessage = 'Erro ao iniciar sessão';
+    let errorMessage = 'Could not sign in';
     
     switch (error.code) {
       case 'auth/invalid-email':
-        errorMessage = 'Email inválido';
+        errorMessage = 'Invalid email';
         break;
       case 'auth/user-disabled':
-        errorMessage = 'Utilizador desativado';
+        errorMessage = 'Account disabled';
         break;
       case 'auth/user-not-found':
-        errorMessage = 'Utilizador não encontrado';
+        errorMessage = 'User not found';
         break;
       case 'auth/wrong-password':
-        errorMessage = 'Password incorreta';
+        errorMessage = 'Incorrect password';
         break;
       case 'auth/invalid-credential':
-        errorMessage = 'Email ou password incorretos';
+        errorMessage = 'Incorrect email or password';
         break;
       case 'auth/too-many-requests':
-        errorMessage = 'Demasiadas tentativas. Tente novamente mais tarde.';
+        errorMessage = 'Too many attempts. Try again later.';
         break;
     }
     
@@ -98,7 +93,7 @@ export async function loginVendedor(email: string, password: string): Promise<Au
 }
 
 // ============================================
-// REGISTO DE NOVO VENDEDOR
+// REGISTER NEW VENDEDOR
 // ============================================
 
 export async function registerVendedor(
@@ -107,25 +102,21 @@ export async function registerVendedor(
   dados: VendedorAuthData
 ): Promise<AuthResult> {
   try {
-    // Validar inputs
     if (!email || !password || !dados.nome) {
-      return { success: false, error: 'Email, password e nome são obrigatórios' };
+      return { success: false, error: 'Email, password, and name are required' };
     }
 
     if (password.length < 6) {
-      return { success: false, error: 'Password deve ter pelo menos 6 caracteres' };
+      return { success: false, error: 'Password must be at least 6 characters' };
     }
 
-    // Verificar se email já existe no Firestore
     const existingQuery = await getDoc(doc(db, 'vendedores', email.toLowerCase()));
     if (existingQuery.exists()) {
-      return { success: false, error: 'Já existe um vendedor com este email' };
+      return { success: false, error: 'A vendor with this email already exists' };
     }
 
-    // Criar utilizador no Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-    // Criar documento do vendedor no Firestore
     await setDoc(doc(db, 'vendedores', userCredential.user.uid), {
       ...dados,
       email: email.toLowerCase(),
@@ -140,19 +131,19 @@ export async function registerVendedor(
       user: userCredential.user 
     };
   } catch (error: any) {
-    console.error('Erro no registo:', error.code);
+    console.error('Registration error:', error.code);
     
-    let errorMessage = 'Erro ao criar conta';
+    let errorMessage = 'Could not create account';
     
     switch (error.code) {
       case 'auth/email-already-in-use':
-        errorMessage = 'Este email já está em uso';
+        errorMessage = 'This email is already in use';
         break;
       case 'auth/invalid-email':
-        errorMessage = 'Email inválido';
+        errorMessage = 'Invalid email';
         break;
       case 'auth/weak-password':
-        errorMessage = 'Password muito fraca';
+        errorMessage = 'Password is too weak';
         break;
     }
     
@@ -161,7 +152,7 @@ export async function registerVendedor(
 }
 
 // ============================================
-// OBTER VENDEDOR ATUAL
+// GET CURRENT VENDEDOR
 // ============================================
 
 export async function getCurrentVendedor(): Promise<VendedorAuthData | null> {
@@ -192,22 +183,22 @@ export async function logoutVendedor(): Promise<void> {
 }
 
 // ============================================
-// RECUPERAR PASSWORD
+// PASSWORD RESET
 // ============================================
 
 export async function resetPassword(email: string): Promise<AuthResult> {
   try {
     if (!email) {
-      return { success: false, error: 'Email é obrigatório' };
+      return { success: false, error: 'Email is required' };
     }
 
     await sendPasswordResetEmail(auth, email);
     return { success: true };
   } catch (error: any) {
-    let errorMessage = 'Erro ao enviar email de recuperação';
+    let errorMessage = 'Could not send recovery email';
     
     if (error.code === 'auth/user-not-found') {
-      errorMessage = 'Email não encontrado';
+      errorMessage = 'Email not found';
     }
     
     return { success: false, error: errorMessage };
@@ -215,7 +206,7 @@ export async function resetPassword(email: string): Promise<AuthResult> {
 }
 
 // ============================================
-// ATUALIZAR PASSWORD
+// UPDATE PASSWORD
 // ============================================
 
 export async function updateVendedorPassword(
@@ -226,22 +217,21 @@ export async function updateVendedorPassword(
     const user = auth.currentUser;
     
     if (!user) {
-      return { success: false, error: 'Não autenticado' };
+      return { success: false, error: 'Not signed in' };
     }
 
     if (newPassword.length < 6) {
-      return { success: false, error: 'Nova password deve ter pelo menos 6 caracteres' };
+      return { success: false, error: 'New password must be at least 6 characters' };
     }
 
-    // Atualizar password no Firebase Auth
     await updatePassword(user, newPassword);
     
     return { success: true };
   } catch (error: any) {
-    let errorMessage = 'Erro ao atualizar password';
+    let errorMessage = 'Could not update password';
     
     if (error.code === 'auth/requires-recent-login') {
-      errorMessage = 'Por segurança, faça logout e login novamente antes de mudar a password';
+      errorMessage = 'For security, sign out and sign in again before changing your password';
     }
     
     return { success: false, error: errorMessage };
@@ -249,7 +239,7 @@ export async function updateVendedorPassword(
 }
 
 // ============================================
-// OBSERVADOR DE ESTADO DE AUTENTICAÇÃO
+// AUTH STATE OBSERVER
 // ============================================
 
 export function onAuthChange(callback: (user: FirebaseUser | null) => void): () => void {
@@ -257,12 +247,10 @@ export function onAuthChange(callback: (user: FirebaseUser | null) => void): () 
 }
 
 // ============================================
-// VERIFICAR SE EMAIL EXISTE
+// CHECK IF EMAIL EXISTS
 // ============================================
 
 export async function checkEmailExists(email: string): Promise<boolean> {
-  // Método simples - tenta criar conta e se falhar com "email-already-in-use"
-  // Mas isso requereria API adicional. Por agora, verificamos no Firestore.
   const q = await getDoc(doc(db, 'vendedores', email.toLowerCase()));
   return q.exists();
 }

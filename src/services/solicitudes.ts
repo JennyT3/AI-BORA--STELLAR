@@ -38,7 +38,7 @@ export async function createSolicitude(data: Partial<Solicitude>): Promise<strin
     try {
       await sendOrcamentoConfirmacao(data.email, data.nome, data.servicos);
     } catch (e) {
-      console.error("Erro ao enviar email de confirmação:", e);
+      console.error('Failed to send confirmation email:', e);
     }
   }
 

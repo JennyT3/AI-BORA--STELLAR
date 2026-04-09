@@ -43,7 +43,7 @@ export default function AcademiaTrilhas() {
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${colors.orange}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>A carregar trilhas...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading learning paths…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -75,15 +75,15 @@ export default function AcademiaTrilhas() {
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 24px' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 40 }}>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 42px)', fontWeight: 900, color: colors.dark, marginBottom: 16, letterSpacing: '-0.03em' }}>
-            Trilhas de <span style={{ color: colors.orange }}>Aprendizagem</span>
+            Learning <span style={{ color: colors.orange }}>paths</span>
           </h1>
-          <p style={{ color: '#666', fontSize: 18 }}>Escolhe uma trilha e começa a aprender.</p>
+          <p style={{ color: '#666', fontSize: 18 }}>Pick a path and start learning.</p>
         </motion.div>
 
         <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
           {(['todas', 'andamento', 'concluidas'] as const).map(f => (
             <button key={f} onClick={() => setFiltro(f)} style={{ padding: '10px 20px', borderRadius: 100, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, background: filtro === f ? colors.dark : '#f0f0f0', color: filtro === f ? '#fff' : '#666' }}>
-              {f === 'todas' ? 'Todas' : f === 'andamento' ? 'Em Andamento' : 'Concluídas'}
+              {f === 'todas' ? 'All' : f === 'andamento' ? 'In progress' : 'Completed'}
             </button>
           ))}
         </div>
@@ -103,7 +103,7 @@ export default function AcademiaTrilhas() {
                     <h3 style={{ fontSize: 20, fontWeight: 800, color: colors.dark, marginBottom: 8 }}>{trilha.nome}</h3>
                     <p style={{ fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 20, flex: 1 }}>{trilha.descricao}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 12, color: '#888', marginBottom: 20 }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><BookOpen size={14} /> {trilha.total_aulas} aulas</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><BookOpen size={14} /> {trilha.total_aulas} lessons</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={14} /> {trilha.tempo_total}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

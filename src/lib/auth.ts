@@ -1,9 +1,9 @@
 // ============================================
-// SERVIÇO DE AUTENTICAÇÃO JWT (MEJORADO)
+// JWT SESSION HELPERS
 // ============================================
 
 const TOKEN_KEY = 'aibora_session';
-const TOKEN_EXPIRY = 24 * 60 * 60 * 1000; // 24 horas
+const TOKEN_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 export interface SessionToken {
   id: string;
@@ -15,8 +15,8 @@ export interface SessionToken {
 }
 
 /**
- * Crea un token de sesión local.
- * Nota: En producción, esto debería ser un JWT firmado por el servidor.
+ * Create a local session token.
+ * Note: in production this should be a server-signed JWT.
  */
 export function createSessionToken(user: {
   id: string;
@@ -36,31 +36,28 @@ export function createSessionToken(user: {
 }
 
 /**
- * Guarda la sesión en sessionStorage para mayor seguridad (se limpia al cerrar la pestaña).
+ * Persist session in sessionStorage (cleared when the tab closes).
  */
 export function saveSession(token: SessionToken): void {
   try {
-    // Usamos btoa solo para una ofuscación básica, pero movido a sessionStorage
     const encoded = btoa(JSON.stringify(token));
     sessionStorage.setItem(TOKEN_KEY, encoded);
   } catch (err) {
-    console.error('Erro ao guardar sessão:', err);
+    console.error('Failed to save session:', err);
   }
 }
 
 /**
- * Obtiene la sesión validando la expiración.
+ * Read session and validate expiry.
  */
 export function getSession(): SessionToken | null {
   try {
-    // Intentar primero en sessionStorage (nuevo estándar)
     let stored = sessionStorage.getItem(TOKEN_KEY);
     
-    // Fallback a localStorage para no cerrar sesión a usuarios existentes (migración)
+    // Fallback to localStorage for existing users (migration)
     if (!stored) {
       stored = localStorage.getItem(TOKEN_KEY);
       if (stored) {
-        // Migrar a sessionStorage y limpiar localStorage
         sessionStorage.setItem(TOKEN_KEY, stored);
         localStorage.removeItem(TOKEN_KEY);
       }
@@ -70,7 +67,7 @@ export function getSession(): SessionToken | null {
 
     const decoded = JSON.parse(atob(stored)) as SessionToken;
     
-    // Verificar se expirou
+    // Check expiry
     if (Date.now() > decoded.expiresAt) {
       clearSession();
       return null;
@@ -84,7 +81,7 @@ export function getSession(): SessionToken | null {
 }
 
 /**
- * Limpia la sesión de ambos almacenamientos.
+ * Clear session from both storages.
  */
 export function clearSession(): void {
   sessionStorage.removeItem(TOKEN_KEY);
@@ -105,12 +102,12 @@ export function refreshSession(): boolean {
   return true;
 }
 
-// Verificar se é vendedor
+// True if vendedor session
 export function isVendedorSession(session: SessionToken | null): boolean {
   return session?.role === 'vendedor';
 }
 
-// Verificar se é admin
+// True if admin session
 export function isAdminSession(session: SessionToken | null): boolean {
   return session?.role === 'admin';
 }

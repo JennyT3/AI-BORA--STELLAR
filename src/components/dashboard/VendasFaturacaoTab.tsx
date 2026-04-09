@@ -17,8 +17,8 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Faturação</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Suas vendas e comissões</p>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Billing</h1>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Your sales and commissions</p>
         </div>
       </div>
 
@@ -28,7 +28,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
           <div style={{ fontSize: 32, fontWeight: 900, color: "#10B981", marginTop: 8 }}>{stats.valorTotalPropostas.toFixed(2)}€</div>
         </div>
         <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-          <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Sua Comissão ({vendedor.comissaoPercent}%)</span>
+          <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Your commission ({vendedor.comissaoPercent}%)</span>
           <div style={{ fontSize: 32, fontWeight: 900, color: "#F22283", marginTop: 8 }}>{stats.comissaoTotal.toFixed(2)}€</div>
         </div>
         <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
@@ -38,7 +38,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
       </div>
 
       <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8", marginBottom: 24 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Vendas com Comissão</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Sales with commission</h3>
         {propostas.filter(p => p.resposta === "sim").map(p => {
           const comissao = (p.valor || 0) * vendedor.comissaoPercent / 100;
           return (
@@ -50,7 +50,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontWeight: 700, color: "#10B981" }}>{p.valor?.toFixed(2)}€</div>
-                  <div style={{ fontSize: 12, color: "#F22283" }}>+{comissao.toFixed(2)}€ comissão</div>
+                  <div style={{ fontSize: 12, color: "#F22283" }}>+{comissao.toFixed(2)}€ commission</div>
                 </div>
                 <button 
                   onClick={async () => {
@@ -58,7 +58,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
                       numeroFatura: p.numeroOrcamento || "FAC-AUTO",
                       dataEmissao: new Date().toLocaleDateString('pt-PT'),
                       cliente: p.cliente,
-                      servicos: p.servicos || ["Serviços de Marketing"],
+                      servicos: p.servicos || ["Marketing services"],
                       subtotal: p.valor || 0,
                       iva: (p.valor || 0) * 0.23,
                       total: (p.valor || 0) * 1.23,
@@ -83,7 +83,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
       </div>
 
       <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Comissões por Tarefas Executadas</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Commissions from completed tasks</h3>
         {(tareas || []).filter(t => t.estado === 'paga' && t.asignadaA === vendedor.id && t.comissaoColaboradorValor).map(t => {
           return (
             <div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 0", borderBottom: "1px solid #f0f0f0" }}>
@@ -104,7 +104,7 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
         })}
         {(tareas || []).filter(t => t.estado === 'paga' && t.asignadaA === vendedor.id && t.comissaoColaboradorValor).length === 0 && (
           <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.secondary }}>
-            Nenhuma comissão de tarefa registrada ainda
+            No task commissions recorded yet
           </div>
         )}
       </div>

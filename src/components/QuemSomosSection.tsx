@@ -39,19 +39,19 @@ export function QuemSomosSection() {
     <section id="quem-somos" className="py-24" style={{ backgroundColor: '#F5F2F0' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Título con barra naranja */}
+        {/* Title with accent bar */}
         <div className="mb-8">
           <div className="w-16 h-1 mb-3" style={{ backgroundColor: '#F25C05' }}></div>
           <h2 style={{fontSize:"clamp(28px, 4vw, 42px)",fontWeight:900,fontFamily:'Montserrat',lineHeight:1.2}} className="text-text-primary">
-            Quem Somos
+            Who we are
           </h2>
         </div>
 
-        {/* Los dos caminos - debajo del título */}
+        {/* Two paths — below title */}
         <div className="mb-12">
           <p className="text-lg md:text-xl text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
-            A equipa que te faz escolher dois caminhos:<br/>
-            <span className="font-semibold text-text-primary">Ou lhe ensinamos como fazê-lo, ou fazemos tudo por si.</span>
+            The team that lets you choose two paths:<br/>
+            <span className="font-semibold text-text-primary">We either teach you how to do it, or we do it all for you.</span>
           </p>
         </div>
 
@@ -91,17 +91,17 @@ export function QuemSomosSection() {
           ))}
         </div>
 
-        {/* Texto principal */}
+        {/* Main copy */}
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-lg text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
-            A AIBORA nasceu com uma missão simples: descomplicar o marketing digital para negócios locais em Portugal.
+            AIBORA was born with a simple mission: make digital marketing straightforward for local businesses in Portugal.
           </p>
         </div>
 
-        {/* Compromisso */}
+        {/* Commitment */}
         <div className="text-center mt-8">
           <h3 className="text-xl font-bold" style={{fontFamily:'Montserrat', color: '#E11D48'}}>
-            Compromisso total com o seu sucesso
+            Fully committed to your success
           </h3>
         </div>
 

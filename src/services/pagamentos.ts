@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { generateId } from './firebase';
 
 export interface PaymentLink {
@@ -29,7 +29,7 @@ export async function criarPaymentLink(faturaId: string): Promise<PaymentLink | 
     clienteId: fatura.clienteId,
     clienteEmail: fatura.clienteEmail || '',
     valor: fatura.valorTotal || 0,
-    descricao: `Fatura ${fatura.numero}`,
+    descricao: `Invoice ${fatura.numero}`,
     status: 'pendente',
     expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
     createdAt: new Date()
@@ -45,8 +45,8 @@ export async function criarPaymentLink(faturaId: string): Promise<PaymentLink | 
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Fatura ${fatura.numero}`,
-              description: fatura.descricao || 'Serviços Ai Bora'
+              name: `Invoice ${fatura.numero}`,
+              description: fatura.descricao || 'Ai Bora services'
             },
             unit_amount: Math.round((fatura.valorTotal || 0) * 100)
           },

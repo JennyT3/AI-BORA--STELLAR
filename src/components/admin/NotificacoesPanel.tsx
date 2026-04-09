@@ -36,7 +36,7 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
       const data = await listNotificacoes();
       setNotificacoes(data);
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error);
+      console.error('Failed to load notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -80,11 +80,11 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
     
-    if (minutes < 1) return 'Agora';
+    if (minutes < 1) return 'Now';
     if (minutes < 60) return `${minutes}m`;
     if (hours < 24) return `${hours}h`;
     if (days < 7) return `${days}d`;
-    return date.toLocaleDateString('pt-PT');
+    return date.toLocaleDateString('en-GB');
   };
 
   const naoLidas = notificacoes.filter(n => !n.lida).length;
@@ -118,7 +118,7 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Bell size={24} color="#F25C05" />
             <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1b1c1b', margin: 0 }}>
-              Notificações
+              Notifications
             </h2>
             {naoLidas > 0 && (
               <span style={{
@@ -160,7 +160,7 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
               }}
             >
               <CheckCheck size={16} />
-              Marcar todas como lidas
+              Mark all as read
             </button>
           </div>
         )}
@@ -169,12 +169,12 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading ? (
             <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
-              A carregar...
+              Loading...
             </div>
           ) : notificacoes.length === 0 ? (
             <div style={{ padding: '40px', textAlign: 'center' }}>
               <Bell size={48} color="#d1d5db" style={{ marginBottom: '12px' }} />
-              <p style={{ color: '#6b7280', margin: 0 }}>Nenhuma notificação</p>
+              <p style={{ color: '#6b7280', margin: 0 }}>No notifications</p>
             </div>
           ) : (
             notificacoes.map(notif => (
@@ -247,7 +247,7 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
                           }}
                         >
                           <Check size={12} />
-                          Marcar lida
+                          Mark read
                         </button>
                       )}
                       <button
@@ -266,7 +266,7 @@ export function NotificacoesPanel({ onClose, onNavigate }: NotificacoesPanelProp
                         }}
                       >
                         <Trash2 size={12} />
-                        Excluir
+                        Delete
                       </button>
                     </div>
                   </div>

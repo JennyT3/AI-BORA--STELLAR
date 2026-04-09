@@ -19,7 +19,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
           <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Meu Perfil</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Gerencia suas informações pessoais e redes sociais</p>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Manage your profile and social links</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button onClick={onOpenConvite} style={{ padding: "10px 20px", borderRadius: 10, background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', color: "#fff", border: "none", fontWeight: 800, cursor: "pointer", fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 16px rgba(242, 92, 5, 0.2)' }}>
@@ -51,7 +51,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: 16, padding: 24, border: "1px solid #e8e8e8" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Informações Pessoais</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Personal information</h3>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 600, color: theme.colors.text.secondary, display: "block", marginBottom: 4 }}>Nome</label>
@@ -90,7 +90,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
               {editProfile ? (
                 <input value={profileData.instagram} onChange={(e) => onProfileChange('instagram', e.target.value)} placeholder="@instagram" style={{ flex: 1, padding: "10px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} />
               ) : (
-                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.instagram || "Não vinculado"}</span>
+                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.instagram || "Not linked"}</span>
               )}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -98,7 +98,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
               {editProfile ? (
                 <input value={profileData.facebook} onChange={(e) => onProfileChange('facebook', e.target.value)} placeholder="Facebook" style={{ flex: 1, padding: "10px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} />
               ) : (
-                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.facebook || "Não vinculado"}</span>
+                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.facebook || "Not linked"}</span>
               )}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -106,7 +106,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
               {editProfile ? (
                 <input value={profileData.linkedin} onChange={(e) => onProfileChange('linkedin', e.target.value)} placeholder="LinkedIn" style={{ flex: 1, padding: "10px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} />
               ) : (
-                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.linkedin || "Não vinculado"}</span>
+                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.linkedin || "Not linked"}</span>
               )}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -114,7 +114,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
               {editProfile ? (
                 <input value={profileData.twitter} onChange={(e) => onProfileChange('twitter', e.target.value)} placeholder="@twitter" style={{ flex: 1, padding: "10px", borderRadius: 8, border: `2px solid ${theme.colors.border}`, fontSize: 13 }} />
               ) : (
-                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.twitter || "Não vinculado"}</span>
+                <span style={{ fontSize: 14, color: theme.colors.text.primary }}>{vendedor.redesSociais?.twitter || "Not linked"}</span>
               )}
             </div>
           </div>
@@ -122,7 +122,7 @@ export function VendasPerfilTab({ vendedor, profileData, editProfile, isMobile, 
           {editProfile && (
             <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
               <button onClick={onSave} style={{ padding: "12px 24px", borderRadius: 10, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-                <Save size={16} /> Guardar Alterações
+                <Save size={16} /> Save changes
               </button>
               <button onClick={onToggleEdit} style={{ padding: "12px 24px", borderRadius: 10, backgroundColor: theme.colors.bg.secondary, color: theme.colors.text.primary, border: `1px solid ${theme.colors.border}`, fontWeight: 600, cursor: "pointer" }}>
                 Cancelar

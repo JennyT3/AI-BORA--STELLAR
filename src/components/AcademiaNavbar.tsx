@@ -35,7 +35,7 @@ export function AcademiaNavbar() {
 
   const navItems = [
     { label: 'Dashboard', href: '/academia/dashboard', icon: Home },
-    { label: 'Trilhas', href: '/academia/trilhas', icon: Zap },
+    { label: 'Tracks', href: '/academia/trilhas', icon: Zap },
     { label: 'Certificados', href: '/academia/certificados', icon: Award },
     { label: 'Comunidade', href: '/academia/comunidade', icon: Users },
     { label: 'Consultoria', href: '/academia/consultoria', icon: MessageSquare },
@@ -109,7 +109,7 @@ export function AcademiaNavbar() {
                   letterSpacing: '0.05em',
                   textTransform: 'uppercase'
                 }}>
-                  Estudar
+                  Learn
                 </div>
               </div>
             </div>
@@ -178,7 +178,7 @@ export function AcademiaNavbar() {
                 alignItems: 'center',
                 gap: 6
               }} className="hidden sm:flex">
-                <Home size={14} /> Site Principal
+                <Home size={14} /> Main site
               </div>
             </Link>
 
@@ -226,7 +226,7 @@ export function AcademiaNavbar() {
                     }}
                   >
                     <div style={{ padding: '12px 16px', borderBottom: '1px solid #f5f5f5', marginBottom: 8 }}>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: colors.dark }}>{user?.firstName || 'Utilizador'}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: colors.dark }}>{user?.firstName || 'User'}</div>
                       <div style={{ fontSize: 12, color: '#999', marginTop: 2 }}>{userEmail}</div>
                     </div>
                     
@@ -235,7 +235,7 @@ export function AcademiaNavbar() {
                         onMouseEnter={(e) => e.currentTarget.style.background = '#f9f9f9'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                       >
-                        <User size={16} /> Meu Perfil
+                        <User size={16} /> My profile
                       </div>
                     </Link>
 
@@ -243,7 +243,7 @@ export function AcademiaNavbar() {
                       onMouseEnter={(e) => e.currentTarget.style.background = '#fff5f5'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
-                      <LogOut size={16} /> Sair
+                      <LogOut size={16} /> Sign out
                     </div>
                   </motion.div>
                 )}

@@ -6,10 +6,10 @@ import { Footer } from "../components/Footer";
 import { SimuladorServicios } from "../components/SimuladorServicios";
 
 const fotos = [
-  { src: "/antes.webp", label: "Antes" },
-  { src: "/depois.webp", label: "Depois" },
-  { src: "/estudio.webp", label: "Estudio" },
-  { src: "/foto-criativa.webp", label: "Criativo" },
+  { src: "/antes.webp", label: "Before" },
+  { src: "/depois.webp", label: "After" },
+  { src: "/estudio.webp", label: "Studio" },
+  { src: "/foto-criativa.webp", label: "Creative" },
   { src: "/mopack.webp", label: "Packaging" },
   { src: "/branding.webp", label: "Branding" },
 ];
@@ -23,10 +23,10 @@ export function Servicos() {
         <section style={{ backgroundColor: "#1A1A1A", padding: "120px 16px 80px" }}>
           <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
             <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff", lineHeight: 1.1, margin: "0 0 16px" }}>
-              Os nossos servicos
+              Our services
             </h1>
             <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 16, color: "#aaaaaa", margin: 0, lineHeight: 1.5 }}>
-              Seleciona os servicos que precisas e pede o teu orcamento sem compromisso
+              Select the services you need and request your quote with no obligation
             </p>
           </div>
         </section>
@@ -38,10 +38,10 @@ export function Servicos() {
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <div style={{ width: 36, height: 3, backgroundColor: "#F25C05", margin: "0 auto 16px", borderRadius: 2 }} />
               <h2 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(22px, 4vw, 32px)", color: "#1A1A1A", margin: "0 0 12px" }}>
-                Resultados reais. Sempre.
+                Real results. Always.
               </h2>
               <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: "#4A4A4A", margin: 0 }}>
-                Trabalhos reais com clientes reais. Cada projeto com impacto mensuravel.
+                Real work with real clients. Every project with measurable impact.
               </p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>

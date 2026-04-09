@@ -36,22 +36,22 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
           <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>
             Propostas
           </h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{proposals.length} propostas guardadas</p>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>{proposals.length} saved proposals</p>
         </div>
         <button
           onClick={onRefresh}
           style={{ padding: '12px 16px', borderRadius: 10, backgroundColor: '#fff', color: theme.colors.text.secondary, border: `1px solid ${theme.colors.border}`, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
         >
-          Atualizar
+          Refresh
         </button>
       </div>
 
       {/* States */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 64, color: theme.colors.text.secondary }}>A carregar...</div>
+        <div style={{ textAlign: 'center', padding: 64, color: theme.colors.text.secondary }}>Loading...</div>
       ) : proposals.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 64, color: theme.colors.text.secondary, backgroundColor: '#fff', borderRadius: 16, border: `1px solid ${theme.colors.border}` }}>
-          Nenhuma proposta guardada ainda.
+          No saved proposals yet.
         </div>
       ) : (
         <div style={{ display: 'grid', gap: isMobile ? 12 : 16 }}>
@@ -62,7 +62,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
               {editingId === p.id ? (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 12 }}>
                   <div>
-                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Cliente</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Client</label>
                     <input
                       value={editData.cliente}
                       onChange={(e) => onUpdateEditData({ ...editData, cliente: e.target.value })}
@@ -70,7 +70,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Valor (€)</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Amount (€)</label>
                     <input
                       type="number"
                       value={editData.valor}
@@ -79,7 +79,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Desconto (€)</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Discount (€)</label>
                     <input
                       type="number"
                       value={editData.desconto}
@@ -88,7 +88,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Marcas</label>
+                    <label style={{ fontSize: 11, color: theme.colors.text.secondary, fontWeight: 600, display: 'block', marginBottom: 6 }}>Brands</label>
                     <input
                       type="number"
                       value={editData.marcas}
@@ -101,13 +101,13 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                       onClick={() => onSave(p.id)}
                       style={{ flex: 1, padding: '14px', borderRadius: 8, backgroundColor: '#10B981', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}
                     >
-                      Guardar
+                      Save
                     </button>
                     <button
                       onClick={onCancel}
                       style={{ flex: 1, padding: '14px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 13, minHeight: 44 }}
                     >
-                      Cancelar
+                      Cancel
                     </button>
                   </div>
                 </div>
@@ -139,11 +139,11 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     <div style={{ fontSize: 13, color: theme.colors.text.secondary, marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       <span>{p.numeroOrcamento}</span>
                       <span style={{ color: '#F25C05', fontWeight: 700 }}>{p.valor?.toFixed(2)} €</span>
-                      <span>{p.marcas} marca{p.marcas !== 1 ? "s" : ""}</span>
-                      {p.dataEnvio && <span style={{ color: '#3498DB' }}>Enviada: {p.dataEnvio}</span>}
+                      <span>{p.marcas} brand{p.marcas !== 1 ? "s" : ""}</span>
+                      {p.dataEnvio && <span style={{ color: '#3498DB' }}>Sent: {p.dataEnvio}</span>}
                     </div>
 
-                    {/* Serviços tags */}
+                    {/* Service tags */}
                     {p.servicos && p.servicos.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                         {p.servicos.slice(0, 4).map((s: string, i: number) => (
@@ -158,7 +158,7 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                     )}
                   </div>
 
-                  {/* Actions - Botones grandes para touch */}
+                  {/* Actions */}
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: isMobile ? 12 : 0 }}>
                     <a
                       href={`/p/${p.id}`}
@@ -166,45 +166,45 @@ export function Propostas({ proposals, loading, editingId, editData, onEdit, onS
                       rel="noopener noreferrer"
                       style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#3498DB', color: '#fff', fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'inline-block', minHeight: 44, alignItems: 'center' }}
                     >
-                      Ver
+                      View
                     </a>
                     <button
-                      onClick={() => { navigator.clipboard.writeText(`https://aibora.pt/p/${p.id}`); alert("Link copiado!"); }}
+                      onClick={() => { navigator.clipboard.writeText(`https://aibora.pt/p/${p.id}`); alert("Link copied."); }}
                       style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
-                      Copiar
+                      Copy
                     </button>
                     <button
                       onClick={() => onEditOrcamento(p.id)}
                       style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#fff7ed', color: '#F25C05', border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
-                      Editar
+                      Edit
                     </button>
                     <button
                       onClick={() => onMarcarEnviada(p)}
                       style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: p.dataEnvio ? '#dbeafe' : '#f3f4f6', color: p.dataEnvio ? '#3498DB' : theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                     >
-                      Enviada
+                      Sent
                     </button>
 
                     {p.resposta === "sim" ? (
                       <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#10B981', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
-                        ✓ Aceite
+                        ✓ Accepted
                       </span>
                     ) : p.resposta === "nao" ? (
                       <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#dc2626', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
-                        ✕ Recusado
+                        ✕ Declined
                       </span>
                     ) : p.resposta === "rehacer" ? (
                       <span style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#F25C05', color: '#fff', fontSize: 12, fontWeight: 600, minHeight: 44, display: 'flex', alignItems: 'center' }}>
-                        ↩ Rever
+                        ↩ Review
                       </span>
                     ) : (
                       <button
                         onClick={() => onRegistrarResposta(p)}
                         style={{ padding: '12px 16px', borderRadius: 8, backgroundColor: '#f3f4f6', color: theme.colors.text.secondary, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}
                       >
-                        Resposta
+                        Response
                       </button>
                     )}
 

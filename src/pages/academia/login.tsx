@@ -37,10 +37,10 @@ export default function AcademiaLogin() {
       if (result.status === 'complete') {
         setLocation('/academia/dashboard');
       } else {
-        setError('Verifica o teu email ou tenta novamente.');
+        setError('Check your email or try again.');
       }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Credenciais inválidas. Tenta novamente.');
+      setError(err.errors?.[0]?.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ export default function AcademiaLogin() {
           marginBottom: 8,
           textAlign: 'center',
         }}>
-          Academia Bora Lá
+          Bora Lá Academy
         </h1>
         
         {/* Subtítulo */}
@@ -82,7 +82,7 @@ export default function AcademiaLogin() {
           fontSize: 14,
           textAlign: 'center',
         }}>
-          A tua jornada começa aqui
+          Your learning journey starts here
         </p>
 
         <form onSubmit={handleEmailLogin}>
@@ -103,7 +103,7 @@ export default function AcademiaLogin() {
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#666', marginBottom: 8 }}>Email</label>
             <input
               type="email"
-              placeholder="seu@email.com"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -121,7 +121,7 @@ export default function AcademiaLogin() {
           </div>
           
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#666', marginBottom: 8 }}>Palavra-passe</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#666', marginBottom: 8 }}>Password</label>
             <input
               type="password"
               placeholder="••••••••"
@@ -157,13 +157,13 @@ export default function AcademiaLogin() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'A entrar...' : 'Entrar na Academia'}
+            {loading ? 'Signing in…' : 'Sign in to Academy'}
           </button>
         </form>
 
         <div style={{ marginTop: 24, textAlign: 'center' }}>
           <p style={{ fontSize: 12, color: '#999' }}>
-            Usa as tuas credenciais de colaborador para aceder.
+            Use your team credentials to sign in.
           </p>
         </div>
       </div>

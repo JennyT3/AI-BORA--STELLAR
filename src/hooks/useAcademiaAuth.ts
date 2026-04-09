@@ -64,7 +64,7 @@ export function useAcademiaAuth(): UseAcademiaAuthReturn {
       }
       return false;
     } catch (error) {
-      console.warn('Bypass: Erro Firebase Auth');
+      console.warn('Bypass: Firebase Auth error');
       return false;
     }
   }, [auth, getToken]);
@@ -104,14 +104,14 @@ export function useAcademiaAuth(): UseAcademiaAuthReturn {
         setStats(userStats);
         setProgressos(userProgressos);
       } else {
-        // MODO BYPASS: Forzamos onboarding_completo: true para evitar bucles
-        console.log('Bypass: Modo Teste Ativado');
+        // BYPASS: force onboarding_completo true to avoid redirect loops
+        console.log('Bypass: test mode enabled');
         setAcademiaUser({
           id: user.id,
           email: user.emailAddresses[0]?.emailAddress || '',
-          nome: user.fullName || user.firstName || 'Utilizador Teste',
+          nome: user.fullName || user.firstName || 'Test user',
           role: 'cliente',
-          onboarding_completo: true, // <--- CRÍTICO: Evita que te mande a /onboarding
+          onboarding_completo: true, // critical: avoids redirect to /onboarding
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
@@ -128,8 +128,8 @@ export function useAcademiaAuth(): UseAcademiaAuthReturn {
             user_id: user.id,
             aula_id: 'aula-1',
             trilha_id: 'trilha-1',
-            trilha_nome: 'IA para Negócios',
-            aula_titulo: 'Introdução',
+            trilha_nome: 'AI for local business',
+            aula_titulo: 'Introduction',
             concluida: true,
             percentagem: 100,
             updated_at: new Date().toISOString()
@@ -137,7 +137,7 @@ export function useAcademiaAuth(): UseAcademiaAuthReturn {
         ]);
       }
     } catch (error) {
-      console.error('Erro loadUserData:', error);
+      console.error('loadUserData error:', error);
     } finally {
       setIsLoading(false);
       setUserLoading(false);

@@ -26,29 +26,29 @@ export function PropostaPage() {
         const id = params.id;
         
         if (!id) {
-          setError("Proposta não encontrada");
+          setError("Proposal not found");
           setLoading(false);
           return;
         }
 
         let data = null;
         
-        // Primeiro tenta buscar por token (novo sistema seguro)
+        // Try secure token lookup first
         const tokenData = await getProposalByToken(id);
         if (tokenData) {
           data = tokenData;
         } else {
-          // Fallback: busca por ID (sistema antigo para compatibilidade)
+          // Fallback: lookup by ID (legacy compatibility)
           data = await getProposal(id);
         }
         
         if (!data) {
-          setError("Proposta não encontrada");
+          setError("Proposal not found");
         } else if (!data.accessToken && !data.clienteId) {
-          // Proposta antiga sem token - verificar validade
+          // Legacy proposal without token — check validity
           const aindaValida = await isProposalValid(id);
           if (!aindaValida) {
-            setError("Esta proposta expirou (válida por 10 dias)");
+            setError("This proposal has expired (valid for 10 days)");
           } else {
             setProposal(data);
           }
@@ -56,7 +56,7 @@ export function PropostaPage() {
           setProposal(data);
         }
       } catch (err: any) {
-        setError("Erro ao carregar proposta: " + err.message);
+        setError("Error loading proposal: " + err.message);
       }
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export function PropostaPage() {
   const handleResposta = async (tipo: "sim" | "nao" | "reagendar") => {
     if (!proposal || respondendo) return;
     
-    if (tipo === 'sim' && !confirm("Confirmas a aceitação desta proposta?")) return;
+    if (tipo === 'sim' && !confirm("Do you accept this proposal?")) return;
     
     setRespondendo(true);
     
@@ -107,29 +107,29 @@ export function PropostaPage() {
           for (const servico of proposal.servicos) {
             const nomeServico = typeof servico === 'string' ? servico : (servico.nome || servico);
             const DETALHAMENTO: Record<string, string[]> = {
-              "Gestão de Redes Sociais": ["Planeamento mensal de conteúdo", "Scheduler de publicações", "Relatórios de métricas", "Estratégia de crescimento", "Suporte e engajamento diário"],
-              "Criação de Conteúdo": ["Textos para posts", "Legendas criativas", "Copywriting persuasivo", "Conteúdo para blog", "Newsletters"],
-              "Design de Posts": ["Posts gráficos personalizados", "Carrosséis informativos", "Stories e Reels", "Banners e covers", "Templates de marca"],
-              "Community Management": ["Resposta a comentários", "Mensagens diretas", "Moderação", "Gestão de reviews", "Relatórios de engagement"],
-              "Design de Logotipo": ["3 propostas iniciais", "Revisões ilimitadas", "Múltiplos formatos", "Manual de marca básico", "Uso comercial"],
-              "Identidade Corporativa": ["Logotipo + variações", "Paleta de cores", "Tipografia", "Cartão de visita", "Pasta corporativa"],
-              "Produção de Vídeos": ["Roteiro e storyboard", "Filmagem profissional", "Edição e pós-produção", "Motion graphics", "Entrega em 4K"],
-              "Criação de Reels": ["Conceito criativo", "Roteiro corto", "Edição dinâmica", "Trendy sounds", "Otimização para reach"],
-              "Página Web/Landing": ["Design responsivo", "Otimizado para SEO", "Formulários de contacto", "Integração analytics", "SSL incluído"],
-              "Loja Online": ["Gestão de produtos", "Pagamentos seguros", "Shipping integrado", "Painel administrativo", "Template profissional"],
-              "SEO Local": ["Perfil de negócio otimizado", "Palavras-chave locais", "Backlinks locais", "Gestão de avaliações", "Relatórios mensais"],
-              "Facebook/Instagram Ads": ["Segmentação avançada", "Criação de creatives", "A/B testing", "Pixel setup", "Relatórios de resultados"],
-              "Email Marketing": ["Design de templates", "Automação de emails", "Segmentação de listas", "A/B testing", "Relatórios de abertura"],
-              "Chatbot WhatsApp": ["Respostas automáticas", "Menu interativo", "Agendamento de reuniões", "Integração com CRM", "Chatbot com IA"],
-              "IA & Automação": ["Automação de tarefas", "Integração de apps", "Workflows personalizados", "Relatórios automáticos", "Assistente virtual"],
-              "Fotografia Profissional": ["Sessão de 2h", "20 fotos editadas", "Uso comercial", "Diferentes cenários", "Alta resolução"],
-              "Consultoria Estratégica": ["Análise do negócio", "Estratégia digital", "Plano de ação", "Reuniões mensais", "Suporte prioritário"],
+              "Gestão de Redes Sociais": ["Monthly content planning", "Publication scheduling", "Metric reports", "Growth strategy", "Daily support and engagement"],
+              "Criação de Conteúdo": ["Post copy", "Creative captions", "Persuasive copywriting", "Blog content", "Newsletters"],
+              "Design de Posts": ["Custom graphic posts", "Informative carousels", "Stories and Reels", "Banners and covers", "Brand templates"],
+              "Community Management": ["Comment replies", "Direct messages", "Moderation", "Review management", "Engagement reports"],
+              "Design de Logotipo": ["3 initial concepts", "Unlimited revisions", "Multiple formats", "Basic brand manual", "Commercial use"],
+              "Identidade Corporativa": ["Logo + variations", "Colour palette", "Typography", "Business card", "Corporate folder"],
+              "Produção de Vídeos": ["Script and storyboard", "Professional filming", "Editing and post-production", "Motion graphics", "4K delivery"],
+              "Criação de Reels": ["Creative concept", "Short script", "Dynamic editing", "Trending audio", "Reach optimisation"],
+              "Página Web/Landing": ["Responsive design", "SEO optimisation", "Contact forms", "Analytics integration", "SSL included"],
+              "Loja Online": ["Product management", "Secure payments", "Integrated shipping", "Admin panel", "Professional template"],
+              "SEO Local": ["Optimised business profile", "Local keywords", "Local backlinks", "Review management", "Monthly reports"],
+              "Facebook/Instagram Ads": ["Advanced targeting", "Creative production", "A/B testing", "Pixel setup", "Performance reports"],
+              "Email Marketing": ["Template design", "Email automation", "List segmentation", "A/B testing", "Open-rate reports"],
+              "Chatbot WhatsApp": ["Automatic replies", "Interactive menu", "Meeting booking", "CRM integration", "AI chatbot"],
+              "IA & Automação": ["Task automation", "App integration", "Custom workflows", "Automatic reports", "Virtual assistant"],
+              "Fotografia Profissional": ["2h session", "20 edited photos", "Commercial use", "Multiple setups", "High resolution"],
+              "Consultoria Estratégica": ["Business analysis", "Digital strategy", "Action plan", "Monthly meetings", "Priority support"],
             };
             const detalhes = DETALHAMENTO[nomeServico] || [];
             await createTarea({
               titulo: nomeServico,
               servicoNome: nomeServico,
-              descricao: detalhes.length > 0 ? "O que está incluído:\n• " + detalhes.join("\n• ") : '',
+              descricao: detalhes.length > 0 ? "What's included:\n• " + detalhes.join("\n• ") : '',
               clienteId: proposal.clienteId,
               clienteNome: proposal.cliente,
               clienteEmail: proposal.email || '',
@@ -169,7 +169,7 @@ export function PropostaPage() {
       }
 
       if (tipo === "nao" && proposal.clienteId) {
-        const motivo = prompt('Pode-nos dizer porquê? (opcional)');
+        const motivo = prompt('Could you tell us why? (optional)');
         
         await updateCliente(proposal.clienteId, {
           categoria: "arquivo",
@@ -183,8 +183,8 @@ export function PropostaPage() {
 
       setRespostaEnviada(tipo);
     } catch (err: any) {
-      console.error("Erro ao registar resposta:", err);
-      alert("Erro ao registar resposta. Tenta novamente.");
+      console.error("Error saving response:", err);
+      alert("Could not save your response. Please try again.");
     }
     
     setRespondendo(false);
@@ -193,7 +193,7 @@ export function PropostaPage() {
   // Dynamic title
   useEffect(() => {
     if (proposal?.cliente) {
-      document.title = `Proposta para ${proposal.cliente} — AI BORA`;
+      document.title = `Proposal for ${proposal.cliente} — AI BORA`;
     }
   }, [proposal]);
 
@@ -202,7 +202,7 @@ export function PropostaPage() {
       <div style={{ minHeight: '100vh', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 40, height: 40, border: '3px solid #333', borderTop: '3px solid #F25C05', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#cccccc', fontSize: 14 }}>Carregando proposta...</p>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#cccccc', fontSize: 14 }}>Loading proposal...</p>
         </div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
@@ -218,13 +218,13 @@ export function PropostaPage() {
             {error}
           </h1>
           <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#cccccc', marginBottom: 24 }}>
-            A proposta pode ter expirado ou não existe.
+            The proposal may have expired or does not exist.
           </p>
           <button 
             onClick={() => setLocation('/')}
             style={{ fontFamily: 'Montserrat, sans-serif', backgroundColor: '#F22283', color: '#fff', padding: '14px 32px', borderRadius: 100, border: 'none', fontWeight: 700, cursor: 'pointer' }}
           >
-            Voltar ao início
+            Back to home
           </button>
         </div>
       </div>
@@ -234,20 +234,20 @@ export function PropostaPage() {
   if (respostaEnviada) {
     const mensagens = {
       sim: {
-        titulo: "Ótimo! Proposta confirmada.",
-        subtitulo: "Bem-vindo à família AI BORA! Entraremos em contacto nas próximas horas.",
+        titulo: "Great! Proposal confirmed.",
+        subtitulo: "Welcome to the AI BORA family! We will be in touch within the next few hours.",
         cor: "#10B981",
         emoji: "🎉"
       },
       reagendar: {
-        titulo: "Sem problema!",
-        subtitulo: "Vamos rever a proposta e ajustá-la às tuas necessidades. Entraremos em contacto em breve.",
+        titulo: "No problem!",
+        subtitulo: "We will review the proposal and adjust it to your needs. We will be in touch shortly.",
         cor: "#F25C05",
         emoji: "↩️"
       },
       nao: {
-        titulo: "Obrigado pelo teu tempo.",
-        subtitulo: "Se mudares de ideias, estaremos aqui. Boa sorte no teu negócio!",
+        titulo: "Thanks for your time.",
+        subtitulo: "If you change your mind, we will be here. Good luck with your business!",
         cor: "#6B7280",
         emoji: "👋"
       }
@@ -273,7 +273,7 @@ export function PropostaPage() {
               rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#25D366', color: '#fff', fontWeight: 700, fontSize: 14, padding: '14px 28px', borderRadius: 50, textDecoration: 'none' }}
             >
-              Falar pelo WhatsApp
+              Chat on WhatsApp
             </a>
           )}
           {respostaEnviada !== "sim" && (
@@ -281,7 +281,7 @@ export function PropostaPage() {
               href="/"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#aaaaaa', fontSize: 13, textDecoration: 'none' }}
             >
-              ← Voltar ao início
+              ← Back to home
             </a>
           )}
         </div>
@@ -301,21 +301,21 @@ export function PropostaPage() {
         {/* Hero Section */}
         <section style={{ textAlign: 'center', marginBottom: 80 }}>
           <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(242,92,5,0.1)', color: '#F25C05', borderRadius: 100, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 24 }}>
-            Proposta Personalizada
+            Tailored proposal
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: -2, color: '#ffffff' }}>
-            Olá, {proposal.cliente}.<br />
-            Vamos elevar o teu negócio?
+            Hi, {proposal.cliente}.<br />
+            Ready to grow your business?
           </h1>
           <p style={{ fontSize: 18, color: '#cccccc', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
-            Analisámos o teu perfil e preparámos uma estratégia focada em resultados reais para a <span style={{ color: '#fff', fontWeight: 700 }}>{proposal.empresa || 'tua empresa'}</span>.
+            We reviewed your profile and prepared a strategy focused on real results for <span style={{ color: '#fff', fontWeight: 700 }}>{proposal.empresa || 'your business'}</span>.
           </p>
         </section>
 
-        {/* Serviços Selecionados */}
+        {/* Proposed services */}
         <section style={{ marginBottom: 100 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12, color: '#ffffff' }}>Serviços Propostos</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12, color: '#ffffff' }}>Proposed services</h2>
             <div style={{ width: 40, height: 4, background: '#F25C05', margin: '0 auto' }}></div>
           </div>
 
@@ -329,7 +329,7 @@ export function PropostaPage() {
                   </div>
                   <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12, color: '#ffffff' }}>{nome}</h3>
                   <p style={{ color: '#cccccc', fontSize: 14, lineHeight: 1.6 }}>
-                    Solução completa e personalizada para garantir o melhor desempenho do teu negócio nesta área.
+                    A complete, tailored solution to help your business perform at its best in this area.
                   </p>
                 </div>
               );
@@ -337,21 +337,21 @@ export function PropostaPage() {
           </div>
         </section>
 
-        {/* Porquê nós? */}
+        {/* Why us */}
         <section style={{ background: '#fff', color: '#1A1A1A', borderRadius: 40, padding: '80px 40px', marginBottom: 100, textAlign: 'center' }}>
-          <h2 style={{ fontSize: 32, fontWeight: 900, marginBottom: 20 }}>Porquê a AI BORA?</h2>
+          <h2 style={{ fontSize: 32, fontWeight: 900, marginBottom: 20 }}>Why AI BORA?</h2>
           <p style={{ fontSize: 16, color: '#666', maxWidth: 500, margin: '0 auto 60px' }}>
-            Tudo o que o teu negócio precisa para ter uma presença digital forte e profissional.
+            Everything your business needs for a strong, professional digital presence.
           </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
             {[
-              { icon: "📱", title: "Marketing Digital", desc: "Gestão completa das tuas redes sociais com conteúdo de qualidade e estratégia definida.", tags: ["Instagram", "Facebook", "LinkedIn"], highlight: proposal?.servicos?.some((s: string) => s.includes('Redes') || s.includes('Marketing') || s.includes('Gestão')) },
-              { icon: "📊", title: "Consultoria", desc: "Estratégia digital personalizada para o teu negócio crescer.", tags: ["Análise", "Planeamento", "Relatórios"], highlight: proposal?.servicos?.some((s: string) => s.includes('Consultoria') || s.includes('Análise') || s.includes('Estratégica')) },
-              { icon: "🎨", title: "Design & Identidade", desc: "Identidade visual profissional que representa a tua marca com credibilidade.", tags: ["Logótipo", "Posts", "Banners"], highlight: proposal?.servicos?.some((s: string) => s.includes('Design') || s.includes('Logotipo') || s.includes('Identidade')) },
-              { icon: "💻", title: "Website", desc: "Site moderno, rápido e otimizado para motores de busca e converter visitantes.", tags: ["Landing Page", "SEO", "Mobile"], highlight: proposal?.servicos?.some((s: string) => s.includes('Web') || s.includes('Landing') || s.includes('Site')) },
-              { icon: "📢", title: "Publicidade Paga", desc: "Campanhas pagas geridas por especialistas para maximizar o teu investimento.", tags: ["Meta Ads"], highlight: proposal?.servicos?.some((s: string) => s.includes('Ads') || s.includes('Publicidade')) },
-              { icon: "⚡", title: "Automação & IA", desc: "Automatiza processos repetitivos e responde aos clientes 24/7 con inteligência artificial.", tags: ["Chatbot", "WhatsApp Auto", "CRM"], highlight: proposal?.servicos?.some((s: string) => s.includes('Chatbot') || s.includes('Automação') || s.includes('IA')) },
+              { icon: "📱", title: "Digital marketing", desc: "Full management of your social channels with quality content and a clear strategy.", tags: ["Instagram", "Facebook", "LinkedIn"], highlight: proposal?.servicos?.some((s: string) => s.includes('Redes') || s.includes('Marketing') || s.includes('Gestão')) },
+              { icon: "📊", title: "Consulting", desc: "Personalised digital strategy to help your business grow.", tags: ["Analysis", "Planning", "Reports"], highlight: proposal?.servicos?.some((s: string) => s.includes('Consultoria') || s.includes('Análise') || s.includes('Estratégica')) },
+              { icon: "🎨", title: "Design & identity", desc: "Professional visual identity that represents your brand with credibility.", tags: ["Logo", "Posts", "Banners"], highlight: proposal?.servicos?.some((s: string) => s.includes('Design') || s.includes('Logotipo') || s.includes('Identidade')) },
+              { icon: "💻", title: "Website", desc: "A modern, fast site optimised for search and conversions.", tags: ["Landing Page", "SEO", "Mobile"], highlight: proposal?.servicos?.some((s: string) => s.includes('Web') || s.includes('Landing') || s.includes('Site')) },
+              { icon: "📢", title: "Paid ads", desc: "Paid campaigns managed by specialists to maximise your investment.", tags: ["Meta Ads"], highlight: proposal?.servicos?.some((s: string) => s.includes('Ads') || s.includes('Publicidade')) },
+              { icon: "⚡", title: "Automation & AI", desc: "Automate repetitive work and respond to customers 24/7 with AI.", tags: ["Chatbot", "WhatsApp Auto", "CRM"], highlight: proposal?.servicos?.some((s: string) => s.includes('Chatbot') || s.includes('Automação') || s.includes('IA')) },
             ].map((servico, index) => (
               <div key={index} style={{ 
                 background: servico.highlight ? 'rgba(242,92,5,0.1)' : 'rgba(255,255,255,0.04)', 
@@ -376,20 +376,20 @@ export function PropostaPage() {
 
         {/* Investimento */}
         <section style={{ textAlign: 'center', marginBottom: 100 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 40, color: '#ffffff' }}>O teu Investimento</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 40, color: '#ffffff' }}>Your investment</h2>
           <div style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', borderRadius: 32, padding: '60px 40px', display: 'inline-block', minWidth: 320 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, opacity: 0.9 }}>Valor Total do Projeto</p>
+            <p style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, opacity: 0.9 }}>Total project value</p>
             <div style={{ fontSize: 'clamp(40px, 8vw, 64px)', fontWeight: 900, marginBottom: 8, letterSpacing: -2 }}>
-              {Number(proposal.valor || proposal.total || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}€
+              {Number(proposal.valor || proposal.total || 0).toLocaleString('en-GB', { minimumFractionDigits: 2 })}€
             </div>
-            <p style={{ fontSize: 14, opacity: 0.8 }}>+ IVA à taxa legal em vigor</p>
+            <p style={{ fontSize: 14, opacity: 0.8 }}>+ VAT at the applicable legal rate</p>
           </div>
         </section>
 
         {/* CTA / Resposta */}
         <section style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: isMobile ? 24 : 40, padding: isMobile ? '40px 20px' : '80px 40px' }}>
-          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 16, color: '#ffffff' }}>Pronto para começar?</h2>
-          <p style={{ color: '#cccccc', marginBottom: 48 }}>Escolha uma das opções abaixo para prosseguirmos.</p>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 16, color: '#ffffff' }}>Ready to get started?</h2>
+          <p style={{ color: '#cccccc', marginBottom: 48 }}>Choose one of the options below to continue.</p>
           
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: 16 }}>
             <button 
@@ -397,21 +397,21 @@ export function PropostaPage() {
               disabled={respondendo}
               style={{ width: isMobile ? '100%' : 'auto', background: '#F25C05', color: '#fff', border: 'none', padding: '18px 40px', borderRadius: 16, fontSize: 16, fontWeight: 800, cursor: 'pointer', transition: 'transform 0.2s' }}
             >
-              {respondendo ? 'A processar...' : 'Sim, aceito a proposta! ✅'}
+              {respondendo ? 'Processing...' : 'Yes, I accept the proposal ✅'}
             </button>
             <button 
               onClick={() => handleResposta('reagendar')}
               disabled={respondendo}
               style={{ width: isMobile ? '100%' : 'auto', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', padding: '18px 40px', borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
             >
-              Quero ajustar detalhes 📝
+              I want to adjust details 📝
             </button>
             <button 
-              onClick={() => { if (confirm('Tens a certeza que não tens interesse?')) handleResposta('nao'); }}
+              onClick={() => { if (confirm('Are you sure you are not interested?')) handleResposta('nao'); }}
               disabled={respondendo}
               style={{ width: isMobile ? '100%' : 'auto', background: 'transparent', color: '#555', border: '1px solid #333', padding: '18px 40px', borderRadius: 16, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
             >
-              Não tenho interesse
+              Not interested
             </button>
           </div>
         </section>
@@ -457,7 +457,7 @@ export function PropostaPage() {
       </main>
 
       <footer style={{ padding: '40px 24px', textAlign: 'center', color: '#666666', fontSize: 12 }}>
-        © {new Date().getFullYear()} AI BORA · Marketing Digital de Resultados
+        © {new Date().getFullYear()} AI BORA · Results-driven digital marketing
       </footer>
     </div>
   );

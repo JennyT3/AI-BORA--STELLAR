@@ -48,7 +48,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
       const faturasData = await listFaturasAll();
       setFaturas(faturasData);
     } catch (err) {
-      console.error('Erro ao carregar faturas:', err);
+      console.error('Error loading invoices:', err);
     }
     setLoading(false);
   };
@@ -85,8 +85,8 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
       
       await loadFaturas();
     } catch (err) {
-      console.error('Erro ao processar pagamento:', err);
-      alert('Erro ao processar pagamento');
+      console.error('Error processing payment:', err);
+      alert('Could not process payment');
     }
     setProcessingId(null);
   };
@@ -111,12 +111,15 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
 
   const hasFilters = filterEstado || filterCliente || filterDataInicio || filterDataFim || searchTerm;
 
+  const invoiceEstadoLabel = (e: string) =>
+    ({ pendente: 'Pending', paga: 'Paid', vencida: 'Overdue', cancelada: 'Cancelled' } as Record<string, string>)[e] || e;
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Faturação</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Gestão de faturas e pagamentos</p>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: isMobile ? 24 : 28, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Invoicing</h1>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Invoice and payment management</p>
         </div>
       </div>
 
@@ -126,10 +129,10 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(16, 185, 129, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <DollarSign size={20} color="#10B981" />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total Cobrado</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total collected</span>
           </div>
           <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#10B981" }}>{stats.totalPago.toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPago} faturas pagas</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPago} paid invoices</div>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
@@ -137,10 +140,10 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(245, 158, 11, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Clock size={20} color="#F59E0B" />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Por Cobrar</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Outstanding</span>
           </div>
           <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#F59E0B" }}>{stats.totalPendente.toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPendente} faturas pendentes</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemPendente} pending invoices</div>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
@@ -148,10 +151,10 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(239, 68, 68, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <AlertCircle size={20} color="#EF4444" />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Vencidas</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Overdue</span>
           </div>
           <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: "#EF4444" }}>{stats.totalVencido.toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemVencido} faturas vencidas</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{stats.contagemVencido} overdue invoices</div>
         </div>
 
         <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
@@ -159,19 +162,19 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(242, 92, 5, 0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <FileText size={20} color={theme.colors.accent.primary} />
             </div>
-            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Total Geral</span>
+            <span style={{ fontSize: 12, color: theme.colors.text.secondary, fontWeight: 600 }}>Grand total</span>
           </div>
           <div style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: theme.colors.accent.primary }}>{stats.totalGeral.toFixed(2)} €</div>
-          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{faturas.length} total de faturas</div>
+          <div style={{ fontSize: 11, color: theme.colors.text.secondary, marginTop: 4 }}>{faturas.length} invoices total</div>
         </div>
       </div>
 
       <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}`, marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-          <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Faturas</h3>
+          <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Invoices</h3>
           {hasFilters && (
             <button onClick={clearFilters} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: theme.colors.accent.primary, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-              <X size={14} /> Limpar filtros
+              <X size={14} /> Clear filters
             </button>
           )}
         </div>
@@ -181,7 +184,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#999" }} />
             <input
               type="text"
-              placeholder="Buscar fatura ou cliente..."
+              placeholder="Search invoice or client..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: "100%", padding: "10px 12px 10px 38px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
@@ -192,18 +195,18 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             onChange={(e) => setFilterEstado(e.target.value)}
             style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minWidth: 140 }}
           >
-            <option value="">Todos os estados</option>
-            <option value="pendente">Pendente</option>
-            <option value="paga">Paga</option>
-            <option value="vencida">Vencida</option>
-            <option value="cancelada">Cancelada</option>
+            <option value="">All statuses</option>
+            <option value="pendente">Pending</option>
+            <option value="paga">Paid</option>
+            <option value="vencida">Overdue</option>
+            <option value="cancelada">Cancelled</option>
           </select>
           <select
             value={filterCliente}
             onChange={(e) => setFilterCliente(e.target.value)}
             style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13, minWidth: 160 }}
           >
-            <option value="">Todos os clientes</option>
+            <option value="">All clients</option>
             {clientes.map(c => (
               <option key={c.id} value={c.id}>{c.nome}</option>
             ))}
@@ -213,14 +216,14 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
             value={filterDataInicio}
             onChange={(e) => setFilterDataInicio(e.target.value)}
             style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
-            placeholder="Data início"
+            placeholder="Start date"
           />
           <input
             type="date"
             value={filterDataFim}
             onChange={(e) => setFilterDataFim(e.target.value)}
             style={{ padding: "10px 12px", borderRadius: 8, border: `1px solid ${theme.colors.border}`, fontSize: 13 }}
-            placeholder="Data fim"
+            placeholder="End date"
           />
         </div>
 
@@ -232,12 +235,12 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
         ) : filteredFaturas.length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.secondary }}>
             <FileText size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
-            <div>{hasFilters ? "Nenhuma fatura encontrada com os filtros aplicados" : "Nenhuma fatura registada"}</div>
+            <div>{hasFilters ? "No invoices match these filters" : "No invoices on file"}</div>
           </div>
         ) : (
           <div style={{ display: "grid", gap: 12 }}>
             {filteredFaturas.map(fat => {
-              const clienteNome = clientesMap[fat.clienteId]?.nome || fat.clienteNome || 'Cliente';
+              const clienteNome = clientesMap[fat.clienteId]?.nome || fat.clienteNome || 'Client';
               const isVencida = fat.estado === 'pendente' && new Date(fat.dataVencimento) < new Date();
               
               return (
@@ -250,18 +253,18 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
                       <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 15 }}>{fat.numero}</div>
                       <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginTop: 2 }}>{clienteNome}</div>
                       <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
-                        Emissão: {fat.dataEmissao ? new Date(fat.dataEmissao).toLocaleDateString('pt-PT') : '—'} • Venc: {fat.dataVencimento ? new Date(fat.dataVencimento).toLocaleDateString('pt-PT') : '—'}
+                        Issued: {fat.dataEmissao ? new Date(fat.dataEmissao).toLocaleDateString('en-GB') : '—'} • Due: {fat.dataVencimento ? new Date(fat.dataVencimento).toLocaleDateString('en-GB') : '—'}
                       </div>
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 16, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
                     <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
                       <div style={{ fontWeight: 800, color: theme.colors.accent.primary, fontSize: isMobile ? 16 : 18 }}>{fat.valorTotal?.toFixed(2) || "0.00"} €</div>
-                      <div style={{ fontSize: 11, color: "#999" }}>IVA: {fat.valorIVA?.toFixed(2) || "0.00"} €</div>
+                      <div style={{ fontSize: 11, color: "#999" }}>VAT: {fat.valorIVA?.toFixed(2) || "0.00"} €</div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
                       <span style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 100, backgroundColor: `${getEstadoColor(fat.estado)}20`, color: getEstadoColor(fat.estado), textTransform: "uppercase" }}>
-                        {fat.estado}
+                        {invoiceEstadoLabel(fat.estado)}
                       </span>
                       {fat.estado === 'pendente' && (
                         <button 
@@ -269,7 +272,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
                           disabled={processingId === fat.id}
                           style={{ padding: "8px 14px", borderRadius: 8, backgroundColor: "#10B981", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}
                         >
-                          {processingId === fat.id ? 'A processar...' : 'Marcar como Paga'}
+                          {processingId === fat.id ? 'Processing...' : 'Mark as paid'}
                         </button>
                       )}
                     </div>
@@ -283,16 +286,16 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
 
       <div style={{ backgroundColor: "#ffffff", borderRadius: isMobile ? 12 : 16, padding: isMobile ? 16 : 24, border: `1px solid ${theme.colors.border}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-          <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Clientes para Faturar</h3>
-          <button onClick={onNavigateClientes} style={{ fontSize: 12, color: theme.colors.accent.primary, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Ver todos os clientes →</button>
+          <h3 style={{ fontSize: isMobile ? 16 : 18, fontWeight: 700, color: theme.colors.text.primary, fontFamily: theme.fontFamily.sans }}>Clients to invoice</h3>
+          <button onClick={onNavigateClientes} style={{ fontSize: 12, color: theme.colors.accent.primary, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>View all clients →</button>
         </div>
 
         {clientes.filter(c => c.categoria === "cliente").length === 0 ? (
           <div style={{ textAlign: "center", padding: 40, color: theme.colors.text.secondary }}>
             <FileText size={48} style={{ marginBottom: 12, opacity: 0.5 }} />
-            <div>Nenhum cliente ativo para faturar</div>
+            <div>No active clients to invoice</div>
             <button onClick={onNavigateClientes} style={{ marginTop: 12, padding: "14px 20px", borderRadius: 8, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontWeight: 600, cursor: "pointer", minHeight: 44 }}>
-              Ver Clientes
+              View clients
             </button>
           </div>
         ) : (
@@ -305,7 +308,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, color: theme.colors.text.primary, fontSize: 15 }}>{c.nome}</div>
-                    <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginTop: 2 }}>{c.email || "Sem email"}</div>
+                    <div style={{ fontSize: 12, color: theme.colors.text.secondary, marginTop: 2 }}>{c.email || "No email"}</div>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 16, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
@@ -314,7 +317,7 @@ export function Faturacao({ clientes, onCriarFatura, onNavigateClientes }: Fatur
                     {c.propostaNumero && <div style={{ fontSize: 10, color: theme.colors.text.secondary }}>{c.propostaNumero}</div>}
                   </div>
                   <button onClick={() => onCriarFatura(c)} style={{ padding: "12px 16px", borderRadius: 8, backgroundColor: theme.colors.accent.primary, color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", minHeight: 44 }}>
-                    Criar Fatura
+                    Create invoice
                   </button>
                 </div>
               </div>

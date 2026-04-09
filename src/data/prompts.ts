@@ -20,40 +20,40 @@ export const aspectRatios: { value: AspectRatio; label: string }[] = [
 export const prompts: Prompt[] = [
   {
     id: "static-1",
-    title: "Retrato Cinematico",
-    category: "Retrato",
+    title: "Cinematic portrait",
+    category: "Portrait",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop",
     prompt: "Cinematic portrait of a person, soft lighting, highly detailed, 8k, professional photography",
     isPremium: false,
-    tags: ["retrato", "cinematico", "fotografia"]
+    tags: ["portrait", "cinematic", "photography"]
   },
   {
     id: "static-2",
-    title: "Paisagem Futurista",
+    title: "Futuristic landscape",
     category: "3D",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop",
     prompt: "Futuristic landscape with glowing neon lights, cyberpunk style, digital art, ultra detailed",
     isPremium: false,
-    tags: ["3d", "futurista", "cyberpunk"]
+    tags: ["3d", "futuristic", "cyberpunk"]
   },
   {
     id: "static-3",
-    title: "Design de Logotipo Minimalista",
+    title: "Minimalist logo design",
     category: "Design",
     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&auto=format&fit=crop",
     prompt: "Minimalist logo design for a tech company, clean lines, modern aesthetic, vector style",
     isPremium: false,
-    tags: ["design", "logo", "minimalista"]
+    tags: ["design", "logo", "minimal"]
   }
 ];
 
 export const categories = [
-  "Todos",
-  "Fotografia",
-  "Retrato",
+  "All",
+  "Photography",
+  "Portrait",
   "3D",
   "Design",
-  "Ilustracao",
-  "Produto",
-  "Tendencias"
+  "Illustration",
+  "Product",
+  "Trends"
 ];

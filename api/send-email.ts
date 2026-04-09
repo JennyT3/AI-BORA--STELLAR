@@ -7,13 +7,13 @@ const FOOTER = `
   <tr><td style="background:#1a1a1a;padding:32px 40px 28px;">
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
     <tr><td align="center" style="line-height:2.4;">
-      <a href="https://aibora.pt/" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Sobre nós</a>
+      <a href="https://aibora.pt/" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">About us</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/servicos" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Serviços</a>
+      <a href="https://aibora.pt/servicos" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Services</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/privacidade" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Política de Privacidade</a>
+      <a href="https://aibora.pt/privacidade" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Privacy policy</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/unsubscribe" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Cancelar subscrição</a>
+      <a href="https://aibora.pt/unsubscribe" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Unsubscribe</a>
     </td></tr></table>
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
     <tr><td align="center">
@@ -34,10 +34,10 @@ const FOOTER = `
         <a href="tel:+351936021747" style="color:#ffffff;text-decoration:none;">+351 936 021 747</a>
       </p>
     </td></tr></table>
-    <p style="font-size:11px;color:#666666;text-align:center;margin:16px 0 0;">© 2026 Ai Bora. Todos os direitos reservados.</p>
+    <p style="font-size:11px;color:#666666;text-align:center;margin:16px 0 0;">© 2026 Ai Bora. All rights reserved.</p>
   </td></tr>`;
 
-const HEADER = `<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+const HEADER = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#e8e8e8;font-family:'Segoe UI',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#e8e8e8;padding:32px 16px;">
 <tr><td align="center">
@@ -56,282 +56,282 @@ function wrap(body: string): string {
 const templates: Record<string, (data: any) => { subject: string; html: string }> = {
 
   'link-proposta': (data) => ({
-    subject: `✦ A sua proposta exclusiva está pronta, ${data.clienteNome}`,
+    subject: `✦ Your exclusive proposal is ready, ${data.clienteNome}`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Proposta Exclusiva ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Preparámos uma proposta pensada especialmente para si e para o seu projeto. Pode ver todos os detalhes e dar o seu feedback pelo link abaixo.</p>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Tem alguma questão? Responda a este email ou contacte-nos — estamos aqui para ajudar.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Exclusive proposal ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">We prepared a proposal tailored to you and your project. View all details and share your feedback using the link below.</p>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Questions? Reply to this email or contact us — we are here to help.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver a minha proposta →</a>
+          <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View my proposal →</a>
         </td></tr></table>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 2px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Válida até</p>
+          <p style="font-size:12px;color:#999;margin:0 0 2px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Valid until</p>
           <p style="font-size:15px;color:#111;margin:0;font-weight:600;">${data.validade}</p>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'confirmacao-orcamento': (data) => ({
-    subject: `Recebemos o seu pedido de orçamento, ${data.clienteNome}!`,
+    subject: `We received your quote request, ${data.clienteNome}!`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">📋 Pedido Recebido</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome}!</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Obrigado pelo seu interesse nos serviços da Ai Bora. Recebemos o seu pedido de orçamento e a nossa equipa está a analisá-lo.</p>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Dentro de <strong>2 dias úteis</strong> receberá uma proposta personalizada, elaborada especificamente para as necessidades do seu negócio.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">📋 Request received</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome}!</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Thank you for your interest in Ai Bora. We received your quote request and our team is reviewing it.</p>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Within <strong>2 business days</strong> you will receive a tailored proposal for your business needs.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Resumo do pedido</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Request summary</p>
           <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>ID:</strong> ${data.solicitacaoId}</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Data:</strong> ${data.data}</p>
-          ${data.tipoProjeto ? `<p style="font-size:14px;color:#111;margin:0;"><strong>Serviços:</strong> ${data.tipoProjeto}</p>` : ''}
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Date:</strong> ${data.data}</p>
+          ${data.tipoProjeto ? `<p style="font-size:14px;color:#111;margin:0;"><strong>Services:</strong> ${data.tipoProjeto}</p>` : ''}
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Estamos ansiosos por ajudar o seu negócio a crescer!</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">We look forward to helping your business grow!</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'confirmacao-mensagem': (data) => ({
-    subject: `Obrigado por nos contactar, ${data.clienteNome}!`,
+    subject: `Thank you for contacting us, ${data.clienteNome}!`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">👋 Recebemos a sua mensagem</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome}!</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Obrigado por nos contactar. Recebemos a sua mensagem e vamos analisar o seu pedido com atenção.</p>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">A nossa equipa vai entrar em contacto consigo dentro de <strong>24 horas</strong>. Enquanto isso, se tiver alguma dúvida, pode responder a este email ou chamar-nos diretamente.</p>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Estamos ansiosos por ajudar!</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">👋 We received your message</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome}!</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Thank you for reaching out. We received your message and will review your request carefully.</p>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Our team will get back to you within <strong>24 hours</strong>. In the meantime, if you have any questions, reply to this email or call us directly.</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">We look forward to helping!</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'confirmacao-colaborador': (data) => ({
-    subject: `Recebemos a sua candidatura, ${data.clienteNome}!`,
+    subject: `We received your application, ${data.clienteNome}!`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✨ Recebemos a sua candidatura</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome}!</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Obrigado por se candidatar para fazer parte da rede Ai Bora. Recebemos o seu formulário e a nossa equipa está a analisar o seu perfil.</p>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Dentro de <strong>48 horas</strong> receberá feedback sobre a sua candidatura. Se for selecionado, receberá instruções detalhadas sobre os próximos passos.</p>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Fique atento ao seu email — temos imensas oportunidades para si!</p>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Estamos ansiosos por trabalhar consigo!</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✨ We received your application</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome}!</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Thank you for applying to join the Ai Bora network. We received your form and our team is reviewing your profile.</p>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Within <strong>48 hours</strong> you will hear back about your application. If selected, you will receive detailed next steps.</p>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Watch your inbox — we have many opportunities for you!</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">We look forward to working with you!</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'resposta-proposta': (data) => ({
-    subject: `Resposta à proposta de ${data.clienteNome} — Ai Bora`,
+    subject: `Response to proposal from ${data.clienteNome} — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Resposta Recebida ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;">Resposta de ${data.clienteNome}</h1>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Response received ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;">Reply from ${data.clienteNome}</h1>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Resposta:</strong> ${data.resposta}</p>
-          ${data.comentarios ? `<p style="font-size:14px;color:#444;margin:0;"><strong>Comentários:</strong> ${data.comentarios}</p>` : ''}
+          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Response:</strong> ${data.resposta}</p>
+          ${data.comentarios ? `<p style="font-size:14px;color:#444;margin:0;"><strong>Comments:</strong> ${data.comentarios}</p>` : ''}
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'proposta-rejeitada': (data) => ({
-    subject: `Obrigado pelo seu tempo — Ai Bora`,
+    subject: `Thank you for your time — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Até breve ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Obrigado pelo seu tempo e pela confiança depositada em nós. Ficamos à sua disposição para qualquer questão futura — será sempre bem-vindo/a.</p>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Until next time ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Thank you for your time and for trusting us. We are here for any future questions — you are always welcome.</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'boas-vindas-cliente': (data) => ({
-    subject: `Bem-vindo/a à Ai Bora, ${data.clienteNome}! 🎉`,
+    subject: `Welcome to Ai Bora, ${data.clienteNome}! 🎉`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Bem-vindo/a ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 🎉</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">É oficial — já é cliente ativo Ai Bora! Pode aceder à sua ficha pessoal a qualquer momento pelo link abaixo.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Welcome ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 🎉</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">It is official — you are now an active Ai Bora client! Access your personal profile anytime using the link below.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkFicha}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver a minha ficha →</a>
+          <a href="${data.linkFicha}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View my profile →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'nova-oferta-colaboradores': (data) => ({
-    subject: `✦ Novas tarefas disponíveis — Ai Bora`,
+    subject: `✦ New tasks available — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Nova Oportunidade ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Há novas tarefas disponíveis no painel. Entre agora e solicite as que mais lhe interessam antes que sejam atribuídas.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ New opportunity ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">There are new tasks in the dashboard. Log in now and claim the ones you want before they are assigned.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkPainel}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver tarefas disponíveis →</a>
+          <a href="${data.linkPainel}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View available tasks →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'tarefa-atribuida': (data) => ({
-    subject: `Nova tarefa atribuída: ${data.nomeTarefa} — Ai Bora`,
+    subject: `New task assigned: ${data.nomeTarefa} — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Tarefa Atribuída ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Foi-lhe atribuída uma nova tarefa. Aceda ao painel para ver todos os detalhes e dar início ao trabalho.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Task assigned ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A new task has been assigned to you. Open the dashboard to see all details and get started.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Detalhes</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Tarefa:</strong> ${data.nomeTarefa}</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Details</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Task:</strong> ${data.nomeTarefa}</p>
           <p style="font-size:14px;color:#111;margin:0;"><strong>Cliente:</strong> ${data.nomeCliente}</p>
         </td></tr></table>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkPainel}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver a minha tarefa →</a>
+          <a href="${data.linkPainel}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View my task →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'entrega-aprovada': (data) => ({
-    subject: `A sua entrega está pronta para rever — Ai Bora`,
+    subject: `Your delivery is ready to review — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Entrega Pronta ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">A sua entrega está pronta! Pode rever o trabalho e dar a aprovação diretamente pelo link abaixo.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Delivery ready ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Your delivery is ready! Review the work and approve it using the link below.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkEntrega}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver e aprovar entrega →</a>
+          <a href="${data.linkEntrega}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Review and approve delivery →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'fatura': (data) => ({
-    subject: `A sua fatura Ai Bora — ${data.valor}€`,
+    subject: `Your Ai Bora invoice — ${data.valor}€`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Fatura Disponível ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Segue a sua fatura pelos serviços contratados. Pode efetuar o pagamento pelo link abaixo.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Invoice available ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Here is your invoice for the contracted services. You can pay using the link below.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Resumo</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Valor:</strong> ${data.valor}€</p>
-          <p style="font-size:14px;color:#111;margin:0;"><strong>Vencimento:</strong> ${data.vencimento}</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Summary</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Amount:</strong> ${data.valor}€</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Due date:</strong> ${data.vencimento}</p>
         </td></tr></table>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkFatura}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Pagar agora →</a>
+          <a href="${data.linkFatura}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Pay now →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'liquidacao-executor': (data) => ({
-    subject: `A sua comissão está pronta — Ai Bora`,
+    subject: `Your commission is ready — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Comissão Pronta ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A sua comissão pelo trabalho realizado está pronta. Segue o detalhe.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Commission ready ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Your commission for the work completed is ready. Details below.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Detalhe</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Details</p>
           <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Tarefa:</strong> ${data.nomeTarefa}</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Comissão:</strong> ${data.valor}€</p>
-          <p style="font-size:14px;color:#111;margin:0;"><strong>Data:</strong> ${data.data}</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Commission:</strong> ${data.valor}€</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Date:</strong> ${data.data}</p>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'liquidacao-captador': (data) => ({
-    subject: `A sua comissão de captação está pronta — Ai Bora`,
+    subject: `Your referral commission is ready — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Comissão de Captação ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A sua comissão pela captação do cliente está pronta. Segue o detalhe.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Referral commission ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Your commission for referring this client is ready. Details below.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Detalhe</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Cliente captado:</strong> ${data.nomeCliente}</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Comissão:</strong> ${data.valor}€</p>
-          <p style="font-size:14px;color:#111;margin:0;"><strong>Data:</strong> ${data.data}</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Details</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Referred client:</strong> ${data.nomeCliente}</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Commission:</strong> ${data.valor}€</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Date:</strong> ${data.data}</p>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'pagamento-confirmado': (data) => ({
-    subject: `Pagamento confirmado — Obrigado, ${data.clienteNome}!`,
+    subject: `Payment confirmed — Thank you, ${data.clienteNome}!`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Pagamento Confirmado ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Obrigado, ${data.clienteNome}! 🙏</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">Recebemos o seu pagamento com sucesso. Pode consultar todos os detalhes na sua ficha pessoal.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Payment confirmed ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Thank you, ${data.clienteNome}! 🙏</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">We received your payment successfully. You can view all details in your personal profile.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkFicha}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver a minha ficha →</a>
+          <a href="${data.linkFicha}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View my profile →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'comissao-enviada-executor': (data) => ({
-    subject: `A sua comissão foi enviada — Ai Bora`,
+    subject: `Your commission has been sent — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Comissão Enviada ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A sua comissão foi processada e enviada com sucesso.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Commission sent ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Your commission was processed and sent successfully.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Detalhe</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Details</p>
           <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Tarefa:</strong> ${data.nomeTarefa}</p>
-          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Valor enviado:</strong> ${data.valor}€</p>
-          <p style="font-size:14px;color:#111;margin:0;"><strong>Data:</strong> ${data.data}</p>
+          <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Amount sent:</strong> ${data.valor}€</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Date:</strong> ${data.data}</p>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
 
   'comissao-enviada-captador': (data) => ({
-    subject: `A sua comissão de venda foi enviada — Ai Bora`,
+    subject: `Your sales commission has been sent — Ai Bora`,
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Comissão de Venda Enviada ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.colaboradorNome} 👋</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A sua comissão por captação de cliente foi processada e enviada com sucesso.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Sales commission sent ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.colaboradorNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Your client-referral commission was processed and sent successfully.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Detalhe</p>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Details</p>
           <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Cliente captado:</strong> ${data.nomeCliente}</p>
           <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Valor enviado:</strong> ${data.valor}€</p>
           <p style="font-size:14px;color:#111;margin:0;"><strong>Data:</strong> ${data.data}</p>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
@@ -363,11 +363,11 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
           <p style="font-size:14px;color:#111;margin:0;"><strong>Email:</strong> ${data.email}</p>
         </td></tr></table>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkLogin}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Entrar na plataforma →</a>
+          <a href="${data.linkLogin}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Sign in to the platform →</a>
         </td></tr></table>
         <p style="font-size:13px;color:#888;margin:0 0 36px;">Use "Esqueci a password" para criar a sua senha inicial.</p>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
@@ -378,11 +378,11 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
       <tr><td style="padding:48px 40px 16px;">
         <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Ai Bora ✦</p>
         <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">${data.titulo}</h1>
-        ${data.nomeDestinatario ? `<p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Olá, ${data.nomeDestinatario}!</p>` : ''}
+        ${data.nomeDestinatario ? `<p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Hello, ${data.nomeDestinatario}!</p>` : ''}
         <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">${data.mensagem}</p>
-        ${data.link ? `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;"><a href="${data.link}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Saber mais →</a></td></tr></table>` : ''}
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        ${data.link ? `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;"><a href="${data.link}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Learn more →</a></td></tr></table>` : ''}
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
@@ -400,10 +400,10 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
         </td></tr></table>
         <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">O cliente pediu alterações à proposta. Por favor, contacte o cliente para discutir os ajustes necessários.</p>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Editar Proposta →</a>
+          <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Edit proposal →</a>
         </td></tr></table>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
@@ -413,16 +413,16 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
     html: wrap(`
       <tr><td style="padding:48px 40px 16px;">
         <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Resposta Registada ✦</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${data.clienteNome} 👋</h1>
         <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Obrigado pela sua resposta. Registámos a sua preferência:</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
           <p style="font-size:14px;color:#111;margin:0;"><strong>Sua resposta:</strong> ${data.resposta}</p>
         </td></tr></table>
         ${data.fichaUrl ? `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.fichaUrl}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Aceder à minha área →</a>
+          <a href="${data.fichaUrl}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Go to my area →</a>
         </td></tr></table>` : ''}
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   }),
@@ -440,11 +440,11 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
           <p style="font-size:14px;color:#111;margin:0;"><strong>Código de Verificação:</strong> ${data.codigoVerificacao}</p>
         </td></tr></table>
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${data.linkVerificacao}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver meu Certificado →</a>
+          <a href="${data.linkVerificacao}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">View my certificate →</a>
         </td></tr></table>
         <p style="font-size:15px;color:#444;margin:0 0 8px;">Partilha a tua conquista no LinkedIn!</p>
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa AI BORA Academy 📚</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The AI BORA Academy team 📚</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   })

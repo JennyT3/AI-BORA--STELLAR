@@ -21,7 +21,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
   const [copied, setCopied] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<AspectRatio>("1:1");
 
-  // Bloquear scroll del body cuando modal está abierto
+  // Lock body scroll while modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -49,7 +49,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
 
   return (
     <>
-      {/* CARD */}
+      {/* Card */}
       <div
         onClick={() => setIsOpen(true)}
         className="group relative overflow-hidden rounded-xl cursor-pointer bg-card border border-border hover:border-[#F25C05]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#F25C05]/10 aspect-square"
@@ -107,19 +107,19 @@ export function PromptCard({ prompt }: PromptCardProps) {
               className="text-[9px] md:text-[10px] text-gray-300"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
-              Ver prompt
+              View prompt
             </p>
           )}
         </div>
       </div>
 
-      {/* MODAL - MÓVIL: scrollable, DESKTOP: normal */}
+      {/* Modal — mobile: scrollable; desktop: normal */}
       {isOpen && (
         <div 
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto"
           onClick={() => setIsOpen(false)}
         >
-          {/* Contenedor centrado con padding para scroll */}
+          {/* Centered container with scroll padding */}
           <div className="min-h-screen flex items-start md:items-center justify-center p-3 md:p-4 py-8 md:py-4">
             <div 
               className="relative w-full max-w-sm md:max-w-4xl flex flex-col md:flex-row rounded-2xl overflow-hidden"
@@ -131,7 +131,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* BOTÓN CERRAR */}
+              {/* Close button */}
               <button 
                 onClick={() => setIsOpen(false)}
                 className="absolute top-2 right-2 md:top-3 md:right-3 z-50 p-2.5 bg-black/80 hover:bg-black rounded-full transition-colors border border-white/30 shadow-lg"
@@ -139,11 +139,11 @@ export function PromptCard({ prompt }: PromptCardProps) {
                 <X className="w-5 h-5 text-white" />
               </button>
 
-              {/* COLUMNA IZQUIERDA - Imagen (sticky en móvil para que no se pierda) */}
+              {/* Left column — image */}
               <div 
                 className="w-full md:w-1/2 p-3 md:p-5 flex flex-col bg-[#111] border-b md:border-b-0 md:border-r border-[#333]"
               >
-                {/* Título en MÓVIL */}
+                {/* Title — mobile */}
                 <div className="md:hidden mb-3 pr-12">
                   <h2 
                     className="text-base font-bold leading-tight"
@@ -168,7 +168,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                   )}
                 </div>
 
-                {/* Imagen */}
+                {/* Image */}
                 <div className="flex-shrink-0 flex items-center justify-center w-full py-2">
                   <div 
                     className="relative flex items-center justify-center bg-[#0a0a0a] rounded-lg overflow-hidden"
@@ -191,7 +191,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                   </div>
                 </div>
 
-                {/* Selector de Formatos */}
+                {/* Format selector */}
                 <div className="mt-3 pt-3 border-t border-[#333] flex-shrink-0">
                   <p 
                     className="text-[11px] mb-2 text-center"
@@ -201,7 +201,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                       fontWeight: 600
                     }}
                   >
-                    Formato
+                    Format
                   </p>
                   <div className="flex justify-center gap-1.5">
                     {aspectRatios.map((ratio) => (
@@ -236,12 +236,12 @@ export function PromptCard({ prompt }: PromptCardProps) {
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA - Prompt (SCROLLABLE en móvil) */}
+              {/* Right column — prompt */}
               <div 
                 className="w-full md:w-1/2 p-3 md:p-5 flex flex-col"
                 style={{ minHeight: 'auto' }}
               >
-                {/* Título en DESKTOP */}
+                {/* Title — desktop */}
                 <div className="hidden md:block mb-4 pr-10">
                   <h2 
                     className="text-xl font-bold"
@@ -288,13 +288,13 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         fontWeight: 600
                       }}
                     >
-                      Conteúdo Premium
+                      Premium content
                     </p>
                     <p 
                       className="text-gray-400 text-xs mb-3 md:mb-4 text-center"
                       style={{ fontFamily: 'Montserrat, sans-serif' }}
                     >
-                      Subscreve para desbloquear
+                      Subscribe to unlock
                     </p>
                     <button 
                       className="px-5 md:px-6 py-2 md:py-2.5 rounded-full text-xs md:text-sm font-semibold text-white transition-colors"
@@ -303,12 +303,12 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         fontFamily: 'Montserrat, sans-serif'
                       }}
                     >
-                      Ver Planos
+                      View plans
                     </button>
                   </div>
                 ) : (
                   <>
-                    {/* Prompt - Scrollable si es largo */}
+                    {/* Prompt — scrollable when long */}
                     <div className="flex-1 min-h-0">
                       <p 
                         className="text-[11px] md:text-xs mb-2"
@@ -344,7 +344,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
                       </div>
                     </div>
 
-                    {/* Botón Copiar - Sticky abajo en móvil */}
+                    {/* Copy button */}
                     <div className="mt-3 md:mt-4 flex-shrink-0">
                       <button
                         onClick={handleCopy}
@@ -359,12 +359,12 @@ export function PromptCard({ prompt }: PromptCardProps) {
                         {copied ? (
                           <>
                             <Check className="w-4 h-4" />
-                            Copiado!
+                            Copied!
                           </>
                         ) : (
                           <>
                             <Copy className="w-4 h-4" />
-                            Copiar Prompt
+                            Copy prompt
                           </>
                         )}
                       </button>

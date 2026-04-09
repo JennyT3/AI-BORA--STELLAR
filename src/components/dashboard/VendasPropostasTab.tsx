@@ -10,11 +10,11 @@ export interface VendasPropostasTabProps {
 }
 
 const STATUS_FILTERS = [
-  { value: 'all', label: 'Todas' },
-  { value: 'pendente', label: 'Pendentes' },
-  { value: 'enviada', label: 'Enviadas' },
-  { value: 'sim', label: 'Aceites' },
-  { value: 'nao', label: 'Recusadas' },
+  { value: 'all', label: 'All' },
+  { value: 'pendente', label: 'Pending' },
+  { value: 'enviada', label: 'Sent' },
+  { value: 'sim', label: 'Accepted' },
+  { value: 'nao', label: 'Declined' },
 ];
 
 export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo }: VendasPropostasTabProps) {
@@ -28,11 +28,11 @@ export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo
   });
 
   const getStatusBadge = (p: any) => {
-    if (p.resposta === 'sim') return { bg: '#dcfce7', color: '#16a34a', label: '✓ Aceito' };
-    if (p.resposta === 'nao') return { bg: '#fee2e2', color: '#dc2626', label: '✕ Recusado' };
-    if (p.resposta === 'reagendar') return { bg: '#fef3c7', color: '#d97706', label: '↻ Reagendar' };
-    if (p.dataEnvio) return { bg: '#e8f5e9', color: '#3498db', label: 'Enviada' };
-    return { bg: '#f3f4f6', color: '#9ca3af', label: 'Pendente' };
+    if (p.resposta === 'sim') return { bg: '#dcfce7', color: '#16a34a', label: '✓ Accepted' };
+    if (p.resposta === 'nao') return { bg: '#fee2e2', color: '#dc2626', label: '✕ Declined' };
+    if (p.resposta === 'reagendar') return { bg: '#fef3c7', color: '#d97706', label: '↻ Reschedule' };
+    if (p.dataEnvio) return { bg: '#e8f5e9', color: '#3498db', label: 'Sent' };
+    return { bg: '#f3f4f6', color: '#9ca3af', label: 'Pending' };
   };
 
   const formatComissao = (valor: number, comissaoPercent?: number) => {
@@ -50,7 +50,7 @@ export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 24, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 8 }}>Minhas Propostas</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 13 }}>{propostas.length} propostas dos seus clientes</p>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 13 }}>{propostas.length} proposals from your clients</p>
         </div>
         <select 
           value={filterStatus} 
@@ -95,7 +95,7 @@ export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo
                   </div>
                   <div style={{ fontSize: 11, color: "#888", display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <span>{p.numeroOrcamento || '—'}</span>
-                    <span>{new Date(p.createdAt).toLocaleDateString('pt-PT')}</span>
+                    <span>{new Date(p.createdAt).toLocaleDateString('en-US')}</span>
                   </div>
                   {p.servicos && p.servicos.length > 0 && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8 }}>
@@ -130,7 +130,9 @@ export function VendasPropostasTab({ propostas, vendedor, isMobile, onNavigateTo
         })}
         {filteredPropostas.length === 0 && (
           <div style={{ textAlign: "center", padding: 40, backgroundColor: "#fff", borderRadius: 12, color: theme.colors.text.secondary }}>
-            {filterStatus === 'all' ? 'Nenhuma proposta ainda' : `Nenhuma proposta "${STATUS_FILTERS.find(f => f.value === filterStatus)?.label}"`}
+            {filterStatus === 'all'
+              ? 'No proposals yet'
+              : `No ${STATUS_FILTERS.find(f => f.value === filterStatus)?.label?.toLowerCase() ?? ''} proposals`}
           </div>
         )}
       </div>

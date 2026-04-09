@@ -60,7 +60,7 @@ export function ClienteFicha() {
       
       if (tarea && cliente && proposta) {
         const servicosFatura = [{
-          nome: tarea.servicoNome || 'Serviço',
+          nome: tarea.servicoNome || 'Service',
           descricao: tarea.descricao || '',
           preco: tarea.valorCliente || proposta.valor || 0
         }];
@@ -81,7 +81,7 @@ export function ClienteFicha() {
         setFaturas(faturasAtualizadas);
       }
     } catch (err) {
-      alert("Erro ao aprobar entrega.");
+      alert("Could not approve delivery.");
     }
     setAprovingId(null);
   };
@@ -90,20 +90,20 @@ export function ClienteFicha() {
     async function loadData() {
       try {
         if (!params.id) {
-          setError("Cliente não encontrado");
+          setError("Client not found");
           setLoading(false);
           return;
         }
 
         const clienteData = await getCliente(params.id);
         if (!clienteData) {
-          setError("Cliente não encontrado");
+          setError("Client not found");
           setLoading(false);
           return;
         }
         setCliente(clienteData);
 
-        // Cargar tareas del cliente
+        // Load client tasks
         const q = query(
           collection(db, 'tareas'), 
           where('clienteId', '==', params.id),
@@ -113,25 +113,25 @@ export function ClienteFicha() {
         const tareasData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setTareas(tareasData);
 
-        // Cargar propuesta si existe
+        // Load linked proposal if any
         if (clienteData.propostaId) {
           const propData = await getProposal(clienteData.propostaId);
           setProposta(propData);
         }
 
-        // Cargar facturas
+        // Load invoices
         const fatData = await listFaturasByCliente(params.id);
         setFaturas(fatData);
 
-        // Cargar emails
+        // Load emails
         if (userRole === 'admin' || userRole === 'vendedor') {
           const emData = await listRegistosEmailByCliente(params.id);
           setEmails(emData);
         }
 
       } catch (err: any) {
-        console.error("Erro ao carregar dados:", err);
-        setError("Erro ao carregar os dados da ficha.");
+        console.error("Error loading data:", err);
+        setError("Could not load this profile.");
       }
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export function ClienteFicha() {
       <div style={{ minHeight: '100vh', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 40, height: 40, border: '3px solid #333', borderTop: '3px solid #F25C05', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#888', fontSize: 14 }}>Carregando a tua ficha...</p>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#888', fontSize: 14 }}>Loading your profile...</p>
         </div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
@@ -157,13 +157,13 @@ export function ClienteFicha() {
         <div style={{ textAlign: 'center', maxWidth: 400 }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>😕</div>
           <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 24, color: '#ffffff', marginBottom: 12 }}>
-            {error || "Acesso não autorizado"}
+            {error || "Access not authorised"}
           </h1>
           <button 
             onClick={() => window.location.href = '/'}
             style={{ fontFamily: 'Montserrat, sans-serif', backgroundColor: '#F25C05', color: '#fff', padding: '14px 32px', borderRadius: 100, border: 'none', fontWeight: 700, cursor: 'pointer' }}
           >
-            Voltar ao início
+            Back to home
           </button>
         </div>
       </div>
@@ -183,12 +183,12 @@ export function ClienteFicha() {
 
   const getStatusLabel = (estado: string) => {
     switch (estado) {
-      case 'disponivel': return 'Aguardando Início';
-      case 'asignada': return 'Em Produção';
-      case 'entregue': return 'Em Revisão';
-      case 'aprovada_admin': return 'Aprovado por Admin';
-      case 'aprovada_cliente': return 'Concluído';
-      case 'paga': return 'Pago';
+      case 'disponivel': return 'Awaiting start';
+      case 'asignada': return 'In production';
+      case 'entregue': return 'In review';
+      case 'aprovada_admin': return 'Approved by admin';
+      case 'aprovada_cliente': return 'Completed';
+      case 'paga': return 'Paid';
       default: return estado;
     }
   };
@@ -202,7 +202,7 @@ export function ClienteFicha() {
           <div style={{ fontSize: 18, fontWeight: 900 }}>AI <span style={{ color: '#F25C05' }}>BORA</span></div>
         </div>
         <div style={{ fontSize: 12, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
-          Área do Cliente
+          Client area
         </div>
       </nav>
 
@@ -210,13 +210,13 @@ export function ClienteFicha() {
         {/* WELCOME SECTION */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#F25C05', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>
-            <Sparkles size={16} /> Bem-vindo à tua jornada digital
+            <Sparkles size={16} /> Welcome to your digital journey
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
-            Olá, <span style={{ color: '#F25C05' }}>{cliente.nome}</span>.
+            Hi, <span style={{ color: '#F25C05' }}>{cliente.nome}</span>.
           </h1>
           <p style={{ fontSize: 18, color: '#888', maxWidth: 600, lineHeight: 1.6 }}>
-            Aqui podes acompanhar o progresso dos teus serviços, ver entregas e gerir a tua parceria com a AI BORA.
+            Track your services, review deliveries, and manage your partnership with AI BORA.
           </p>
         </header>
 
@@ -228,33 +228,33 @@ export function ClienteFicha() {
               <div style={{ marginBottom: 48 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                   <h2 style={{ fontSize: 20, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <FileText size={20} color="#F25C05" /> Proposta / Orçamento
+                    <FileText size={20} color="#F25C05" /> Proposal / quote
                   </h2>
                   {userRole !== 'cliente' && !proposta && (
                     <a href={`/admin/orcamento?cliente=${params.id}`} target="_blank" style={{ padding: '10px 16px', borderRadius: 12, background: '#F25C05', color: '#fff', textDecoration: 'none', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Plus size={16} /> Criar Proposta
+                      <Plus size={16} /> Create proposal
                     </a>
                   )}
                 </div>
                 <div style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 20, padding: 24 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                     <div>
-                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Orçamento Nº</div>
+                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Quote no.</div>
                       <div style={{ fontWeight: 700, fontSize: 16 }}>{proposta.numeroOrcamento || '—'}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Valor Total</div>
+                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Total value</div>
                       <div style={{ fontWeight: 800, fontSize: 18, color: '#F25C05' }}>€{proposta.valor?.toFixed(0) || '0'}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Aprovado em</div>
-                      <div style={{ fontWeight: 700, fontSize: 16 }}>{proposta.dataResposta ? new Date(proposta.dataResposta).toLocaleDateString('pt-PT') : '—'}</div>
+                      <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Approved on</div>
+                      <div style={{ fontWeight: 700, fontSize: 16 }}>{proposta.dataResposta ? new Date(proposta.dataResposta).toLocaleDateString('en-GB') : '—'}</div>
                     </div>
                   </div>
                     <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                         <div style={{ flex: 1, minWidth: 200 }}>
-                          <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>Serviços Contratados</div>
+                          <div style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>Contracted services</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                             {proposta.servicos && proposta.servicos.map((s: string, idx: number) => (
                               <span key={idx} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 100, background: 'rgba(255,255,255,0.05)', color: '#ccc' }}>
@@ -265,11 +265,11 @@ export function ClienteFicha() {
                         </div>
                         <div style={{ display: 'flex', gap: 12 }}>
                           <a href={`/p/${proposta.id}`} target="_blank" rel="noopener noreferrer" style={{ padding: '10px 16px', borderRadius: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', textDecoration: 'none', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                            <Eye size={16} /> Ver Proposta
+                            <Eye size={16} /> View proposal
                           </a>
                           {userRole === 'admin' && (
                             <a href={`/admin/orcamento?edit=${proposta.id}`} target="_blank" rel="noopener noreferrer" style={{ padding: '10px 16px', borderRadius: 12, background: 'rgba(242, 92, 5, 0.1)', color: '#F25C05', textDecoration: 'none', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(242, 92, 5, 0.2)' }}>
-                              <FileText size={16} /> Ver PDF / Editor
+                              <FileText size={16} /> View PDF / editor
                             </a>
                           )}
                         </div>
@@ -280,15 +280,15 @@ export function ClienteFicha() {
             )}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
               <h2 style={{ fontSize: 20, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Layout size={20} color="#F25C05" /> O Teu Processo de Trabalho
+                <Layout size={20} color="#F25C05" /> Your workflow
               </h2>
-              <span style={{ fontSize: 12, color: '#666' }}>{tareas.length} Tarefas Ativas</span>
+              <span style={{ fontSize: 12, color: '#666' }}>{tareas.length} active tasks</span>
             </div>
 
             {tareas.length === 0 ? (
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 20, padding: 60, textAlign: 'center' }}>
                 <Clock size={48} color="#333" style={{ marginBottom: 16 }} />
-                <p style={{ color: '#666' }}>Estamos a preparar o teu plano de trabalho. Volta em breve!</p>
+                <p style={{ color: '#666' }}>We are preparing your work plan. Check back soon.</p>
               </div>
             ) : (
               <div style={{ position: 'relative', paddingLeft: 24 }}>
@@ -339,12 +339,12 @@ export function ClienteFicha() {
                         <div style={{ display: 'flex', gap: 24 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#666', fontSize: 12 }}>
                             <Calendar size={14} />
-                            <span>Início: {tarea.createdAt ? new Date(tarea.createdAt).toLocaleDateString('pt-PT') : '—'}</span>
+                            <span>Start: {tarea.createdAt ? new Date(tarea.createdAt).toLocaleDateString('en-GB') : '—'}</span>
                           </div>
                           {tarea.prazo && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#F25C05', fontSize: 12, fontWeight: 600 }}>
                               <Clock size={14} />
-                              <span>Entrega: {tarea.prazo}</span>
+                              <span>Due: {tarea.prazo}</span>
                             </div>
                           )}
                         </div>
@@ -356,7 +356,7 @@ export function ClienteFicha() {
                             rel="noopener noreferrer"
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#F25C05', color: '#fff', fontSize: 12, fontWeight: 700, padding: '10px 20px', borderRadius: 12, textDecoration: 'none' }}
                           >
-                            Ver Entrega <ExternalLink size={14} />
+                            View delivery <ExternalLink size={14} />
                           </a>
                         )}
                         
@@ -366,7 +366,7 @@ export function ClienteFicha() {
                             disabled={aprovingId === tarea.id}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#10B981', color: '#fff', fontSize: 12, fontWeight: 700, padding: '10px 20px', borderRadius: 12, border: 'none', cursor: 'pointer', marginLeft: 8 }}
                           >
-                            {aprovingId === tarea.id ? 'Aprovando...' : '✅ Aprovar Entrega'}
+                            {aprovingId === tarea.id ? 'Approving...' : '✅ Approve delivery'}
                           </button>
                         )}
                       </div>
@@ -380,27 +380,27 @@ export function ClienteFicha() {
             <div style={{ marginTop: 48 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                 <h2 style={{ fontSize: 20, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <CreditCard size={20} color="#F25C05" /> Faturação e Pagamentos
+                  <CreditCard size={20} color="#F25C05" /> Invoicing and payments
                 </h2>
               </div>
               
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 20, padding: 24 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: '#fff' }}>Próxima Fatura</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: '#fff' }}>Next invoice</h3>
                 {faturas.filter(f => f.status === 'pendente' || f.status === 'pago_notificado').length > 0 ? (
                   faturas.filter(f => f.status === 'pendente' || f.status === 'pago_notificado').map(fat => (
                     <div key={fat.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 16 }}>€{fat.valor?.toFixed(0) || '0'}</div>
-                        <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>Vencimento: {new Date(fat.dueDate).toLocaleDateString('pt-PT')}</div>
+                        <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>Due: {new Date(fat.dueDate).toLocaleDateString('en-GB')}</div>
                       </div>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                         <span style={{ fontSize: 12, fontWeight: 600, color: fat.status === 'pago_notificado' ? '#F59E0B' : '#F25C05' }}>
-                          {fat.status === 'pago_notificado' ? 'Em verificação' : 'Pendente'}
+                          {fat.status === 'pago_notificado' ? 'Under review' : 'Pending'}
                         </span>
                         {fat.status === 'pendente' && (
                           <button 
                             onClick={async () => {
-                              if (!confirm('Confirmas que efetuaste o pagamento?')) return;
+                              if (!confirm('Confirm you have made the payment?')) return;
                               try {
                                 const { updateDoc, doc } = await import('firebase/firestore');
                                 await updateDoc(doc(db, 'faturas_recorrentes', fat.id), {
@@ -408,37 +408,37 @@ export function ClienteFicha() {
                                   dataConfirmacaoCliente: new Date().toISOString(),
                                   confirmacaoCliente: true
                                 });
-                                alert('Obrigado! O seu pagamento está em verificação. Receberá confirmação em breve.');
+                                alert('Thank you! Your payment is being verified. You will receive confirmation shortly.');
                                 const fatData = await listFaturasByCliente(params.id!);
                                 setFaturas(fatData);
                               } catch (err) {
-                                alert('Erro ao confirmar pagamento. Tente novamente.');
+                                alert('Could not confirm payment. Please try again.');
                               }
                             }}
                             style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
                           >
-                            Já Paguei
+                            I have paid
                           </button>
                         )}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p style={{ color: '#888', fontSize: 14 }}>Sem faturas pendentes no momento.</p>
+                  <p style={{ color: '#888', fontSize: 14 }}>No pending invoices at the moment.</p>
                 )}
 
-                <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 32, marginBottom: 16, color: '#fff' }}>Historial de Faturas</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 32, marginBottom: 16, color: '#fff' }}>Invoice history</h3>
                 {faturas.filter(f => f.status === 'pago').length > 0 ? (
                   <div style={{ display: 'grid', gap: 8 }}>
                     {faturas.filter(f => f.status === 'pago').map(fat => (
                       <div key={fat.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 8 }}>
-                        <span style={{ fontSize: 14 }}>Pago em {fat.updatedAt ? new Date(fat.updatedAt).toLocaleDateString('pt-PT') : ''}</span>
+                        <span style={{ fontSize: 14 }}>Paid on {fat.updatedAt ? new Date(fat.updatedAt).toLocaleDateString('en-GB') : ''}</span>
                         <span style={{ fontSize: 14, fontWeight: 700, color: '#10B981' }}>€{fat.valor?.toFixed(0) || '0'}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p style={{ color: '#888', fontSize: 14 }}>Não há histórico de pagamentos.</p>
+                  <p style={{ color: '#888', fontSize: 14 }}>No payment history yet.</p>
                 )}
               </div>
             </div>
@@ -448,25 +448,25 @@ export function ClienteFicha() {
               <div style={{ marginTop: 48 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                   <h2 style={{ fontSize: 20, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Mail size={20} color="#F25C05" /> Historial de Emails Enviados
+                    <Mail size={20} color="#F25C05" /> Sent email history
                   </h2>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 20, padding: 24 }}>
                   {emails.length === 0 ? (
-                    <p style={{ color: '#888', fontSize: 14 }}>Nenhum email foi enviado pelo sistema para este cliente.</p>
+                    <p style={{ color: '#888', fontSize: 14 }}>No system emails have been sent to this client.</p>
                   ) : (
                     <div style={{ display: 'grid', gap: 12 }}>
                       {emails.map(email => (
                         <div key={email.id} style={{ padding: 12, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                             <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{email.assunto}</span>
-                            <span style={{ fontSize: 11, color: '#888' }}>{new Date(email.dataEnvio).toLocaleDateString('pt-PT')} {new Date(email.dataEnvio).toLocaleTimeString('pt-PT')}</span>
+                            <span style={{ fontSize: 11, color: '#888' }}>{new Date(email.dataEnvio).toLocaleDateString('en-GB')} {new Date(email.dataEnvio).toLocaleTimeString('en-GB')}</span>
                           </div>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 100, background: 'rgba(242,92,5,0.1)', color: '#F25C05', fontWeight: 700, textTransform: 'uppercase' }}>
                               {email.tipo}
                             </span>
-                            <span style={{ fontSize: 11, color: '#666' }}>Para: {email.destinatario}</span>
+                            <span style={{ fontSize: 11, color: '#666' }}>To: {email.destinatario}</span>
                           </div>
                         </div>
                       ))}
@@ -486,7 +486,7 @@ export function ClienteFicha() {
                   {cliente.nome?.charAt(0)}
                 </div>
                 <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{cliente.nome}</h3>
-                <p style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>{cliente.empresa || 'Negócio Local'}</p>
+                <p style={{ fontSize: 14, color: '#888', marginBottom: 24 }}>{cliente.empresa || 'Local business'}</p>
                 
                 <div style={{ display: 'grid', gap: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13, color: '#ccc' }}>
@@ -503,11 +503,11 @@ export function ClienteFicha() {
                 </div>
               </div>
 
-              {/* AÇÕES DO CLIENTE */}
+              {/* Staff actions */}
               {userRole !== 'cliente' && (
                 <div style={{ background: 'rgba(242,92,5,0.1)', border: '1px solid rgba(242,92,5,0.2)', borderRadius: 24, padding: 24, marginBottom: 24 }}>
                   <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#F25C05', textTransform: 'uppercase', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <FileText size={16} /> Ações do Gestão
+                    <FileText size={16} /> Management actions
                   </h4>
                   <div style={{ display: 'grid', gap: 12 }}>
                     {!proposta ? (
@@ -515,7 +515,7 @@ export function ClienteFicha() {
                         onClick={() => window.open(`/admin/orcamento?cliente=${params.id}`, '_blank')}
                         style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 16, background: '#F25C05', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}
                       >
-                        <Plus size={18} /> Criar Proposta
+                        <Plus size={18} /> Create proposal
                       </button>
                     ) : (
                       <a 
@@ -523,7 +523,7 @@ export function ClienteFicha() {
                         target="_blank"
                         style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 16, background: '#F25C05', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}
                       >
-                        <FileText size={18} /> Editar Proposta
+                        <FileText size={18} /> Edit proposal
                       </a>
                     )}
                   </div>
@@ -532,7 +532,7 @@ export function ClienteFicha() {
 
               {/* QUICK ACTIONS */}
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: 24 }}>
-                <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Suporte & Contacto</h4>
+                <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Support & contact</h4>
                 <div style={{ display: 'grid', gap: 12 }}>
                   <a 
                     href="https://wa.me/351912345678" 
@@ -540,13 +540,13 @@ export function ClienteFicha() {
                     rel="noopener noreferrer"
                     style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 16, background: 'rgba(37, 211, 102, 0.1)', color: '#25D366', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}
                   >
-                    <MessageSquare size={18} /> Falar no WhatsApp
+                    <MessageSquare size={18} /> Chat on WhatsApp
                   </a>
                   <button 
-                    onClick={() => window.location.href = `mailto:info@aibora.pt?subject=Questão sobre o meu projeto - ${cliente.nome}`}
+                    onClick={() => window.location.href = `mailto:info@aibora.pt?subject=Question about my project - ${cliente.nome}`}
                     style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px', borderRadius: 16, background: 'rgba(255,255,255,0.05)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, textAlign: 'left' }}
                   >
-                    <Mail size={18} /> Enviar Email
+                    <Mail size={18} /> Send email
                   </button>
                 </div>
               </div>
@@ -554,29 +554,29 @@ export function ClienteFicha() {
               {/* BLOCK: ADMIN ONLY (NOTES & COMMISSIONS) */}
               {userRole === 'admin' && (
                 <div style={{ marginTop: 24 }}>
-                  {/* Observações / Notas Internas */}
+                  {/* Internal notes */}
                   <div style={{ background: 'rgba(242,92,5,0.05)', border: '1px solid rgba(242,92,5,0.2)', borderRadius: 24, padding: 24, marginBottom: 24 }}>
                     <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#F25C05', textTransform: 'uppercase', letterSpacing: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Eye size={16} /> Notas Internas (Privado)
+                      <Eye size={16} /> Internal notes (private)
                     </h4>
                     <p style={{ fontSize: 13, color: '#ccc', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                      {cliente.observacoes || 'Sem notas registadas para este cliente.'}
+                      {cliente.observacoes || 'No notes recorded for this client.'}
                     </p>
                     <button style={{ background: 'transparent', border: '1px solid #F25C05', color: '#F25C05', marginTop: 16, padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer', width: '100%' }}>
-                      Editar Notas
+                      Edit notes
                     </button>
                   </div>
 
                   {/* Comissões Vendedor */}
                   {cliente.vendedorId && proposta && (
                     <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 24, padding: 24 }}>
-                      <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Comissões Atribuídas</h4>
+                      <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>Assigned commissions</h4>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                         <span style={{ fontSize: 13, color: '#ccc' }}>Vendedor ID</span>
                         <span style={{ fontSize: 12, fontWeight: 600 }}>{cliente.vendedorId.slice(0, 8)}...</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: 13, color: '#ccc' }}>Comissão Estimada</span>
+                        <span style={{ fontSize: 13, color: '#ccc' }}>Estimated commission</span>
                         <span style={{ fontSize: 14, fontWeight: 800, color: '#10B981' }}>€{((proposta.valor || 0) * 0.1).toFixed(0)}</span>
                       </div>
                     </div>
@@ -593,7 +593,7 @@ export function ClienteFicha() {
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'center', pointerEvents: 'auto' }}>
           <div style={{ background: '#F25C05', padding: '12px 24px', borderRadius: 100, boxShadow: '0 10px 30px rgba(242,92,5,0.3)', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff', animation: 'pulse 2s infinite' }}></div>
-            <span style={{ fontSize: 13, fontWeight: 700 }}>Projeto em curso com AI BORA</span>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>Project in progress with AI BORA</span>
           </div>
         </div>
       </div>

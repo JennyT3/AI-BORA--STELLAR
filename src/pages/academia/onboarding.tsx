@@ -11,29 +11,29 @@ const colors = {
 };
 
 const TIPOS_NEGOCIO = [
-  { value: 'ecommerce', label: 'E-commerce / Loja Online' },
-  { value: 'servicos', label: 'Prestação de Serviços' },
-  { value: 'consultoria', label: 'Consultoria' },
-  { value: 'restaurante', label: 'Restaurante / Bar' },
-  { value: 'salute', label: 'Saúde / Bem-estar' },
-  { value: 'educacao', label: 'Educação' },
-  { value: 'outro', label: 'Outro' },
+  { value: 'ecommerce', label: 'E-commerce / online store' },
+  { value: 'servicos', label: 'Professional services' },
+  { value: 'consultoria', label: 'Consulting' },
+  { value: 'restaurante', label: 'Restaurant / bar' },
+  { value: 'salute', label: 'Health / wellness' },
+  { value: 'educacao', label: 'Education' },
+  { value: 'outro', label: 'Other' },
 ];
 
 const TAMANHO_EMPRESAS = [
-  { value: 'solo', label: 'Sou o único(a) responsable' },
-  { value: 'pequeno', label: '2 a 10 funcionários' },
-  { value: 'medio', label: '11 a 50 funcionários' },
-  { value: 'grande', label: 'Mais de 50 funcionários' },
+  { value: 'solo', label: 'Solo / only me' },
+  { value: 'pequeno', label: '2–10 people' },
+  { value: 'medio', label: '11–50 people' },
+  { value: 'grande', label: 'More than 50 people' },
 ];
 
 const OBJETIVOS = [
-  { value: 'aumentar_vendas', label: 'Aumentar vendas e faturamento' },
-  { value: 'reduzir_custos', label: 'Reduzir custos e automatizar tarefas' },
-  { value: 'melhorar_marketing', label: 'Melhorar marketing e attracting clientes' },
-  { value: 'criar_conteudo', label: 'Criar conteúdo más rápido con IA' },
-  { value: 'gerir_redes', label: 'Gerir redes sociais de forma eficiente' },
-  { value: 'outro', label: 'Outro objetivo' },
+  { value: 'aumentar_vendas', label: 'Grow sales and revenue' },
+  { value: 'reduzir_custos', label: 'Cut costs and automate tasks' },
+  { value: 'melhorar_marketing', label: 'Improve marketing and attract clients' },
+  { value: 'criar_conteudo', label: 'Create content faster with AI' },
+  { value: 'gerir_redes', label: 'Run social media more efficiently' },
+  { value: 'outro', label: 'Other goal' },
 ];
 
 export default function AcademiaOnboarding() {
@@ -63,7 +63,7 @@ export default function AcademiaOnboarding() {
             border: `3px solid ${colors.orange}`, borderTopColor: 'transparent',
             animation: 'spin 1s linear infinite', margin: '0 auto 16px'
           }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>A carregar...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -88,9 +88,9 @@ export default function AcademiaOnboarding() {
     if (!user) return;
     
     setSaving(true);
-    console.log('Bypass: Finalizando onboarding...');
+    console.log('Completing onboarding…');
     
-    // Intentar guardar sin bloquear
+    // Best-effort save (non-blocking)
     updateUsuario(user.id, {
       nome: formData.nome,
       tipo_negocio: formData.tipo_negocio,
@@ -99,7 +99,7 @@ export default function AcademiaOnboarding() {
     
     completeOnboarding(user.id).catch(() => {});
     
-    // Redirigir inmediatamente
+    // Redirect shortly after
     setTimeout(() => {
       setLocation('/academia/dashboard');
     }, 100);
@@ -141,10 +141,10 @@ export default function AcademiaOnboarding() {
             </svg>
           </div>
           <h1 style={{ fontSize: 24, fontWeight: 700, color: colors.dark, marginBottom: 8 }}>
-            Complete o seu perfil
+            Complete your profile
           </h1>
           <p style={{ color: '#666', fontSize: 14 }}>
-            Isto vai nos ajudar a personalizar a sua experiência
+            This helps us tailor your experience
           </p>
         </div>
 
@@ -178,13 +178,13 @@ export default function AcademiaOnboarding() {
           {step === 1 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.dark, marginBottom: 24 }}>
-                Como te chamas?
+                What should we call you?
               </h2>
               <input
                 type="text"
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                placeholder="O teu nome completo"
+                placeholder="Your full name"
                 autoFocus
                 style={{
                   width: '100%', padding: '16px 20px', borderRadius: 12,
@@ -199,11 +199,11 @@ export default function AcademiaOnboarding() {
           {step === 2 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.dark, marginBottom: 24 }}>
-                Qual é o teu negócio?
+                Tell us about your business
               </h2>
               <div style={{ marginBottom: 24 }}>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#666', marginBottom: 8 }}>
-                  Tipo de negócio
+                  Business type
                 </label>
                 <select
                   value={formData.tipo_negocio}
@@ -214,7 +214,7 @@ export default function AcademiaOnboarding() {
                     background: '#fff', cursor: 'pointer', outline: 'none',
                   }}
                 >
-                  <option value="">Seleciona uma opção</option>
+                  <option value="">Select an option</option>
                   {TIPOS_NEGOCIO.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
@@ -222,7 +222,7 @@ export default function AcademiaOnboarding() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#666', marginBottom: 8 }}>
-                  Tamanho da empresa
+                  Company size
                 </label>
                 <select
                   value={formData.tamanho_empresa}
@@ -233,7 +233,7 @@ export default function AcademiaOnboarding() {
                     background: '#fff', cursor: 'pointer', outline: 'none',
                   }}
                 >
-                  <option value="">Seleciona uma opção</option>
+                  <option value="">Select an option</option>
                   {TAMANHO_EMPRESAS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
@@ -245,10 +245,10 @@ export default function AcademiaOnboarding() {
           {step === 3 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: colors.dark, marginBottom: 8 }}>
-                Quais são os teus objetivos?
+                What are your goals?
               </h2>
               <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>
-                Seleciona até 3 opções que mais te definem
+                Choose up to three that fit you best
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {OBJETIVOS.map((obj) => {
@@ -293,7 +293,7 @@ export default function AcademiaOnboarding() {
                   cursor: 'pointer', fontSize: 14,
                 }}
               >
-                Voltar
+                Back
               </button>
             ) : <div />}
 
@@ -307,7 +307,7 @@ export default function AcademiaOnboarding() {
                 fontSize: 14, transition: 'all 0.2s ease',
               }}
             >
-              {saving ? 'A carregar...' : step === 3 ? 'Finalizar' : 'Continuar'}
+              {saving ? 'Loading…' : step === 3 ? 'Finish' : 'Continue'}
             </button>
           </div>
         </div>

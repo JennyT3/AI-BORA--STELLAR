@@ -189,7 +189,7 @@ export async function checkAndSendReminders(): Promise<void> {
     const diffDays = Math.floor((dataVencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
     
     if (diffDays === 7 || diffDays === 12 || diffDays === 15) {
-      console.log(`📧 Fatura ${fatura.numero}: Lembrete dia ${diffDays} antes do vencimento`);
+      console.log(`📧 Invoice ${fatura.numero}: reminder ${diffDays} days before due date`);
     }
   }
 }
@@ -199,7 +199,7 @@ export async function processPagamento(faturaId: string): Promise<void> {
   if (!fatura || fatura.estado !== 'paga') return;
   
   if (fatura.vendedorId) {
-    console.log(`💰 Processando comissão para vendedor ${fatura.vendedorId}`);
+    console.log(`💰 Processing commission for vendedor ${fatura.vendedorId}`);
   }
 }
 

@@ -18,7 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(400).json({ error: 'Email é obrigatório' });
+      return res.status(400).json({ error: 'Email is required' });
     }
 
     const q = query(
@@ -31,7 +31,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const snap = await getDocs(q);
 
     if (snap.empty) {
-      return res.status(404).json({ error: 'Cliente não encontrado ou não ativo' });
+      return res.status(404).json({ error: 'Client not found or not active' });
     }
 
     const cliente = snap.docs[0].data();
@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const html = `
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,19 +71,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   </td></tr>
   <tr><td style="height:4px;background:linear-gradient(90deg,#cb1a74 0%,#fb4a50 50%,#ff6f2e 100%);font-size:0;">&nbsp;</td></tr>
   <tr><td style="padding:48px 40px 16px;">
-    <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🔐 Acesso à Área do Cliente</p>
-    <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${cliente.nome} 👋</h1>
-    <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Solicitou acesso à sua área de cliente. Clique no botão abaixo para aceder.</p>
+    <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🔐 Client area access</p>
+    <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${cliente.nome} 👋</h1>
+    <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">You requested access to your client area. Click the button below to sign in.</p>
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
-      <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Cliente:</strong> ${cliente.nome}</p>
+      <p style="font-size:14px;color:#111;margin:0 0 4px;"><strong>Client:</strong> ${cliente.nome}</p>
       <p style="font-size:14px;color:#111;margin:0;"><strong>Email:</strong> ${email}</p>
     </td></tr></table>
     <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-      <a href="${loginLink}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Aceder à minha área →</a>
+      <a href="${loginLink}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Go to my area →</a>
     </td></tr></table>
-    <p style="font-size:13px;color:#888;margin:0 0 36px;">⚠️ Este link é válido por 24 horas. Se não pediu este acesso, ignore este email.</p>
-    <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
-    <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+    <p style="font-size:13px;color:#888;margin:0 0 36px;">⚠️ This link is valid for 24 hours. If you did not request access, ignore this email.</p>
+    <p style="font-size:15px;color:#444;margin:0 0 4px;">Best regards,</p>
+    <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
   </td></tr>
   </table></td></tr></table>
 </body>
@@ -92,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data, error } = await resend.emails.send({
       from: 'Ai Bora <geral@aibora.pt>',
       to: [email],
-      subject: `Acesso à sua área de cliente - Ai Bora`,
+      subject: `Your client area access — Ai Bora`,
       html,
     });
 
@@ -103,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ 
       success: true, 
-      message: 'Magic link enviado para o email' 
+      message: 'Magic link sent to your email' 
     });
 
   } catch (error) {

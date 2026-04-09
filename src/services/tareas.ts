@@ -6,26 +6,26 @@ import { sendFaturaEmail } from './emailService';
 import { criarNotificacao } from './notificacoes';
 
 export type TareaEstado = 
-  | 'disponivel'           // Disponible para cualquier colaborador
-  | 'pendente_atribuicao'  // Colaborador solicitó, esperando aprobación admin
-  | 'atribuida'            // Admin aprobó la solicitud del colaborador
-  | 'em_analise'           // Colaborador está analizando/entendiendo
-  | 'em_execucao'          // Colaborador trabajando activamente
-  | 'em_revisao'           // Trabajo entregado, en revisión del admin
-  | 'aprovada'             // Admin aprobó la entrega
-  | 'entregue'             // Enviada al cliente para aprobación
-  | 'paga';                // Cliente pagó la factura
+  | 'disponivel'           // Open to any collaborator
+  | 'pendente_atribuicao'  // Collaborator requested; awaiting admin approval
+  | 'atribuida'            // Admin approved collaborator request
+  | 'em_analise'           // Collaborator reviewing / understanding
+  | 'em_execucao'          // Collaborator actively working
+  | 'em_revisao'           // Work submitted; admin review
+  | 'aprovada'             // Admin approved delivery
+  | 'entregue'             // Sent to client for approval
+  | 'paga';                // Client paid the invoice
 
 export const TAREFA_ESTADOS: { value: TareaEstado; label: string; color: string }[] = [
-  { value: 'disponivel', label: 'Disponível', color: '#22c55e' },
-  { value: 'pendente_atribuicao', label: 'Aguardando Aprovação', color: '#f59e0b' },
-  { value: 'atribuida', label: 'Atribuída', color: '#3b82f6' },
-  { value: 'em_analise', label: 'Em Análise', color: '#8b5cf6' },
-  { value: 'em_execucao', label: 'Em Execução', color: '#ec4899' },
-  { value: 'em_revisao', label: 'Em Revisão', color: '#14b8a6' },
-  { value: 'aprovada', label: 'Aprovada', color: '#10b981' },
-  { value: 'entregue', label: 'Entregue ao Cliente', color: '#f97316' },
-  { value: 'paga', label: 'Paga', color: '#65a30d' },
+  { value: 'disponivel', label: 'Available', color: '#22c55e' },
+  { value: 'pendente_atribuicao', label: 'Awaiting approval', color: '#f59e0b' },
+  { value: 'atribuida', label: 'Assigned', color: '#3b82f6' },
+  { value: 'em_analise', label: 'In review', color: '#8b5cf6' },
+  { value: 'em_execucao', label: 'In progress', color: '#ec4899' },
+  { value: 'em_revisao', label: 'In revision', color: '#14b8a6' },
+  { value: 'aprovada', label: 'Approved', color: '#10b981' },
+  { value: 'entregue', label: 'Delivered to client', color: '#f97316' },
+  { value: 'paga', label: 'Paid', color: '#65a30d' },
 ];
 
 export interface Tarea {
@@ -140,8 +140,8 @@ export async function solicitarTarea(tareaId: string, vendedorId: string, vended
 
   await criarNotificacao({
     tipo: 'nova_tarefa_solicitada',
-    titulo: 'Nova solicitação de tarefa',
-    mensagem: `${vendedorNome} solicitou realizar a tarefa "${tarea.titulo}". Aprovar ou rejeitar?`,
+    titulo: 'New task request',
+    mensagem: `${vendedorNome} requested to work on "${tarea.titulo}". Approve or reject?`,
     tarefaId,
     clienteId: tarea.clienteId
   });
@@ -160,8 +160,8 @@ export async function aprobarSolicitudTarea(tareaId: string, vendedorId: string,
 
   await criarNotificacao({
     tipo: 'tarefa_aprovada',
-    titulo: 'Tarefa atribuída',
-    mensagem: `A tua solicitação para "${tarea.titulo}" foi aprovada! Podes começar.`,
+    titulo: 'Task assigned',
+    mensagem: `Your request for "${tarea.titulo}" was approved. You can start.`,
     tarefaId,
     vendedorId
   });
@@ -182,8 +182,8 @@ export async function rechazarSolicitudTarea(tareaId: string, vendedorId: string
 
   await criarNotificacao({
     tipo: 'tarefa_rejeitada',
-    titulo: 'Solicitação rejeitada',
-    mensagem: `A tua solicitação para "${tarea.titulo}" foi rejeitada. ${motivo ? `Motivo: ${motivo}` : ''}`,
+    titulo: 'Request rejected',
+    mensagem: `Your request for "${tarea.titulo}" was rejected. ${motivo ? `Reason: ${motivo}` : ''}`,
     tarefaId,
     vendedorId
   });
@@ -216,8 +216,8 @@ export async function entregarTarea(tareaId: string, arquivos?: string[], links?
 
   await criarNotificacao({
     tipo: 'tarefa_entregue',
-    titulo: 'Tarefa entregue para revisão',
-    mensagem: `"${tarea.titulo}" foi entregue. Revisar e aprovar ou solicitar alterações.`,
+    titulo: 'Task submitted for review',
+    mensagem: `"${tarea.titulo}" was submitted. Review and approve or request changes.`,
     tarefaId,
     clienteId: tarea.clienteId
   });
@@ -229,14 +229,14 @@ export async function aprobarEntregaTarea(tareaId: string): Promise<void> {
 
   await updateTarea(tareaId, {
     estado: 'aprovada',
-    revisaoNota: 'Aprovado pelo admin',
+    revisaoNota: 'Approved by admin',
     dataAprovacao: new Date().toISOString()
   });
 
   await criarNotificacao({
     tipo: 'tarefa_aprovada',
-    titulo: 'Entrega aprovada',
-    mensagem: `A tua entrega em "${tarea.titulo}" foi aprovada pelo admin.`,
+    titulo: 'Delivery approved',
+    mensagem: `Your delivery for "${tarea.titulo}" was approved by admin.`,
     tarefaId,
     vendedorId: tarea.asignadaA
   });
@@ -253,8 +253,8 @@ export async function solicitarAlteracoes(tareaId: string, nota: string): Promis
 
   await criarNotificacao({
     tipo: 'tarefa_rejeitada',
-    titulo: 'Alterações solicitadas',
-    mensagem: `O admin solicitou alterações em "${tarea.titulo}": ${nota}`,
+    titulo: 'Changes requested',
+    mensagem: `Admin requested changes on "${tarea.titulo}": ${nota}`,
     tarefaId,
     vendedorId: tarea.asignadaA
   });
@@ -299,8 +299,8 @@ export async function marcarTareaPaga(tareaId: string): Promise<void> {
   if (tarea?.asignadaA) {
     await criarNotificacao({
       tipo: 'fatura_paga',
-      titulo: 'Tarefa paga - Comissão disponível',
-      mensagem: `A tarefa "${tarea.titulo}" foi paga. A tua comissão está disponível para saque.`,
+      titulo: 'Task paid — commission available',
+      mensagem: `Task "${tarea.titulo}" was paid. Your commission is available for payout.`,
       tarefaId,
       vendedorId: tarea.asignadaA
     });
@@ -327,8 +327,8 @@ export async function asignarTarea(
 
   await criarNotificacao({
     tipo: 'tarefa_aprovada',
-    titulo: 'Tarefa atribuída',
-    mensagem: `Foste atribuído à tarefa "${await getTarea(tareaId).then(t => t?.titulo)}". Prazo: ${prazo}`,
+    titulo: 'Task assigned',
+    mensagem: `You were assigned task "${await getTarea(tareaId).then(t => t?.titulo)}". Deadline: ${prazo}`,
     tarefaId,
     vendedorId
   });
@@ -345,11 +345,11 @@ export async function aprobarTareaPorCliente(clienteId: string, tareaId: string)
   try {
     const tarea = await getTarea(tareaId);
     if (!tarea) {
-      return { success: false, error: 'Tarefa não encontrada.' };
+      return { success: false, error: 'Task not found.' };
     }
     
     if (tarea.clienteId !== clienteId) {
-      return { success: false, error: 'Acesso negado: a tarefa pertence a outro cliente.' };
+      return { success: false, error: 'Access denied: this task belongs to another client.' };
     }
 
     await updateTarea(tareaId, {
@@ -362,13 +362,13 @@ export async function aprobarTareaPorCliente(clienteId: string, tareaId: string)
 
     const faturaId = await createFatura({
       clienteId,
-      clienteNome: cliente?.nome || tarea.clienteNome || 'Cliente Independente',
+      clienteNome: cliente?.nome || tarea.clienteNome || 'Independent client',
       clienteEmail: cliente?.email || tarea.clienteEmail,
       clienteNif: cliente?.nif,
       clienteEmpresa: cliente?.empresa,
       servicos: [{
         nome: tarea.titulo,
-        descricao: tarea.descricao || 'Serviço prestado',
+        descricao: tarea.descricao || 'Service delivered',
         preco: tarea.valorCliente || 0
       }],
       vendedorId: tarea.asignadaA || cliente?.vendedorId,
@@ -380,9 +380,9 @@ export async function aprobarTareaPorCliente(clienteId: string, tareaId: string)
     
     if (cliente?.email || tarea.clienteEmail) {
       await sendFaturaEmail({
-        nome: cliente?.nome || tarea.clienteNome || 'Cliente',
+        nome: cliente?.nome || tarea.clienteNome || 'Client',
         email: cliente?.email || tarea.clienteEmail || '',
-        numeroFatura: 'Automática',
+        numeroFatura: 'Automatic',
         valorTotal: `${valorComIva} €`,
         dataVencimento: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-PT'),
         linkFatura: `https://aibora.pt/admin/faturas`, 
@@ -392,7 +392,7 @@ export async function aprobarTareaPorCliente(clienteId: string, tareaId: string)
 
     return { success: true };
   } catch (err: any) {
-    console.error("Erro na aprovação:", err);
+    console.error('Approval error:', err);
     return { success: false, error: err.message };
   }
 }

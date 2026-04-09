@@ -39,12 +39,12 @@ export function VendasSidebar({
   
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
-    { id: 'clientes', label: 'Meus Clientes', icon: Users, count: clienteCount },
-    { id: 'tarefas', label: 'Minhas Tarefas', icon: CheckSquare },
-    { id: 'comissoes', label: 'Comissões', icon: DollarSign },
-    { id: 'faturacao', label: 'Faturação', icon: TrendingUp },
-    { id: 'perfil', label: 'Meu Perfil', icon: User },
+    { id: 'propostas', label: 'Proposals', icon: FileText, count: proposalCount },
+    { id: 'clientes', label: 'My clients', icon: Users, count: clienteCount },
+    { id: 'tarefas', label: 'My tasks', icon: CheckSquare },
+    { id: 'comissoes', label: 'Commissions', icon: DollarSign },
+    { id: 'faturacao', label: 'Billing', icon: TrendingUp },
+    { id: 'perfil', label: 'My profile', icon: User },
   ];
 
   const sidebarWidth = isMobile ? 280 : (collapsed ? 80 : 280);
@@ -98,7 +98,7 @@ export function VendasSidebar({
             gap: 10
           }}>
             <TrendingUp size={16} color="#F25C05" />
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#F25C05' }}>BORA VENDER MAIS!</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: '#F25C05' }}>LET&apos;S SELL MORE!</span>
           </div>
         </div>
       )}
@@ -191,7 +191,7 @@ export function VendasSidebar({
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
             >
               <Plus size={18} strokeWidth={3} />
-              Novo Orçamento
+              New quote
             </button>
           </div>
         )}
@@ -245,7 +245,7 @@ export function VendasSidebar({
           onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
         >
           <LogOut size={18} />
-          {!collapsed && <span>Terminar Sessão</span>}
+          {!collapsed && <span>Sign out</span>}
         </button>
       </div>
     </aside>

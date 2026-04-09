@@ -42,7 +42,7 @@ export function CTAFooterSection() {
         try {
           await sendMensagemConfirmacao(formData.email, formData.nome);
         } catch (emailErr) {
-          console.error('Erro ao enviar email de confirmação:', emailErr);
+          console.error('Failed to send confirmation email:', emailErr);
         }
       }
 
@@ -53,7 +53,7 @@ export function CTAFooterSection() {
       setTimeout(() => setSubmitStatus('idle'), 3000);
       
     } catch (error) {
-      console.error('Erro ao enviar:', error);
+      console.error('Failed to submit:', error);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -83,8 +83,8 @@ export function CTAFooterSection() {
             
             <div className="flex flex-col space-y-4">
               <div className="text-center md:text-left">
-                <h2 style={{fontSize:"clamp(18px, 2.5vw, 24px)",fontWeight:900,lineHeight:1.2,marginBottom:"8px",maxWidth:"220px"}}>Pronto para começar?<br />  <span className="text-fuchsia-brand">Fale connosco hoje.</span></h2>
-                <p className="text-xs text-text-secondary font-medium">Resposta em menos de 24 horas.</p>
+                <h2 style={{fontSize:"clamp(18px, 2.5vw, 24px)",fontWeight:900,lineHeight:1.2,marginBottom:"8px",maxWidth:"220px"}}>Ready to get started?<br />  <span className="text-fuchsia-brand">Talk to us today.</span></h2>
+                <p className="text-xs text-text-secondary font-medium">We reply within 24 hours.</p>
               </div>
 
               <a 
@@ -97,17 +97,17 @@ export function CTAFooterSection() {
                   <WhatsAppIcon size={20} />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-text-primary mb-0">Fale no WhatsApp</div>
-                  <div className="text-[#25D366] text-xs font-bold">Resposta em minutos</div>
+                  <div className="font-bold text-sm text-text-primary mb-0">Chat on WhatsApp</div>
+                  <div className="text-[#25D366] text-xs font-bold">Replies in minutes</div>
                 </div>
               </a>
 
               <ul className="space-y-2">
                 {[
-                  "Sem compromisso — conversa gratuita",
-                  "Resposta em menos de 24 horas",
-                  "Empresa portuguesa, suporte em português",
-                  "Pagamento só quando estiver online"
+                  "No obligation — free introductory chat",
+                  "Response within 24 hours",
+                  "Portuguese company, support in Portuguese",
+                  "Pay only when you go live"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-xs text-text-secondary font-medium">
                     <div className="w-4 h-4 rounded-full bg-surface2 border border-black/5 flex items-center justify-center shrink-0">
@@ -123,26 +123,26 @@ export function CTAFooterSection() {
               <form className="space-y-3" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="nome" className="block text-xs font-bold text-text-primary mb-1">Nome <span className="text-fuchsia-brand">*</span></label>
+                    <label htmlFor="nome" className="block text-xs font-bold text-text-primary mb-1">Name <span className="text-fuchsia-brand">*</span></label>
                     <input 
                       type="text" 
                       id="nome" 
                       required
                       value={formData.nome}
                       onChange={handleChange}
-                      placeholder="O seu nome"
+                      placeholder="Your name"
                       className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
                     />
                   </div>
                   <div>
-                    <label htmlFor="nomeNegocio" className="block text-xs font-bold text-text-primary mb-1">Negócio <span className="text-fuchsia-brand">*</span></label>
+                    <label htmlFor="nomeNegocio" className="block text-xs font-bold text-text-primary mb-1">Business <span className="text-fuchsia-brand">*</span></label>
                     <input 
                       type="text" 
                       id="nomeNegocio" 
                       required
                       value={formData.nomeNegocio}
                       onChange={handleChange}
-                      placeholder="Ex: Padaria"
+                      placeholder="e.g. Bakery"
                       className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
                     />
                   </div>
@@ -150,7 +150,7 @@ export function CTAFooterSection() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="telefone" className="block text-xs font-bold text-text-primary mb-1">Telemóvel <span className="text-fuchsia-brand">*</span></label>
+                    <label htmlFor="telefone" className="block text-xs font-bold text-text-primary mb-1">Mobile <span className="text-fuchsia-brand">*</span></label>
                     <input 
                       type="tel" 
                       id="telefone" 
@@ -168,33 +168,33 @@ export function CTAFooterSection() {
                       id="email" 
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="email@exemplo.pt"
+                      placeholder="you@example.com"
                       className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="mensagem" className="block text-xs font-bold text-text-primary mb-1">Mensagem</label>
+                  <label htmlFor="mensagem" className="block text-xs font-bold text-text-primary mb-1">Message</label>
                   <textarea 
                     id="mensagem" 
                     rows={2}
                     value={formData.mensagem}
                     onChange={handleChange}
-                    placeholder="Conta-nos sobre o teu negócio..."
+                    placeholder="Tell us about your business..."
                     className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors resize-none shadow-sm"
                   />
                 </div>
 
                 {submitStatus === 'success' && (
                   <div className="bg-green-100 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium">
-                    ✅ Enviado com sucesso!
+                    ✅ Sent successfully!
                   </div>
                 )}
                 
                 {submitStatus === 'error' && (
                   <div className="bg-red-100 border border-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-medium">
-                    ❌ Erro. Tente pelo WhatsApp.
+                    ❌ Something went wrong. Try WhatsApp.
                   </div>
                 )}
 
@@ -208,10 +208,10 @@ export function CTAFooterSection() {
                   {isSubmitting ? (
                     <>
                       <Loader2 size={14} className="animate-spin" />
-                      A enviar...
+                      Sending...
                     </>
                   ) : (
-                    <>Enviar mensagem →</>
+                    <>Send message →</>
                   )}
                 </motion.button>
               </form>

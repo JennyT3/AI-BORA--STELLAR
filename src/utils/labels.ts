@@ -1,5 +1,6 @@
 import { theme } from "../styles/theme";
 
+/** Display helpers: comparison values match persisted Firestore fields. */
 export const getStatusColor = (p: { resposta?: string; dataEnvio?: string }): string => {
   if (p.resposta === "sim") return "#10B981";
   if (p.resposta === "nao") return "#DC2626";
@@ -9,11 +10,11 @@ export const getStatusColor = (p: { resposta?: string; dataEnvio?: string }): st
 };
 
 export const getStatusLabel = (p: { resposta?: string; dataEnvio?: string }): string => {
-  if (p.resposta === "sim") return "✓ Aceite";
-  if (p.resposta === "nao") return "✕ Recusado";
-  if (p.resposta === "reagendar" || p.resposta === "reagendado") return "↻ Reagendado";
-  if (p.dataEnvio) return "Enviada";
-  return "Pendente";
+  if (p.resposta === "sim") return "✓ Accepted";
+  if (p.resposta === "nao") return "✕ Declined";
+  if (p.resposta === "reagendar" || p.resposta === "reagendado") return "↻ Rescheduled";
+  if (p.dataEnvio) return "Sent";
+  return "Pending";
 };
 
 export const getStatusColorDashboard = (status: string): string => {
@@ -23,17 +24,17 @@ export const getStatusColorDashboard = (status: string): string => {
 };
 
 export const getStatusLabelDashboard = (status: string): string => {
-  if (status === "pendente") return "Pendente";
-  if (status === "em-analise") return "Em Análise";
-  return "Concluída";
+  if (status === "pendente") return "Pending";
+  if (status === "em-analise") return "Under review";
+  return "Completed";
 };
 
 export const getProposalStatusBadge = (p: { resposta?: string; dataEnvio?: string }) => {
-  if (p.resposta === "sim") return { color: "#dcfce7", text: "✓ Aceito", textColor: "#16a34a" };
-  if (p.resposta === "nao") return { color: "#fee2e2", text: "✕ Recusado", textColor: "#dc2626" };
-  if (p.resposta === "reagendar") return { color: "#fef3c7", text: "↻ Reagendado", textColor: "#d97706" };
-  if (p.dataEnvio) return { color: "#E8F4FD", text: "Enviada", textColor: "#3498DB" };
-  return { color: "#f3f4f6", text: "Pendente", textColor: "#9ca3af" };
+  if (p.resposta === "sim") return { color: "#dcfce7", text: "✓ Accepted", textColor: "#16a34a" };
+  if (p.resposta === "nao") return { color: "#fee2e2", text: "✕ Declined", textColor: "#dc2626" };
+  if (p.resposta === "reagendar") return { color: "#fef3c7", text: "↻ Rescheduled", textColor: "#d97706" };
+  if (p.dataEnvio) return { color: "#E8F4FD", text: "Sent", textColor: "#3498DB" };
+  return { color: "#f3f4f6", text: "Pending", textColor: "#9ca3af" };
 };
 
 export const getCategoriaClasses = (cat: string): string => {
@@ -46,10 +47,10 @@ export const getCategoriaClasses = (cat: string): string => {
 };
 
 export const getCategoriaLabel = (cat: string): string => {
-  if (cat === "cliente") return "Cliente";
-  if (cat === "proposta_enviada") return "Proposta Enviada";
-  if (cat === "potencial") return "Potencial";
-  if (cat === "curioso") return "Curioso";
-  if (cat === "sem_interesse") return "Sem Interesse";
+  if (cat === "cliente") return "Client";
+  if (cat === "proposta_enviada") return "Proposal sent";
+  if (cat === "potencial") return "Potential";
+  if (cat === "curioso") return "Curious";
+  if (cat === "sem_interesse") return "Not interested";
   return cat;
 };

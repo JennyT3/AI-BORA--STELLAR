@@ -61,7 +61,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
     if (!formData.nome.trim() || !formData.telefone.trim()) return;
     setLoading(true);
     try {
-      // Crear cliente automáticamente en Firestore
+      // Create client record in Firestore
       const clienteId = await createCliente({
         nome: formData.nome,
         ...(formData.email && { email: formData.email }),
@@ -100,7 +100,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
         ).catch(() => {});
       }
     } catch (err: any) {
-      alert('Erro ao enviar: ' + err.message);
+      alert('Failed to send: ' + err.message);
     }
     setLoading(false);
   };
@@ -149,18 +149,18 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                   <CheckCircle size={64} color="#10B981" style={{ margin: '0 auto 24px' }} />
                 </motion.div>
                 <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 24, color: '#1A1A1A', marginBottom: 12 }}>
-                  Solicitação enviada! 🎉
+                  Request sent! 🎉
                 </h2>
                 <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, color: '#666', lineHeight: 1.6, marginBottom: 32 }}>
-                  Obrigado, <strong>{formData.nome}</strong>!<br />
-                  Entraremos em contacto em menos de 24 horas.
+                  Thank you, <strong>{formData.nome}</strong>!<br />
+                  We will get back to you within 24 hours.
                 </p>
                 <button onClick={handleClose} style={{
                   fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14,
                   backgroundColor: '#F22283', color: '#fff', border: 'none',
                   padding: '14px 32px', borderRadius: 100, cursor: 'pointer',
                 }}>
-                  Fechar
+                  Close
                 </button>
               </div>
             ) : (
@@ -173,10 +173,10 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                 }}>
                   <div>
                     <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 20, color: '#1A1A1A', margin: '0 0 4px' }}>
-                      Pedir Orçamento
+                      Request a quote
                     </h2>
                     <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#888', margin: 0 }}>
-                      {servicosSelecionados.length} serviço{servicosSelecionados.length !== 1 ? 's' : ''} selecionado{servicosSelecionados.length !== 1 ? 's' : ''}
+                      {servicosSelecionados.length} service{servicosSelecionados.length !== 1 ? 's' : ''} selected
                     </p>
                   </div>
                   <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#666' }}>
@@ -203,14 +203,14 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                     <div>
                       <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>
-                        Nome <span style={{ color: '#F22283' }}>*</span>
+                        Name <span style={{ color: '#F22283' }}>*</span>
                       </label>
-                      <input id="nome" value={formData.nome} onChange={handleChange} placeholder="O seu nome"
+                      <input id="nome" value={formData.nome} onChange={handleChange} placeholder="Your name"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
                     </div>
                     <div>
                       <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>
-                        Telemóvel <span style={{ color: '#F22283' }}>*</span>
+                        Mobile <span style={{ color: '#F22283' }}>*</span>
                       </label>
                       <input id="telefone" value={formData.telefone} onChange={handleChange} placeholder="+351 9XX XXX XXX"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
@@ -219,40 +219,40 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                     <div>
-                      <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Empresa</label>
-                      <input id="empresa" value={formData.empresa} onChange={handleChange} placeholder="Nome do negócio"
+                      <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Company</label>
+                      <input id="empresa" value={formData.empresa} onChange={handleChange} placeholder="Business name"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
                     </div>
                     <div>
                       <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Email</label>
-                      <input id="email" value={formData.email} onChange={handleChange} placeholder="email@exemplo.pt"
+                      <input id="email" value={formData.email} onChange={handleChange} placeholder="you@example.com"
                         style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
                     </div>
                   </div>
 
                   <div style={{ marginBottom: 24 }}>
-                    <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Observações</label>
+                    <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Notes</label>
                     <textarea id="observacoes" value={formData.observacoes} onChange={handleChange}
-                      placeholder="Descreve o teu negócio, necessidades específicas ou serviços que não encontraste na lista..."
+                      placeholder="Describe your business, specific needs, or services you did not find in the list..."
                       rows={3}
                       style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
                   </div>
 
                   <div style={{ marginBottom: 24 }}>
                     <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>Website</label>
-                    <input id="website" value={formData.website || ''} onChange={handleChange} placeholder="https://www.tuempresa.pt"
+                    <input id="website" value={formData.website || ''} onChange={handleChange} placeholder="https://www.yourcompany.com"
                       style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} />
                   </div>
 
                   <div style={{ marginBottom: 24 }}>
                     <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', display: 'block', marginBottom: 6 }}>
-                      Quem te indicou? <span style={{ fontSize: 10, color: '#999', fontWeight: 400 }}>(opcional)</span>
+                      Who referred you? <span style={{ fontSize: 10, color: '#999', fontWeight: 400 }}>(optional)</span>
                     </label>
                     <input 
                       id="vendedorId" 
                       value={formData.vendedorId} 
                       onChange={handleChange} 
-                      placeholder="Nome ou código do colaborador"
+                      placeholder="Partner name or code"
                       style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 13, boxSizing: 'border-box' }} 
                     />
                   </div>
@@ -260,7 +260,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                   <div style={{ marginBottom: 24 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                       <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A' }}>
-                        Marcas / Negócios
+                        Brands / businesses
                       </label>
                       <button onClick={addMarca} style={{
                         display: 'flex', alignItems: 'center', gap: 4,
@@ -268,7 +268,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                         color: '#F22283', background: 'none', border: '1px solid #F22283',
                         borderRadius: 20, padding: '4px 10px', cursor: 'pointer',
                       }}>
-                        <Plus size={12} /> Adicionar marca
+                        <Plus size={12} /> Add brand
                       </button>
                     </div>
 
@@ -278,7 +278,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                           <input
                             value={marca.nome}
                             onChange={e => updateMarcaNome(i, e.target.value)}
-                            placeholder={`Nome da marca ${i + 1}`}
+                            placeholder={`Brand name ${i + 1}`}
                             style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'Montserrat, sans-serif', fontSize: 12 }}
                           />
                           {marcas.length > 1 && (
@@ -289,7 +289,7 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                         </div>
 
                         <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, color: '#888', margin: '0 0 8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                          Redes sociais activas
+                          Active social profiles
                         </p>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                           {REDES_SOCIAIS.map(rede => {
@@ -328,10 +328,10 @@ export function OrcamentoModal({ isOpen, onClose, servicosSelecionados }: Props)
                       boxShadow: canSubmit ? '0 4px 16px rgba(242,34,131,0.3)' : 'none',
                     }}
                   >
-                    {loading ? 'A enviar...' : <><Send size={16} /> Enviar Solicitação</>}
+                    {loading ? 'Sending...' : <><Send size={16} /> Submit request</>}
                   </button>
                   <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, color: '#aaa', textAlign: 'center', marginTop: 10 }}>
-                    Resposta em menos de 24h • Sem compromisso
+                    Reply within 24h • No obligation
                   </p>
                 </div>
               </>

@@ -1,9 +1,9 @@
 // ============================================
-// VALIDAÇÕES E SANITIZAÇÃO
+// VALIDATION AND SANITIZATION
 // ============================================
 
 // ============================================
-// VALIDAÇÕES DE EMAIL
+// EMAIL VALIDATION
 // ============================================
 
 export function isValidEmail(email: string): boolean {
@@ -16,12 +16,12 @@ export function sanitizeEmail(email: string): string {
 }
 
 // ============================================
-// VALIDAÇÕES DE TELEFONE (Portugal)
+// PHONE VALIDATION (Portugal)
 // ============================================
 
 export function isValidPhone(pt: string): boolean {
   const cleaned = pt.replace(/\D/g, '');
-  // Portugal: 9 dígitos começando com 9 outelefones starts com 2
+  // Portugal: typically 9 digits starting with 9, or landlines starting with 2
   return cleaned.length >= 9 && cleaned.length <= 11;
 }
 
@@ -41,7 +41,7 @@ export function formatPhone(pt: string): string {
 }
 
 // ============================================
-// VALIDAÇÃO DE NIF PORTUGUÊS
+// PORTUGUESE TAX ID (NIF) VALIDATION
 // ============================================
 
 export function isValidNIF(nif: string): boolean {
@@ -50,11 +50,11 @@ export function isValidNIF(nif: string): boolean {
   const num = nif.replace(/\D/g, '');
   if (num.length !== 9) return false;
   
-  // NIF deve começar por 1, 2, 3, 4, 5, 6, 7, 8 ou 9
+  // NIF must start with 1–9
   const firstDigit = parseInt(num[0]);
   if (firstDigit < 1 || firstDigit > 9) return false;
   
-  // Algoritmo de validação de NIF
+  // NIF check digit algorithm
   let sum = 0;
   for (let i = 0; i < 8; i++) {
     sum += parseInt(num[i]) * (9 - i);
@@ -71,7 +71,7 @@ export function sanitizeNIF(nif: string): string {
 }
 
 // ============================================
-// SANITIZAÇÃO DE STRINGS (PREVENÇÃO XSS)
+// STRING SANITIZATION (XSS PREVENTION)
 // ============================================
 
 export function sanitizeString(str: string): string {
@@ -108,7 +108,7 @@ export function sanitizeHtml(allowedTags: string[] = ['b', 'i', 'u', 'em', 'stro
 }
 
 // ============================================
-// VALIDAÇÃO DE INPUTS NUMÉRICOS
+// NUMERIC INPUT VALIDATION
 // ============================================
 
 export function isValidNumber(value: any): boolean {
@@ -121,7 +121,7 @@ export function sanitizeNumber(value: any): number {
 }
 
 // ============================================
-// VALIDAÇÃO DE URL
+// URL VALIDATION
 // ============================================
 
 export function isValidUrl(url: string): boolean {
@@ -147,7 +147,7 @@ export function sanitizeUrl(url: string): string {
 }
 
 // ============================================
-// VALIDAÇÃO DE DATA
+// DATE VALIDATION
 // ============================================
 
 export function isValidDate(dateStr: string): boolean {
@@ -162,7 +162,7 @@ export function sanitizeDate(dateStr: string): string {
 }
 
 // ============================================
-// VALIDAÇÃO COMPLETA DE FORMULÁRIO
+// FULL FORM VALIDATION
 // ============================================
 
 export interface ValidationResult {
@@ -179,21 +179,21 @@ export function validateCliente(data: {
   const errors: Record<string, string> = {};
   
   if (!data.nome?.trim()) {
-    errors.nome = 'Nome é obrigatório';
+    errors.nome = 'Name is required';
   } else if (data.nome.length > 200) {
-    errors.nome = 'Nome muito longo (máx 200 caracteres)';
+    errors.nome = 'Name is too long (max 200 characters)';
   }
   
   if (data.email && !isValidEmail(data.email)) {
-    errors.email = 'Email inválido';
+    errors.email = 'Invalid email';
   }
   
   if (data.telemovel && !isValidPhone(data.telemovel)) {
-    errors.telemovel = 'Telemóvel inválido';
+    errors.telemovel = 'Invalid mobile number';
   }
   
   if (data.nif && !isValidNIF(data.nif)) {
-    errors.nif = 'NIF inválido';
+    errors.nif = 'Invalid tax ID (NIF)';
   }
   
   return {
@@ -210,15 +210,15 @@ export function validateProposta(data: {
   const errors: Record<string, string> = {};
   
   if (!data.cliente?.trim()) {
-    errors.cliente = 'Nome do cliente é obrigatório';
+    errors.cliente = 'Client name is required';
   }
   
   if (data.email && !isValidEmail(data.email)) {
-    errors.email = 'Email inválido';
+    errors.email = 'Invalid email';
   }
   
   if (data.valor !== undefined && data.valor < 0) {
-    errors.valor = 'Valor não pode ser negativo';
+    errors.valor = 'Amount cannot be negative';
   }
   
   return {
@@ -228,7 +228,7 @@ export function validateProposta(data: {
 }
 
 // ============================================
-// SANITIZAÇÃO DE DADOS ANTES DE GUARDAR
+// SANITIZE DATA BEFORE SAVE
 // ============================================
 
 export function sanitizeClienteData(data: any): any {

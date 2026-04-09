@@ -7,18 +7,18 @@ const FOOTER = `
   <tr><td style="background:#1a1a1a;padding:32px 40px 28px;">
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
     <tr><td align="center" style="line-height:2.4;">
-      <a href="https://aibora.pt/" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Sobre nós</a>
+      <a href="https://aibora.pt/" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">About us</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/servicos" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Serviços</a>
+      <a href="https://aibora.pt/servicos" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Services</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/privacidade" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Política de Privacidade</a>
+      <a href="https://aibora.pt/privacidade" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Privacy policy</a>
       <span style="color:#444;">|</span>
-      <a href="https://aibora.pt/unsubscribe" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Cancelar subscrição</a>
+      <a href="https://aibora.pt/unsubscribe" style="font-size:12px;color:#888888;text-decoration:none;margin:0 8px;">Unsubscribe</a>
     </td></tr></table>
-    <p style="font-size:11px;color:#666666;text-align:center;margin:16px 0 0;">© 2026 Ai Bora. Todos os direitos reservados.</p>
+    <p style="font-size:11px;color:#666666;text-align:center;margin:16px 0 0;">© 2026 Ai Bora. All rights reserved.</p>
   </td></tr>`;
 
-const HEADER = `<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+const HEADER = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#e8e8e8;font-family:'Segoe UI',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#e8e8e8;padding:32px 16px;">
 <tr><td align="center">
@@ -52,7 +52,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { nome, email, telefone, tipo, especialidade, solicitacaoId } = req.body;
 
     if (!nome || !email || !tipo) {
-      return res.status(400).json({ error: 'Nome, email e tipo são obrigatórios' });
+      return res.status(400).json({ error: 'Name, email, and type are required' });
     }
 
     const isColaborador = tipo === 'colaborador';
@@ -104,55 +104,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const html = wrap(`
       <tr><td style="padding:48px 40px 16px;">
-        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🎉 Bem-vindo/a à Ai Bora!</p>
-        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${nome}! 🎉</h1>
-        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">A sua conta foi criada com sucesso. Você agora faz parte da rede Ai Bora como <strong>${isColaborador ? 'Colaborador' : 'Vendedor'}</strong>.</p>
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🎉 Welcome to Ai Bora!</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Hello, ${nome}! 🎉</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Your account was created successfully. You are now part of the Ai Bora network as <strong>${isColaborador ? 'Collaborator' : 'Vendor'}</strong>.</p>
         
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
           <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Email:</strong> ${email}</p>
-          <p style="font-size:14px;color:#111;margin:0;"><strong>Password temporária:</strong> ${passwordTemporaria}</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Temporary password:</strong> ${passwordTemporaria}</p>
         </td></tr></table>
 
-        <p style="font-size:13px;color:#888;margin:0 0 36px;">⚠️ Altere a sua password no primeiro acesso.</p>
+        <p style="font-size:13px;color:#888;margin:0 0 36px;">⚠️ Change your password on first sign-in.</p>
 
-        <h2 style="font-size:18px;font-weight:700;color:#111;margin:0 0 16px;">Os seus próximos passos:</h2>
+        <h2 style="font-size:18px;font-weight:700;color:#111;margin:0 0 16px;">Your next steps:</h2>
         
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:36px;">
           <tr><td style="padding:12px;background:#f8f7f4;border-radius:8px;margin-bottom:8px;">
-            <strong style="color:#111;">1. Aceda à plataforma</strong><br/>
-            <span style="color:#666;font-size:13px;">Faça login para aceder ao seu painel</span><br/>
+            <strong style="color:#111;">1. Open the platform</strong><br/>
+            <span style="color:#666;font-size:13px;">Sign in to access your dashboard</span><br/>
             <a href="${linkLogin}" style="color:#ff6f2e;font-size:13px;">${linkLogin}</a>
           </td></tr>
           <tr><td style="padding:12px;background:#f8f7f4;border-radius:8px;margin-bottom:8px;">
-            <strong style="color:#111;">2. ${isColaborador ? 'Manual do Colaborador' : 'Manual do Vendedor'}</strong><br/>
-            <span style="color:#666;font-size:13px;">Conheça os processos e procedimentos</span><br/>
-            <a href="${manualLink}" style="color:#ff6f2e;font-size:13px;">Ver manual</a>
+            <strong style="color:#111;">2. ${isColaborador ? 'Collaborator handbook' : 'Vendor handbook'}</strong><br/>
+            <span style="color:#666;font-size:13px;">Learn our processes and procedures</span><br/>
+            <a href="${manualLink}" style="color:#ff6f2e;font-size:13px;">View handbook</a>
           </td></tr>
           <tr><td style="padding:12px;background:#f8f7f4;border-radius:8px;margin-bottom:8px;">
             <strong style="color:#111;">3. AI BORA Academy</strong><br/>
-            <span style="color:#666;font-size:13px;">Cursos de vendas, ferramentas e metodologias</span><br/>
-            <a href="${academiaLink}" style="color:#ff6f2e;font-size:13px;">Aceder à Academia</a>
+            <span style="color:#666;font-size:13px;">Sales courses, tools, and methodology</span><br/>
+            <a href="${academiaLink}" style="color:#ff6f2e;font-size:13px;">Open Academy</a>
           </td></tr>
           <tr><td style="padding:12px;background:#f8f7f4;border-radius:8px;">
-            <strong style="color:#111;">4. Catálogo de Serviços</strong><br/>
-            <span style="color:#666;font-size:13px;">Preços base, comissões e tempos de entrega</span><br/>
-            <a href="${catalogoLink}" style="color:#ff6f2e;font-size:13px;">Ver catálogo</a>
+            <strong style="color:#111;">4. Service catalog</strong><br/>
+            <span style="color:#666;font-size:13px;">Base pricing, commissions, and delivery times</span><br/>
+            <a href="${catalogoLink}" style="color:#ff6f2e;font-size:13px;">View catalog</a>
           </td></tr>
         </table>
 
         <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
-          <a href="${linkLogin}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Entrar na plataforma →</a>
+          <a href="${linkLogin}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Sign in to the platform →</a>
         </td></tr></table>
 
-        <p style="font-size:15px;color:#444;margin:0 0 4px;">Estamos ansiosos por trabalhar consigo!</p>
-        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">We look forward to working with you!</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">The Ai Bora team 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`);
 
     const { data, error } = await resend.emails.send({
       from: 'Ai Bora <geral@aibora.pt>',
       to: [email],
-      subject: `Bem-vindo/a à Ai Bora, ${nome}! 🎉`,
+      subject: `Welcome to Ai Bora, ${nome}! 🎉`,
       html,
     });
 
@@ -165,7 +165,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true, 
       emailId: data?.id,
       clerkUserId,
-      message: 'Vendedor criado e email de bem-vindo enviado'
+      message: 'Vendor created and welcome email sent'
     });
 
   } catch (error) {

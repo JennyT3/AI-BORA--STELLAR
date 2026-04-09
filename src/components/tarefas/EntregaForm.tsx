@@ -53,8 +53,8 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
         onSuccess?.();
       }, 2000);
     } catch (error) {
-      console.error('Erro ao entregar:', error);
-      alert('Erro ao entregar tarefa. Tente novamente.');
+      console.error('Failed to submit delivery:', error);
+      alert('Failed to submit delivery. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -79,10 +79,10 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
       }}>
         <CheckCircle size={48} color="#059669" style={{ marginBottom: '12px' }} />
         <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#065f46', marginBottom: '8px' }}>
-          Entrega realizada!
+          Delivery submitted!
         </h3>
         <p style={{ fontSize: '14px', color: '#047857' }}>
-          O admin foi notificado. Aguarde a revisão.
+          The admin has been notified. Awaiting review.
         </p>
       </div>
     );
@@ -97,7 +97,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#1b1c1b', margin: 0 }}>
-          Entregar Tarefa
+          Submit delivery
         </h3>
         <button onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
           <X size={20} color="#666" />
@@ -108,10 +108,10 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
         <strong>{tarefaTitulo}</strong>
       </p>
 
-      {/* Archivos */}
+      {/* Files */}
       <div style={{ marginBottom: '20px' }}>
         <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
-          Arquivos (opcional)
+          Files (optional)
         </label>
         
         <input
@@ -141,7 +141,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
           }}
         >
           <Upload size={20} />
-          Clicar para selecionar arquivos
+          Click to select files
         </button>
 
         {arquivos.length > 0 && (
@@ -174,7 +174,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
       {/* Links */}
       <div style={{ marginBottom: '20px' }}>
         <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
-          Links externos (opcional)
+          External links (optional)
         </label>
         
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -205,7 +205,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
               cursor: novoLink.trim() ? 'pointer' : 'not-allowed'
             }}
           >
-            Adicionar
+            Add
           </button>
         </div>
 
@@ -235,15 +235,15 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
         )}
       </div>
 
-      {/* Nota */}
+      {/* Note */}
       <div style={{ marginBottom: '24px' }}>
         <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
-          Nota adicional (opcional)
+          Additional note (optional)
         </label>
         <textarea
           value={nota}
           onChange={(e) => setNota(e.target.value)}
-          placeholder="Explique o que foi feito, observações importantes..."
+          placeholder="Describe what was done, important notes..."
           rows={4}
           style={{
             width: '100%',
@@ -256,7 +256,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
         />
       </div>
 
-      {/* Botones */}
+      {/* Actions */}
       <div style={{ display: 'flex', gap: '12px' }}>
         <button
           onClick={onCancel}
@@ -272,7 +272,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
             cursor: 'pointer'
           }}
         >
-          Cancelar
+          Cancel
         </button>
         <button
           onClick={handleSubmit}
@@ -294,7 +294,7 @@ export function EntregaForm({ tareaId, tarefaTitulo, onSuccess, onCancel }: Entr
           }}
         >
           {loading ? <Loader size={18} className="spin" /> : <CheckCircle size={18} />}
-          {loading ? 'A enviar...' : 'Entregar'}
+          {loading ? 'Sending...' : 'Submit'}
         </button>
       </div>
 

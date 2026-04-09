@@ -6,16 +6,16 @@ import { GOOGLE_SCRIPT_URL } from '../lib/constants';
 import { sendColaboradorConfirmacao } from '../services/emailService';
 
 const TIPOS_COLABORACAO = [
-  { id: 'vendedor', nome: 'Vendedor/Revendedor', descricao: 'Vende os nossos serviços e ganha comissão', icon: '💼' },
-  { id: 'colaborador', nome: 'Colaborador/Freelancer', descricao: 'Executa serviços e ganha comissão', icon: '🎯' },
-  { id: 'afiliado', nome: 'Afiliado', descricao: 'Indica clientes e ganha prémios', icon: '🤝' },
-  { id: 'parceiro', nome: 'Parceiro Estratégico', descricao: 'Colaboração B2B entre empresas', icon: '⚡' },
+  { id: 'vendedor', nome: 'Sales partner / Reseller', descricao: 'Sell our services and earn commission', icon: '💼' },
+  { id: 'colaborador', nome: 'Collaborator / Freelancer', descricao: 'Deliver work and earn commission', icon: '🎯' },
+  { id: 'afiliado', nome: 'Affiliate', descricao: 'Refer clients and earn rewards', icon: '🤝' },
+  { id: 'parceiro', nome: 'Strategic partner', descricao: 'B2B collaboration between companies', icon: '⚡' },
 ];
 
 const ESPECIALIDADES = [
   'SEO', 'Google Ads', 'Facebook/Instagram Ads', 'Web Design', 'Copywriting',
-  'Redes Sociais', 'Email Marketing', 'CRM', 'Analytics', 'Video Editing',
-  'Fotografia', 'Consultoria Marketing', 'Outro'
+  'Social media', 'Email marketing', 'CRM', 'Analytics', 'Video editing',
+  'Photography', 'Marketing consulting', 'Other'
 ];
 
 interface Props {
@@ -61,8 +61,8 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
         telefone: formData.telefone,
         empresa: formData.empresa,
         email: formData.email,
-        observacoes: `Tipo: ${tipo?.nome}\nExperiência: ${formData.experiencia}\nLinkedIn: ${formData.linkedin}\nEspecialidades: ${formData.especialidades.join(', ')}`,
-        servicos: [`Colaboração: ${tipo?.nome}`],
+        observacoes: `Type: ${tipo?.nome}\nExperience: ${formData.experiencia}\nLinkedIn: ${formData.linkedin}\nSkills: ${formData.especialidades.join(', ')}`,
+        servicos: [`Collaboration: ${tipo?.nome}`],
         origem: 'Colabora Connosco',
         marcas: [],
       });
@@ -75,7 +75,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
 
       setStep('success');
     } catch (err: any) {
-      alert('Erro ao enviar: ' + err.message);
+      alert('Failed to send: ' + err.message);
     }
     setLoading(false);
   };
@@ -98,10 +98,10 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
       <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
         <div style={{ width: 36, height: 3, backgroundColor: '#F25C05', margin: '0 auto 20px', borderRadius: 2 }} />
         <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', color: '#FFFFFF', margin: '0 0 16px' }}>
-          Queres crescer connosco?
+          Want to grow with us?
         </h2>
         <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 'clamp(14px, 2vw, 16px)', color: '#A0A0A0', margin: '0 0 48px', lineHeight: 1.6, maxWidth: 600, marginLeft: 'auto', marginRight: 'auto' }}>
-          Tens uma rede de contactos, capacidades de vendas ouSkills digitais? Queres fazer parte da nossa rede de parceiros e ganhar com isso?
+          Do you have a network, sales skills, or digital expertise? Join our partner network and earn with us.
         </p>
 
         {step === 'selection' && (
@@ -143,16 +143,16 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
               <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 18, color: '#FFFFFF', margin: 0 }}>
                 {TIPOS_COLABORACAO.find(t => t.id === tipoSelecionado)?.nome}
               </h3>
-              <button onClick={() => setStep('selection')} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>← Voltar</button>
+              <button onClick={() => setStep('selection')} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>← Back</button>
             </div>
 
             <div style={{ display: 'grid', gap: 16 }}>
               <div>
-                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Nome *</label>
+                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Name *</label>
                 <input
                   value={formData.nome}
                   onChange={e => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-                  placeholder="O teu nome completo"
+                  placeholder="Your full name"
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '2px solid #444', backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: 14, fontFamily: 'Montserrat, sans-serif', outline: 'none' }}
                 />
               </div>
@@ -162,12 +162,12 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="email@exemplo.pt"
+                  placeholder="you@example.com"
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '2px solid #444', backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: 14, fontFamily: 'Montserrat, sans-serif', outline: 'none' }}
                 />
               </div>
               <div>
-                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Telefone</label>
+                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Phone</label>
                 <input
                   value={formData.telefone}
                   onChange={e => setFormData(prev => ({ ...prev, telefone: e.target.value }))}
@@ -176,16 +176,16 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                 />
               </div>
               <div>
-                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Empresa (opicional)</label>
+                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Company (optional)</label>
                 <input
                   value={formData.empresa}
                   onChange={e => setFormData(prev => ({ ...prev, empresa: e.target.value }))}
-                  placeholder="Nome da tua empresa"
+                  placeholder="Your company name"
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '2px solid #444', backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: 14, fontFamily: 'Montserrat, sans-serif', outline: 'none' }}
                 />
               </div>
               <div>
-                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>LinkedIn (opicional)</label>
+                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>LinkedIn (optional)</label>
                 <input
                   value={formData.linkedin}
                   onChange={e => setFormData(prev => ({ ...prev, linkedin: e.target.value }))}
@@ -195,7 +195,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
               </div>
               {(tipoSelecionado === 'colaborador' || tipoSelecionado === 'freelancer') && (
                 <div>
-                  <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Especialidades (seleciona as que aplicam)</label>
+                  <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Skills (select all that apply)</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {ESPECIALIDADES.map(esp => (
                       <button
@@ -220,11 +220,11 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                 </div>
               )}
               <div>
-                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Conta-nos sobre a tua experiência</label>
+                <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Tell us about your experience</label>
                 <textarea
                   value={formData.experiencia}
                   onChange={e => setFormData(prev => ({ ...prev, experiencia: e.target.value }))}
-                  placeholder="Quantos anos de experiência? Que tipo de clientes atendes? Etc..."
+                  placeholder="Years of experience, types of clients you serve, etc."
                   rows={3}
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '2px solid #444', backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: 14, fontFamily: 'Montserrat, sans-serif', outline: 'none', resize: 'vertical' }}
                 />
@@ -237,7 +237,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                   fontSize: 14, fontWeight: 700, fontFamily: 'Montserrat, sans-serif', cursor: canSubmit && !loading ? 'pointer' : 'not-allowed', marginTop: 8
                 }}
               >
-                {loading ? 'A enviar...' : 'Quero Colaborar'}
+                {loading ? 'Sending...' : 'I want to collaborate'}
               </button>
             </div>
           </motion.div>
@@ -250,9 +250,9 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
             style={{ backgroundColor: '#2A2A2A', borderRadius: 16, padding: '48px 24px', maxWidth: 480, margin: '0 auto', textAlign: 'center' }}
           >
             <CheckCircle size={64} color="#22C55E" style={{ marginBottom: 16 }} />
-            <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 20, color: '#FFFFFF', margin: '0 0 12px' }}>Recebemos o teu interesse!</h3>
+            <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 20, color: '#FFFFFF', margin: '0 0 12px' }}>We have received your interest!</h3>
             <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, color: '#A0A0A0', margin: '0 0 24px' }}>
-              A nossa equipa vai analisar a tua candidatura e entrará em contacto em menos de 24 horas.
+              Our team will review your application and get back to you within 24 hours.
             </p>
             <button
               onClick={() => setStep('selection')}
@@ -261,7 +261,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                 fontSize: 14, fontWeight: 600, fontFamily: 'Montserrat, sans-serif', cursor: 'pointer'
               }}
             >
-              Ver outras opções
+              See other options
             </button>
           </motion.div>
         )}

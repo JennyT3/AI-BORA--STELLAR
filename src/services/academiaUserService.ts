@@ -49,7 +49,7 @@ const COLECAO_PROGRESSO = 'academia_progresso';
 const COLECAO_CERTIFICADOS = 'academia_certificados';
 
 // ============================================
-// USUÁRIO
+// USER
 // ============================================
 
 export async function syncUsuario(clerkUser: {
@@ -85,11 +85,11 @@ export async function syncUsuario(clerkUser: {
     await setDoc(userRef, novoUsuario);
     return novoUsuario;
   } catch (e) {
-    console.warn('Bypass: syncUsuario simulado');
+    console.warn('Bypass: syncUsuario simulated');
     return {
       id: clerkUser.id,
       email: clerkUser.email,
-      nome: clerkUser.firstName || 'Utilizador',
+      nome: clerkUser.firstName || 'User',
       role: 'cliente',
       onboarding_completo: true,
       created_at: new Date().toISOString(),
@@ -106,7 +106,7 @@ export async function updateUsuario(
     const userRef = doc(db, COLECAO_USERS, userId);
     await updateDoc(userRef, { ...datos, updated_at: new Date().toISOString() });
   } catch (e) {
-    console.warn('Bypass: updateUsuario simulado');
+    console.warn('Bypass: updateUsuario simulated');
   }
 }
 
@@ -115,7 +115,7 @@ export async function completeOnboarding(userId: string): Promise<void> {
 }
 
 // ============================================
-// PROGRESSO
+// PROGRESS
 // ============================================
 
 export async function saveProgresso(
@@ -153,7 +153,7 @@ export async function saveProgresso(
       await setDoc(progressoRef, { ...progressoData, id: progressoRef.id });
     }
   } catch (e) {
-    console.warn('Bypass: saveProgresso simulado');
+    console.warn('Bypass: saveProgresso simulated');
   }
 }
 
@@ -178,7 +178,7 @@ export async function getAllProgresso(userId: string): Promise<AcademiaProgresso
 }
 
 // ============================================
-// CERTIFICADOS
+// CERTIFICATES
 // ============================================
 
 export async function criarCertificado(userId: string, trilhaId: string, trilhaNome: string): Promise<AcademiaCertificado> {
@@ -194,7 +194,7 @@ export async function criarCertificado(userId: string, trilhaId: string, trilhaN
     await setDoc(certRef, { ...certificado, id: certRef.id });
     return { ...certificado, id: certRef.id };
   } catch (e) {
-    console.warn('Bypass: criarCertificado simulado');
+    console.warn('Bypass: criarCertificado simulated');
     return { ...certificado, id: 'mock-id' };
   }
 }
@@ -222,7 +222,7 @@ export async function verificarCertificado(codigo: string): Promise<AcademiaCert
     }
     return null;
   } catch (e) {
-    console.warn('Bypass: verificarCertificado simulado');
+    console.warn('Bypass: verificarCertificado simulated');
     return null;
   }
 }

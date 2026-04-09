@@ -28,7 +28,7 @@ export default function ClienteLoginPage() {
       const result = await validarMagicLink(token);
       
       if (!result) {
-        setError('Link expirado ou inválido. Solicite um novo link.');
+        setError('Link expired or invalid. Please request a new link.');
         setLoading(false);
         return;
       }
@@ -41,7 +41,7 @@ export default function ClienteLoginPage() {
       setLocation(`/c/${result.clienteId}?logged=true`);
     } catch (err) {
       console.error('Login error:', err);
-      setError('Erro ao fazer login. Tente novamente.');
+      setError('Could not sign in. Please try again.');
       setLoading(false);
     }
   };
@@ -61,10 +61,10 @@ export default function ClienteLoginPage() {
       if (response.ok) {
         setMagicLinkSent(true);
       } else {
-        setError('Email não encontrado. Contacte-nos para obter acesso.');
+        setError('Email not found. Contact us to get access.');
       }
     } catch (err) {
-      setError('Erro ao enviar link. Tente novamente.');
+      setError('Could not send link. Please try again.');
     } finally {
       setSending(false);
     }
@@ -81,7 +81,7 @@ export default function ClienteLoginPage() {
       }}>
         <div style={{ textAlign: 'center' }}>
           <Loader size={40} color="#F25C05" style={{ animation: 'spin 1s linear infinite' }} />
-          <p style={{ marginTop: '16px', color: '#666' }}>A verificar acesso...</p>
+          <p style={{ marginTop: '16px', color: '#666' }}>Verifying access...</p>
         </div>
         <style>{`
           @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -111,7 +111,7 @@ export default function ClienteLoginPage() {
         }}>
           <AlertCircle size={48} color="#dc2626" style={{ marginBottom: '16px' }} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1b1c1b', marginBottom: '12px' }}>
-            Erro de Acesso
+            Access error
           </h2>
           <p style={{ color: '#666', marginBottom: '24px' }}>{error}</p>
           <a 
@@ -126,7 +126,7 @@ export default function ClienteLoginPage() {
               fontWeight: 600
             }}
           >
-            Voltar à página inicial
+            Back to home
           </a>
         </div>
       </div>
@@ -154,13 +154,13 @@ export default function ClienteLoginPage() {
         }}>
           <CheckCircle size={48} color="#10b981" style={{ marginBottom: '16px' }} />
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1b1c1b', marginBottom: '12px' }}>
-            Link Enviado!
+            Link sent
           </h2>
           <p style={{ color: '#666', marginBottom: '24px' }}>
-            Enviámos um link de acesso ao seu email. Clique no link para aceder à sua área de cliente.
+            We sent a sign-in link to your email. Click the link to open your client area.
           </p>
           <p style={{ color: '#888', fontSize: '14px' }}>
-            O link é válido por 24 horas.
+            The link is valid for 24 hours.
           </p>
         </div>
       </div>
@@ -186,10 +186,10 @@ export default function ClienteLoginPage() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#1b1c1b', marginBottom: '8px' }}>
-            Área do Cliente
+            Client area
           </h1>
           <p style={{ color: '#666' }}>
-            Aceda à sua ficha pessoal e histórico de serviços
+            View your profile and service history
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export default function ClienteLoginPage() {
               color: '#374151', 
               marginBottom: '8px' 
             }}>
-              Email associado à sua conta
+              Email on your account
             </label>
             <div style={{ position: 'relative' }}>
               <Mail 
@@ -219,7 +219,7 @@ export default function ClienteLoginPage() {
                 type="email"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="seu@email.pt"
+                placeholder="you@example.com"
                 required
                 style={{
                   width: '100%',
@@ -256,11 +256,11 @@ export default function ClienteLoginPage() {
             {sending ? (
               <>
                 <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                A enviar...
+                Sending...
               </>
             ) : (
               <>
-                Enviar link de acesso
+                Send sign-in link
                 <ArrowRight size={18} />
               </>
             )}
@@ -273,7 +273,7 @@ export default function ClienteLoginPage() {
           color: '#9ca3af', 
           marginTop: '20px' 
         }}>
-          Ou contacte-nos para obter acesso
+          Or contact us to get access
         </p>
 
         <style>{`

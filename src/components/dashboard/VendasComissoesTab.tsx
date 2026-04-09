@@ -23,7 +23,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
       const data = await getComissoes(vendedorId, tipo);
       setComissoes(data);
     } catch (error) {
-      console.error('Erro ao carregar comissões:', error);
+      console.error('Failed to load commissions:', error);
     } finally {
       setLoading(false);
     }
@@ -34,9 +34,9 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
   );
 
   const comissoesAgrupadasPorMes = filteredComissoes.reduce((acc, comissao) => {
-    const mes = new Date(comissao.dataCriacao).toLocaleDateString('pt-PT', { 
-      year: 'numeric', 
-      month: 'long' 
+    const mes = new Date(comissao.dataCriacao).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
     });
     if (!acc[mes]) acc[mes] = [];
     acc[mes].push(comissao);
@@ -58,7 +58,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
   const getProximoMes = () => {
     const now = new Date();
     const proximo = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    return proximo.toLocaleDateString('pt-PT', { year: 'numeric', month: 'long' });
+    return proximo.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   };
 
   const getProjecaoMensal = () => {
@@ -79,7 +79,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-        A carregar comissões...
+        Loading commissions...
       </div>
     );
   }
@@ -89,10 +89,10 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
       <div style={{ marginBottom: '24px' }}>
         <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1b1c1b', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Wallet size={24} color="#F25C05" />
-          Minhas Comissões
+          My commissions
         </h2>
         <p style={{ color: '#666', fontSize: '14px' }}>
-          Histórico de comissões e projeções de ganhos
+          Commission history and earnings outlook
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <Clock size={16} color="#f59e0b" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Pendente</span>
+            <span style={{ fontSize: '12px', color: '#666' }}>Pending</span>
           </div>
           <div style={{ fontSize: '24px', fontWeight: 900, color: '#f59e0b' }}>
             {totalPendente.toFixed(2)}€
@@ -111,7 +111,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <CheckCircle size={16} color="#10b981" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Pago</span>
+            <span style={{ fontSize: '12px', color: '#666' }}>Paid</span>
           </div>
           <div style={{ fontSize: '24px', fontWeight: 900, color: '#10b981' }}>
             {totalPago.toFixed(2)}€
@@ -121,7 +121,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
         <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <TrendingUp size={16} color="#2563eb" />
-            <span style={{ fontSize: '12px', color: '#666' }}>Projeção {getProximoMes()}</span>
+            <span style={{ fontSize: '12px', color: '#666' }}>Projection {getProximoMes()}</span>
           </div>
           <div style={{ fontSize: '24px', fontWeight: 900, color: '#2563eb' }}>
             ~{projecao.toFixed(2)}€
@@ -156,7 +156,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
               color: filterStatus === status ? '#fff' : '#4b5563'
             }}
           >
-            {status === 'all' ? 'Todas' : status === 'pendente' ? 'Pendentes' : 'Pagas'}
+            {status === 'all' ? 'All' : status === 'pendente' ? 'Pending' : 'Paid'}
           </button>
         ))}
       </div>
@@ -170,7 +170,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
           borderRadius: '12px'
         }}>
           <DollarSign size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
-          <p style={{ color: '#6b7280' }}>Nenhuma comissão encontrada</p>
+          <p style={{ color: '#6b7280' }}>No commissions found</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -211,7 +211,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
                       backgroundColor: '#f3f4f6',
                       color: '#6b7280'
                     }}>
-                      {lista.length} {lista.length === 1 ? 'comissão' : 'comissões'}
+                      {lista.length} {lista.length === 1 ? 'commission' : 'commissions'}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -237,10 +237,10 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
                       >
                         <div>
                           <div style={{ fontSize: '13px', fontWeight: 600, color: '#1b1c1b' }}>
-                            Fatura: {comissao.faturaId}
+                            Invoice: {comissao.faturaId}
                           </div>
                           <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                            Venda: {comissao.valorVenda.toFixed(2)}€ • {tipo === 'vendedor' ? comissao.percentualVendedor : comissao.percentualColaborador}% = {(tipo === 'vendedor' ? comissao.valorVendedor : comissao.valorColaborador).toFixed(2)}€
+                            Sale: {comissao.valorVenda.toFixed(2)}€ • {tipo === 'vendedor' ? comissao.percentualVendedor : comissao.percentualColaborador}% = {(tipo === 'vendedor' ? comissao.valorVendedor : comissao.valorColaborador).toFixed(2)}€
                           </div>
                         </div>
                         <span style={{
@@ -251,7 +251,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
                           backgroundColor: comissao.status === 'pago' ? '#d1fae5' : '#fef3c7',
                           color: comissao.status === 'pago' ? '#059669' : '#d97706'
                         }}>
-                          {comissao.status === 'pago' ? 'Pago' : 'Pendente'}
+                          {comissao.status === 'pago' ? 'Paid' : 'Pending'}
                         </span>
                       </div>
                     ))}
@@ -263,7 +263,7 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
         </div>
       )}
 
-      {/* Info adicional */}
+      {/* How it works */}
       <div style={{ 
         marginTop: '24px', 
         padding: '16px', 
@@ -272,9 +272,9 @@ export function VendasComissoesTab({ vendedorId, tipo }: VendasComissoesTabProps
         border: '1px solid #bae6fd'
       }}>
         <p style={{ fontSize: '13px', color: '#0369a1', margin: 0 }}>
-          <strong>Como funciona:</strong> As comissões são calculadas automaticamente quando o cliente paga a fatura. 
-          O vendedor recebe {tipo === 'vendedor' ? '10%' : ''} do valor total e o colaborador {tipo === 'colaborador' ? '60%' : ''} do valor do seu trabalho. 
-          As comissões ficam disponíveis para saque após confirmação do pagamento.
+          <strong>How it works:</strong> Commissions are calculated automatically when the client pays the invoice.
+          The vendor earns {tipo === 'vendedor' ? '10%' : ''} of the total sale and the collaborator {tipo === 'colaborador' ? '60%' : ''} of their work value.
+          Commissions become available for payout after payment is confirmed.
         </p>
       </div>
     </div>

@@ -61,7 +61,7 @@ export default function AcademiaDashboard() {
             border: `3px solid ${colors.orange}`, borderTopColor: 'transparent',
             animation: 'spin 1s linear infinite', margin: '0 auto'
           }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif', marginTop: 16 }}>A carregar o teu dashboard...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif', marginTop: 16 }}>Loading your dashboard…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -71,22 +71,22 @@ export default function AcademiaDashboard() {
   if (!isSignedIn) return <Redirect to="/academia/login" />;
 
   const statCards = [
-    { label: 'Aulas Concluídas', value: stats?.aulas_concluidas || 0, icon: CheckCircle2, color: '#10B981' },
-    { label: 'Trilhas Ativas', value: stats?.trilhas_iniciadas || 0, icon: BookOpen, color: colors.orange },
-    { label: 'Certificados', value: stats?.certificados || 0, icon: Award, color: colors.magenta },
-    { label: 'Progresso Geral', value: `${stats?.percentual_geral || 0}%`, icon: TrendingUp, color: '#3B82F6' },
+    { label: 'Lessons completed', value: stats?.aulas_concluidas || 0, icon: CheckCircle2, color: '#10B981' },
+    { label: 'Active paths', value: stats?.trilhas_iniciadas || 0, icon: BookOpen, color: colors.orange },
+    { label: 'Certificates', value: stats?.certificados || 0, icon: Award, color: colors.magenta },
+    { label: 'Overall progress', value: `${stats?.percentual_geral || 0}%`, icon: TrendingUp, color: '#3B82F6' },
   ];
 
-  const firstName = user?.firstName || academiaUser?.nome?.split(' ')[0] || 'Explorador';
+  const firstName = user?.firstName || academiaUser?.nome?.split(' ')[0] || 'Explorer';
   const streakDias = academiaUser?.streak_dias || 0;
   const metaMinutos = academiaUser?.meta_minutos_dia || 60;
   const metaFeita = academiaUser?.minutos_hoje || 0;
   const metaPct = Math.min(100, Math.round((metaFeita / metaMinutos) * 100));
 
-  // Primeira aula em progresso (para o banner "continuar")
+  // First in-progress lesson (resume banner)
   const emProgresso = progressos.find(p => p.percentagem > 0 && p.percentagem < 100);
 
-  // Próximas aulas da trilha (mock se vazio)
+  // Upcoming lessons (mock if empty)
   const proximasAulas = progressos.slice(0, 3);
 
   return (
@@ -99,17 +99,17 @@ export default function AcademiaDashboard() {
         <div style={{ marginBottom: 40, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: 24 }}>
           <div>
             <span style={{ fontSize: 11, fontWeight: 800, color: colors.magenta, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
-              Menos teoria, mais ação
+              Less theory, more action
             </span>
             <motion.h1
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 900, color: colors.dark, margin: '0 0 12px', letterSpacing: '-0.03em', lineHeight: 1.1 }}
             >
-              Bora aprender, <span style={{ color: colors.orange }}>{firstName}!</span>
+              Let&apos;s learn, <span style={{ color: colors.orange }}>{firstName}!</span>
             </motion.h1>
             <p style={{ fontSize: 16, color: '#666', maxWidth: 500, lineHeight: 1.6, margin: 0 }}>
-              Faltam apenas <strong style={{ color: colors.dark }}>{Math.max(0, (stats?.total_aulas || 0) - (stats?.aulas_concluidas || 0))} aulas</strong> para completares a tua trilha atual.
+              Only <strong style={{ color: colors.dark }}>{Math.max(0, (stats?.total_aulas || 0) - (stats?.aulas_concluidas || 0))} lessons</strong> left to finish your current path.
             </p>
           </div>
 
@@ -129,12 +129,12 @@ export default function AcademiaDashboard() {
                 {String(streakDias).padStart(2, '0')}
               </div>
               <div style={{ fontSize: 10, fontWeight: 800, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 4 }}>
-                Dias de fogo
+                Day streak
               </div>
             </div>
             <div style={{ width: 1, height: 48, background: colors.border }} />
             <div style={{ minWidth: 140 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: colors.dark, marginBottom: 8 }}>Meta Diária</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: colors.dark, marginBottom: 8 }}>Daily goal</div>
               <div style={{ height: 8, background: '#f0eded', borderRadius: 4, overflow: 'hidden', marginBottom: 6 }}>
                 <motion.div
                   initial={{ width: 0 }}
@@ -143,7 +143,7 @@ export default function AcademiaDashboard() {
                   style={{ height: '100%', background: `linear-gradient(90deg, ${colors.orange}, ${colors.magenta})`, borderRadius: 4 }}
                 />
               </div>
-              <div style={{ fontSize: 11, color: '#999', fontWeight: 600 }}>{metaFeita}/{metaMinutos} min hoje</div>
+              <div style={{ fontSize: 11, color: '#999', fontWeight: 600 }}>{metaFeita}/{metaMinutos} min today</div>
             </div>
             <div style={{
               width: 40, height: 40, borderRadius: 12,
@@ -195,7 +195,7 @@ export default function AcademiaDashboard() {
           ))}
         </div>
 
-        {/* ── Banner: Continuar de onde parou ── */}
+        {/* ── Resume banner ── */}
         {emProgresso && (
           <Link href={`/academia/aula/${emProgresso.aula_id}`}>
             <motion.div
@@ -222,13 +222,13 @@ export default function AcademiaDashboard() {
                   fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
                   padding: '5px 14px', borderRadius: 100, marginBottom: 16
                 }}>
-                  Continuar de onde parou
+                  Pick up where you left off
                 </span>
                 <h2 style={{ fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 900, color: '#fff', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
-                  {emProgresso.aula_titulo || 'Continuar Aula'}
+                  {emProgresso.aula_titulo || 'Resume lesson'}
                 </h2>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '0 0 24px', fontWeight: 500 }}>
-                  {emProgresso.trilha_nome || 'Trilha'}
+                  {emProgresso.trilha_nome || 'Learning path'}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
                   <div style={{ flex: 1, maxWidth: 240, height: 10, background: 'rgba(255,255,255,0.1)', borderRadius: 5, overflow: 'hidden' }}>
@@ -253,7 +253,7 @@ export default function AcademiaDashboard() {
                   }}
                 >
                   <PlayCircle size={18} color={colors.orange} />
-                  BORA COMEÇAR
+                  LET&apos;S GO
                 </motion.button>
               </div>
             </motion.div>
@@ -263,15 +263,15 @@ export default function AcademiaDashboard() {
         {/* ── Main Grid ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 32 }} className="dashboard-grid">
 
-          {/* Left: Meus Cursos */}
+          {/* Left: Continue learning */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <h2 style={{ fontSize: 22, fontWeight: 900, color: colors.dark, margin: 0 }}>
-                Continuar a Aprender
+                Keep learning
               </h2>
               <Link href="/academia/trilhas">
                 <span style={{ fontSize: 13, fontWeight: 700, color: colors.orange, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  Ver todos <ChevronRight size={14} />
+                  See all <ChevronRight size={14} />
                 </span>
               </Link>
             </div>
@@ -303,10 +303,10 @@ export default function AcademiaDashboard() {
                       </div>
                       <div style={{ flex: 1, padding: '18px 20px' }}>
                         <p style={{ fontSize: 10, fontWeight: 800, color: colors.orange, margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                          {p.trilha_nome || 'Trilha'}
+                          {p.trilha_nome || 'Path'}
                         </p>
                         <h4 style={{ fontSize: 15, fontWeight: 800, color: colors.dark, margin: '0 0 12px' }}>
-                          {p.aula_titulo || 'Aula'}
+                          {p.aula_titulo || 'Lesson'}
                         </h4>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ flex: 1, height: 6, background: '#f0eded', borderRadius: 3, overflow: 'hidden' }}>
@@ -336,9 +336,9 @@ export default function AcademiaDashboard() {
                 <div style={{ width: 80, height: 80, background: '#f9f9f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
                   <BookOpen size={36} color="#ddd" />
                 </div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, color: colors.dark, marginBottom: 12 }}>Ainda não começaste nenhuma trilha</h3>
+                <h3 style={{ fontSize: 20, fontWeight: 800, color: colors.dark, marginBottom: 12 }}>You have not started a path yet</h3>
                 <p style={{ color: '#999', marginBottom: 32, maxWidth: 360, margin: '0 auto 32px', lineHeight: 1.6, fontSize: 15 }}>
-                  Escolhe um tema e começa a tua jornada na IA hoje mesmo.
+                  Choose a topic and start your AI journey today.
                 </p>
                 <Link href="/academia/trilhas">
                   <button style={{
@@ -346,13 +346,13 @@ export default function AcademiaDashboard() {
                     borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 15,
                     fontFamily: 'Montserrat, sans-serif'
                   }}>
-                    Ver Catálogo de Trilhas
+                    Browse path catalogue
                   </button>
                 </Link>
               </motion.div>
             )}
 
-            {/* Explorar novos cursos */}
+            {/* Explore more paths */}
             <Link href="/academia/trilhas">
               <motion.div
                 whileHover={{ background: '#f9f9f9' }}
@@ -369,7 +369,7 @@ export default function AcademiaDashboard() {
                 }}>
                   <Zap size={18} color={colors.orange} />
                 </div>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#888' }}>Explorar novas trilhas</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#888' }}>Explore new paths</span>
               </motion.div>
             </Link>
           </div>
@@ -380,7 +380,7 @@ export default function AcademiaDashboard() {
             {/* Trilha progress sidebar */}
             <div style={{ background: '#fff', padding: 28, borderRadius: 24, border: `1px solid ${colors.border}` }}>
               <h3 style={{ fontSize: 17, fontWeight: 900, color: colors.dark, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <TrendingUp size={18} color={colors.magenta} /> Sua Trilha
+                <TrendingUp size={18} color={colors.magenta} /> Your path
               </h3>
               <div style={{ position: 'relative' }}>
                 {/* vertical line */}
@@ -397,12 +397,12 @@ export default function AcademiaDashboard() {
                     <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />
                   </div>
                   <div style={{ background: `${colors.orange}08`, padding: '14px 16px', borderRadius: 16, borderLeft: `3px solid ${colors.orange}` }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, color: colors.orange, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Atual</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: colors.orange, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Current</span>
                     <h5 style={{ fontSize: 14, fontWeight: 800, color: colors.dark, margin: '4px 0 2px' }}>
-                      {emProgresso?.trilha_nome || 'IA Generativa para Criativos'}
+                      {emProgresso?.trilha_nome || 'Generative AI for creatives'}
                     </h5>
                     <p style={{ fontSize: 12, color: '#999', margin: 0 }}>
-                      {emProgresso ? `${emProgresso.percentagem}% completo` : 'Começa quando quiseres'}
+                      {emProgresso ? `${emProgresso.percentagem}% complete` : 'Start whenever you are ready'}
                     </p>
                   </div>
                 </div>
@@ -415,9 +415,9 @@ export default function AcademiaDashboard() {
                   }} />
                   <div style={{ padding: '10px 0' }}>
                     <h5 style={{ fontSize: 13, fontWeight: 700, color: '#aaa', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Lock size={12} /> Workshop: Lançamentos de Alto Impacto
+                      <Lock size={12} /> Workshop: High-impact launches
                     </h5>
-                    <p style={{ fontSize: 11, color: '#bbb', margin: 0 }}>Bloqueado até completar módulo anterior</p>
+                    <p style={{ fontSize: 11, color: '#bbb', margin: 0 }}>Locked until you finish the previous module</p>
                   </div>
                 </div>
 
@@ -429,9 +429,9 @@ export default function AcademiaDashboard() {
                   }} />
                   <div style={{ padding: '10px 0' }}>
                     <h5 style={{ fontSize: 13, fontWeight: 700, color: '#aaa', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Trophy size={12} /> Projeto Final + Certificado
+                      <Trophy size={12} /> Final project + certificate
                     </h5>
-                    <p style={{ fontSize: 11, color: '#bbb', margin: 0 }}>Mentoria individual inclusa</p>
+                    <p style={{ fontSize: 11, color: '#bbb', margin: 0 }}>Includes one-to-one mentoring</p>
                   </div>
                 </div>
               </div>
@@ -443,20 +443,20 @@ export default function AcademiaDashboard() {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <Award size={16} color={colors.magenta} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: colors.magenta, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Recompensa</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: colors.magenta, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Reward</span>
                 </div>
                 <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, margin: 0 }}>
-                  Complete a trilha esta semana para desbloquear o <strong style={{ color: colors.dark }}>Pack de Prompts Exclusivos</strong>.
+                  Finish a path this week to unlock the <strong style={{ color: colors.dark }}>exclusive prompt pack</strong>.
                 </p>
               </div>
             </div>
 
-            {/* Acesso Rápido */}
+            {/* Quick links */}
             <div style={{ background: colors.dark, padding: 24, borderRadius: 24, color: '#fff' }}>
-              <h3 style={{ fontSize: 16, fontWeight: 900, marginBottom: 18, letterSpacing: '-0.02em' }}>Acesso Rápido</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 900, marginBottom: 18, letterSpacing: '-0.02em' }}>Quick links</h3>
               <div style={{ display: 'grid', gap: 10 }}>
                 {[
-                  { label: 'Meu Perfil', href: '/academia/perfil', icon: UserIcon },
+                  { label: 'My profile', href: '/academia/perfil', icon: UserIcon },
                   { label: 'Certificados', href: '/academia/certificados', icon: Award },
                   { label: 'Comunidade', href: '/academia/comunidade', icon: UsersIcon },
                   { label: 'Consultoria IA', href: '/academia/consultoria', icon: MessageSquare },
@@ -480,7 +480,7 @@ export default function AcademiaDashboard() {
               </div>
             </div>
 
-            {/* CTA Explorar */}
+            {/* CTA browse paths */}
             <Link href="/academia/trilhas">
               <motion.div
                 whileHover={{ scale: 1.02 }}
@@ -491,9 +491,9 @@ export default function AcademiaDashboard() {
                   boxShadow: '0 8px 20px rgba(255,111,46,0.25)'
                 }}
               >
-                <h3 style={{ fontSize: 17, fontWeight: 900, marginBottom: 8 }}>Explorar Trilhas</h3>
+                <h3 style={{ fontSize: 17, fontWeight: 900, marginBottom: 8 }}>Explore paths</h3>
                 <p style={{ fontSize: 13, opacity: 0.85, marginBottom: 20, lineHeight: 1.5, margin: '0 0 20px' }}>
-                  Descobre novos conteúdos e avança na tua carreira com IA.
+                  Discover new content and grow your career with AI.
                 </p>
                 <button style={{
                   width: '100%', padding: '12px', background: '#fff', color: colors.dark,
@@ -501,7 +501,7 @@ export default function AcademiaDashboard() {
                   fontSize: 13, fontFamily: 'Montserrat, sans-serif',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                 }}>
-                  <Zap size={14} color={colors.orange} /> Ver Catálogo
+                  <Zap size={14} color={colors.orange} /> View catalogue
                 </button>
               </motion.div>
             </Link>

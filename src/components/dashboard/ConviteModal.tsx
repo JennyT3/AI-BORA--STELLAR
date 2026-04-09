@@ -25,13 +25,13 @@ export function ConviteModal({ isOpen, onClose, vendedor }: ConviteModalProps) {
   };
 
   const handleWhatsApp = () => {
-    const text = `Junta-te a mim na AI BORA e descobre o CRM do futuro! Usa o meu convite exclusivo: ${inviteLink}`;
+    const text = `Join me on AI BORA and see the CRM of the future! Use my exclusive invite: ${inviteLink}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const handleEmail = () => {
-    const subject = 'Convite VIP - AI BORA';
-    const body = `Junta-te a mim na AI BORA e descobre o CRM do futuro! Usa o meu convite exclusivo: ${inviteLink}`;
+    const subject = 'VIP invite — AI BORA';
+    const body = `Join me on AI BORA and see the CRM of the future! Use my exclusive invite: ${inviteLink}`;
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
   };
 
@@ -79,10 +79,10 @@ export function ConviteModal({ isOpen, onClose, vendedor }: ConviteModalProps) {
           </div>
           
           <h2 style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 12, letterSpacing: '-0.5px' }}>
-            Convida & <span style={{ color: '#F25C05' }}>Ganha</span>
+            Invite & <span style={{ color: '#F25C05' }}>earn</span>
           </h2>
           <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.6, marginBottom: 32 }}>
-            Convida um colega para a AI BORA com o teu link exclusivo. Quando ele fechar o seu primeiro cliente, ganhas automaticamente <strong style={{ color: '#F25C05' }}>+5% de bónus</strong> na tua próxima comissão!
+            Invite a colleague to AI BORA with your exclusive link. When they close their first client, you automatically earn <strong style={{ color: '#F25C05' }}>+5% bonus</strong> on your next commission!
           </p>
 
           <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -93,7 +93,7 @@ export function ConviteModal({ isOpen, onClose, vendedor }: ConviteModalProps) {
               onClick={handleCopy}
               style={{ padding: '8px 16px', background: copied ? 'rgba(16, 185, 129, 0.1)' : '#F25C05', color: copied ? '#10B981' : '#fff', borderRadius: 10, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, transition: 'all 0.2s', flexShrink: 0 }}
             >
-              {copied ? <><Check size={14} /> Copiado</> : <><Copy size={14} /> Copiar</>}
+              {copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
             </button>
           </div>
 
@@ -109,13 +109,13 @@ export function ConviteModal({ isOpen, onClose, vendedor }: ConviteModalProps) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
-                <Users size={14} /> Convidados
+                <Users size={14} /> Invited
               </div>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#fff' }}>{convitesEnviados}</div>
             </div>
             <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>
-                <Check size={14} color="#10B981" /> Sucesso!
+                <Check size={14} color="#10B981" /> Converted
               </div>
               <div style={{ fontSize: 24, fontWeight: 900, color: '#10B981' }}>{convitesConvertidos}</div>
             </div>

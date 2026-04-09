@@ -7,49 +7,49 @@ export interface Trilha {
   icone: string;
   total_aulas: number;
   tempo_total: string;
-  nivel: 'Iniciante' | 'Intermédio' | 'Avançado';
+  nivel: 'Beginner' | 'Intermediate' | 'Advanced';
   cor: string;
 }
 
 export const TRILHAS_MOCK: Trilha[] = [
   {
     id: 'ia-negocios',
-    nome: 'IA para Negócios Locais',
-    descricao: 'Aprende a usar inteligência artificial para aumentar vendas e clientes no teu negócio.',
+    nome: 'AI for local business',
+    descricao: 'Learn to use artificial intelligence to grow sales and customers for your business.',
     icone: '🤖',
     total_aulas: 12,
     tempo_total: '3h 20min',
-    nivel: 'Iniciante',
+    nivel: 'Beginner',
     cor: '#ff6f2e',
   },
   {
     id: 'automacao',
-    nome: 'Automação sem Código',
-    descricao: 'Automatiza tarefas repetitivas com Zapier, Make e ferramentas sem programação.',
+    nome: 'No-code automation',
+    descricao: 'Automate repetitive tasks with Zapier, Make, and tools without coding.',
     icone: '⚡',
     total_aulas: 8,
     tempo_total: '2h 45min',
-    nivel: 'Intermédio',
+    nivel: 'Intermediate',
     cor: '#cb1a74',
   },
   {
     id: 'comunicacao',
-    nome: 'Comunicação Digital',
-    descricao: 'Cria conteúdo, copy e campanhas que convertem para redes sociais.',
+    nome: 'Digital communication',
+    descricao: 'Create content, copy, and campaigns that convert on social media.',
     icone: '📢',
     total_aulas: 10,
     tempo_total: '2h 10min',
-    nivel: 'Iniciante',
+    nivel: 'Beginner',
     cor: '#10B981',
   },
   {
     id: 'produtividade',
-    nome: 'Produtividade com IA',
-    descricao: 'Organiza o teu dia, agenda e tarefas con assistentes virtuais.',
+    nome: 'Productivity with AI',
+    descricao: 'Organize your day, calendar, and tasks with virtual assistants.',
     icone: '⏱️',
     total_aulas: 6,
     tempo_total: '1h 30min',
-    nivel: 'Iniciante',
+    nivel: 'Beginner',
     cor: '#3B82F6',
   },
 ];

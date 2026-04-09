@@ -14,12 +14,12 @@ export interface VendasClientesTabProps {
 }
 
 const CATEGORIAS = [
-  { value: 'potencial', label: 'Potencial', color: '#F59E0B' },
-  { value: 'cliente', label: 'Cliente', color: '#10B981' },
-  { value: 'inativo', label: 'Inativo', color: '#6B7280' },
-  { value: 'sem_interesse', label: 'Sem Interesse', color: '#DC2626' },
-  { value: 'proposta_enviada', label: 'Proposta Enviada', color: '#3498DB' },
-  { value: 'curioso', label: 'Curioso', color: '#9CA3AF' },
+  { value: 'potencial', label: 'Lead', color: '#F59E0B' },
+  { value: 'cliente', label: 'Client', color: '#10B981' },
+  { value: 'inativo', label: 'Inactive', color: '#6B7280' },
+  { value: 'sem_interesse', label: 'Not interested', color: '#DC2626' },
+  { value: 'proposta_enviada', label: 'Proposal sent', color: '#3498DB' },
+  { value: 'curioso', label: 'Curious', color: '#9CA3AF' },
 ];
 
 export function VendasClientesTab({ 
@@ -48,9 +48,9 @@ export function VendasClientesTab({
   });
 
   const getCategoriaLabel = (cat?: string) => {
-    if (!cat) return 'Curioso';
+    if (!cat) return 'Curious';
     const c = CATEGORIAS.find(c => c.value === cat);
-    return c ? c.label : 'Curioso';
+    return c ? c.label : 'Curious';
   };
 
   const getCategoriaColor = (cat?: string) => {
@@ -80,7 +80,7 @@ export function VendasClientesTab({
   const hasValidProposta = (c: any) => c.propostaId && c.propostaId.trim() !== '';
 
   const exportToCSV = () => {
-    const headers = ['Nome', 'Categoria', 'Empresa', 'Telefone', 'Email', 'Origem', 'Proposta', 'Resposta', 'Criado em'];
+    const headers = ['Name', 'Category', 'Company', 'Phone', 'Email', 'Source', 'Proposal', 'Response', 'Created at'];
     const rows = filteredClientes.map(c => [
       c.nome || '',
       getCategoriaLabel(c.categoria) || '',
@@ -107,8 +107,8 @@ export function VendasClientesTab({
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 24, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 4 }}>Meus Clientes</h1>
-          <p style={{ color: theme.colors.text.secondary, fontSize: 13 }}>{filteredClientes.length} de {clientes.length} clientes</p>
+          <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 24, fontWeight: 900, color: theme.colors.text.primary, marginBottom: 4 }}>My clients</h1>
+          <p style={{ color: theme.colors.text.secondary, fontSize: 13 }}>{filteredClientes.length} of {clientes.length} clients</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={exportToCSV} style={{ padding: "8px 12px", borderRadius: 6, backgroundColor: "#fff", color: "#666", border: "1px solid #e0e0e0", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
@@ -168,7 +168,7 @@ export function VendasClientesTab({
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
             <button onClick={onSubmit} disabled={!novoCliente.nome?.trim()} style={{ padding: "8px 16px", borderRadius: 4, backgroundColor: novoCliente.nome?.trim() ? theme.colors.accent.primary : '#ccc', color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: novoCliente.nome?.trim() ? "pointer" : "not-allowed" }}>
-              Guardar
+              Save
             </button>
             <button onClick={onToggleForm} style={{ padding: "8px 16px", borderRadius: 4, backgroundColor: "#f5f5f5", color: "#666", border: "none", fontSize: 12, cursor: "pointer" }}>
               Cancelar
@@ -195,13 +195,13 @@ export function VendasClientesTab({
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Morada</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>CP</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Cidade</th>
-                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Serviços</th>
-                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Orçamento</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Services</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Quote</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Proposta</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Fatura</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Notas Vendedor</th>
                 <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Último Contacto</th>
-                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Ações</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Actions</th>
               </tr>
             </thead>
             <tbody>

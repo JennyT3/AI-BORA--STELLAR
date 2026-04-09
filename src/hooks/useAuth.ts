@@ -45,7 +45,7 @@ export function useAuth() {
   const [vendedorReady, setVendedorReady] = useState(false);
 
   useEffect(() => {
-    // Verificar sessão JWT primeiro (para vendedores)
+    // Check JWT session first (vendedores)
     const initVendedorFromSession = async () => {
       const savedSession = getSession();
       
@@ -68,14 +68,14 @@ export function useAuth() {
 
     initVendedorFromSession();
 
-    // Listener do Firebase Auth (para admin e vendedor)
+    // Firebase Auth listener (admin and vendedor)
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        // Verificar se é admin ou vendedor
+        // Check if admin or vendedor
         const vendedorDoc = await getDoc(doc(db, 'vendedores', firebaseUser.uid));
         
         if (vendedorDoc.exists()) {
-          // É vendedor - carregar dados do Firestore
+          // Vendedor — load Firestore data
           const vendedorData = vendedorDoc.data();
           setAuthenticated(true);
           setCurrentUser({
@@ -85,7 +85,7 @@ export function useAuth() {
             email: firebaseUser.email || ''
           });
           
-          // Se ainda não temos o vendedor no estado, adicionar
+          // Add vendedor to state if missing
           if (!vendedor) {
             setVendedor({
               id: firebaseUser.uid,
@@ -93,7 +93,7 @@ export function useAuth() {
             } as Vendedor);
           }
         } else {
-          // É admin (não tem documento em vendedores)
+          // Admin (no vendedores document)
           setAuthenticated(true);
           setCurrentUser({
             id: firebaseUser.uid,
@@ -119,15 +119,15 @@ export function useAuth() {
         return { success: true };
       } catch (err: any) {
         const msg = err.code === 'auth/invalid-credential'
-          ? 'Email ou password incorretos'
-          : 'Erro ao iniciar sessão';
+          ? 'Incorrect email or password'
+          : 'Could not sign in';
         return { success: false, error: msg };
       }
     } else if (type === 'vendedor') {
-      // data contém o objeto vendedor retornado pelo login (do authService)
+      // data is the vendedor object returned by login (authService)
       setVendedor(data);
       
-      // Criar token JWT seguro (sem password!)
+      // Create secure JWT (no password stored)
       const token = createSessionToken({
         id: data.id,
         nome: data.nome,
@@ -135,7 +135,7 @@ export function useAuth() {
         role: 'vendedor'
       });
       
-      // Salvar apenas o token (não o objeto vendedor completo!)
+      // Persist token only (not the full vendedor object)
       saveSession(token);
       setSessionToken(token);
       
@@ -147,7 +147,7 @@ export function useAuth() {
     if (type === 'admin') {
       await signOut(auth);
     } else {
-      // Limpar sessão JWT e logout do Firebase
+      // Clear JWT session and sign out of Firebase
       clearSession();
       setSessionToken(null);
       setVendedor(null);

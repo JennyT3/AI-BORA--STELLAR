@@ -59,7 +59,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
           }));
 
           if (clientesParseados.length === 0) {
-            throw new Error('Nenhum cliente encontrado no arquivo');
+            throw new Error('No clients found in the file');
           }
 
           const result = await importarClientesParaVendedor(vendedorId, clientesParseados, 'vendedor');
@@ -69,7 +69,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
             setTimeout(onSuccess, 2000);
           }
         } catch (err: any) {
-          setError(err.message || 'Erro ao processar arquivo');
+          setError(err.message || 'Failed to process file');
         } finally {
           setLoading(false);
         }
@@ -77,7 +77,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
 
       reader.readAsArrayBuffer(file);
     } catch (err: any) {
-      setError(err.message || 'Erro ao importar arquivo');
+      setError(err.message || 'Failed to import file');
       setLoading(false);
     }
   };
@@ -100,7 +100,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
       );
       setDelegacaoEnviada(true);
     } catch (err: any) {
-      setError(err.message || 'Erro ao solicitar delegação');
+      setError(err.message || 'Failed to request delegation');
     } finally {
       setSolicitandoDelegacao(false);
     }
@@ -140,7 +140,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#1b1c1b', margin: 0 }}>
-            Importar Clientes
+            Import clients
           </h2>
           <button
             onClick={onClose}
@@ -158,30 +158,30 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
           </button>
         </div>
 
-        {/* Resultado exitoso */}
+        {/* Success result */}
         {resultado && !error && (
           <div style={{ marginBottom: '24px' }}>
-            {/* Resumen de 3 números grandes */}
+            {/* Summary counts */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
               <div style={{ textAlign: 'center', background: '#ecfdf5', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ fontSize: '28px', fontWeight: 900, color: '#10b981' }}>{resultado.criados || 0}</div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#047857', marginTop: '4px' }}>CRIADOS</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#047857', marginTop: '4px' }}>CREATED</div>
               </div>
               <div style={{ textAlign: 'center', background: '#fef3c7', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ fontSize: '28px', fontWeight: 900, color: '#d97706' }}>{resultado.atualizados || 0}</div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginTop: '4px' }}>ATUALIZADOS</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginTop: '4px' }}>UPDATED</div>
               </div>
               <div style={{ textAlign: 'center', background: resultado.erros?.length > 0 ? '#fef2f2' : '#f3f4f6', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ fontSize: '28px', fontWeight: 900, color: resultado.erros?.length > 0 ? '#dc2626' : '#6b7280' }}>{resultado.erros?.length || 0}</div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: resultado.erros?.length > 0 ? '#b91c1c' : '#4b5563', marginTop: '4px' }}>ERROS</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: resultado.erros?.length > 0 ? '#b91c1c' : '#4b5563', marginTop: '4px' }}>ERRORS</div>
               </div>
             </div>
 
-            {/* Lista de erros */}
+            {/* Error list */}
             {resultado.erros?.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#1b1c1b', marginBottom: '8px' }}>
-                  Erros encontrados ({resultado.erros.length}):
+                  Errors found ({resultado.erros.length}):
                 </h4>
                 <div style={{
                   backgroundColor: '#fef2f2',
@@ -200,17 +200,17 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
               </div>
             )}
 
-            {/* Duplicados con botón de delegación masiva */}
+            {/* Duplicates — bulk delegation */}
             {resultado.duplicados?.length > 0 && !delegacaoEnviada && (
               <div style={{ marginBottom: '20px', backgroundColor: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <Users size={18} color="#d97706" />
                   <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#92400e', margin: 0 }}>
-                    {resultado.duplicados.length} clientes já existem
+                    {resultado.duplicados.length} clients already exist
                   </h4>
                 </div>
                 <p style={{ fontSize: '12px', color: '#92400e', margin: '0 0 12px 0' }}>
-                  Estes clientes pertencem a outros vendedores. Solicite a delegação em massa.
+                  These clients belong to other sellers. Request bulk delegation.
                 </p>
                 <ul style={{ fontSize: '11px', color: '#78350f', margin: '0 0 12px 0', paddingLeft: '20px', maxHeight: '100px', overflowY: 'auto' }}>
                   {resultado.duplicados.slice(0, 5).map((d: any, idx: number) => (
@@ -219,7 +219,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
                     </li>
                   ))}
                   {resultado.duplicados.length > 5 && (
-                    <li>... e mais {resultado.duplicados.length - 5}</li>
+                    <li>... and {resultado.duplicados.length - 5} more</li>
                   )}
                 </ul>
                 <button
@@ -238,27 +238,27 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
                     opacity: solicitandoDelegacao ? 0.7 : 1
                   }}
                 >
-                  {solicitandoDelegacao ? 'A enviar...' : `Solicitar delegação de todos (${resultado.duplicados.length})`}
+                  {solicitandoDelegacao ? 'Sending...' : `Request delegation for all (${resultado.duplicados.length})`}
                 </button>
               </div>
             )}
 
-            {/* Mensaje de delegación enviada */}
+            {/* Delegation request sent */}
             {delegacaoEnviada && (
               <div style={{ marginBottom: '20px', backgroundColor: '#d1fae5', border: '1px solid #6ee7b7', borderRadius: '12px', padding: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <CheckCircle size={18} color="#059669" />
                   <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#065f46', margin: 0 }}>
-                    Solicitação enviada!
+                    Request sent!
                   </h4>
                 </div>
                 <p style={{ fontSize: '12px', color: '#065f46', margin: 0 }}>
-                  Aguarde aprovação do administrador. Você será notificado quando os clientes forem delegados.
+                  Please wait for admin approval. You will be notified when clients are delegated.
                 </p>
               </div>
             )}
 
-            {/* Botones */}
+            {/* Actions */}
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={onClose}
@@ -274,7 +274,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
                   cursor: 'pointer'
                 }}
               >
-                Fechar
+                Close
               </button>
               <button
                 onClick={resetModal}
@@ -290,7 +290,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
                   cursor: 'pointer'
                 }}
               >
-                Importar outro ficheiro
+                Import another file
               </button>
             </div>
           </div>
@@ -311,7 +311,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
             <AlertCircle size={20} color="#dc2626" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#dc2626', margin: '0 0 4px 0' }}>
-                Erro na Importação
+                Import error
               </h3>
               <p style={{ fontSize: '13px', color: '#991b1b', margin: 0 }}>
                 {error}
@@ -344,10 +344,10 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
             >
               <Upload size={32} color="#F25C05" style={{ marginBottom: '12px', margin: '0 auto 12px' }} />
               <p style={{ fontSize: '14px', fontWeight: 700, color: '#1b1c1b', margin: '0 0 4px 0' }}>
-                Clica aqui para selecionar arquivo
+                Click to select a file
               </p>
               <p style={{ fontSize: '12px', color: '#8e7165', margin: 0 }}>
-                ou arrasta um arquivo Excel/CSV
+                or drag and drop an Excel/CSV file
               </p>
             </div>
 
@@ -359,7 +359,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
               style={{ display: 'none' }}
             />
 
-            {/* Instruções */}
+            {/* Instructions */}
             <div style={{
               backgroundColor: '#fcf9f7',
               borderRadius: '12px',
@@ -367,13 +367,13 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
               marginBottom: '24px'
             }}>
               <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#1b1c1b', marginBottom: '8px', margin: '0 0 8px 0' }}>
-                Formato esperado:
+                Expected format:
               </h4>
               <ul style={{ fontSize: '12px', color: '#8e7165', margin: 0, paddingLeft: '20px' }}>
-                <li>Colunas: nome, email, telemovel, nif, empresa, website, morada, codigoPostal, cidade, categoria, origem, processo, notasVendedor, dataUltimoContacto, servicos</li>
-                <li>Pelo menos a coluna "nome" é obrigatória</li>
-                <li>Suporta arquivos .xlsx, .xls e .csv</li>
-                <li>Deduplicação automática por NIF → Email → Telefone</li>
+                <li>Columns: nome, email, telemovel, nif, empresa, website, morada, codigoPostal, cidade, categoria, origem, processo, notasVendedor, dataUltimoContacto, servicos</li>
+                <li>At least the &quot;nome&quot; column is required</li>
+                <li>Supports .xlsx, .xls, and .csv files</li>
+                <li>Automatic deduplication by NIF → email → phone</li>
               </ul>
             </div>
 
@@ -391,7 +391,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
                 cursor: 'pointer'
               }}
             >
-              Cancelar
+              Cancel
             </button>
           </>
         )}
@@ -401,10 +401,10 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNom
           <div style={{ textAlign: 'center', padding: '32px 0' }}>
             <Loader size={32} color="#F25C05" style={{ animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
             <p style={{ fontSize: '14px', fontWeight: 700, color: '#1b1c1b' }}>
-              A processar arquivo...
+              Processing file...
             </p>
             <p style={{ fontSize: '12px', color: '#8e7165' }}>
-              Isto pode levar alguns segundos
+              This may take a few seconds
             </p>
           </div>
         )}

@@ -65,7 +65,7 @@ export function VendasHeader({ userName, userRole = "VENDEDOR", onLogout, onTogg
             fontFamily: "Montserrat, sans-serif",
             display: isMobile ? "none" : "block",
           }}>
-            AI BORA Vendas
+            AI BORA Sales
           </span>
         </div>
 
@@ -84,7 +84,7 @@ export function VendasHeader({ userName, userRole = "VENDEDOR", onLogout, onTogg
             />
             <input
               type="text"
-              placeholder="Pesquisa global..."
+              placeholder="Global search..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onFocus={() => setSearchFocused(true)}
@@ -109,8 +109,8 @@ export function VendasHeader({ userName, userRole = "VENDEDOR", onLogout, onTogg
       <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 24 }}>
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 16 }}>
           {[
-            { icon: Bell, label: "Notificações" },
-            { icon: HelpCircle, label: "Ajuda" },
+            { icon: Bell, label: "Notifications" },
+            { icon: HelpCircle, label: "Help" },
             { icon: Grid, label: "Apps" },
           ].map(({ icon: Icon, label }) => (
             <button

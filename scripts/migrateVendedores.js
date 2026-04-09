@@ -1,27 +1,27 @@
 /**
  * ============================================
- * SCRIPT DE MIGRAÇÃO PARA FIREBASE AUTH
+ * FIREBASE AUTH MIGRATION SCRIPT
  * ============================================
- * 
- * Este script migra vendedores existentes do sistema de passwords
- * em texto plano para Firebase Authentication.
- * 
- * INSTRUÇÕES:
- * 1. Execute este script no cliente Firebase Console (Functions) 
- *    OU localmente com firebase emulators
- * 2. Antes de executar, faça backup da coleção 'vendedores'
- * 3. Após migração, atualize as Firestore Rules
- * 
- * WARNING: Este script deve ser executado APENAS UMA VEZ
+ *
+ * This script migrates existing vendedores from plain-text passwords
+ * to Firebase Authentication.
+ *
+ * INSTRUCTIONS:
+ * 1. Run this script in the Firebase Console (Functions) client
+ *    OR locally with Firebase emulators
+ * 2. Before running, back up the 'vendedores' collection
+ * 3. After migration, update Firestore Rules
+ *
+ * WARNING: This script should be run ONLY ONCE
  */
 
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, doc, updateDoc, setDoc } = require('firebase/firestore');
 const { getAuth, createUserWithEmailAndPassword } = require('firebase/auth');
 
-// Configuração - substituir com credenciais do projeto
+// Configuration — replace with your project credentials
 const firebaseConfig = {
-  //填入你的Firebase配置
+  // Add your Firebase config here
 };
 
 const app = initializeApp(firebaseConfig);
@@ -32,7 +32,7 @@ async function migrateVendedores() {
   console.log('🚀 Starting Vendedor Migration to Firebase Auth...\n');
 
   try {
-    // 1. Buscar todos os vendedores
+    // 1. Fetch all vendedores
     console.log('📋 Fetching all vendedores...');
     const vendedoresSnapshot = await getDocs(collection(db, 'vendedores'));
     const totalVendedores = vendedoresSnapshot.size;
@@ -42,7 +42,7 @@ async function migrateVendedores() {
     let failCount = 0;
     const errors = [];
 
-    // 2. Para cada vendedor, criar conta no Firebase Auth
+    // 2. For each vendedor, create a Firebase Auth account
     for (const vendedorDoc of vendedoresSnapshot.docs) {
       const vendedor = vendedorDoc.data();
       const email = vendedor.email;
@@ -53,36 +53,36 @@ async function migrateVendedores() {
         continue;
       }
 
-      // Se já foi migrado, pular
+      // Skip if already migrated
       if (vendedor.authMigrated) {
         console.log(`   ✅ ${email} - already migrated`);
         continue;
       }
 
-      // Se não tem password, criar conta com password temporária
+      // If no password, create account with temporary password
       const tempPassword = generateTempPassword();
       
       try {
-        // Criar utilizador no Firebase Auth
+        // Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, tempPassword);
         
-        // Atualizar documento no Firestore
+        // Update document in Firestore
         await updateDoc(doc(db, 'vendedores', vendedorDoc.id), {
           authUid: userCredential.user.uid,
           authMigrated: true,
           migratedAt: new Date().toISOString(),
-          // Remover password em texto plano (se existir)
+          // Remove plain-text password (if present)
           password: null,
-          // Manter outros campos intactos
+          // Keep other fields intact
           ativo: vendedor.ativo !== false,
           updatedAt: new Date().toISOString()
         });
 
         console.log(`   ✅ Migrated: ${email} (UID: ${userCredential.user.uid})`);
         
-        // NOTA: Neste ponto, você deveria enviar email ao vendedor
-        // com instruções para redefinir a password temporária
-        // Isso requer integrar com um serviço de email
+        // NOTE: At this point you should email the vendedor
+        // with instructions to reset the temporary password
+        // This requires integrating with an email service
         
         successCount++;
 
@@ -93,7 +93,7 @@ async function migrateVendedores() {
       }
     }
 
-    // 3. Resumo
+    // 3. Summary
     console.log('\n' + '='.repeat(50));
     console.log('📊 MIGRATION SUMMARY');
     console.log('='.repeat(50));
@@ -120,7 +120,7 @@ async function migrateVendedores() {
   }
 }
 
-// Gerar password temporária segura
+// Generate a secure temporary password
 function generateTempPassword() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let password = '';
@@ -130,7 +130,7 @@ function generateTempPassword() {
   return password + 'A1!';
 }
 
-// Executar se chamado diretamente
+// Run when executed directly
 if (require.main === module) {
   migrateVendedores()
     .then(() => process.exit(0))
@@ -141,28 +141,27 @@ module.exports = { migrateVendedores };
 
 /**
  * ============================================
- * VERSÃO ALTERNATIVA - EXECUTAR NO BROWSER
+ * ALTERNATIVE VERSION — RUN IN THE BROWSER
  * ============================================
- * 
- * Para executar no browser (após login como admin):
- * 
+ *
+ * To run in the browser (after logging in as admin):
+ *
  * async function migrateAllVendedores() {
  *   const db = getFirestore();
  *   const auth = getAuth();
- *   
+ *
  *   const snapshot = await getDocs(collection(db, 'vendedores'));
- *   
+ *
  *   for (const docSnap of snapshot.docs) {
  *     const data = docSnap.data();
  *     if (data.email && !data.authMigrated && data.password) {
  *       try {
- *         // Gerar UID temporário (não cria no Auth ainda!)
  *         const tempUid = 'vendedor_' + docSnap.id;
- *         
+ *
  *         await updateDoc(doc(db, 'vendedores', docSnap.id), {
  *           tempUid: tempUid,
- *           authMigrated: false, // Pendente
- *           // NÃO remover password ainda - manter até verificar
+ *           authMigrated: false, // Pending
+ *           // Do NOT remove password yet — keep until verified
  *         });
  *         console.log('Marked:', data.email);
  *       } catch (e) {

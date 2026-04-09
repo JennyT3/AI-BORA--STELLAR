@@ -42,17 +42,17 @@ export interface AdminAlertData {
 
 export async function sendAdminAlert(data: AdminAlertData): Promise<boolean> {
   const mensagemMap: Record<string, string> = {
-    nova_solicitacao: `📬 Nova solicitação de ${data.entidade}`,
-    nova_proposta: `📄 Nova proposta de ${data.entidade}`,
-    proposta_aceite: `✅ Proposta ACEITE de ${data.entidade}`,
-    proposta_rejeitada: `❌ Proposta REJEITADA de ${data.entidade}`,
-    novo_cliente: `👤 Novo cliente: ${data.entidade}`,
+    nova_solicitacao: `📬 New request from ${data.entidade}`,
+    nova_proposta: `📄 New proposal from ${data.entidade}`,
+    proposta_aceite: `✅ Proposal ACCEPTED from ${data.entidade}`,
+    proposta_rejeitada: `❌ Proposal REJECTED from ${data.entidade}`,
+    novo_cliente: `👤 New client: ${data.entidade}`,
   };
 
   await queueNotification({
     tipo: 'admin_alert',
     destinatario: 'admin@aibora.pt',
-    asunto: mensagemMap[data.tipo] || 'Alerta AI BORA',
+    asunto: mensagemMap[data.tipo] || 'AI BORA alert',
     mensaje: data.detalhes,
   });
   return true;

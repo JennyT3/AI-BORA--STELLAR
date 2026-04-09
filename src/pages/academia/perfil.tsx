@@ -16,13 +16,13 @@ const colors = {
 };
 
 const TIPOS_NEGOCIO = [
-  { value: 'ecommerce', label: 'E-commerce / Loja Online' },
-  { value: 'servicos', label: 'Prestação de Serviços' },
-  { value: 'consultoria', label: 'Consultoria' },
-  { value: 'restaurante', label: 'Restaurante / Bar' },
-  { value: 'salute', label: 'Saúde / Bem-estar' },
-  { value: 'educacao', label: 'Educação' },
-  { value: 'outro', label: 'Outro' },
+  { value: 'ecommerce', label: 'E-commerce / online store' },
+  { value: 'servicos', label: 'Professional services' },
+  { value: 'consultoria', label: 'Consulting' },
+  { value: 'restaurante', label: 'Restaurant / bar' },
+  { value: 'salute', label: 'Health / wellness' },
+  { value: 'educacao', label: 'Education' },
+  { value: 'outro', label: 'Other' },
 ];
 
 export default function AcademiaPerfil() {
@@ -63,7 +63,7 @@ export default function AcademiaPerfil() {
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${colors.orange}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>A carregar perfil...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading profile…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -84,10 +84,10 @@ export default function AcademiaPerfil() {
       });
       await refetch();
       setEditando(false);
-      setMensagem({ text: 'Perfil atualizado com sucesso! ✨', type: 'success' });
+      setMensagem({ text: 'Profile updated successfully.', type: 'success' });
       setTimeout(() => setMensagem(null), 4000);
     } catch (error) {
-      setMensagem({ text: 'Erro ao guardar as alterações. Tenta novamente.', type: 'error' });
+      setMensagem({ text: 'Could not save changes. Please try again.', type: 'error' });
     } finally {
       setSalvando(false);
     }
@@ -109,10 +109,10 @@ export default function AcademiaPerfil() {
             animate={{ opacity: 1, x: 0 }}
             style={{ fontSize: 36, fontWeight: 900, color: colors.dark, marginBottom: 12, letterSpacing: '-0.02em' }}
           >
-            O Meu <span style={{ color: colors.orange }}>Perfil</span>
+            My <span style={{ color: colors.orange }}>profile</span>
           </motion.h1>
           <p style={{ color: '#666', fontSize: 16 }}>
-            Gere a tua conta e acompanha o teu progresso na Bora Lá Estudar.
+            Manage your account and track your progress at Bora Lá Academy.
           </p>
         </div>
 
@@ -122,14 +122,14 @@ export default function AcademiaPerfil() {
             animate={{ opacity: 1, y: 0 }}
             style={{
               padding: '16px 24px', borderRadius: 16, marginBottom: 32,
-              background: mensaje.type === 'success' ? '#d1fae5' : '#fee2e2',
-              color: mensaje.type === 'success' ? '#065f46' : '#991b1b',
-              fontSize: 14, fontWeight: 700, border: `1px solid ${mensaje.type === 'success' ? '#10b98130' : '#ef444430'}`,
+              background: mensagem.type === 'success' ? '#d1fae5' : '#fee2e2',
+              color: mensagem.type === 'success' ? '#065f46' : '#991b1b',
+              fontSize: 14, fontWeight: 700, border: `1px solid ${mensagem.type === 'success' ? '#10b98130' : '#ef444430'}`,
               display: 'flex', alignItems: 'center', gap: 12
             }}
           >
-            {mensaje.type === 'success' ? <ShieldCheck size={20} /> : <X size={20} />}
-            {mensaje.text}
+            {mensagem.type === 'success' ? <ShieldCheck size={20} /> : <X size={20} />}
+            {mensagem.text}
           </motion.div>
         )}
 
@@ -158,7 +158,7 @@ export default function AcademiaPerfil() {
                     </button>
                   </div>
                   <div>
-                    <h2 style={{ fontSize: 24, fontWeight: 900, color: colors.dark, marginBottom: 4 }}>{academiaUser?.nome || 'Explorador'}</h2>
+                    <h2 style={{ fontSize: 24, fontWeight: 900, color: colors.dark, marginBottom: 4 }}>{academiaUser?.nome || 'Explorer'}</h2>
                     <p style={{ fontSize: 14, color: '#999', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Mail size={14} /> {user?.emailAddresses?.[0]?.emailAddress}
                     </p>
@@ -169,7 +169,7 @@ export default function AcademiaPerfil() {
                     onClick={() => setEditando(true)}
                     style={{ padding: '10px 20px', borderRadius: 12, border: '1px solid #eee', background: '#f9f9f9', color: colors.dark, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
                   >
-                    Editar Perfil
+                    Edit profile
                   </button>
                 )}
               </div>
@@ -177,7 +177,7 @@ export default function AcademiaPerfil() {
               <div style={{ display: 'grid', gap: 24 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#999', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome Completo</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#999', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full name</label>
                     <div style={{ position: 'relative' }}>
                       <User size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: editando ? colors.orange : '#ccc' }} />
                       <input
@@ -190,7 +190,7 @@ export default function AcademiaPerfil() {
                     </div>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#999', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tipo de Negócio</label>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 800, color: '#999', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Business type</label>
                     <div style={{ position: 'relative' }}>
                       <Briefcase size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: editando ? colors.orange : '#ccc' }} />
                       <select
@@ -199,7 +199,7 @@ export default function AcademiaPerfil() {
                         disabled={!editando}
                         style={{ width: '100%', padding: '16px 16px 16px 48px', borderRadius: 16, border: editando ? `2px solid ${colors.orange}` : '1px solid #eee', fontSize: 15, background: editando ? '#fff' : '#f9f9f9', color: colors.dark, fontWeight: 600, outline: 'none', cursor: editando ? 'pointer' : 'default', boxSizing: 'border-box', appearance: 'none' }}
                       >
-                        <option value="">Seleciona...</option>
+                        <option value="">Select…</option>
                         {TIPOS_NEGOCIO.map(opt => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}
@@ -219,13 +219,13 @@ export default function AcademiaPerfil() {
                       disabled={salvando}
                       style={{ flex: 1, padding: '16px', borderRadius: 16, border: 'none', background: colors.dark, color: '#fff', fontWeight: 800, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
                     >
-                      {salvando ? 'A guardar...' : <><Save size={18} /> Guardar Alterações</>}
+                      {salvando ? 'Saving…' : <><Save size={18} /> Save changes</>}
                     </button>
                     <button
                       onClick={() => { setEditando(false); setFormData({ nome: academiaUser?.nome || '', tipo_negocio: academiaUser?.tipo_negocio || '' }); }}
                       style={{ padding: '16px 24px', borderRadius: 16, border: '1px solid #eee', background: '#fff', color: '#666', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
                     >
-                      Cancelar
+                      Cancel
                     </button>
                   </motion.div>
                 )}
@@ -235,14 +235,14 @@ export default function AcademiaPerfil() {
             {/* Account Security / Actions */}
             <section style={{ background: '#fff', borderRadius: 32, padding: 32, border: `1px solid ${colors.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 900, color: colors.dark, marginBottom: 4 }}>Sessão e Segurança</h3>
-                <p style={{ fontSize: 14, color: '#999', margin: 0 }}>Termina a tua sessão de forma segura.</p>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: colors.dark, marginBottom: 4 }}>Session and security</h3>
+                <p style={{ fontSize: 14, color: '#999', margin: 0 }}>Sign out securely when you are done.</p>
               </div>
               <button 
                 onClick={handleLogout}
                 style={{ padding: '14px 28px', borderRadius: 16, border: 'none', background: '#fff5f5', color: '#e74c3c', fontWeight: 800, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}
               >
-                <LogOut size={18} /> Sair da Conta
+                <LogOut size={18} /> Sign out
               </button>
             </section>
           </div>
@@ -252,7 +252,7 @@ export default function AcademiaPerfil() {
             
             {/* Stats Card */}
             <div style={{ background: colors.dark, borderRadius: 32, padding: 32, color: '#fff' }}>
-              <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 24 }}>O Teu Progresso</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 24 }}>Your progress</h3>
               <div style={{ display: 'grid', gap: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.orange }}>
@@ -260,7 +260,7 @@ export default function AcademiaPerfil() {
                   </div>
                   <div>
                     <div style={{ fontSize: 24, fontWeight: 900 }}>{stats?.aulas_concluidas || 0}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase' }}>Aulas Concluídas</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase' }}>Lessons completed</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -269,7 +269,7 @@ export default function AcademiaPerfil() {
                   </div>
                   <div>
                     <div style={{ fontSize: 24, fontWeight: 900 }}>{certificados.length}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase' }}>Certificados</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase' }}>Certificates</div>
                   </div>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function AcademiaPerfil() {
 
             {/* Recent Certificates */}
             <div style={{ background: '#fff', borderRadius: 32, padding: 32, border: `1px solid ${colors.border}` }}>
-              <h3 style={{ fontSize: 18, fontWeight: 900, color: colors.dark, marginBottom: 20 }}>Certificados Recentes</h3>
+              <h3 style={{ fontSize: 18, fontWeight: 900, color: colors.dark, marginBottom: 20 }}>Recent certificates</h3>
               {certificados.length > 0 ? (
                 <div style={{ display: 'grid', gap: 16 }}>
                   {certificados.slice(0, 2).map((cert, i) => (
@@ -291,12 +291,12 @@ export default function AcademiaPerfil() {
                 </div>
               ) : (
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                  <p style={{ fontSize: 13, color: '#999', lineHeight: 1.5 }}>Ainda não tens certificados. Começa a estudar para os desbloquear!</p>
+                  <p style={{ fontSize: 13, color: '#999', lineHeight: 1.5 }}>No certificates yet. Start learning to unlock your first one.</p>
                 </div>
               )}
               <Link href="/academia/certificados">
                 <button style={{ width: '100%', marginTop: 20, padding: '12px', background: 'transparent', color: colors.orange, border: `2px solid ${colors.orange}`, borderRadius: 12, fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
-                  Ver Todos
+                  View all
                 </button>
               </Link>
             </div>

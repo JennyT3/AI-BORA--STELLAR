@@ -10,6 +10,18 @@ import { Search } from 'lucide-react';
 const SHEET_ID = "1e5ASsGLdmntjUMyTCHFiB0fQwzrsrciA-DgtYTy4U2c";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
 
+/** Display labels for filter chips (data categories stay as stored). */
+const CATEGORY_LABEL: Record<string, string> = {
+  Todos: "All",
+  Fotografia: "Photography",
+  Retrato: "Portrait",
+  "3D": "3D",
+  Design: "Design",
+  Ilustracao: "Illustration",
+  Produto: "Product",
+  Tendencias: "Trends",
+};
+
 function parseCSV(csv: string): Prompt[] {
   const lines = csv.trim().split('\n');
   if (lines.length < 2) return [];
@@ -76,13 +88,13 @@ export function Prompts() {
         if (parsed.length > 0) {
           setSheetPrompts(parsed);
         } else {
-          console.warn('Planilha retornou 0 prompts. Verifica colunas e campo Activo.');
+          console.warn('Sheet returned 0 prompts. Check columns and Active field.');
         }
         setLoadingSheet(false);
       })
       .catch((err) => {
         clearTimeout(timeout);
-        console.error("Erro ao carregar prompts:", err.name === 'AbortError' ? 'Timeout 10s' : err);
+        console.error("Error loading prompts:", err.name === 'AbortError' ? 'Timeout 10s' : err);
         setLoadingSheet(false);
       });
 
@@ -90,7 +102,7 @@ export function Prompts() {
   }, []);
 
   const allPrompts = useMemo(() => {
-    // Usar prompts da planilha se existirem, senão usar os estáticos (se houver)
+    // Prefer sheet prompts; fall back to static list if empty
     const combined = sheetPrompts.length > 0 ? sheetPrompts : (prompts || []);
     return combined;
   }, [sheetPrompts]);
@@ -156,7 +168,7 @@ export function Prompts() {
                 className="text-sm max-w-md mx-auto"
                 style={{ fontFamily: 'Montserrat, sans-serif', color: '#aaaaaa' }}
               >
-                Biblioteca de prompts otimizados para criadores e empresas.
+                A library of optimised prompts for creators and businesses.
               </p>
             </div>
 
@@ -164,7 +176,7 @@ export function Prompts() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="text"
-                placeholder="Pesquisar prompts..."
+                placeholder="Search prompts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 rounded-full text-sm focus:outline-none transition-colors text-gray-900 placeholder-gray-500"
@@ -186,7 +198,7 @@ export function Prompts() {
                     borderColor: activeFilter === cat ? '#F25C05' : '#444'
                   }}
                 >
-                  {cat}
+                  {CATEGORY_LABEL[cat] ?? cat}
                 </button>
               ))}
             </div>
@@ -206,7 +218,7 @@ export function Prompts() {
             ) : visiblePrompts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Nenhum prompt encontrado.
+                  No prompts found.
                 </p>
               </div>
             ) : (
@@ -231,7 +243,7 @@ export function Prompts() {
                         className="px-6 py-2 rounded-full text-sm font-medium border transition-colors hover:bg-[#F25C05]/10"
                         style={{ fontFamily: 'Montserrat, sans-serif', color: '#F25C05', borderColor: '#F25C05' }}
                       >
-                        Carregar mais
+                        Load more
                       </button>
                     )}
                   </div>
@@ -239,7 +251,7 @@ export function Prompts() {
 
                 {!hasMore && visiblePrompts.length > 0 && (
                   <p className="text-center text-gray-500 text-xs py-8" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                    Fim da biblioteca
+                    End of library
                   </p>
                 )}
               </>
@@ -253,16 +265,16 @@ export function Prompts() {
               className="text-xl md:text-2xl font-bold mb-3"
               style={{ fontFamily: 'Montserrat, sans-serif', color: '#F25C05', fontWeight: 800 }}
             >
-              Queres mais prompts exclusivos?
+              Want more exclusive prompts?
             </h2>
             <p className="text-text-secondary text-sm mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-              Subscreve e recebe acesso ilimitado à nossa biblioteca completa.
+              Subscribe for unlimited access to our full library.
             </p>
             <button
               className="px-8 py-3 rounded-full text-sm font-bold text-white transition-transform hover:scale-105"
               style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', fontFamily: 'Montserrat, sans-serif' }}
             >
-              Subscrever Agora
+              Subscribe now
             </button>
           </div>
         </section>

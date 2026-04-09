@@ -4,24 +4,24 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    question: "Quanto tempo demora a criar o meu site?",
-    answer: "Normalmente entre 2 a 3 semanas. Depende da complexidade e da rapidez com que nos envia o conteúdo (textos e imagens)."
+    question: "How long does it take to build my website?",
+    answer: "Usually between 2 and 3 weeks. It depends on complexity and how quickly you send content (copy and images)."
   },
   {
-    question: "Preciso de pagar alguma coisa antes?",
-    answer: "Não. O pagamento só é feito quando o site estiver online e a funcionar. Sem riscos para si."
+    question: "Do I need to pay anything upfront?",
+    answer: "No. You only pay when the site is live and working. No risk on your side."
   },
   {
-    question: "E se eu não perceber nada de tecnologia?",
-    answer: "Perfeito! Nós tratamos de tudo. Não precisa de saber programar nem gerir servidores. Explicamos tudo de forma simples."
+    question: "What if I know nothing about technology?",
+    answer: "Perfect — we handle everything. You do not need to code or manage servers. We explain everything in plain language."
   },
   {
-    question: "O site fica a meu nome?",
-    answer: "Sim, totalmente. O domínio é seu, o site é seu. Não ficamos com nada."
+    question: "Does the site belong to me?",
+    answer: "Yes, fully. The domain is yours, the site is yours. We do not keep any of it."
   },
   {
-    question: "E depois de ficar online, preciso de ajuda?",
-    answer: "Oferecemos 30 dias de suporte gratuito. Depois pode escolher um plano de manutenção ou chamar-nos quando precisar."
+    question: "After launch, will I need help?",
+    answer: "We include 30 days of free support. After that you can choose a maintenance plan or reach out when you need us."
   }
 ];
 
@@ -34,10 +34,10 @@ export function FAQSection() {
         
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">
-            Perguntas frequentes
+            Frequently asked questions
           </h2>
           <p className="text-sm text-text-secondary">
-            Esclarecemos as dúvidas mais comuns
+            Answers to the most common questions
           </p>
         </div>
 

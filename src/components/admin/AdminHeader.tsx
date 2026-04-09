@@ -74,7 +74,7 @@ export function AdminHeader({
             />
             <input
               type="text"
-              placeholder="Pesquisa global no ecossistema..."
+              placeholder="Search across the workspace..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onFocus={() => setSearchFocused(true)}
@@ -104,7 +104,7 @@ export function AdminHeader({
           <NotificacoesBadge onNavigate={onNavigate} />
           
           <button
-            title="Ajuda"
+            title="Help"
             style={{
               width: 44,
               height: 44,
@@ -125,7 +125,7 @@ export function AdminHeader({
           </button>
 
           <button
-            title="Aplicações"
+            title="Apps"
             style={{
               width: 44,
               height: 44,

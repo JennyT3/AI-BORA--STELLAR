@@ -23,7 +23,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
       const data = await listTodasSolicitacoesDelegacao();
       setSolicitacoes(data);
     } catch (error) {
-      console.error("Erro ao carregar solicitações:", error);
+      console.error("Error loading delegation requests:", error);
     } finally {
       setLoading(false);
     }
@@ -39,20 +39,20 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
       await aprobarDelegacao(solicitacao.id, "admin");
       await loadSolicitacoes();
     } catch (error) {
-      console.error("Erro ao aprovar delegação:", error);
+      console.error("Error approving delegation:", error);
     } finally {
       setProcessingId(null);
     }
   };
 
   const handleRejeitar = async (solicitacao: SolicitacaoDelegacao) => {
-    const motivo = prompt("Motivo da rejeição (opcional):");
+    const motivo = prompt("Rejection reason (optional):");
     setProcessingId(solicitacao.id);
     try {
-      await rejeitarDelegacao(solicitacao.id, "admin", motivo || "Rejeitado pelo administrador");
+      await rejeitarDelegacao(solicitacao.id, "admin", motivo || "Rejected by administrator");
       await loadSolicitacoes();
     } catch (error) {
-      console.error("Erro ao rejeitar delegação:", error);
+      console.error("Error rejecting delegation:", error);
     } finally {
       setProcessingId(null);
     }
@@ -79,21 +79,21 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
         color: style.color,
       }}>
         <Icon size={12} />
-        {status === "pendente" ? "Pendente" : status === "aprovada" ? "Aprovada" : "Rejeitada"}
+        {status === "pendente" ? "Pending" : status === "aprovada" ? "Approved" : "Rejected"}
       </span>
     );
   };
 
   const formatDate = (data: any) => {
     if (!data) return "—";
-    if (data.toDate) return data.toDate().toLocaleDateString("pt-PT");
-    return new Date(data).toLocaleDateString("pt-PT");
+    if (data.toDate) return data.toDate().toLocaleDateString("en-GB");
+    return new Date(data).toLocaleDateString("en-GB");
   };
 
   if (loading) {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
-        <div style={{ color: theme.colors.textSecondary }}>A carregar...</div>
+        <div style={{ color: theme.colors.textSecondary }}>Loading…</div>
       </div>
     );
   }
@@ -104,10 +104,10 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
     <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
       <div style={{ marginBottom: "24px" }}>
         <h1 style={{ fontSize: "24px", fontWeight: 900, color: "#1b1c1b", margin: "0 0 8px 0", fontFamily: "Montserrat, sans-serif" }}>
-          Solicitações de Delegação
+          Delegation requests
         </h1>
         <p style={{ fontSize: "14px", color: theme.colors.textSecondary, margin: 0 }}>
-          Gere as solicitações de delegação de clientes entre vendedores
+          Review requests to delegate clients between sales reps
         </p>
       </div>
 
@@ -127,7 +127,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
               color: filterStatus === status ? "#fff" : "#4b5563",
             }}
           >
-            {status === "all" ? "Todas" : status === "pendente" ? `Pendente (${pendentes})` : status === "aprovada" ? "Aprovadas" : "Rejeitadas"}
+            {status === "all" ? "All" : status === "pendente" ? `Pending (${pendentes})` : status === "aprovada" ? "Approved" : "Rejected"}
           </button>
         ))}
       </div>
@@ -141,7 +141,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
         }}>
           <Users size={48} color="#9ca3af" style={{ marginBottom: "16px" }} />
           <p style={{ fontSize: "16px", color: "#6b7280", margin: 0 }}>
-            Nenhuma solicitação encontrada
+            No requests found
           </p>
         </div>
       ) : (
@@ -167,10 +167,10 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div>
                     <div style={{ fontSize: "14px", fontWeight: 700, color: "#1b1c1b" }}>
-                      {solicitacao.vendedorSolicitanteNome || "Vendedor"}
+                      {solicitacao.vendedorSolicitanteNome || "Sales rep"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                      {solicitacao.totalClientes} cliente{solicitacao.totalClientes !== 1 ? "s" : ""} • {formatDate(solicitacao.dataSolicitacao)}
+                      {solicitacao.totalClientes} client{solicitacao.totalClientes !== 1 ? "s" : ""} • {formatDate(solicitacao.dataSolicitacao)}
                     </div>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                     }}
                   >
                     <Eye size={14} />
-                    {expandedId === solicitacao.id ? "Ocultar" : "Ver"} {solicitacao.totalClientes}
+                    {expandedId === solicitacao.id ? "Hide" : "View"} {solicitacao.totalClientes}
                   </button>
                 </div>
               </div>
@@ -222,7 +222,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                       opacity: processingId === solicitacao.id ? 0.7 : 1,
                     }}
                   >
-                    ✅ Aprovar Todos
+                    ✅ Approve all
                   </button>
                   <button
                     onClick={() => handleRejeitar(solicitacao)}
@@ -240,7 +240,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                       opacity: processingId === solicitacao.id ? 0.7 : 1,
                     }}
                   >
-                    ❌ Rejeitar
+                    ❌ Reject
                   </button>
                 </div>
               )}
@@ -254,7 +254,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                   <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr style={{ borderBottom: "1px solid #e5e7eb" }}>
-                        <th style={{ textAlign: "left", padding: "8px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase" }}>Nome</th>
+                        <th style={{ textAlign: "left", padding: "8px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase" }}>Name</th>
                         <th style={{ textAlign: "left", padding: "8px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase" }}>NIF</th>
                         <th style={{ textAlign: "left", padding: "8px", fontSize: "11px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase" }}>Email</th>
                       </tr>
@@ -271,7 +271,7 @@ export function DelegacoesAdmin({ onNavigate }: DelegacoesAdminProps) {
                   </table>
                   {solicitacao.status === "rejeitada" && solicitacao.motivoRejeicao && (
                     <div style={{ marginTop: "12px", padding: "12px", backgroundColor: "#fef2f2", borderRadius: "8px", fontSize: "13px", color: "#991b1b" }}>
-                      <strong>Motivo:</strong> {solicitacao.motivoRejeicao}
+                      <strong>Reason:</strong> {solicitacao.motivoRejeicao}
                     </div>
                   )}
                 </div>

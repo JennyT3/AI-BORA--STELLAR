@@ -5,23 +5,23 @@ import { useSectionInView } from '../hooks/useSectionInView';
 const steps = [
   {
     num: "01",
-    title: "Conversa Inicial",
-    desc: "Percebemos o seu negócio e o que o cliente procura."
+    title: "Introductory call",
+    desc: "We learn your business and what your customers need."
   },
   {
     num: "02",
-    title: "Diagnóstico Digital",
-    desc: "Auditamos a presença atual e definimos o plano."
+    title: "Digital diagnosis",
+    desc: "We audit your current presence and define the plan."
   },
   {
     num: "03",
-    title: "Execução Rápida",
-    desc: "Implementamos tudo. Sem trabalho da sua parte."
+    title: "Fast execution",
+    desc: "We implement everything. No heavy lifting on your side."
   },
   {
     num: "04",
-    title: "Resultados Reais",
-    desc: "Monitorização e ajustes mensais incluídos."
+    title: "Real results",
+    desc: "Monitoring and monthly tweaks included."
   }
 ];
 
@@ -33,14 +33,14 @@ export function ComoFuncionaSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
         
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <SectionBadge text="COMO FUNCIONA" />
+          <SectionBadge text="HOW IT WORKS" />
           <motion.h2 
             initial={{ opacity: 0, y: 24 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6"
           >
-            Do primeiro contacto ao <span className="underline-gradient">online</span>
+            From first contact to <span className="underline-gradient">live</span>
           </motion.h2>
         </div>
 

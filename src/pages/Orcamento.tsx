@@ -76,8 +76,8 @@ export function Orcamento() {
 
   const dataCriacao = new Date();
   const dataValidade = new Date(dataCriacao.getTime() + 10 * 24 * 60 * 60 * 1000);
-  const dataCriacaoStr = dataCriacao.toLocaleDateString("pt-PT");
-  const dataValidadeStr = dataValidade.toLocaleDateString("pt-PT");
+  const dataCriacaoStr = dataCriacao.toLocaleDateString("en-GB");
+  const dataValidadeStr = dataValidade.toLocaleDateString("en-GB");
 
   useEffect(() => {
     if (solId) {
@@ -141,10 +141,10 @@ export function Orcamento() {
     import("../services/firebase").then(async ({ listClientes }) => {
       try {
         const lista = await listClientes(200);
-        console.log("clientesCRM cargados:", lista?.length);
+        console.log("clientesCRM loaded:", lista?.length);
         setClientesCRM(lista || []);
       } catch (e) {
-        console.error("Erro ao carregar clientes CRM:", e);
+        console.error("Error loading CRM clients:", e);
       }
     });
   }, []);
@@ -163,7 +163,7 @@ export function Orcamento() {
 const total = precoTotal;
   const descuentoAplicado = (total * (descontoPercent / 100)) + descontoValor;
   const totalConDescuento = total - descuentoAplicado;
-  // Calcular IVA sobre el total CON descuento (no sobre el total original)
+  // VAT on discounted total (not on pre-discount total)
   const ivaBase = totalConDescuento / (1 + IVA_TAXA);
   const ivaComDesconto = totalConDescuento - ivaBase;
   const subtotalComDesconto = ivaBase;
@@ -188,18 +188,18 @@ const total = precoTotal;
     if (logoBase64) doc.addImage(logoBase64, "PNG", 12, 7, 24, 24);
     doc.setTextColor(26, 26, 26); doc.setFontSize(17); doc.setFont("helvetica", "bold"); doc.text("AI BORA", 40, 18);
     doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.setTextColor(140, 140, 140); doc.text("Marketing Digital & Criativo", 40, 24);
-    doc.setTextColor(26, 26, 26); doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text("ORÇAMENTO", 198, 13, { align: "right" });
-    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(90, 90, 90); doc.text("Nº " + numeroOrcamento, 198, 20, { align: "right" }); doc.text("Data: " + dataCriacaoStr, 198, 26, { align: "right" }); doc.text("Válido até: " + dataValidadeStr, 198, 32, { align: "right" });
+    doc.setTextColor(26, 26, 26); doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.text("QUOTE", 198, 13, { align: "right" });
+    doc.setFontSize(8); doc.setFont("helvetica", "normal"); doc.setTextColor(90, 90, 90); doc.text("No. " + numeroOrcamento, 198, 20, { align: "right" }); doc.text("Date: " + dataCriacaoStr, 198, 26, { align: "right" }); doc.text("Valid until: " + dataValidadeStr, 198, 32, { align: "right" });
 
     let y = 46;
-    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("DADOS DO CLIENTE", 14, y);
+    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("CLIENT DETAILS", 14, y);
     doc.setDrawColor(242, 92, 5); doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5);
     y += 5; doc.setFillColor(247, 245, 243); doc.rect(14, y, 182, 32, "F");
     const lbl = (label: string, value: string, x: number, yy: number) => { doc.setFontSize(8.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26); doc.text(label, x, yy); doc.setFont("helvetica", "normal"); doc.setTextColor(70, 70, 70); doc.text(value || "—", x + 22, yy); };
-    lbl("Nome:", cliente.nome, 18, y + 8); lbl("Empresa:", cliente.empresa, 107, y + 8); lbl("NIF:", cliente.nif, 18, y + 16); lbl("Email:", cliente.email, 107, y + 16); lbl("Telefone:", cliente.telefone, 18, y + 24); lbl("Morada:", cliente.morada, 107, y + 24);
+    lbl("Name:", cliente.nome, 18, y + 8); lbl("Company:", cliente.empresa, 107, y + 8); lbl("Tax ID:", cliente.nif, 18, y + 16); lbl("Email:", cliente.email, 107, y + 16); lbl("Phone:", cliente.telefone, 18, y + 24); lbl("Address:", cliente.morada, 107, y + 24);
 
     y += 40;
-    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("MARCAS E SERVIÇOS", 14, y);
+    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("BRANDS AND SERVICES", 14, y);
     doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5); y += 7;
 
     for (let mi = 0; mi < marcas.length; mi++) {
@@ -207,11 +207,11 @@ const total = precoTotal;
       const subtotalMarca = marcas.length > 0 ? subtotalComDesconto / marcas.length : 0;
       doc.setFillColor(242, 92, 5); doc.rect(14, y, 182, 9, "F");
       doc.setTextColor(255, 255, 255); doc.setFontSize(8.5); doc.setFont("helvetica", "bold");
-      const nomeMarca = marca.nome ? marca.nome.toUpperCase() : "MARCA " + (mi + 1);
-      doc.text("MARCA: " + nomeMarca, 18, y + 6.2); y += 13;
+      const nomeMarca = marca.nome ? marca.nome.toUpperCase() : "BRAND " + (mi + 1);
+      doc.text("BRAND: " + nomeMarca, 18, y + 6.2); y += 13;
 
       if (marca.redes.length > 0) {
-        doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(100, 100, 100); doc.text("REDES SOCIAIS:", 18, y); y += 4;
+        doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(100, 100, 100); doc.text("SOCIAL MEDIA:", 18, y); y += 4;
         let rx = 18;
         for (const redeId of marca.redes) {
           const rede = REDES.find(r => r.id === redeId); if (!rede) continue;
@@ -226,52 +226,52 @@ const total = precoTotal;
       }
 
       if (marca.servicos.length > 0) {
-        autoTable(doc, { startY: y, head: [["#", "Serviços Incluídos", subtotalMarca.toFixed(2) + " € s/ IVA"]], body: marca.servicos.map((s, i) => [(i + 1).toString(), s, ""]), theme: "plain", headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 7.5, fontStyle: "bold", cellPadding: 3 }, bodyStyles: { fontSize: 8, textColor: [40, 40, 40], cellPadding: 3 }, columnStyles: { 0: { cellWidth: 8, halign: "center" }, 1: { cellWidth: 148 }, 2: { cellWidth: 26, halign: "right" } }, alternateRowStyles: { fillColor: [250, 248, 246] }, margin: { left: 14, right: 14 }, tableLineColor: [220, 215, 210], tableLineWidth: 0.2 });
+        autoTable(doc, { startY: y, head: [["#", "Services included", subtotalMarca.toFixed(2) + " € ex VAT"]], body: marca.servicos.map((s, i) => [(i + 1).toString(), s, ""]), theme: "plain", headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 7.5, fontStyle: "bold", cellPadding: 3 }, bodyStyles: { fontSize: 8, textColor: [40, 40, 40], cellPadding: 3 }, columnStyles: { 0: { cellWidth: 8, halign: "center" }, 1: { cellWidth: 148 }, 2: { cellWidth: 26, halign: "right" } }, alternateRowStyles: { fillColor: [250, 248, 246] }, margin: { left: 14, right: 14 }, tableLineColor: [220, 215, 210], tableLineWidth: 0.2 });
         y = (doc as any).lastAutoTable?.finalY + 8;
       } else {
         doc.setFillColor(250, 248, 246); doc.rect(14, y, 182, 8, "F");
-        doc.setTextColor(160, 160, 160); doc.setFontSize(7.5); doc.setFont("helvetica", "italic"); doc.text("Serviços a definir conforme proposta comercial", 18, y + 5.5); y += 14;
+        doc.setTextColor(160, 160, 160); doc.setFontSize(7.5); doc.setFont("helvetica", "italic"); doc.text("Services to be defined per commercial proposal", 18, y + 5.5); y += 14;
       }
       y += 3;
     }
 
     if (y > 235) { doc.addPage(); y = 18; }
-    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("RESUMO FINANCEIRO", 14, y);
+    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(242, 92, 5); doc.text("FINANCIAL SUMMARY", 14, y);
     doc.setLineWidth(0.4); doc.line(14, y + 1.5, 196, y + 1.5); y += 7;
     doc.setFillColor(242, 92, 5); doc.roundedRect(120, y, 76, 22, 3, 3, "F");
-    doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.text("TOTAL MENSAL (c/ IVA 23%)", 158, y + 7, { align: "center" });
+    doc.setTextColor(255, 255, 255); doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.text("MONTHLY TOTAL (incl. 23% VAT)", 158, y + 7, { align: "center" });
     doc.setFontSize(17); doc.setFont("helvetica", "bold"); doc.text(totalConDescuento.toFixed(2) + " €", 194, y + 18, { align: "right" });
 
     let ty = y + 4;
     const linhaFin = (label: string, valor: string, bold: boolean, cor: [number, number, number]) => { doc.setFontSize(8.5); doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setTextColor(cor[0], cor[1], cor[2]); doc.text(label, 14, ty); doc.text(valor, 115, ty, { align: "right" }); doc.setDrawColor(225, 220, 215); doc.setLineWidth(0.2); doc.line(14, ty + 1.5, 115, ty + 1.5); ty += 7; };
-    linhaFin("Subtotal (sem IVA):", subtotalComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
-    if (descuentoAplicado > 0) linhaFin("Desconto:", "- " + descuentoAplicado.toFixed(2) + " €", false, [242, 92, 5]);
-    linhaFin("IVA (23%):", ivaComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
-    linhaFin("TOTAL A PAGAR:", totalConDescuento.toFixed(2) + " €", true, [242, 92, 5]);
+    linhaFin("Subtotal (ex VAT):", subtotalComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
+    if (descuentoAplicado > 0) linhaFin("Discount:", "- " + descuentoAplicado.toFixed(2) + " €", false, [242, 92, 5]);
+    linhaFin("VAT (23%):", ivaComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
+    linhaFin("TOTAL DUE:", totalConDescuento.toFixed(2) + " €", true, [242, 92, 5]);
 
     ty += 6;
     if (ty > 238) { doc.addPage(); ty = 18; }
     doc.setFillColor(247, 245, 243); doc.rect(14, ty, 182, 54, "F");
-    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26); doc.text("CONDIÇÕES COMERCIAIS", 18, ty + 8);
+    doc.setFontSize(7.5); doc.setFont("helvetica", "bold"); doc.setTextColor(26, 26, 26); doc.text("COMMERCIAL TERMS", 18, ty + 8);
     doc.setDrawColor(242, 92, 5); doc.setLineWidth(0.3); doc.line(18, ty + 10, 192, ty + 10);
-    const conds = ["Âmbito: Prestação de serviços conforme detalhado acima para " + marcas.length + " marca" + (marcas.length > 1 ? "s" : "") + ".", "Período: 3 meses experimentais + contrato anual renovável automaticamente.", "Pagamento: Mensal, por transferência bancária ou débito direto até ao dia 5 de cada mês.", "Validade: Orçamento válido até " + dataValidadeStr + " (10 dias corridos a partir da emissão).", "Rescisão: Aviso prévio de 30 dias após o período experimental, por escrito.", "Propriedade Intelectual: Todo o conteúdo criado é propriedade do cliente após liquidação total."];
+    const conds = ["Scope: Delivery of services as detailed above for " + marcas.length + " brand" + (marcas.length > 1 ? "s" : "") + ".", "Term: 3-month trial + annual contract with automatic renewal.", "Payment: Monthly by bank transfer or direct debit by the 5th of each month.", "Validity: This quote is valid until " + dataValidadeStr + " (10 calendar days from issue).", "Termination: 30 days' written notice after the trial period.", "Intellectual property: All created content belongs to the client after full payment."];
     doc.setFontSize(7.8); doc.setFont("helvetica", "normal"); doc.setTextColor(60, 60, 60); let cy = ty + 17; conds.forEach(c => { doc.text("•  " + c, 18, cy, { maxWidth: 174 }); cy += 6.5; });
 
     const totalPages = (doc as any).internal.getNumberOfPages();
-    for (let p = 1; p <= totalPages; p++) { doc.setPage(p); doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.3); doc.line(14, pH - 18, 196, pH - 18); doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.text("AI BORA, Lda  |  NIF: 319918645  |  geral@aibora.pt  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 12, { align: "center" }); doc.setFontSize(6.5); doc.setTextColor(160, 160, 160); doc.text("Este orçamento não constitui fatura. Sujeito à aceitação formal por escrito.", 105, pH - 7, { align: "center" }); doc.setTextColor(190, 190, 190); doc.text(p + " / " + totalPages, 196, pH - 7, { align: "right" }); }
+    for (let p = 1; p <= totalPages; p++) { doc.setPage(p); doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.3); doc.line(14, pH - 18, 196, pH - 18); doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.text("AI BORA, Lda  |  Tax ID: 319918645  |  geral@aibora.pt  |  +351 936 021 747  |  www.aibora.pt", 105, pH - 12, { align: "center" }); doc.setFontSize(6.5); doc.setTextColor(160, 160, 160); doc.text("This quote is not an invoice. Subject to formal written acceptance.", 105, pH - 7, { align: "center" }); doc.setTextColor(190, 190, 190); doc.text(p + " / " + totalPages, 196, pH - 7, { align: "right" }); }
 
     return doc;
   };
 
   const gerarPDF = async () => {
-    if (!cliente.nome || totalConDescuento <= 0) { alert("Preenche o Nome do Cliente e o Valor Total."); return; }
-    try { const doc = await criarPDF(); const pdfBlob = doc.output('blob'); const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); } catch (err) { console.error(err); alert("Erro ao gerar PDF."); }
+    if (!cliente.nome || totalConDescuento <= 0) { alert("Please enter the client name and total amount."); return; }
+    try { const doc = await criarPDF(); const pdfBlob = doc.output('blob'); const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); } catch (err) { console.error(err); alert("Could not generate PDF."); }
   };
 
   const podeGerarProposta = !!cliente.nome && totalConDescuento > 0;
 
   const handleGuardarProposta = async () => {
-    if (!cliente.nome || totalConDescuento <= 0) { alert("Preenche o Nome do Cliente e o Valor Total."); return; }
+    if (!cliente.nome || totalConDescuento <= 0) { alert("Please enter the client name and total amount."); return; }
     const savedUser = localStorage.getItem("adminUser");
     const currentUser = savedUser ? JSON.parse(savedUser) : null;
     try {
@@ -300,7 +300,7 @@ const total = precoTotal;
       const id = await createProposal(proposalData);
       setPropostaId(id);
       
-      // Actualizar cliente con la propuesta vinculada
+      // Link proposal to client record
       if (clienteIdSeleccionado) {
         try {
           const { updateCliente } = await import('../services/firebase');
@@ -314,11 +314,11 @@ const total = precoTotal;
             dataUltimoContacto: new Date().toISOString()
           });
         } catch (err) {
-          console.error('Error al vincular propuesta al cliente:', err);
+          console.error('Error linking proposal to client:', err);
         }
       }
       
-      // Obtener la propuesta para obtener el token de acceso
+      // Load proposal for access token
       const { getProposal } = await import('../services/firebase');
       const propostaCriada = await getProposal(id);
       const accessToken = propostaCriada?.accessToken || id;
@@ -327,8 +327,8 @@ const total = precoTotal;
       if (cliente.email) {
         sendPropostaLinkEmail({ nome: cliente.nome, email: cliente.email, link, empresa: cliente.empresa }).catch(() => {});
       }
-      navigator.clipboard.writeText(link).then(() => { const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); setTimeout(() => { alert(`✅ Proposta guardada!\n\nLink único copiado:\n${link}`); }, 500); });
-    } catch (err) { console.error(err); alert("Erro ao guardar proposta: " + err.message); }
+      navigator.clipboard.writeText(link).then(() => { const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); setTimeout(() => { alert(`Proposal saved.\n\nUnique link copied:\n${link}`); }, 500); });
+    } catch (err) { console.error(err); alert("Could not save proposal: " + err.message); }
   };
 
   if (!isAdminMode) {
@@ -339,7 +339,7 @@ const total = precoTotal;
           <main className="pt-20">
             <section style={{ backgroundColor: "#1A1A1A", padding: "80px 16px 60px" }}>
               <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
-                <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff" }}>A carregar dados...</h1>
+                <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff" }}>Loading...</h1>
               </div>
             </section>
           </main>
@@ -350,7 +350,7 @@ const total = precoTotal;
   }
 
   if (isVendedorOrcamento) {
-    const vendedorNome = currentVendedor?.nome || "Vendedor";
+    const vendedorNome = currentVendedor?.nome || "Sales rep";
     return (
       <div style={{ minHeight: "100vh", backgroundColor: theme.colors.bg.primary, display: "flex" }}>
         <VendasSidebar
@@ -379,8 +379,8 @@ const total = precoTotal;
           <div style={{ height: "100%", overflow: "auto", paddingRight: 16 }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
               <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
-                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial</p>
+                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>New quote</h1>
+                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Create a new sales proposal</p>
               </div>
 <OrcamentoForm
                 cliente={cliente} setCliente={setCliente} marcas={marcas} setMarcas={setMarcas}
@@ -428,8 +428,8 @@ const total = precoTotal;
           <div style={{ height: "100%", overflow: "auto", paddingRight: 16 }}>
             <div style={{ maxWidth: 1200, margin: "0 auto" }}>
               <div style={{ marginBottom: 32 }}>
-                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>Novo Orçamento</h1>
-                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Cria uma nova proposta comercial</p>
+                <h1 style={{ fontFamily: theme.fontFamily.sans, fontSize: 32, fontWeight: 900, color: theme.colors.text.primary }}>New quote</h1>
+                <p style={{ color: theme.colors.text.secondary, fontSize: 14 }}>Create a new sales proposal</p>
               </div>
 
               <OrcamentoForm
@@ -455,8 +455,8 @@ const total = precoTotal;
       <main className="pt-20">
         <section style={{ backgroundColor: "#1A1A1A", padding: "80px 16px 60px" }}>
           <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
-            <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff", lineHeight: 1.1 }}>Gerador de <span style={{ color: "#F22283" }}>Orçamentos</span></h1>
-            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 16, color: "#aaaaaa" }}>Configura as marcas, serviços e gera um PDF profissional em segundos.</p>
+            <h1 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(28px, 5vw, 48px)", color: "#ffffff", lineHeight: 1.1 }}>Quote <span style={{ color: "#F22283" }}>generator</span></h1>
+            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 16, color: "#aaaaaa" }}>Set up brands and services and generate a professional PDF in seconds.</p>
           </div>
         </section>
 

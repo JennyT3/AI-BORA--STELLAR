@@ -3,57 +3,57 @@ import { motion } from "motion/react";
 import { WHATSAPP_LINK } from "../lib/constants";
 import { packs } from "../data/packs";
 
-// Packs Mensais (Gestão Contínua)
+// Monthly packs (ongoing management)
 const plansMensais = [
   {
     id: "essencial-mensal",
-    label: "Essencial",
+    label: "Essential",
     price: "79",
-    desc: "Para começar a marcar presença online.",
+    desc: "Start building your online presence.",
     features: [
-      "Meta Business Suite — Facebook e Instagram",
-      "Perfil de Negócio Otimizado",
-      "5 posts mensais",
-      "Gestão de mensagens",
-      "Relatório mensal",
-      "Suporte via WhatsApp",
+      "Meta Business Suite — Facebook and Instagram",
+      "Optimised business profile",
+      "5 posts per month",
+      "Message management",
+      "Monthly report",
+      "Support via WhatsApp",
     ],
-    cta: "Começar",
+    cta: "Get started",
     highlight: false,
   },
   {
     id: "crescimento",
-    label: "Crescimento",
+    label: "Growth",
     price: "149",
-    desc: "Crescer com estratégia e resultados reais.",
+    desc: "Grow with strategy and real results.",
     features: [
-      "Tudo do Essencial",
-      "12 posts mensais",
-      "1 Campanha paga",
-      "2 designs / mês",
-      "Análise de concorrentes",
-      "E-mail marketing",
-      "Call mensal 30min",
+      "Everything in Essential",
+      "12 posts per month",
+      "1 paid campaign",
+      "2 designs / month",
+      "Competitor analysis",
+      "Email marketing",
+      "30-minute monthly call",
     ],
-    cta: "Falar connosco",
+    cta: "Talk to us",
     highlight: true,
   },
   {
     id: "autoridade",
-    label: "Autoridade",
+    label: "Authority",
     price: "297",
-    desc: "Domina a sua área local.",
+    desc: "Lead your local market.",
     features: [
-      "Tudo do Crescimento",
-      "20+ posts mensais",
-      "2–3 campanhas pagas",
-      "IA respostas automáticas",
-      "Sessão foto/vídeo mensal",
-      "5 designs / mês",
-      "Consultoria 2h",
-      "Suporte VIP",
+      "Everything in Growth",
+      "20+ posts per month",
+      "2–3 paid campaigns",
+      "AI-powered auto replies",
+      "Monthly photo/video session",
+      "5 designs / month",
+      "2h consulting",
+      "VIP support",
     ],
-    cta: "Quero Autoridade",
+    cta: "I want Authority",
     highlight: false,
   },
 ];
@@ -63,8 +63,8 @@ export function Packs() {
     <div className="min-h-screen bg-bg">
       <Navbar />
       <main className="pt-28 pb-20">
-        
-        {/* SECCIÓN 1: PACKS PAGAMENTO ÚNICO */}
+
+        {/* Section 1: one-off packs */}
         <section style={{ backgroundColor: "#F5F2F0", padding: "64px 16px" }}>
           <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 32px" }}>
             <div style={{ width: 40, height: 3, backgroundColor: "#F25C05", margin: "0 auto 12px", borderRadius: 2 }} />
@@ -76,9 +76,9 @@ export function Packs() {
               lineHeight: 1.2,
               margin: "0 0 8px"
             }}>
-              Packs de Presença Digital
+              Digital presence packs
               <br />
-              <span style={{ color: "#F22283" }}>Pagamento Único</span>
+              <span style={{ color: "#F22283" }}>One-time payment</span>
             </h1>
             <p style={{
               fontFamily: "Montserrat, sans-serif",
@@ -88,10 +88,10 @@ export function Packs() {
               margin: "0 0 16px",
               lineHeight: 1.5
             }}>
-              Investimento <span style={{ textDecoration: "underline", textDecorationColor: "#F25C05" }}>único</span>. Sem mensalidades. Sem surpresas.
+              <span style={{ textDecoration: "underline", textDecorationColor: "#F25C05" }}>One-time</span> investment. No monthly fees. No surprises.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
-              {["Sem Contratos", "Pagamento Único", "Sem Taxas Ocultas"].map(t => (
+              {["No long contracts", "One-time payment", "No hidden fees"].map(t => (
                 <span key={t} style={{
                   fontFamily: "Montserrat, sans-serif",
                   fontWeight: 700,
@@ -137,7 +137,7 @@ export function Packs() {
                     borderRadius: 12, textTransform: "uppercase",
                     boxShadow: "0 2px 8px rgba(242,34,131,0.3)"
                   }}>
-                    Mais Popular
+                    Most popular
                   </div>
                 )}
 
@@ -157,7 +157,7 @@ export function Packs() {
                   <span style={{
                     fontFamily: "Montserrat, sans-serif", fontWeight: 400,
                     fontSize: 12, color: "#4A4A4A"
-                  }}>+ IVA</span>
+                  }}>+ VAT</span>
                 </div>
 
                 <p style={{
@@ -176,7 +176,7 @@ export function Packs() {
                     fontFamily: "Montserrat, sans-serif", fontWeight: 700,
                     fontSize: 11, color: pack.domain ? "#25D366" : "#F25C05"
                   }}>
-                    {pack.domain ? "Domínio próprio incluído" : "Sem domínio próprio"}
+                    {pack.domain ? "Custom domain included" : "No custom domain"}
                   </span>
                 </div>
 
@@ -200,7 +200,7 @@ export function Packs() {
                 </ul>
 
                 <a
-                  href={`${WHATSAPP_LINK}?text=Olá, tenho interesse no ${pack.label} de €${pack.price}.`}
+                  href={`${WHATSAPP_LINK}?text=Hi, I'm interested in the ${pack.label} pack at €${pack.price}.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -221,10 +221,9 @@ export function Packs() {
           </div>
         </section>
 
-        {/* DIVISOR */}
         <div style={{ height: 80 }} />
 
-        {/* SECCIÓN 2: PACKS MENSAIS */}
+        {/* Section 2: monthly packs */}
         <section style={{ backgroundColor: "#FAFAFA", padding: "64px 16px" }}>
           <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 32px" }}>
             <div style={{ width: 40, height: 3, backgroundColor: "#F25C05", margin: "0 auto 12px", borderRadius: 2 }} />
@@ -236,9 +235,9 @@ export function Packs() {
               lineHeight: 1.2,
               margin: "0 0 8px"
             }}>
-              Packs Mensais
+              Monthly packs
               <br />
-              <span style={{ color: "#F22283" }}>Gestão Contínua</span>
+              <span style={{ color: "#F22283" }}>Ongoing management</span>
             </h2>
             <p style={{
               fontFamily: "Montserrat, sans-serif",
@@ -248,7 +247,7 @@ export function Packs() {
               margin: 0,
               lineHeight: 1.5
             }}>
-              Subscrição mensal. Sem contratos longos. Cancela quando quiseres.
+              Monthly subscription. No long contracts. Cancel anytime.
             </p>
           </div>
 
@@ -275,95 +274,95 @@ export function Packs() {
                 }}
               >
                 {plan.highlight && (
-                  <div style={{ 
-                    position: "absolute", 
-                    top: -10, 
-                    left: "50%", 
-                    transform: "translateX(-50%)", 
-                    backgroundColor: "#F22283", 
-                    color: "#fff", 
-                    fontFamily: "Montserrat, sans-serif", 
-                    fontWeight: 700, 
-                    fontSize: 10, 
-                    letterSpacing: 1, 
-                    padding: "4px 12px", 
-                    borderRadius: 12, 
+                  <div style={{
+                    position: "absolute",
+                    top: -10,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    backgroundColor: "#F22283",
+                    color: "#fff",
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 10,
+                    letterSpacing: 1,
+                    padding: "4px 12px",
+                    borderRadius: 12,
                     textTransform: "uppercase",
                     boxShadow: "0 2px 8px rgba(242,34,131,0.3)"
                   }}>
-                    Mais Popular
+                    Most popular
                   </div>
                 )}
-                
-                <span style={{ 
-                  fontFamily: "Montserrat, sans-serif", 
-                  fontWeight: 700, 
-                  fontSize: 11, 
-                  letterSpacing: 1.5, 
-                  color: "#F25C05", 
-                  textTransform: "uppercase" 
+
+                <span style={{
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 700,
+                  fontSize: 11,
+                  letterSpacing: 1.5,
+                  color: "#F25C05",
+                  textTransform: "uppercase"
                 }}>
                   {plan.label}
                 </span>
-                
+
                 <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                  <span style={{ 
-                    fontFamily: "Montserrat, sans-serif", 
-                    fontWeight: 900, 
-                    fontSize: 40, 
-                    color: "#1A1A1A", 
-                    lineHeight: 1 
+                  <span style={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 900,
+                    fontSize: 40,
+                    color: "#1A1A1A",
+                    lineHeight: 1
                   }}>
                     {plan.price}€
                   </span>
-                  <span style={{ 
-                    fontFamily: "Montserrat, sans-serif", 
-                    fontWeight: 400, 
-                    fontSize: 14, 
-                    color: "#4A4A4A" 
+                  <span style={{
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 400,
+                    fontSize: 14,
+                    color: "#4A4A4A"
                   }}>
-                    /mês
+                    /mo
                   </span>
                 </div>
-                
-                <p style={{ 
-                  fontFamily: "Montserrat, sans-serif", 
-                  fontWeight: 400, 
-                  fontSize: 14, 
-                  color: "#4A4A4A", 
-                  margin: 0, 
+
+                <p style={{
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: "#4A4A4A",
+                  margin: 0,
                   lineHeight: 1.5,
                   minHeight: 40
                 }}>
                   {plan.desc}
                 </p>
-                
+
                 <div style={{ height: 1, backgroundColor: "#eeeeee", margin: "8px 0" }} />
-                
-                <ul style={{ 
-                  listStyle: "none", 
-                  padding: 0, 
-                  margin: 0, 
-                  display: "flex", 
-                  flexDirection: "column", 
-                  gap: 10, 
-                  flex: 1 
+
+                <ul style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  flex: 1
                 }}>
                   {plan.features.map((f) => (
-                    <li key={f} style={{ 
-                      fontFamily: "Montserrat, sans-serif", 
-                      fontWeight: 400, 
-                      fontSize: 14, 
-                      color: "#1A1A1A", 
-                      display: "flex", 
-                      alignItems: "flex-start", 
+                    <li key={f} style={{
+                      fontFamily: "Montserrat, sans-serif",
+                      fontWeight: 400,
+                      fontSize: 14,
+                      color: "#1A1A1A",
+                      display: "flex",
+                      alignItems: "flex-start",
                       gap: 10,
                       lineHeight: 1.4
                     }}>
-                      <span style={{ 
-                        color: "#F22283", 
-                        fontWeight: 700, 
-                        flexShrink: 0, 
+                      <span style={{
+                        color: "#F22283",
+                        fontWeight: 700,
+                        flexShrink: 0,
                         fontSize: 14,
                         marginTop: 2
                       }}>
@@ -373,22 +372,22 @@ export function Packs() {
                     </li>
                   ))}
                 </ul>
-                
+
                 <a
-                  href={`${WHATSAPP_LINK}?text=Olá, tenho interesse no plano ${plan.label}`}
+                  href={`${WHATSAPP_LINK}?text=Hi, I'm interested in the ${plan.label} monthly plan`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ 
-                    marginTop: "auto", 
-                    display: "block", 
-                    textAlign: "center", 
-                    padding: "14px 20px", 
-                    borderRadius: 10, 
-                    fontFamily: "Montserrat, sans-serif", 
-                    fontWeight: 700, 
-                    fontSize: 14, 
-                    textDecoration: "none", 
-                    backgroundColor: plan.highlight ? "#F22283" : "#1A1A1A", 
+                  style={{
+                    marginTop: "auto",
+                    display: "block",
+                    textAlign: "center",
+                    padding: "14px 20px",
+                    borderRadius: 10,
+                    fontFamily: "Montserrat, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    textDecoration: "none",
+                    backgroundColor: plan.highlight ? "#F22283" : "#1A1A1A",
                     color: "#ffffff",
                     transition: "all 0.2s ease",
                     boxShadow: plan.highlight ? "0 4px 12px rgba(242,34,131,0.3)" : "none"

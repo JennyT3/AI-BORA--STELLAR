@@ -27,49 +27,49 @@ const colors = {
   light: '#fcf9f8'
 };
 
-// Dados das trilhas e aulas (em produção, viriam do Firebase)
+// Path and lesson copy (in production this may come from Firebase)
 const trilhasData: Record<string, {
   nome: string;
   descricao: string;
   aulas: { id: string; titulo: string; duracao: string; descricao: string; video_url?: string; recursos?: { nome: string; tipo: string; tamanho: string }[] }[];
 }> = {
   'ia-negocios': {
-    nome: 'IA para Negócios Locais',
-    descricao: 'Aprende a usar inteligência artificial para aumentar vendas e clientes.',
+    nome: 'AI for local business',
+    descricao: 'Use artificial intelligence to grow sales and reach more customers.',
     aulas: [
-      { id: 'aula-1', titulo: 'Introdução à IA para Negócios', duracao: '12:30', descricao: 'Entende o básico de IA e como pode ajudar o teu negócio.', recursos: [{ nome: 'Guia Introdução', tipo: 'PDF', tamanho: '2.4 MB' }] },
-      { id: 'aula-2', titulo: 'ChatGPT para Atendimento', duracao: '18:45', descricao: 'Como usar ChatGPT para atender clientes automaticamente.', recursos: [{ nome: 'Prompts Atendimento', tipo: 'PDF', tamanho: '1.1 MB' }] },
-      { id: 'aula-3', titulo: 'Criação de Conteúdo com IA', duracao: '22:10', descricao: 'Gera textos, legendas e posts em segundos.', recursos: [] },
-      { id: 'aula-4', titulo: 'Análise de Dados Simples', duracao: '15:20', descricao: 'Usa IA para analisar métricas do teu negócio.', recursos: [{ nome: 'Template Análise', tipo: 'XLSX', tamanho: '0.5 MB' }] },
-      { id: 'aula-5', titulo: 'Automação de Redes Sociais', duracao: '25:00', descricao: 'Agenda posts automaticamente com IA.', recursos: [] },
-      { id: 'aula-6', titulo: 'E-mail Marketing Inteligente', duracao: '20:15', descricao: 'Cria campanhas de email que convertem.', recursos: [{ nome: 'Checklist Email', tipo: 'PDF', tamanho: '0.8 MB' }] },
+      { id: 'aula-1', titulo: 'Introduction to AI for business', duracao: '12:30', descricao: 'Learn AI basics and how it can help your business.', recursos: [{ nome: 'Intro guide', tipo: 'PDF', tamanho: '2.4 MB' }] },
+      { id: 'aula-2', titulo: 'ChatGPT for customer support', duracao: '18:45', descricao: 'Use ChatGPT to respond to customers automatically.', recursos: [{ nome: 'Support prompts', tipo: 'PDF', tamanho: '1.1 MB' }] },
+      { id: 'aula-3', titulo: 'Content creation with AI', duracao: '22:10', descricao: 'Generate copy, captions and posts in seconds.', recursos: [] },
+      { id: 'aula-4', titulo: 'Simple data analysis', duracao: '15:20', descricao: 'Use AI to read metrics from your business.', recursos: [{ nome: 'Analysis template', tipo: 'XLSX', tamanho: '0.5 MB' }] },
+      { id: 'aula-5', titulo: 'Social media automation', duracao: '25:00', descricao: 'Schedule posts automatically with AI.', recursos: [] },
+      { id: 'aula-6', titulo: 'Smart email marketing', duracao: '20:15', descricao: 'Build email campaigns that convert.', recursos: [{ nome: 'Email checklist', tipo: 'PDF', tamanho: '0.8 MB' }] },
     ]
   },
   'automacao': {
-    nome: 'Automação sem Código',
-    descricao: 'Automatiza tarefas repetitivas com Zapier e Make.',
+    nome: 'No-code automation',
+    descricao: 'Automate repetitive work with Zapier and Make.',
     aulas: [
-      { id: 'aula-1', titulo: 'Introdução à Automação', duracao: '10:00', descricao: 'O que é automação e por que precisas dela.', recursos: [{ nome: 'Guia Automação', tipo: 'PDF', tamanho: '1.5 MB' }] },
-      { id: 'aula-2', titulo: 'Primeiro Zap: Gmail + Spreadsheet', duracao: '28:30', descricao: 'Cria o teu primeiro fluxo automatizado.', recursos: [] },
-      { id: 'aula-3', titulo: 'Webhooks e Integrações', duracao: '24:00', descricao: 'Liga diferentes apps entre si.', recursos: [{ nome: 'Lista Webhooks', tipo: 'PDF', tamanho: '0.9 MB' }] },
-      { id: 'aula-4', titulo: 'Automatização de CRM', duracao: '18:20', descricao: 'Mantém o teu CRM atualizado automaticamente.', recursos: [] },
+      { id: 'aula-1', titulo: 'Introduction to automation', duracao: '10:00', descricao: 'What automation is and why it matters.', recursos: [{ nome: 'Automation guide', tipo: 'PDF', tamanho: '1.5 MB' }] },
+      { id: 'aula-2', titulo: 'First Zap: Gmail + spreadsheet', duracao: '28:30', descricao: 'Build your first automated workflow.', recursos: [] },
+      { id: 'aula-3', titulo: 'Webhooks and integrations', duracao: '24:00', descricao: 'Connect different apps together.', recursos: [{ nome: 'Webhook list', tipo: 'PDF', tamanho: '0.9 MB' }] },
+      { id: 'aula-4', titulo: 'CRM automation', duracao: '18:20', descricao: 'Keep your CRM updated automatically.', recursos: [] },
     ]
   },
   'comunicacao': {
-    nome: 'Comunicação Digital',
-    descricao: 'Cria conteúdo que vende e engaja.',
+    nome: 'Digital communication',
+    descricao: 'Create content that sells and engages.',
     aulas: [
-      { id: 'aula-1', titulo: 'Copywriting com IA', duracao: '15:00', descricao: 'Escreve textos que vendem usando inteligência artificial.', recursos: [{ nome: 'Biblioteca Prompts', tipo: 'PDF', tamanho: '2.1 MB' }] },
-      { id: 'aula-2', titulo: 'Conteúdo para Instagram', duracao: '20:45', descricao: 'Cria posts e stories que engajam.', recursos: [] },
-      { id: 'aula-3', titulo: 'Vídeos Curtos com IA', duracao: '25:30', descricao: 'Produz vídeos rápidos para redes sociais.', recursos: [] },
+      { id: 'aula-1', titulo: 'AI copywriting', duracao: '15:00', descricao: 'Write copy that converts using AI.', recursos: [{ nome: 'Prompt library', tipo: 'PDF', tamanho: '2.1 MB' }] },
+      { id: 'aula-2', titulo: 'Instagram content', duracao: '20:45', descricao: 'Create posts and stories that perform.', recursos: [] },
+      { id: 'aula-3', titulo: 'Short video with AI', duracao: '25:30', descricao: 'Produce quick videos for social.', recursos: [] },
     ]
   },
   'produtividade': {
-    nome: 'Produtividade com IA',
-    descricao: 'Organiza o teu dia com assistentes virtuais.',
+    nome: 'Productivity with AI',
+    descricao: 'Organise your day with virtual assistants.',
     aulas: [
-      { id: 'aula-1', titulo: 'Assistentes Pessoais de IA', duracao: '12:00', descricao: 'Como usar IA como teu assistente pessoal.', recursos: [] },
-      { id: 'aula-2', titulo: 'Gestão de Tempo Inteligente', duracao: '16:30', descricao: 'Organiza tua agenda com sugestões de IA.', recursos: [{ nome: 'Template Planning', tipo: 'PDF', tamanho: '1.2 MB' }] },
+      { id: 'aula-1', titulo: 'Personal AI assistants', duracao: '12:00', descricao: 'Use AI as your daily assistant.', recursos: [] },
+      { id: 'aula-2', titulo: 'Smart time management', duracao: '16:30', descricao: 'Plan your calendar with AI suggestions.', recursos: [{ nome: 'Planning template', tipo: 'PDF', tamanho: '1.2 MB' }] },
     ]
   }
 };
@@ -83,17 +83,17 @@ export default function AcademiaAula() {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   
-  // Obter IDs da URL
+  // Parse IDs from URL
   const aulaId = params?.id || '';
   const [trilhaId, aulaIndexStr] = aulaId.split('-aula-');
   const aulaIndex = aulaIndexStr ? parseInt(aulaIndexStr) - 1 : 0;
   
-  // Obter dados da trilha e aula
+  // Path and lesson data
   const trilha = trilhasData[trilhaId];
   const aulas = trilha?.aulas || [];
   const aula = aulas[aulaIndex];
 
-  // Carregar progresso
+  // Load progress
   useEffect(() => {
     async function loadProgresso() {
       if (user && trilhaId) {
@@ -112,7 +112,7 @@ export default function AcademiaAula() {
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${colors.orange}`, borderTopColor: 'transparent', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>A carregar...</p>
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
@@ -130,27 +130,26 @@ export default function AcademiaAula() {
     return null;
   }
 
-  // Se não encontrou a trilha/aula
   if (!trilha || !aula) {
     return (
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat, sans-serif' }}>
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: colors.dark, marginBottom: 16 }}>Aula não encontrada</h1>
-          <Link href="/academia/trilhas" style={{ color: colors.orange, fontWeight: 600 }}>Voltar às trilhas</Link>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: colors.dark, marginBottom: 16 }}>Lesson not found</h1>
+          <Link href="/academia/trilhas" style={{ color: colors.orange, fontWeight: 600 }}>Back to learning paths</Link>
         </div>
       </div>
     );
   }
 
-  // Verificar se a aula está concluída
+  // Lesson completion state
   const aulaProgresso = progressos.find(p => p.aula_id === aula.id);
   const concluida = aulaProgresso?.concluida || false;
 
-  // Calcular progresso da trilha
+  // Path progress
   const aulasConcluidas = progressos.filter(p => p.concluida).length;
   const progressoTotal = Math.round((aulasConcluidas / aulas.length) * 100);
 
-  // Marcar como concluída
+  // Mark complete
   const handleMarcarConcluida = async () => {
     if (!user || concluida) return;
     
@@ -166,23 +165,22 @@ export default function AcademiaAula() {
         Math.round(((aulasConcluidas + 1) / aulas.length) * 100)
       );
       
-      // Recarregar progresso
+      // Reload progress
       const prog = await getProgressoTrilha(user.id, trilhaId);
       setProgressos(prog);
     } catch (error) {
-      console.error('Erro ao guardar progresso:', error);
+      console.error('Error saving progress:', error);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Aula anterior e próxima
+  // Prev / next lesson
   const aulaAnterior = aulaIndex > 0 ? aulas[aulaIndex - 1] : null;
   const aulaProxima = aulaIndex < aulas.length - 1 ? aulas[aulaIndex + 1] : null;
 
-  // Recursos
   const recursosAula = aula.recursos || [
-    { nome: 'Guia da Aula', tipo: 'PDF', tamanho: '1.5 MB' },
+    { nome: 'Lesson guide', tipo: 'PDF', tamanho: '1.5 MB' },
     { nome: 'Checklist', tipo: 'PDF', tamanho: '0.8 MB' }
   ];
 
@@ -196,24 +194,24 @@ export default function AcademiaAula() {
               <div style={{ width: 40, height: 40, borderRadius: 10, background: `linear-gradient(135deg, ${colors.orange} 0%, ${colors.magenta} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 700, color: colors.dark }}>Academia <span style={{ color: colors.orange }}>Bora Lá</span></span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: colors.dark }}>Bora Lá <span style={{ color: colors.orange }}>Academy</span></span>
             </div>
           </Link>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
             <Link href={`/academia/trilha/${trilhaId}`} style={{ color: '#666', textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>
-              ← Voltar à trilha
+              ← Back to path
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Barra de progresso */}
+      {/* Progress bar */}
       <div style={{ background: '#fff', borderBottom: '1px solid #eee', padding: '12px 32px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: colors.orange }}>{trilha.nome}</span>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>{progressoTotal}% concluído</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>{progressoTotal}% complete</span>
           </div>
           <div style={{ height: 4, background: '#eee', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${progressoTotal}%`, background: colors.orange, borderRadius: 2 }} />
@@ -224,7 +222,7 @@ export default function AcademiaAula() {
       <main style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: 40 }}>
           
-          {/* Coluna esquerda: Vídeo + Conteúdo */}
+          {/* Main column: video + content */}
           <div>
             {/* Video Player (placeholder) */}
             <div style={{
@@ -262,15 +260,15 @@ export default function AcademiaAula() {
               </div>
             </div>
 
-            {/* Título e descrição */}
+            {/* Title and description */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <span style={{ background: colors.orange, color: '#fff', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
-                  Aula {aulaIndex + 1} de {aulas.length}
+                  Lesson {aulaIndex + 1} of {aulas.length}
                 </span>
                 {concluida && (
                   <span style={{ background: '#10B981', color: '#fff', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Check size={14} /> Concluída
+                    <Check size={14} /> Done
                   </span>
                 )}
               </div>
@@ -282,11 +280,11 @@ export default function AcademiaAula() {
               </p>
             </div>
 
-            {/* Recursos */}
+            {/* Resources */}
             {recursosAula.length > 0 && (
               <div style={{ marginBottom: 32 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.dark, marginBottom: 16 }}>
-                  Material de Apoio
+                  Downloads
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   {recursosAula.map((recurso, i) => (
@@ -313,12 +311,12 @@ export default function AcademiaAula() {
               </div>
             )}
 
-            {/* Botões de navegação */}
+            {/* Navigation */}
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
               {aulaAnterior ? (
                 <Link href={`/academia/aula/${trilhaId}-aula-${aulaIndex}`} style={{ textDecoration: 'none', flex: 1 }}>
                   <button style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 24px', background: '#fff', border: '1px solid #ddd', borderRadius: 12, color: '#666', fontWeight: 600, fontSize: 14, cursor: 'pointer', width: '100%', justifyContent: 'center' }}>
-                    <ChevronLeft size={18} /> Aula Anterior
+                    <ChevronLeft size={18} /> Previous lesson
                   </button>
                 </Link>
               ) : <div style={{ flex: 1 }} />}
@@ -329,29 +327,29 @@ export default function AcademiaAula() {
                   disabled={isSaving}
                   style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 24px', background: concluida ? '#10B981' : colors.orange, border: 'none', borderRadius: 12, color: '#fff', fontWeight: 700, fontSize: 14, cursor: concluida ? 'default' : 'pointer', opacity: isSaving ? 0.7 : 1 }}
                 >
-                  {isSaving ? 'A guardar...' : concluida ? '✓ Concluída' : 'Marcar como Concluída'}
+                  {isSaving ? 'Saving…' : concluida ? '✓ Done' : 'Mark as complete'}
                 </button>
               ) : aulaProxima ? (
                 <Link href={`/academia/aula/${trilhaId}-aula-${aulaIndex + 2}`} style={{ textDecoration: 'none', flex: 1 }}>
                   <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 24px', background: colors.orange, border: 'none', borderRadius: 12, color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                    Próxima Aula <ChevronRight size={18} />
+                    Next lesson <ChevronRight size={18} />
                   </button>
                 </Link>
               ) : (
                 <Link href={`/academia/quiz/${trilhaId}`} style={{ textDecoration: 'none', flex: 1 }}>
                   <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 24px', background: '#10B981', border: 'none', borderRadius: 12, color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                    Fazer Quiz 🎯
+                    Take quiz 🎯
                   </button>
                 </Link>
               )}
             </div>
           </div>
 
-          {/* Coluna direita: Lista de aulas */}
+          {/* Sidebar: lesson list */}
           <div>
             <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1px solid #eee', position: 'sticky', top: 100 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: colors.dark, marginBottom: 16 }}>
-                Conteúdo da Trilha
+                Path outline
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

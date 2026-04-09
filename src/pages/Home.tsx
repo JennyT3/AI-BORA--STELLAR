@@ -21,13 +21,13 @@ export function Home() {
           <div style={{ maxWidth: 560, margin: "0 auto" }}>
             <div style={{ width: 36, height: 3, backgroundColor: "#F25C05", margin: "0 auto 16px", borderRadius: 2 }} />
             <h2 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(20px, 3.5vw, 30px)", color: "#1A1A1A", margin: "0 0 12px" }}>
-              O que precisas para o teu negocio?
+              What does your business need?
             </h2>
             <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: "#4A4A4A", margin: "0 0 28px", lineHeight: 1.5 }}>
-              Escolhe os servicos, monta o teu pacote e pede orcamento sem compromisso.
+              Choose services, build your package, and request a quote with no obligation.
             </p>
             <a href="/servicos#simulador" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#F22283", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(242,34,131,0.3)" }}>
-              Ver servicos
+              View services
             </a>
             <a href="/academia/login" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#ff6f2e", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(255,111,46,0.3)", marginLeft: 12 }}>
               Bora Lá →

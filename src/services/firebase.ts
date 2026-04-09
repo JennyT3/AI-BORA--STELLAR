@@ -21,7 +21,7 @@ const auth = getAuth(app);
 export { db, auth };
 
 // ============================================
-// UTILITÁRIOS
+// UTILITIES
 // ============================================
 
 export function generateId(): string {
@@ -33,11 +33,11 @@ export function generateId(): string {
   return id;
 }
 
-// Alias para backward compatibility
+// Alias for backward compatibility
 export const generateProposalId = generateId;
 
 // ============================================
-// RE-EXPORT DOS MÓDULOS (BACKWARD COMPATIBILITY)
+// RE-EXPORT MODULES (BACKWARD COMPATIBILITY)
 // ============================================
 
 export * from './proposals';
@@ -53,7 +53,7 @@ import { listVendedoresAtivos, delegarClienteAVendedor } from './vendedores';
 export { listVendedoresAtivos, delegarClienteAVendedor };
 
 // ============================================
-// EMAILS E LOGS (ainda em firebase.ts por dependências)
+// EMAIL LOGS (still in firebase.ts due to dependencies)
 // ============================================
 
 import { collection, setDoc } from 'firebase/firestore';

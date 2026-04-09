@@ -45,7 +45,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
             zIndex: 20
           }}
         >
-          <Download size={18} /> Exportar BD Completa
+          <Download size={18} /> Export full database
         </button>
       </div>
 
@@ -57,7 +57,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
         marginBottom: 40 
       }}>
         <NewStatsCard 
-          label="Propostas" 
+          label="Proposals" 
           value={stats.total.toLocaleString()} 
           percentage={12.5}
           percentageColor="green"
@@ -66,7 +66,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           iconBg="rgba(242, 92, 5, 0.05)"
         />
         <NewStatsCard 
-          label="Respondidas" 
+          label="Answered" 
           value={stats.respondidas.toLocaleString()} 
           percentage={8.2}
           percentageColor="green"
@@ -75,7 +75,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           iconBg="rgba(52, 152, 219, 0.05)"
         />
         <NewStatsCard 
-          label="Aceites" 
+          label="Accepted" 
           value={stats.aceitas.toLocaleString()} 
           percentage={-2.1}
           percentageColor="orange"
@@ -84,7 +84,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           iconBg="rgba(16, 185, 129, 0.05)"
         />
         <NewStatsCard 
-          label="Clientes" 
+          label="Clients" 
           value={clientesAtivos.toLocaleString()} 
           percentage={14.2}
           percentageColor="green"
@@ -94,7 +94,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
         />
       </div>
 
-      {/* Quick Actions - Conectados y Funcionales */}
+      {/* Quick actions */}
       <div style={{ 
         display: "grid", 
         gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", 
@@ -108,7 +108,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Plus size={16} strokeWidth={3} /></div>
-          Novo Orçamento
+          New quote
         </button>
         <button 
           onClick={onNovoCliente} 
@@ -117,7 +117,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Users size={16} /></div>
-          Novo Cliente
+          New client
         </button>
         <button 
           onClick={onNovaFatura} 
@@ -126,7 +126,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1b1c1b", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><DollarSign size={16} /></div>
-          Nova Fatura
+          New invoice
         </button>
         <button 
           onClick={() => onNavigate("faturacao")} 
@@ -135,7 +135,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "#1b1c1b" }}><Target size={16} /></div>
-          Faturação
+          Invoicing
         </button>
       </div>
 
@@ -187,11 +187,11 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
 
       {/* Lists Grid */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 32 }}>
-        {/* Recent Requests - Conectado a Solicitacoes */}
+        {/* Recent requests */}
         <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Solicitações Recentes</h3>
-            <button onClick={() => onNavigate("solicitacoes")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>Ver tudo</button>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Recent enquiries</h3>
+            <button onClick={() => onNavigate("solicitacoes")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>View all</button>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
             {solicitudes.slice(0, 3).map(s => (
@@ -219,11 +219,11 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
           </div>
         </div>
 
-        {/* Recent Proposals - Conectado a Propostas */}
+        {/* Recent proposals */}
         <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Propostas Recentes</h3>
-            <button onClick={() => onNavigate("propostas")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>Ver tudo</button>
+            <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Recent proposals</h3>
+            <button onClick={() => onNavigate("propostas")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>View all</button>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
             {proposals.slice(0, 3).map(p => {

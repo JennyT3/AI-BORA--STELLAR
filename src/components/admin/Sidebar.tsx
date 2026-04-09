@@ -37,14 +37,14 @@ export function Sidebar({
   onCloseMobile,
 }: SidebarProps) {
   const navItems = [
-    { id: 'dashboard', label: 'Painel Principal', icon: LayoutDashboard },
-    { id: 'solicitacoes', label: 'Solicitações', icon: FileText },
-    { id: 'clientes', label: 'CRM Clientes', icon: Users, count: clienteCount },
-    { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
-    { id: 'vendedores', label: 'Vendedores', icon: Users },
-    { id: 'delegacoes', label: 'Delegações', icon: ArrowRightLeft },
-    { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
-    { id: 'faturacao', label: 'Faturação', icon: DollarSign },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'solicitacoes', label: 'Requests', icon: FileText },
+    { id: 'clientes', label: 'CRM — clients', icon: Users, count: clienteCount },
+    { id: 'propostas', label: 'Proposals', icon: FileText, count: proposalCount },
+    { id: 'vendedores', label: 'Sales team', icon: Users },
+    { id: 'delegacoes', label: 'Delegations', icon: ArrowRightLeft },
+    { id: 'tarefas', label: 'Tasks', icon: CheckSquare },
+    { id: 'faturacao', label: 'Billing', icon: DollarSign },
     { id: 'marketing', label: 'Marketing', icon: Megaphone },
   ];
 
@@ -177,7 +177,7 @@ export function Sidebar({
                 }}
               >
                 <Plus size={18} strokeWidth={3} />
-                Criar Novo
+                Create new
               </button>
             </div>
           )}
@@ -202,7 +202,7 @@ export function Sidebar({
             }}
           >
             <Settings size={18} />
-            {!collapsed && <span>Definições</span>}
+            {!collapsed && <span>Settings</span>}
           </button>
 
           <button 
@@ -223,7 +223,7 @@ export function Sidebar({
             }}
           >
             <LogOut size={18} />
-            {!collapsed && <span>Sair</span>}
+            {!collapsed && <span>Sign out</span>}
           </button>
         </div>
       </aside>

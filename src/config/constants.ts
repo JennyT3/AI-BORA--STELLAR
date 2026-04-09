@@ -10,11 +10,11 @@ export const REDES = [
 ];
 
 export const SERVICOS_POR_CATEGORIA: Record<string, string[]> = {
-  "Marketing": ["Gestão de Redes Sociais", "Criação de Conteúdo", "Community Management", "Email Marketing"],
-  "Design": ["Design de Posts", "Logotipo", "Identidade Corporativa", "Banners e Posters"],
-  "Web": ["Landing Page", "Site Catálogo", "Loja Online", "SEO Local"],
-  "Multimédia": ["Fotografia Profissional", "Produção de Videos", "Criação de Reels", "Edição de Conteúdo"],
-  "Publicidade": ["Facebook Ads", "Instagram Ads", "Gestão de Budget"],
-  "Automação": ["Chatbot WhatsApp", "IA e Automação", "Respostas Automáticas", "Fluxos de CRM"],
-  "Consultoria": ["Consultoria Estratégica", "Análise de Concorrentes", "Dashboard Excel", "Plano de Marketing"],
+  "Marketing": ["Social media management", "Content creation", "Community management", "Email marketing"],
+  "Design": ["Post design", "Logo", "Brand identity", "Banners and posters"],
+  "Web": ["Landing page", "Catalog website", "Online store", "Local SEO"],
+  "Multimédia": ["Professional photography", "Video production", "Reels creation", "Content editing"],
+  "Publicidade": ["Facebook Ads", "Instagram Ads", "Ad budget management"],
+  "Automação": ["WhatsApp chatbot", "AI and automation", "Auto-replies", "CRM flows"],
+  "Consultoria": ["Strategy consulting", "Competitor analysis", "Excel dashboards", "Marketing plan"],
 };

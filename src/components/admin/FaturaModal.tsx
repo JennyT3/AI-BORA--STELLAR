@@ -31,7 +31,7 @@ export function FaturaModal(props: FaturaModalProps) {
   const [editMode, setEditMode] = useState(false);
   const [previewData, setPreviewData] = useState<FaturaPreviewData>({
     numeroFatura,
-    dataEmissao: new Date().toLocaleDateString('pt-PT'),
+    dataEmissao: new Date().toLocaleDateString('en-GB'),
     cliente: '',
     empresa: '',
     email: '',
@@ -52,8 +52,8 @@ export function FaturaModal(props: FaturaModalProps) {
 
     setPreviewData({
       numeroFatura,
-      dataEmissao: new Date().toLocaleDateString('pt-PT'),
-      cliente: cliente.nome || cliente.cliente || 'Cliente',
+      dataEmissao: new Date().toLocaleDateString('en-GB'),
+      cliente: cliente.nome || cliente.cliente || 'Client',
       empresa: cliente.empresa || '',
       email: cliente.email || '',
       telefone: cliente.telemovel || cliente.telefone || '',
@@ -61,7 +61,7 @@ export function FaturaModal(props: FaturaModalProps) {
       morada: cliente.morada || '',
       servicos: Array.isArray(cliente.servicos) ? cliente.servicos : 
                 (cliente.servicos ? [cliente.servicos] : 
-                (cliente.propostaServicos || ['Serviço AI BORA'])),
+                (cliente.propostaServicos || ['AI BORA services'])),
       subtotal,
       iva,
       total,
@@ -75,11 +75,11 @@ export function FaturaModal(props: FaturaModalProps) {
         tipo: 'cliente',
       });
       doc.save(`Fatura-${previewData.numeroFatura}.pdf`);
-      alert('Fatura gerada com sucesso!');
+      alert('Invoice PDF generated successfully.');
       onConfirm();
     } catch (error) {
-      console.error('Erro ao gerar fatura:', error);
-      alert('Erro ao gerar a fatura. Por favor, tente novamente.');
+      console.error('Failed to generate invoice:', error);
+      alert('Could not generate the invoice. Please try again.');
     }
   };
 
@@ -102,7 +102,7 @@ export function FaturaModal(props: FaturaModalProps) {
         <div style={{ backgroundColor: "#fff", borderRadius: 16, maxWidth: 800, width: "100%", maxHeight: '90vh', overflow: 'auto' }}>
           {/* Preview Header */}
           <div style={{ padding: 24, borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 10 }}>
-            <h3 style={{ fontSize: 20, fontWeight: 900, color: "#1b1c1b", fontFamily: 'Montserrat, sans-serif' }}>Pré-visualização da Fatura</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: "#1b1c1b", fontFamily: 'Montserrat, sans-serif' }}>Invoice preview</h3>
             <button onClick={() => setShowPreview(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8 }}>
               <X size={24} color="#666" />
             </button>
@@ -113,17 +113,17 @@ export function FaturaModal(props: FaturaModalProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 30 }}>
               <div>
                 <div style={{ fontSize: 24, fontWeight: 900, color: '#1b1c1b' }}>AI <span style={{ color: '#F25C05' }}>BORA</span></div>
-                <div style={{ fontSize: 10, color: '#8e7165' }}>Marketing Digital & Criativo</div>
+                <div style={{ fontSize: 10, color: '#8e7165' }}>Digital & creative marketing</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: 16, fontWeight: 800, color: '#1b1c1b' }}>{previewData.numeroFatura}</div>
-                <div style={{ fontSize: 12, color: '#666' }}>Data: {previewData.dataEmissao}</div>
+                <div style={{ fontSize: 12, color: '#666' }}>Date: {previewData.dataEmissao}</div>
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 40, marginBottom: 30 }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>EMITIDO POR</div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>ISSUED BY</div>
                 <div style={{ fontSize: 12, color: '#666' }}>
                   <div style={{ fontWeight: 700, color: '#1b1c1b' }}>AI BORA, Lda</div>
                   <div>NIF: 319918645</div>
@@ -132,7 +132,7 @@ export function FaturaModal(props: FaturaModalProps) {
                 </div>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>DADOS DO CLIENTE</div>
+                <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>BILL TO</div>
                 <div style={{ fontSize: 12, color: '#666' }}>
                   <div style={{ fontWeight: 700, color: '#1b1c1b' }}>{previewData.cliente}</div>
                   {previewData.empresa && <div>{previewData.empresa}</div>}
@@ -145,13 +145,13 @@ export function FaturaModal(props: FaturaModalProps) {
             </div>
 
             <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>DESCRIÇÃO DOS SERVIÇOS</div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: '#F25C05', marginBottom: 8 }}>SERVICES</div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#1b1c1b', color: '#fff' }}>
                     <th style={{ padding: '10px 12px', fontSize: 10, textAlign: 'left' }}>#</th>
-                    <th style={{ padding: '10px 12px', fontSize: 10, textAlign: 'left' }}>Descrição</th>
-                    <th style={{ padding: '10px 12px', fontSize: 10, textAlign: 'right' }}>Valor</th>
+                    <th style={{ padding: '10px 12px', fontSize: 10, textAlign: 'left' }}>Description</th>
+                    <th style={{ padding: '10px 12px', fontSize: 10, textAlign: 'right' }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -170,14 +170,14 @@ export function FaturaModal(props: FaturaModalProps) {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 30 }}>
               <div style={{ backgroundColor: '#F25C05', padding: '20px 30px', borderRadius: 12, color: '#fff', textAlign: 'right' }}>
-                <div style={{ fontSize: 10, fontWeight: 600 }}>TOTAL A PAGAR (c/ IVA 23%)</div>
+                <div style={{ fontSize: 10, fontWeight: 600 }}>TOTAL DUE (incl. 23% VAT)</div>
                 <div style={{ fontSize: 24, fontWeight: 900 }}>{previewData.total.toFixed(2)} €</div>
               </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#666', borderTop: '1px solid #e5e7eb', paddingTop: 20 }}>
               <div>IBAN: PT50 0000 0000 0000 0000 0000 0</div>
-              <div>Pagamento por transferência bancária até 5 dias úteis</div>
+              <div>Payment by bank transfer within 5 business days</div>
             </div>
           </div>
 
@@ -187,7 +187,7 @@ export function FaturaModal(props: FaturaModalProps) {
               onClick={() => setShowPreview(false)} 
               style={{ padding: "12px 24px", borderRadius: 12, backgroundColor: "#f3f4f6", color: "#4b5563", border: "none", fontWeight: 700, cursor: "pointer" }}
             >
-              Editar Dados
+              Edit details
             </button>
             <button 
               onClick={handleGerarPDF} 
@@ -204,12 +204,12 @@ export function FaturaModal(props: FaturaModalProps) {
   return (
     <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
       <div style={{ backgroundColor: "#fff", borderRadius: 16, padding: 24, maxWidth: 450, width: "90%", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-        <h3 style={{ fontSize: 20, fontWeight: 900, color: "#1b1c1b", marginBottom: 20, fontFamily: 'Montserrat, sans-serif' }}>Gerar Fatura</h3>
+        <h3 style={{ fontSize: 20, fontWeight: 900, color: "#1b1c1b", marginBottom: 20, fontFamily: 'Montserrat, sans-serif' }}>Generate invoice</h3>
         
         {editMode ? (
           <>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>NÚMERO</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>NUMBER</label>
               <input 
                 type="text" 
                 value={previewData.numeroFatura} 
@@ -221,7 +221,7 @@ export function FaturaModal(props: FaturaModalProps) {
               />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>CLIENTE</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>CLIENT</label>
               <input 
                 type="text" 
                 value={previewData.cliente} 
@@ -240,7 +240,7 @@ export function FaturaModal(props: FaturaModalProps) {
                 />
               </div>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>VALOR (€)</label>
+                <label style={{ fontSize: 11, fontWeight: 800, color: "#8e7165", display: "block", marginBottom: 6 }}>AMOUNT (€)</label>
                 <input 
                   type="number" 
                   value={previewData.subtotal} 
@@ -252,11 +252,11 @@ export function FaturaModal(props: FaturaModalProps) {
           </>
         ) : (
           <div style={{ backgroundColor: "#fcf9f7", borderRadius: 12, padding: 16, marginBottom: 20, border: '1px solid #f3f4f6' }}>
-            <div style={{ fontSize: 13, color: "#1b1c1b", marginBottom: 8 }}>Cliente: <strong>{previewData.cliente}</strong></div>
+            <div style={{ fontSize: 13, color: "#1b1c1b", marginBottom: 8 }}>Client: <strong>{previewData.cliente}</strong></div>
             <div style={{ fontSize: 13, color: "#1b1c1b", marginBottom: 4 }}>NIF: <strong>{previewData.nif || '—'}</strong></div>
-            <div style={{ fontSize: 13, color: "#1b1c1b", marginBottom: 4 }}>Valor Base: <strong>{previewData.subtotal.toFixed(2)} €</strong></div>
-            <div style={{ fontSize: 13, color: "#8e7165", marginBottom: 8 }}>IVA (23%): <strong>{previewData.iva.toFixed(2)} €</strong></div>
-            <div style={{ fontSize: 15, color: "#F25C05", borderTop: '1px solid #e5e7eb', paddingTop: 8, fontWeight: 900 }}>Total com IVA: <strong>{previewData.total.toFixed(2)} €</strong></div>
+            <div style={{ fontSize: 13, color: "#1b1c1b", marginBottom: 4 }}>Subtotal: <strong>{previewData.subtotal.toFixed(2)} €</strong></div>
+            <div style={{ fontSize: 13, color: "#8e7165", marginBottom: 8 }}>VAT (23%): <strong>{previewData.iva.toFixed(2)} €</strong></div>
+            <div style={{ fontSize: 15, color: "#F25C05", borderTop: '1px solid #e5e7eb', paddingTop: 8, fontWeight: 900 }}>Total (incl. VAT): <strong>{previewData.total.toFixed(2)} €</strong></div>
           </div>
         )}
 
@@ -266,7 +266,7 @@ export function FaturaModal(props: FaturaModalProps) {
               onClick={() => setShowPreview(true)} 
               style={{ flex: 1, padding: "14px", borderRadius: 12, backgroundColor: "#3498DB", color: "#fff", border: "none", fontWeight: 700, cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
-              <Eye size={18} /> Pré-visualizar
+              <Eye size={18} /> Preview
             </button>
             <button 
               onClick={() => setEditMode(!editMode)} 
@@ -280,13 +280,13 @@ export function FaturaModal(props: FaturaModalProps) {
               onClick={handleGerarPDF} 
               style={{ flex: 1, padding: "14px", borderRadius: 12, backgroundColor: "#F25C05", color: "#fff", border: "none", fontWeight: 700, cursor: "pointer", boxShadow: '0 4px 12px rgba(242, 92, 5, 0.2)' }}
             >
-              <Download size={18} style={{ display: 'inline', marginRight: 8 }} /> Gerar PDF
+              <Download size={18} style={{ display: 'inline', marginRight: 8 }} /> Generate PDF
             </button>
             <button 
               onClick={onClose} 
               style={{ flex: 1, padding: "14px", borderRadius: 12, backgroundColor: "#f3f4f6", color: "#4b5563", border: "none", fontWeight: 700, cursor: "pointer" }}
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>

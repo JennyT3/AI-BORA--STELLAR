@@ -36,27 +36,27 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
       const data = await listVendedores();
       setVendedores(data);
     } catch (err) {
-      console.error("Erro ao carregar vendedores:", err);
+      console.error("Error loading sales reps:", err);
     }
     setLoading(false);
   };
 
   const handleSave = async () => {
     if (!formData.nome || !formData.email) {
-      alert("Por favor, preencha o nome e email.");
+      alert("Please enter name and email.");
       return;
     }
 
     setIsSaving(true);
     try {
       if (editingVendedor) {
-        // Se está editando e mudando status para ativo, enviar email de acesso
+        // When editing and activating, send access email
         const wasActive = editingVendedor.ativo;
         const isNowActive = formData.ativo;
         
         await updateVendedor(editingVendedor.id, formData);
         
-        // Se estava inativo e agora está ativo, enviar email de acesso
+        // Was inactive and is now active — send access email
         if (!wasActive && isNowActive) {
           await enviarAcessoColaborador({
             vendedorNome: formData.nome,
@@ -67,7 +67,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
       } else {
         // Criar novo vendedor usando authService para garantir que tem password
         if (!formData.password) {
-          alert("Por favor, defina uma password para o novo vendedor.");
+          alert("Please set a password for the new sales rep.");
           setIsSaving(false);
           return;
         }
@@ -80,7 +80,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
         });
 
         if (!authResult.success) {
-          alert(`Erro ao criar conta: ${authResult.error}`);
+          alert(`Could not create account: ${authResult.error}`);
           setIsSaving(false);
           return;
         }
@@ -97,14 +97,14 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
       setEditingVendedor(null);
       setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true, password: "" });
     } catch (err) {
-      alert("Ocorreu um erro ao guardar os dados.");
+      alert("Could not save changes.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Tem a certeza que deseja eliminar este vendedor?")) {
+    if (window.confirm("Are you sure you want to remove this sales rep?")) {
       await deleteVendedor(id);
       loadVendedores();
     }
@@ -124,21 +124,21 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
             Enterprise CRM
           </span>
           <h1 style={{ fontSize: isMobile ? 32 : 48, fontWeight: 900, color: '#1b1c1b', letterSpacing: '-1.5px', lineHeight: 1 }}>
-            Gestão de Vendedores
+            Sales team
           </h1>
           <p style={{ color: '#5a4137', marginTop: 12, maxWidth: 500, fontSize: 15, lineHeight: 1.6 }}>
-            Otimize a sua força de vendas com métricas em tempo real e monitorização de performance individual.
+            Optimise your sales organisation with live metrics and individual performance tracking.
           </p>
         </div>
         <div style={{ display: "flex", gap: 12, width: isMobile ? "100%" : "auto" }}>
           <button style={{ flex: 1, padding: "14px 24px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", fontWeight: 700, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-            <Download size={18} /> Exportar
+            <Download size={18} /> Export
           </button>
           <button 
             onClick={() => { setShowForm(true); setEditingVendedor(null); setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true, password: "" }); }}
             style={{ flex: 1, padding: "14px 24px", borderRadius: 16, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#fff", border: "none", fontWeight: 800, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: '0 10px 25px rgba(242,92,5,0.2)' }}
           >
-            <UserPlus size={18} strokeWidth={3} /> Novo Vendedor
+            <UserPlus size={18} strokeWidth={3} /> New sales rep
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
         <div style={{ gridColumn: isMobile ? "span 1" : "span 7", backgroundColor: "#fff", borderRadius: 20, padding: "4px 16px", display: "flex", alignItems: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.02)" }}>
           <Search size={18} color="#8e7165" />
           <input 
-            placeholder="Procurar por nome, e-mail ou região..." 
+            placeholder="Search by name or email..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: "100%", border: "none", padding: "14px", fontSize: 14, fontWeight: 500, outline: "none", color: "#1b1c1b" }} 
@@ -157,17 +157,17 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
         <div style={{ gridColumn: isMobile ? "span 1" : "span 2", backgroundColor: "#fff", borderRadius: 20, padding: "4px 16px", display: "flex", alignItems: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.02)" }}>
           <Filter size={18} color="#8e7165" />
           <select style={{ width: "100%", border: "none", padding: "14px", fontSize: 13, fontWeight: 700, outline: "none", color: "#5a4137", background: "transparent" }}>
-            <option>Status: Todos</option>
-            <option>Ativos</option>
-            <option>Inativos</option>
+            <option>Status: All</option>
+            <option>Active</option>
+            <option>Inactive</option>
           </select>
         </div>
         <div style={{ gridColumn: isMobile ? "span 1" : "span 3", backgroundColor: "#fff", borderRadius: 20, padding: "4px 16px", display: "flex", alignItems: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.02)", border: "1px solid rgba(0,0,0,0.02)" }}>
           <Calendar size={18} color="#8e7165" />
           <select style={{ width: "100%", border: "none", padding: "14px", fontSize: 13, fontWeight: 700, outline: "none", color: "#5a4137", background: "transparent" }}>
-            <option>Este Mês</option>
-            <option>Último Trimestre</option>
-            <option>Ano Inteiro</option>
+            <option>This month</option>
+            <option>Last quarter</option>
+            <option>Full year</option>
           </select>
         </div>
       </div>
@@ -176,41 +176,41 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
       {showForm && (
         <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, border: "1px solid rgba(242, 92, 5, 0.1)", marginBottom: 32, boxShadow: "0 20px 40px rgba(242, 92, 5, 0.05)" }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1b1c1b' }}>{editingVendedor ? "Editar Vendedor" : "Registar Novo Vendedor"}</h3>
+            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1b1c1b' }}>{editingVendedor ? "Edit sales rep" : "Add sales rep"}</h3>
             <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', color: '#8e7165' }}><X size={24} /></button>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: 20 }}>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Nome Completo *</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Full name *</label>
               <input value={formData.nome} onChange={(e) => setFormData({...formData, nome: e.target.value})} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>E-mail Profissional *</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Work email *</label>
               <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Telemóvel</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Phone</label>
               <input value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: e.target.value})} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Comissão (%)</label>
+              <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Commission (%)</label>
               <input type="number" value={formData.comissaoPercent} onChange={(e) => setFormData({...formData, comissaoPercent: parseInt(e.target.value)})} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: isMobile ? 0 : 24 }}>
               <input type="checkbox" checked={formData.ativo} onChange={(e) => setFormData({...formData, ativo: e.target.checked})} style={{ width: 20, height: 20, accentColor: '#F25C05' }} />
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#1b1c1b' }}>Vendedor Ativo</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#1b1c1b' }}>Active</span>
             </div>
             {!editingVendedor && (
               <div>
-                <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Password Inicial *</label>
-                <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="Mínimo 6 caracteres" style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
+                <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Initial password *</label>
+                <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="At least 6 characters" style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
               </div>
             )}
             <div style={{ gridColumn: isMobile ? "span 1" : "span 3", padding: isMobile ? "12px 0" : "12px 0", marginTop: 8 }}>
               <p style={{ fontSize: 12, color: '#8e7165', fontStyle: 'italic' }}>
                 {editingVendedor 
-                  ? "Para alterar a password de um vendedor existente, ele deve usar a opção 'Esqueci a password' no login." 
-                  : "Defina uma password inicial para o vendedor. Ele poderá alterá-la mais tarde."}
+                  ? "To change an existing rep's password, they should use Forgot password on the sign-in page." 
+                  : "Set an initial password; they can change it later."}
               </p>
             </div>
           </div>
@@ -220,9 +220,9 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
               disabled={isSaving}
               style={{ padding: "16px 32px", borderRadius: 16, backgroundColor: isSaving ? "#ccc" : "#F25C05", color: "#fff", border: "none", fontWeight: 800, cursor: isSaving ? "not-allowed" : "pointer", boxShadow: '0 8px 20px rgba(242, 92, 5, 0.2)' }}
             >
-              {isSaving ? "A guardar..." : "Guardar Vendedor"}
+              {isSaving ? "Saving..." : "Save sales rep"}
             </button>
-            <button onClick={() => { setShowForm(false); setEditingVendedor(null); }} style={{ padding: "16px 32px", borderRadius: 16, backgroundColor: "#f6f3f1", color: "#5a4137", border: "none", fontWeight: 700, cursor: "pointer" }}>Cancelar</button>
+            <button onClick={() => { setShowForm(false); setEditingVendedor(null); }} style={{ padding: "16px 32px", borderRadius: 16, backgroundColor: "#f6f3f1", color: "#5a4137", border: "none", fontWeight: 700, cursor: "pointer" }}>Cancel</button>
           </div>
         </div>
       )}
@@ -249,7 +249,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: isMobile ? 16 : 40, width: isMobile ? "100%" : "auto", minWidth: isMobile ? "100%" : 400 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Comissão</span>
+                <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Commission</span>
                 <span style={{ fontSize: 16, fontWeight: 800, color: '#1b1c1b' }}>{v.comissaoPercent}%</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -258,7 +258,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Status</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: v.ativo ? "#10B981" : "#ba1a1a" }}>{v.ativo ? "ATIVO" : "INATIVO"}</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: v.ativo ? "#10B981" : "#ba1a1a" }}>{v.ativo ? "ACTIVE" : "INACTIVE"}</span>
               </div>
             </div>
 
@@ -267,7 +267,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
                 onClick={(e) => { e.stopPropagation(); window.open(`/vendas?v=${v.id}&admin=true`, '_blank'); }} 
                 style={{ flex: 1, padding: "12px 20px", borderRadius: 12, backgroundColor: "#1b1c1b", color: "#fff", border: "none", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: 'all 0.2s' }}
               >
-                Aceder Painel
+                Open dashboard
               </button>
                 <button 
                   onClick={() => { 
@@ -300,8 +300,8 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
         {filteredVendedores.length === 0 && !loading && (
           <div style={{ textAlign: "center", padding: 80, backgroundColor: "#fff", borderRadius: 24, border: "1px solid rgba(0,0,0,0.02)" }}>
             <Users size={48} color="#f0edeb" style={{ marginBottom: 16 }} />
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: "#1b1c1b", marginBottom: 8 }}>Nenhum vendedor encontrado</h3>
-            <p style={{ color: "#8e7165", fontSize: 14 }}>Tente ajustar a sua pesquisa o crie um novo vendedor.</p>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: "#1b1c1b", marginBottom: 8 }}>No sales reps found</h3>
+            <p style={{ color: "#8e7165", fontSize: 14 }}>Try adjusting your search or add a new sales rep.</p>
           </div>
         )}
       </div>

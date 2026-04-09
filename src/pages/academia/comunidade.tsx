@@ -15,7 +15,7 @@ const colors = {
 export default function Comunidade() {
   const { isLoaded, isSignedIn, academiaUser } = useAcademiaAuth();
 
-  // FIXED: Añadido guard de autenticación
+  // Auth guard
   if (!isLoaded) {
     return (
       <div style={{ minHeight: '100vh', background: colors.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -30,34 +30,34 @@ export default function Comunidade() {
 
   const canais = [
     {
-      nome: 'Geral',
-      descricao: 'Discussões gerais sobre marketing digital e tendências',
+      nome: 'General',
+      descricao: 'Open discussion on digital marketing and trends',
       membros: 1247,
       ativo: true,
       icon: MessageSquare,
     },
     {
-      nome: 'Dúvidas Técnicas',
-      descricao: 'Ajuda com ferramentas, plataformas e técnicas específicas',
+      nome: 'Technical help',
+      descricao: 'Help with tools, platforms and specific techniques',
       membros: 892,
       ativo: true,
       icon: Users,
     },
     {
-      nome: 'Marketing Digital',
-      descricao: 'Estratégias, métricas e casos de sucesso',
+      nome: 'Digital marketing',
+      descricao: 'Strategy, metrics and success stories',
       membroOnline: 156,
       icon: Hash,
     },
     {
-      nome: 'Design & Criativo',
-      descricao: 'Compartilhar trabalhos, feedback e inspiração',
+      nome: 'Design & creative',
+      descricao: 'Share work, feedback and inspiration',
       membros: 634,
       icon: Star,
     },
     {
-      nome: 'Ofertas & Colaborações',
-      descricao: 'Oportunidades de trabalho e parcerias entre membros',
+      nome: 'Offers & collaborations',
+      descricao: 'Job opportunities and partnerships between members',
       membros: 421,
       ativo: true,
       icon: ExternalLink,
@@ -65,9 +65,9 @@ export default function Comunidade() {
   ];
 
   const eventos = [
-    { titulo: 'Live: Future of AI in Marketing', data: '15 Abr 2026', horario: '18:00', participantes: 234 },
-    { titulo: 'Workshop: SEO paraPMEs', data: '18 Abr 2026', horario: '15:00', participantes: 89 },
-    { titulo: 'Q&A: Estratégia de Conteúdo', data: '22 Abr 2026', horario: '17:00', participantes: 156 },
+    { titulo: 'Live: Future of AI in Marketing', data: '15 Apr 2026', horario: '18:00', participantes: 234 },
+    { titulo: 'Workshop: SEO for SMBs', data: '18 Apr 2026', horario: '15:00', participantes: 89 },
+    { titulo: 'Q&A: Content strategy', data: '22 Apr 2026', horario: '17:00', participantes: 156 },
   ];
 
   return (
@@ -81,10 +81,10 @@ export default function Comunidade() {
           style={{ marginBottom: 48 }}
         >
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 42px)', fontWeight: 900, color: colors.dark, marginBottom: 16, letterSpacing: '-0.03em' }}>
-            Comunidade <span style={{ color: colors.orange }}>Slack</span>
+            <span style={{ color: colors.orange }}>Slack</span> community
           </h1>
           <p style={{ color: '#666', fontSize: 18, maxWidth: 600 }}>
-            Conecta-te com outros alunos, partilha experiências e aprende em conjunto.
+            Connect with other learners, share wins and learn together.
           </p>
         </motion.div>
 
@@ -133,7 +133,7 @@ export default function Comunidade() {
               </p>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 13, color: '#888' }}>
-                  {canal.membros} membros
+                  {typeof canal.membros === 'number' ? `${canal.membros} members` : ''}
                 </span>
                 {canal.membroOnline && (
                   <span style={{ fontSize: 13, color: colors.orange, fontWeight: 600 }}>
@@ -153,7 +153,7 @@ export default function Comunidade() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <Bell size={20} color={colors.orange} />
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.dark }}>Próximos Eventos</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: colors.dark }}>Upcoming events</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
             {eventos.map((evento, idx) => (
@@ -171,7 +171,7 @@ export default function Comunidade() {
                   <span>{evento.horario}</span>
                 </div>
                 <span style={{ fontSize: 12, color: colors.orange, fontWeight: 600 }}>
-                  {evento.participantes} confirmados
+                  {evento.participantes} signed up
                 </span>
               </div>
             ))}
@@ -190,9 +190,9 @@ export default function Comunidade() {
             color: '#fff',
           }}
         >
-          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>Junta-te à nossa comunidade!</h3>
+          <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>Join the community</h3>
           <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 20, maxWidth: 500, margin: '0 auto 20px' }}>
-            Tens dúvidas? Queres partilhar algo? O Slack é o melhor lugar para conectar.
+            Questions or something to share? Slack is the best place to connect.
           </p>
           <button style={{
             background: '#fff',
@@ -204,7 +204,7 @@ export default function Comunidade() {
             fontSize: 14,
             cursor: 'pointer',
           }}>
-            Aceder ao Slack
+            Open Slack
           </button>
         </motion.div>
       </main>

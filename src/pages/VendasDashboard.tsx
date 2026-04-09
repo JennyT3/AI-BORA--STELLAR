@@ -36,7 +36,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      setSidebarOpen(mobile); // En móvil empezar oculto
+      setSidebarOpen(mobile); // Start collapsed on mobile
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -108,7 +108,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         <div style={{ textAlign: "center" }}>
           <div style={{ width: 40, height: 40, border: "3px solid rgba(255,255,255,0.1)", borderTop: `3px solid #F25C05`, borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
           <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          <p style={{ color: "#94a3b8", fontSize: 14, fontFamily: 'Montserrat, sans-serif' }}>A carregar o teu sucesso...</p>
+          <p style={{ color: "#94a3b8", fontSize: 14, fontFamily: 'Montserrat, sans-serif' }}>Loading...</p>
         </div>
       </div>
     );
@@ -151,7 +151,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
               onClick={() => {
                 const notifs = propostas.filter(p => p.resposta === 'pendente').length;
                 if (notifs === 0) {
-                  alert('Ainda não tem notificações. Em breve, receberá alertas de novos clientes e comissões.');
+                  alert('No notifications yet. You will soon receive alerts for new clients and commissions.');
                 } else {
                   setActiveTab('dashboard');
                 }
@@ -182,7 +182,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
             {/* Help/FAQ */}
             <button 
-              onClick={() => alert('Academia Ai Bora em breve! Estamos preparando tutoriais e formação para maximizar as tuas vendas.')}
+              onClick={() => alert('AI BORA Academy is coming soon! We are preparing tutorials and training to help you sell more.')}
               style={{ background: 'none', border: 'none', padding: 8, cursor: 'pointer' }}
             >
               <HelpCircle size={20} color="#1b1c1b" />
@@ -257,9 +257,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                { id: 'tarefas', label: 'Minhas Tarefas', icon: CheckSquare },
-                { id: 'clientes', label: 'Meus Clientes', icon: Users },
-                { id: 'propostas', label: 'Propostas', icon: FileText },
+                { id: 'tarefas', label: 'My tasks', icon: CheckSquare },
+                { id: 'clientes', label: 'My clients', icon: Users },
+                { id: 'propostas', label: 'Proposals', icon: FileText },
                 { id: 'faturacao', label: 'Comissões', icon: DollarSign },
                 { id: 'perfil', label: 'Perfil', icon: User },
               ].map((item) => {
@@ -312,7 +312,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 }}
               >
                 <LogOut size={20} />
-                Terminar Sessão
+                Sign out
               </button>
             </div>
           </aside>
@@ -388,7 +388,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                   marginBottom: 16,
                   display: 'block',
                 }}>
-                  Carteira Pessoal
+                  Personal pipeline
                 </span>
                 <h1 style={{
                   fontSize: isMobile ? 32 : 48,
@@ -399,7 +399,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                   marginBottom: 16,
                   fontFamily: 'Montserrat, sans-serif',
                 }}>
-                  {new Date().getHours() < 12 ? 'Bom dia' : new Date().getHours() < 18 ? 'Boa tarde' : 'Boa noite'}, {vendedor.nome.split(' ')[0]}.
+                  {new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 18 ? 'Good afternoon' : 'Good evening'}, {vendedor.nome.split(' ')[0]}.
                 </h1>
                 <p style={{
                   color: 'rgba(90, 65, 55, 0.7)',
@@ -408,7 +408,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                   fontSize: 15,
                   fontFamily: 'Montserrat, sans-serif',
                 }}>
-                  A tua carteira tem <strong style={{ color: '#F25C05' }}>{stats.totalClientes}</strong> clientes ativos. <strong style={{ color: '#F25C05' }}>{propostas.filter(p => p.resposta === 'pendente').length}</strong> propostas pendentes de aprovação.
+                  Your pipeline has <strong style={{ color: '#F25C05' }}>{stats.totalClientes}</strong> active clients and <strong style={{ color: '#F25C05' }}>{propostas.filter(p => p.resposta === 'pendente').length}</strong> proposals awaiting a response.
                 </p>
               </div>
             </div>
@@ -421,9 +421,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
               marginBottom: 40 
             }}>
               <NewStatsCard 
-                label="Convidados" 
+                label="Invited" 
                 value={vendedor.referidosInvitados?.length || 0} 
-                subtitle={`${vendedor.referidosConvertidos || 0} sucessos`}
+                subtitle={`${vendedor.referidosConvertidos || 0} converted`}
                 percentage={vendedor.referidosInvitados?.length ? 100 : 0}
                 percentageColor="orange"
                 icon={<Sparkles size={20} />}
@@ -444,7 +444,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
               <NewStatsCard 
                 label="Propostas" 
                 value={stats.propostasEnviadas} 
-                subtitle={`${stats.propostasAceitas} aceites`}
+                subtitle={`${stats.propostasAceitas} accepted`}
                 percentage={8.2}
                 percentageColor="green"
                 icon={<FileText size={20} />}
@@ -453,9 +453,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 onClick={() => setActiveTab("propostas")}
               />
               <NewStatsCard 
-                label="Comissão" 
+                label="Commission" 
                 value={`${stats.comissaoTotal.toFixed(0)}€`} 
-                subtitle={`Taxa ${vendedor.comissaoPercent}%`}
+                subtitle={`Rate ${vendedor.comissaoPercent}%`}
                 percentage={-2.1}
                 percentageColor="orange"
                 icon={<DollarSign size={20} />}
@@ -464,7 +464,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 onClick={() => setActiveTab("faturacao")}
               />
               <NewStatsCard 
-                label="Volume Vendas" 
+                label="Sales volume" 
                 value={`${stats.valorTotalPropostas.toFixed(0)}€`} 
                 percentage={14.2}
                 percentageColor="green"
@@ -515,7 +515,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                   })}
                 </svg>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, color: "#94a3b8", fontSize: 11, fontWeight: 800 }}>
-                  <span>JAN</span><span>FEV</span><span>MAR</span><span>ABR</span><span>MAI</span><span>JUN</span>
+                  <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span>
                 </div>
               </div>
             </div>
@@ -534,7 +534,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={16} strokeWidth={3} /></div>
-                Nova Proposta
+                New proposal
               </button>
               <button 
                 onClick={() => setActiveTab("clientes")} 
@@ -543,7 +543,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Users size={16} /></div>
-                Ver Clientes
+                View clients
               </button>
               <button 
                 onClick={() => setActiveTab("faturacao")} 
@@ -552,7 +552,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1b1c1b", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><DollarSign size={16} /></div>
-                Ver Comissões
+                View commissions
               </button>
             </div>
 
@@ -593,7 +593,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                     Academia Bora Lá
                   </h3>
                   <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, fontFamily: 'Montserrat, sans-serif' }}>
-                    Continua a tua formação — tens conteúdo novo disponível
+                    Continue your training — new content is available
                   </p>
                 </div>
               </div>
@@ -606,20 +606,20 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 fontSize: 13,
                 fontFamily: 'Montserrat, sans-serif',
               }}>
-                Ir para a Academia →
+                Go to Academy →
               </div>
             </div>
 
             {/* Recent Clients List */}
             <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-                <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Clientes Recentes</h3>
-                <button onClick={() => setActiveTab("clientes")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>Ver todos</button>
+                <h3 style={{ fontSize: 16, fontWeight: 900, color: "#1b1c1b" }}>Recent clients</h3>
+                <button onClick={() => setActiveTab("clientes")} style={{ fontSize: 12, color: "#F25C05", background: "none", border: "none", cursor: "pointer", fontWeight: 800 }}>View all</button>
               </div>
               <div style={{ display: "grid", gap: 12 }}>
                 {clientes.slice(0, 5).map(c => {
                   const statusColor = c.categoria === 'cliente' ? '#10B981' : c.categoria === 'potencial' ? '#F25C05' : '#64748b';
-                  const statusLabel = c.categoria === 'cliente' ? 'Ativo' : c.categoria === 'potencial' ? 'Potencial' : c.categoria;
+                  const statusLabel = c.categoria === 'cliente' ? 'Active' : c.categoria === 'potencial' ? 'Lead' : c.categoria;
                   return (
                     <div 
                       key={c.id}
@@ -646,8 +646,8 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                 {clientes.length === 0 && (
                   <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>
                     <Users size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
-                    <p style={{ fontWeight: 600 }}>Nenhum cliente ainda</p>
-                    <p style={{ fontSize: 12 }}>Começa por adicionar os teus primeiros clientes</p>
+                    <p style={{ fontWeight: 600 }}>No clients yet</p>
+                    <p style={{ fontSize: 12 }}>Start by adding your first clients</p>
                   </div>
                 )}
               </div>
@@ -659,9 +659,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         {activeTab === "clientes" && (
           <div style={{ background: '#fff', padding: 32, borderRadius: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 900 }}>Meus Clientes</h2>
+              <h2 style={{ fontSize: 24, fontWeight: 900 }}>My clients</h2>
               <button onClick={() => setShowImportModal(true)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 20px", borderRadius: 12, backgroundColor: '#F25C05', color: "#fff", border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: '0 4px 12px rgba(242,92,5,0.2)' }}>
-                <Upload size={16} /> Importar Excel
+                <Upload size={16} /> Import Excel
               </button>
             </div>
             <VendasClientesTab
@@ -726,29 +726,29 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
 
         {activeTab === "tarefas" && (
           <div style={{ background: '#fff', padding: 32, borderRadius: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
-            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 32 }}>Minhas Tarefas</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 32 }}>My tasks</h2>
             {/* Tareas logic remains same but with better styling */}
             <div style={{ display: 'grid', gap: 16 }}>
               {tareas.filter(t => t.asignadaA === vendedor.id).map(t => (
                 <div key={t.id} style={{ padding: 24, borderRadius: 20, border: '1px solid #f1f5f9', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <h4 style={{ fontWeight: 700, marginBottom: 4 }}>{t.titulo}</h4>
-                    <p style={{ fontSize: 12, color: '#64748b' }}>{t.clienteNome || 'Cliente'} - {t.servicoNome}</p>
+                    <p style={{ fontSize: 12, color: '#64748b' }}>{t.clienteNome || 'Client'} — {t.servicoNome}</p>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 800, padding: '6px 12px', borderRadius: 100, background: '#F25C0515', color: '#F25C05' }}>{t.estado.toUpperCase()}</span>
                 </div>
               ))}
               {tareas.filter(t => t.asignadaA === vendedor.id).length === 0 && (
-                <div style={{ color: '#64748b', fontSize: 14 }}>Sem tarefas ativas.</div>
+                <div style={{ color: '#64748b', fontSize: 14 }}>No active tasks.</div>
               )}
             </div>
 
             <div style={{ marginTop: 48, paddingTop: 48, borderTop: '1px solid #f1f5f9' }}>
                <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-                 <CheckSquare size={20} color="#F25C05" /> Tarefas Disponíveis
+                 <CheckSquare size={20} color="#F25C05" /> Available tasks
                </h3>
                <p style={{ fontSize: 13, color: '#64748b', marginBottom: 24 }}>
-                 Tarefas abertas que podes aceitar. Podes também ver tarefas próximas de entregar.
+                 Open tasks you can claim. You can also see upcoming deadlines.
                </p>
                
                {/* Tarefas Disponíveis - no assigned yet */}
@@ -757,24 +757,24 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                    <div key={t.id} style={{ padding: 16, borderRadius: 16, border: '1px solid rgba(242, 92, 5, 0.2)', background: 'rgba(242, 92, 5, 0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                      <div>
                        <h4 style={{ fontWeight: 700, marginBottom: 4, fontSize: 14 }}>{t.titulo}</h4>
-                       <p style={{ fontSize: 12, color: '#64748b' }}>{t.clienteNome || 'Cliente'} - {t.servicoNome}</p>
+                       <p style={{ fontSize: 12, color: '#64748b' }}>{t.clienteNome || 'Client'} — {t.servicoNome}</p>
                      </div>
                      <button 
                        onClick={async () => {
-                         if (confirm('Aceitar esta tarefa?')) {
+                         if (confirm('Accept this task?')) {
                            await solicitarTarea(t.id, vendedor.id);
                            await loadData();
                          }
                        }}
                        style={{ padding: '8px 16px', borderRadius: 8, background: '#F25C05', color: '#fff', border: 'none', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
                      >
-                       Aceitar
+                       Accept
                      </button>
                    </div>
                  ))}
                  {tareas.filter(t => !t.asignadaA).length === 0 && (
                    <div style={{ padding: 24, background: '#f8fafc', borderRadius: 16, color: '#64748b', fontSize: 13 }}>
-                     Não há tarefas disponíveis neste momento.
+                     No tasks available right now.
                    </div>
                  )}
                </div>
@@ -782,12 +782,12 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
                {/* Próximas a entregar */}
                {tareas.filter(t => t.asignadaA === vendedor.id && t.estado !== 'entregue' && t.estado !== 'paga').length > 0 && (
                  <>
-                   <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16, marginTop: 24 }}>Próximas a Entregar</h3>
+                   <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 16, marginTop: 24 }}>Upcoming deadlines</h3>
                    <div style={{ display: 'grid', gap: 12 }}>
                      {tareas.filter(t => t.asignadaA === vendedor.id && t.estado !== 'entregue' && t.estado !== 'paga').slice(0, 5).map(t => (
                        <div key={t.id} style={{ padding: 16, borderRadius: 16, border: '1px solid #e2e8f0', background: '#fff' }}>
                          <h4 style={{ fontWeight: 700, marginBottom: 4, fontSize: 14 }}>{t.titulo}</h4>
-                         <p style={{ fontSize: 12, color: '#64748b' }}>Data entrega: {t.prazo ? new Date(t.prazo).toLocaleDateString('pt-PT') : 'Sem prazo'}</p>
+                         <p style={{ fontSize: 12, color: '#64748b' }}>Due: {t.prazo ? new Date(t.prazo).toLocaleDateString('en-GB') : 'No date'}</p>
                        </div>
                      ))}
                    </div>

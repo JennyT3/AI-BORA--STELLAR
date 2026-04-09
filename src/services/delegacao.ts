@@ -78,7 +78,7 @@ export async function aprovarDelegacao(
 ): Promise<void> {
   const solicitacao = await getSolicitacaoDelegacao(solicitacaoId);
   if (!solicitacao) {
-    throw new Error('Solicitação não encontrada');
+    throw new Error('Request not found');
   }
   
   const { writeBatch } = await import('firebase/firestore');
