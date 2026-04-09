@@ -26,9 +26,9 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  
-  // FIXED: removed unused states showNovoCliente, novoCliente, showImportModal, etc.
-  // FIXED: typed props correctly instead of any
+  const [showNovoCliente, setShowNovoCliente] = useState(false);
+  const [novoCliente, setNovoCliente] = useState({ nome: "", email: "", telemovel: "", nif: "", morada: "", empresa: "" });
+  const [showImportModal, setShowImportModal] = useState(false);
   
   useEffect(() => {
     const checkMobile = () => {
