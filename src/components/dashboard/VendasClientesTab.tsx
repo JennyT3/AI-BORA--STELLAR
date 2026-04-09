@@ -179,15 +179,21 @@ export function VendasClientesTab({
 
       {/* Table */}
       <div style={{ backgroundColor: "#fff", borderRadius: 10, border: "1px solid #e8e8e8", overflow: "hidden" }}>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+        <div style={{ overflowX: "auto", maxHeight: "60vh" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1000 }}>
             <thead>
-              <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
+              <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 10 }}>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Nome</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Categoria</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Empresa</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>NIF</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Telefone</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Email</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Origem</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Processo</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Website</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Cidade</th>
+                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Último Contacto</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Proposta</th>
                 <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Ações</th>
               </tr>
@@ -222,6 +228,13 @@ export function VendasClientesTab({
                   </td>
                   <td style={{ padding: "10px 12px" }}>
                     {editingId === c.id ? (
+                      <input value={editData.nif || ''} onChange={e => setEditData({...editData, nif: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                    ) : (
+                      <span style={{ fontSize: 12, color: "#666" }}>{c.nif || '—'}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {editingId === c.id ? (
                       <input value={editData.telemovel || ''} onChange={e => setEditData({...editData, telemovel: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
                     ) : (
                       <a href={`tel:${c.telemovel}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.telemovel || '—'}</a>
@@ -233,6 +246,27 @@ export function VendasClientesTab({
                     ) : (
                       <a href={`mailto:${c.email}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.email || '—'}</a>
                     )}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span style={{ fontSize: 11, color: "#666" }}>{c.origem || '—'}</span>
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, backgroundColor: "#f3f4f6", color: "#666", fontWeight: 600 }}>
+                      {c.processo || 'sem_processo'}
+                    </span>
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    {c.website ? (
+                      <a href={c.website.startsWith('http') ? c.website : `https://${c.website}`} target="_blank" style={{ fontSize: 11, color: "#3498DB", textDecoration: "none" }}>
+                        {c.website.substring(0, 20)}{c.website.length > 20 ? '...' : ''}
+                      </a>
+                    ) : <span style={{ fontSize: 12, color: "#666" }}>—</span>}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span style={{ fontSize: 12, color: "#666" }}>{c.cidade || '—'}</span>
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <span style={{ fontSize: 11, color: "#666" }}>{c.dataUltimoContacto ? c.dataUltimoContacto.split('T')[0] : '—'}</span>
                   </td>
                   <td style={{ padding: "10px 12px" }}>
                     {hasValidProposta(c) ? (
