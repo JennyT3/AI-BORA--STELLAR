@@ -4,7 +4,7 @@ import { theme } from "../styles/theme";
 import { VendasSidebar } from "../components/admin/VendasSidebar";
 import { getStatsVendedor, updateVendedor, Vendedor } from "../services/vendedores";
 import { listClientesByVendedor, listProposalsByVendedor, createCliente, listTareas, solicitarTarea } from "../services/firebase";
-import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check, CheckSquare, Menu, Bell, HelpCircle, LogOut, LayoutDashboard, User } from "lucide-react";
+import { FileText, Users, DollarSign, Plus, TrendingUp, Upload, X, Check, CheckSquare, Menu, Bell, HelpCircle, LogOut, LayoutDashboard, User, Sparkles } from "lucide-react";
 import { VendasClientesTab } from "../components/dashboard/VendasClientesTab";
 import { VendasPropostasTab } from "../components/dashboard/VendasPropostasTab";
 import { VendasFaturacaoTab } from "../components/dashboard/VendasFaturacaoTab";

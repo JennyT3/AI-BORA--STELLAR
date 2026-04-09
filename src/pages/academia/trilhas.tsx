@@ -6,7 +6,7 @@ import { AcademiaNavbar } from '../../components/AcademiaNavbar';
 import { Footer } from '../../components/Footer';
 import { TRILHAS_MOCK } from '../../data/trilhasMock'; // FIXED: DRY - import shared data
 import { motion } from 'framer-motion';
-import { Zap, Clock, BarChart, Play, CheckCircle } from 'lucide-react';
+import { Zap, Clock, BarChart, Play, CheckCircle, BookOpen } from 'lucide-react';
 
 const colors = {
   orange: '#ff6f2e',

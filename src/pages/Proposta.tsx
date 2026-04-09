@@ -197,7 +197,7 @@ export function PropostaPage() {
       <div style={{ minHeight: '100vh', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 40, height: 40, border: '3px solid #333', borderTop: '3px solid #F25C05', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }}></div>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#888', fontSize: 14 }}>Carregando proposta...</p>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#cccccc', fontSize: 14 }}>Carregando proposta...</p>
         </div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
@@ -212,7 +212,7 @@ export function PropostaPage() {
           <h1 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 24, color: '#ffffff', marginBottom: 12 }}>
             {error}
           </h1>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#888', marginBottom: 24 }}>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', color: '#cccccc', marginBottom: 24 }}>
             A proposta pode ter expirado ou não existe.
           </p>
           <button 
@@ -274,7 +274,7 @@ export function PropostaPage() {
           {respostaEnviada !== "sim" && (
             <a
               href="/"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, textDecoration: 'none' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#aaaaaa', fontSize: 13, textDecoration: 'none' }}
             >
               ← Voltar ao início
             </a>
@@ -298,11 +298,11 @@ export function PropostaPage() {
           <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(242,92,5,0.1)', color: '#F25C05', borderRadius: 100, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 24 }}>
             Proposta Personalizada
           </div>
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: -2 }}>
+          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: -2, color: '#ffffff' }}>
             Olá, {proposal.cliente}.<br />
             Vamos elevar o teu negócio?
           </h1>
-          <p style={{ fontSize: 18, color: '#888', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 18, color: '#cccccc', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
             Analisámos o teu perfil e preparámos uma estratégia focada em resultados reais para a <span style={{ color: '#fff', fontWeight: 700 }}>{proposal.empresa || 'tua empresa'}</span>.
           </p>
         </section>
@@ -310,7 +310,7 @@ export function PropostaPage() {
         {/* Serviços Selecionados */}
         <section style={{ marginBottom: 100 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12 }}>Serviços Propostos</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12, color: '#ffffff' }}>Serviços Propostos</h2>
             <div style={{ width: 40, height: 4, background: '#F25C05', margin: '0 auto' }}></div>
           </div>
 
@@ -322,8 +322,8 @@ export function PropostaPage() {
                   <div style={{ width: 48, height: 48, background: '#F25C05', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 24 }}>
                     ✨
                   </div>
-                  <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{nome}</h3>
-                  <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6 }}>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12, color: '#ffffff' }}>{nome}</h3>
+                  <p style={{ color: '#cccccc', fontSize: 14, lineHeight: 1.6 }}>
                     Solução completa e personalizada para garantir o melhor desempenho do teu negócio nesta área.
                   </p>
                 </div>
@@ -371,7 +371,7 @@ export function PropostaPage() {
 
         {/* Investimento */}
         <section style={{ textAlign: 'center', marginBottom: 100 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 40 }}>O teu Investimento</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 40, color: '#ffffff' }}>O teu Investimento</h2>
           <div style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', borderRadius: 32, padding: '60px 40px', display: 'inline-block', minWidth: 320 }}>
             <p style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, opacity: 0.9 }}>Valor Total do Projeto</p>
             <div style={{ fontSize: 'clamp(40px, 8vw, 64px)', fontWeight: 900, marginBottom: 8, letterSpacing: -2 }}>
@@ -383,8 +383,8 @@ export function PropostaPage() {
 
         {/* CTA / Resposta */}
         <section style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: isMobile ? 24 : 40, padding: isMobile ? '40px 20px' : '80px 40px' }}>
-          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 16 }}>Pronto para começar?</h2>
-          <p style={{ color: '#888', marginBottom: 48 }}>Escolha uma das opções abaixo para prosseguirmos.</p>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 16, color: '#ffffff' }}>Pronto para começar?</h2>
+          <p style={{ color: '#cccccc', marginBottom: 48 }}>Escolha uma das opções abaixo para prosseguirmos.</p>
           
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: 16 }}>
             <button 
@@ -451,7 +451,7 @@ export function PropostaPage() {
         </div>
       </main>
 
-      <footer style={{ padding: '40px 24px', textAlign: 'center', color: '#444', fontSize: 12 }}>
+      <footer style={{ padding: '40px 24px', textAlign: 'center', color: '#666666', fontSize: 12 }}>
         © {new Date().getFullYear()} AI BORA · Marketing Digital de Resultados
       </footer>
     </div>
