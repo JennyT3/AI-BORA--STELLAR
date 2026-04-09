@@ -1,19 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import { Upload, X, AlertCircle, CheckCircle, Loader, Users } from 'lucide-react';
 import { importarClientesParaVendedor } from '../services/vendedores';
+import { criarSolicitacaoDelegacao } from '../services/delegacao';
 import * as XLSX from 'xlsx';
 
 interface ImportarClientesModalProps {
   isOpen: boolean;
   onClose: () => void;
   vendedorId: string;
+  vendedorNome?: string;
   onSuccess?: () => void;
 }
 
-export function ImportarClientesModal({ isOpen, onClose, vendedorId, onSuccess }: ImportarClientesModalProps) {
+export function ImportarClientesModal({ isOpen, onClose, vendedorId, vendedorNome, onSuccess }: ImportarClientesModalProps) {
   const [loading, setLoading] = useState(false);
   const [resultado, setResultado] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [solicitandoDelegacao, setSolicitandoDelegacao] = useState(false);
+  const [delegacaoEnviada, setDelegacaoEnviada] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +27,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, onSuccess }
     setLoading(true);
     setError(null);
     setResultado(null);
+    setDelegacaoEnviada(false);
 
     try {
       const reader = new FileReader();
@@ -60,7 +65,7 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, onSuccess }
           const result = await importarClientesParaVendedor(vendedorId, clientesParseados, 'vendedor');
           
           setResultado(result);
-          if (onSuccess) {
+          if (onSuccess && (result.criados > 0 || result.atualizados > 0)) {
             setTimeout(onSuccess, 2000);
           }
         } catch (err: any) {
@@ -74,6 +79,30 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, onSuccess }
     } catch (err: any) {
       setError(err.message || 'Erro ao importar arquivo');
       setLoading(false);
+    }
+  };
+
+  const solicitarDelegacao = async () => {
+    if (!resultado?.duplicados?.length) return;
+    
+    setSolicitandoDelegacao(true);
+    try {
+      await criarSolicitacaoDelegacao(
+        vendedorId,
+        vendedorNome || 'Vendedor',
+        resultado.duplicados.map((d: any) => ({
+          clienteId: d.clienteExistenteId,
+          clienteNome: d.clienteExistenteNome,
+          vendedorAtualId: d.vendedorAtualId,
+          nif: d.clienteImportadoNif,
+          email: d.clienteImportadoEmail
+        }))
+      );
+      setDelegacaoEnviada(true);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao solicitar delegação');
+    } finally {
+      setSolicitandoDelegacao(false);
     }
   };
 
@@ -168,6 +197,64 @@ export function ImportarClientesModal({ isOpen, onClose, vendedorId, onSuccess }
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Duplicados con botón de delegación masiva */}
+            {resultado.duplicados?.length > 0 && !delegacaoEnviada && (
+              <div style={{ marginBottom: '20px', backgroundColor: '#fef3c7', border: '1px solid #fcd34d', borderRadius: '12px', padding: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Users size={18} color="#d97706" />
+                  <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#92400e', margin: 0 }}>
+                    {resultado.duplicados.length} clientes já existem
+                  </h4>
+                </div>
+                <p style={{ fontSize: '12px', color: '#92400e', margin: '0 0 12px 0' }}>
+                  Estes clientes pertencem a outros vendedores. Solicite a delegação em massa.
+                </p>
+                <ul style={{ fontSize: '11px', color: '#78350f', margin: '0 0 12px 0', paddingLeft: '20px', maxHeight: '100px', overflowY: 'auto' }}>
+                  {resultado.duplicados.slice(0, 5).map((d: any, idx: number) => (
+                    <li key={idx} style={{ marginBottom: '4px' }}>
+                      {d.clienteExistenteNome || d.clienteImportadoNome} (NIF: {d.clienteImportadoNif || '—'})
+                    </li>
+                  ))}
+                  {resultado.duplicados.length > 5 && (
+                    <li>... e mais {resultado.duplicados.length - 5}</li>
+                  )}
+                </ul>
+                <button
+                  onClick={solicitarDelegacao}
+                  disabled={solicitandoDelegacao}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    backgroundColor: '#2563eb',
+                    color: '#fff',
+                    border: 'none',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: solicitandoDelegacao ? 'not-allowed' : 'pointer',
+                    opacity: solicitandoDelegacao ? 0.7 : 1
+                  }}
+                >
+                  {solicitandoDelegacao ? 'A enviar...' : `Solicitar delegação de todos (${resultado.duplicados.length})`}
+                </button>
+              </div>
+            )}
+
+            {/* Mensaje de delegación enviada */}
+            {delegacaoEnviada && (
+              <div style={{ marginBottom: '20px', backgroundColor: '#d1fae5', border: '1px solid #6ee7b7', borderRadius: '12px', padding: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <CheckCircle size={18} color="#059669" />
+                  <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#065f46', margin: 0 }}>
+                    Solicitação enviada!
+                  </h4>
+                </div>
+                <p style={{ fontSize: '12px', color: '#065f46', margin: 0 }}>
+                  Aguarde aprovação do administrador. Você será notificado quando os clientes forem delegados.
+                </p>
               </div>
             )}
 

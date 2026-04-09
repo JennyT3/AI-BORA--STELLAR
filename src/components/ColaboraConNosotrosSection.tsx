@@ -7,9 +7,15 @@ import { sendColaboradorConfirmacao } from '../services/emailService';
 
 const TIPOS_COLABORACAO = [
   { id: 'vendedor', nome: 'Vendedor/Revendedor', descricao: 'Vende os nossos serviços e ganha comissão', icon: '💼' },
+  { id: 'colaborador', nome: 'Colaborador/Freelancer', descricao: 'Executa serviços e ganha comissão', icon: '🎯' },
   { id: 'afiliado', nome: 'Afiliado', descricao: 'Indica clientes e ganha prémios', icon: '🤝' },
   { id: 'parceiro', nome: 'Parceiro Estratégico', descricao: 'Colaboração B2B entre empresas', icon: '⚡' },
-  { id: 'freelancer', nome: 'Freelancer/Agency', descricao: 'Trabalha connosco em projetos', icon: '🎯' },
+];
+
+const ESPECIALIDADES = [
+  'SEO', 'Google Ads', 'Facebook/Instagram Ads', 'Web Design', 'Copywriting',
+  'Redes Sociais', 'Email Marketing', 'CRM', 'Analytics', 'Video Editing',
+  'Fotografia', 'Consultoria Marketing', 'Outro'
 ];
 
 interface Props {
@@ -28,7 +34,17 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
     empresa: '',
     experiencia: '',
     linkedin: '',
+    especialidades: [] as string[],
   });
+
+  const toggleEspecialidade = (esp: string) => {
+    setFormData(prev => ({
+      ...prev,
+      especialidades: prev.especialidades.includes(esp)
+        ? prev.especialidades.filter(e => e !== esp)
+        : [...prev.especialidades, esp]
+    }));
+  };
 
   const handleSelect = (id: string) => {
     setTipoSelecionado(id);
@@ -45,7 +61,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
         telefone: formData.telefone,
         empresa: formData.empresa,
         email: formData.email,
-        observacoes: `Tipo: ${tipo?.nome}\nExperiência: ${formData.experiencia}\nLinkedIn: ${formData.linkedin}`,
+        observacoes: `Tipo: ${tipo?.nome}\nExperiência: ${formData.experiencia}\nLinkedIn: ${formData.linkedin}\nEspecialidades: ${formData.especialidades.join(', ')}`,
         servicos: [`Colaboração: ${tipo?.nome}`],
         origem: 'Colabora Connosco',
         marcas: [],
@@ -177,6 +193,32 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '2px solid #444', backgroundColor: '#1A1A1A', color: '#FFFFFF', fontSize: 14, fontFamily: 'Montserrat, sans-serif', outline: 'none' }}
                 />
               </div>
+              {(tipoSelecionado === 'colaborador' || tipoSelecionado === 'freelancer') && (
+                <div>
+                  <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Especialidades (seleciona as que aplicam)</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {ESPECIALIDADES.map(esp => (
+                      <button
+                        key={esp}
+                        type="button"
+                        onClick={() => toggleEspecialidade(esp)}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          border: formData.especialidades.includes(esp) ? '2px solid #F25C05' : '1px solid #444',
+                          backgroundColor: formData.especialidades.includes(esp) ? 'rgba(242, 92, 5, 0.2)' : '#1A1A1A',
+                          color: formData.especialidades.includes(esp) ? '#F25C05' : '#888',
+                          fontSize: '12px',
+                          fontFamily: 'Montserrat, sans-serif',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {esp}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <label style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#FFFFFF', display: 'block', marginBottom: 6 }}>Conta-nos sobre a tua experiência</label>
                 <textarea

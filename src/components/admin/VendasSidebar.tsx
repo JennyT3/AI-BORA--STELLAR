@@ -42,7 +42,8 @@ export function VendasSidebar({
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
     { id: 'clientes', label: 'Meus Clientes', icon: Users, count: clienteCount },
     { id: 'tarefas', label: 'Minhas Tarefas', icon: CheckSquare },
-    { id: 'faturacao', label: 'Comissões', icon: DollarSign },
+    { id: 'comissoes', label: 'Comissões', icon: DollarSign },
+    { id: 'faturacao', label: 'Faturação', icon: TrendingUp },
     { id: 'perfil', label: 'Meu Perfil', icon: User },
   ];
 

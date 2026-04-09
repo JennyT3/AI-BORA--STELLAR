@@ -112,20 +112,32 @@ export async function removeClienteDeVendedor(vendedorId: string, clienteId: str
 
 // ========== IMPORTAR CLIENTES DESDE EXCEL (Asignar a vendedor) ==========
 
-export async function importarClientesParaVendedor(vendedorId: string, clientesData: any[], importadoPor?: string): Promise<{ sucesso: number; erros: string[]; atualizados: number; criados: number }> {
-  // Importar la función de clientes
+export interface DuplicadoInfo {
+  clienteImportadoNome: string;
+  clienteImportadoNif: string;
+  clienteImportadoEmail: string;
+  clienteExistenteId: string;
+  clienteExistenteNome: string;
+  vendedorAtualId?: string;
+}
+
+export async function importarClientesParaVendedor(vendedorId: string, clientesData: any[], importadoPor?: string): Promise<{ sucesso: number; erros: string[]; atualizados: number; criados: number; duplicados: DuplicadoInfo[] }> {
+  if (!vendedorId) {
+    throw new Error('Vendedor ID é obrigatório. Faça login novamente.');
+  }
+
   const { upsertCliente } = await import('./clientes');
   
   let sucesso = 0;
   let atualizados = 0;
   let criados = 0;
   const erros: string[] = [];
+  const duplicados: DuplicadoInfo[] = [];
   
   const now = new Date().toISOString();
   
   for (const cliente of clientesData) {
     try {
-      // Normalizar TODOS los campos con ?? para evitar undefined
       const nome = String(cliente.nome ?? '').trim();
       const email = String(cliente.email ?? '').trim().toLowerCase();
       const telemovel = String((cliente.telemovel ?? cliente.telefone ?? '')).trim();
@@ -139,7 +151,6 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
       const notasVendedor = String(cliente.notasVendedor ?? '').trim();
       const dataUltimoContacto = String(cliente.dataUltimoContacto ?? '').trim();
       
-      // Usar la función de upsert con deduplicación
       const result = await upsertCliente({
         nome,
         email: email,
@@ -166,28 +177,36 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
         importadoPor
       }, vendedorId);
       
-      if (result.wasCreated) {
+      if (result.isDuplicate) {
+        duplicados.push({
+          clienteImportadoNome: nome,
+          clienteImportadoNif: nif,
+          clienteImportadoEmail: email,
+          clienteExistenteId: result.clienteId,
+          clienteExistenteNome: nome,
+          vendedorAtualId: result.existingVendedorId
+        });
+      } else if (result.wasCreated) {
         criados++;
-      } else {
+        sucesso++;
+        await addClienteAVendedor(vendedorId, result.clienteId);
+      } else if (result.wasUpdated) {
         atualizados++;
+        sucesso++;
+        await addClienteAVendedor(vendedorId, result.clienteId);
       }
-      sucesso++;
-      
-      // Adicionar ID do cliente ao vendedor
-      await addClienteAVendedor(vendedorId, result.clienteId);
     } catch (err: any) {
       erros.push(`Erro ao importar ${cliente.nome || 'sem nome'}: ${err.message}`);
     }
   }
   
-  // Actualizar timestamp de última importación
   if (sucesso > 0) {
     await updateDoc(doc(db, 'vendedores', vendedorId), {
       ultimaImportacao: now
     });
   }
   
-  return { sucesso, erros, atualizados, criados };
+  return { sucesso, erros, atualizados, criados, duplicados };
 }
 
 // ========== STATS DEL VENDEDOR ==========

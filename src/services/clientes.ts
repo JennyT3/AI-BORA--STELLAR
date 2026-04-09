@@ -160,6 +160,9 @@ export interface UpsertClienteResult {
   clienteId: string;
   wasCreated: boolean;
   wasUpdated: boolean;
+  isDuplicate: boolean;
+  existingVendedorId?: string;
+  existingVendedorNome?: string;
 }
 
 export interface ImportResult {
@@ -245,29 +248,14 @@ export async function upsertCliente(data: {
   const existente = await findClienteByKeys(nif, email, telemovel);
   
   if (existente) {
-    // Actualizar cliente existente
-    const updateData: Partial<Cliente> = {
-      ...data,
-      nome,
-      email,
-      telemovel,
-      nif,
-      codigoPostal,
-      origem,
-      updatedAt: now,
-      notasVendedor: existente.notasVendedor 
-        ? `${existente.notasVendedor}\n[${now}] ${data.notasVendedor || ''}`
-        : data.notasVendedor,
-      dataUltimoContacto: data.dataUltimoContacto || now,
-      vendedorId: existente.vendedorId || vendedorId
-    };
-    
-    await updateDoc(doc(db, 'clientes', existente.id), updateData);
-    
+    // Retornar info do duplicado para possível solicitação de delegação
     return {
       clienteId: existente.id,
       wasCreated: false,
-      wasUpdated: true
+      wasUpdated: false,
+      isDuplicate: true,
+      existingVendedorId: existente.vendedorId,
+      existingVendedorNome: existente.vendedorId ? 'Vendedor ID: ' + existente.vendedorId : 'Desconhecido'
     };
   } else {
     // Crear nuevo cliente

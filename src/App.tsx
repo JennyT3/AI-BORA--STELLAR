@@ -8,6 +8,8 @@ import { Termos } from "./pages/Termos";
 import { Orcamento } from "./pages/Orcamento";
 import { PropostaPage } from "./pages/Proposta";
 import { ClienteFicha } from "./pages/ClienteFicha";
+import ClienteLoginPage from "./pages/ClienteLogin";
+import PagamentoPage from "./pages/Pagamento";
 import { Admin } from "./pages/Admin";
 import { VendasLogin } from "./pages/VendasLogin";
 import { VendasDashboard } from "./pages/VendasDashboard";
@@ -48,6 +50,9 @@ export default function App() {
         <Route path="/admin/orcamento" component={Orcamento} />
         <Route path="/p/:id" component={PropostaPage} />
         <Route path="/c/:id" component={ClienteFicha} />
+        <Route path="/cliente/login/:token" component={ClienteLoginPage} />
+        <Route path="/cliente/login" component={ClienteLoginPage} />
+        <Route path="/pagamento/:id" component={PagamentoPage} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
 

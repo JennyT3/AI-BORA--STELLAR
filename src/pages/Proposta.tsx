@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
-import { getProposal, isProposalValid, updateProposal, updateCliente, createTarea, getProposalByToken } from "../services/firebase";
+import { getProposal, isProposalValid, updateProposal, updateCliente, createTarea, getProposalByToken, getCliente } from "../services/firebase";
 import { sendEmail } from "../services/emailService";
 import { WHATSAPP_LINK, EMAIL } from "../lib/constants";
 
@@ -169,10 +169,15 @@ export function PropostaPage() {
       }
 
       if (tipo === "nao" && proposal.clienteId) {
+        const motivo = prompt('Pode-nos dizer porquê? (opcional)');
+        
         await updateCliente(proposal.clienteId, {
-          categoria: "sem_interesse",
+          categoria: "arquivo",
           resposta: "nao",
           dataResposta: new Date().toISOString(),
+          naoInteressado: true,
+          motivoNaoInteresse: motivo || '',
+          tags: ['nao_interessado']
         });
       }
 

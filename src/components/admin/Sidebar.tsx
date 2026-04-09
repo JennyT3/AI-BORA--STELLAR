@@ -9,7 +9,8 @@ import {
   X,
   Settings,
   Plus,
-  Megaphone
+  Megaphone,
+  ArrowRightLeft
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -37,9 +38,11 @@ export function Sidebar({
 }: SidebarProps) {
   const navItems = [
     { id: 'dashboard', label: 'Painel Principal', icon: LayoutDashboard },
+    { id: 'solicitacoes', label: 'Solicitações', icon: FileText },
     { id: 'clientes', label: 'CRM Clientes', icon: Users, count: clienteCount },
     { id: 'propostas', label: 'Propostas', icon: FileText, count: proposalCount },
     { id: 'vendedores', label: 'Vendedores', icon: Users },
+    { id: 'delegacoes', label: 'Delegações', icon: ArrowRightLeft },
     { id: 'tarefas', label: 'Tarefas', icon: CheckSquare },
     { id: 'faturacao', label: 'Faturação', icon: DollarSign },
     { id: 'marketing', label: 'Marketing', icon: Megaphone },

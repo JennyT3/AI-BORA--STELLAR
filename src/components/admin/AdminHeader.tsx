@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Search, Bell, HelpCircle, Grid, Menu } from 'lucide-react';
+import { Search, HelpCircle, Grid, Menu } from 'lucide-react';
+import { NotificacoesBadge } from './NotificacoesBadge';
 
 interface AdminHeaderProps {
   userName: string;
@@ -9,6 +10,7 @@ interface AdminHeaderProps {
   onToggleSidebar?: () => void;
   isMobile?: boolean;
   notificationCount?: number;
+  onNavigate?: (tab: string) => void;
 }
 
 export function AdminHeader({ 
@@ -16,7 +18,7 @@ export function AdminHeader({
   userRole = "ADMINISTRADOR", 
   onToggleSidebar, 
   isMobile,
-  notificationCount = 3 
+  onNavigate
 }: AdminHeaderProps) {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -99,40 +101,7 @@ export function AdminHeader({
       {/* Right: Icons + User */}
       <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 12 : 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ position: 'relative' }}>
-            <button
-              title="Notificações"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 14,
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5a4137",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.6)"}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-            >
-              <Bell size={20} />
-            </button>
-            {notificationCount > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: 10,
-                right: 10,
-                width: 8,
-                height: 8,
-                backgroundColor: '#F22283',
-                borderRadius: '50%',
-                border: '2px solid #fcf9f7'
-              }} />
-            )}
-          </div>
+          <NotificacoesBadge onNavigate={onNavigate} />
           
           <button
             title="Ajuda"

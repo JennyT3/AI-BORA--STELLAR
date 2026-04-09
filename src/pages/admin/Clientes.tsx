@@ -185,9 +185,17 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
   // Alias for backwards compatibility
   const filtered = clientesFiltrados;
 
+  // Obtener nombre del vendedor asignado
+  const getVendedorNome = (vendedorId?: string) => {
+    if (!vendedorId) return '—';
+    const v = vendedores.find(v => v.id === vendedorId);
+    return v ? v.nome : '—';
+  };
+
   if (selectedCliente) {
     const currentProcesso = getProcessoInfo(selectedCliente.processo || "iniciado");
     const ProcessoIcon = currentProcesso.icon;
+    const vendedorNome = getVendedorNome(selectedCliente.vendedorId);
 
     const getTarefasFromServicos = () => {
       const servicos = selectedCliente.servicos || [];
@@ -254,11 +262,11 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                     {currentProcesso.label}
                   </button>
                   <button
-                    onClick={() => onVerFicha(selectedCliente.id)}
+                    onClick={() => window.open(`/cliente/${selectedCliente.id}`, '_blank')}
                     style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, backgroundColor: '#F25C05', color: '#fff', border: 'none' }}
                   >
                     <ExternalLink size={12} strokeWidth={3} />
-                    Ver Ficha Cliente
+                    Ver Ficha Completa
                   </button>
                 </div>
               </div>
@@ -292,9 +300,35 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#fcf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Building size={16} color="#F25C05" /></div>
                 <span style={{ color: '#1b1c1b', fontWeight: 600, fontSize: 14 }}>{selectedCliente.nif || "—"} (NIF)</span>
-              </div>
             </div>
           </div>
+
+          {/* Faturas Section */}
+          <div style={{ marginTop: 32, backgroundColor: '#fff', borderRadius: 24, padding: isMobile ? 20 : 32, border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1b1c1b', marginBottom: 4 }}>Faturação</h3>
+              <button onClick={() => onFaturar(selectedCliente)} style={{ padding: '10px 20px', borderRadius: 12, backgroundColor: '#F25C05', color: '#fff', border: 'none', fontSize: 12, fontWeight: 800, cursor: 'pointer' }}>+ Nova Fatura</button>
+            </div>
+            {selectedCliente.faturaIds && selectedCliente.faturaIds.length > 0 ? (
+              <div style={{ display: 'grid', gap: 12 }}>
+                {selectedCliente.faturaIds.slice(0, 5).map((faturaId: string, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', backgroundColor: '#fcf9f7', borderRadius: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#1b1c1b' }}>Fatura #{idx + 1}</div>
+                      <div style={{ fontSize: 12, color: '#666' }}>ID: {faturaId.slice(0, 8)}...</div>
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 800, color: '#6366f1' }}>Ver →</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: 24 }}>
+                <FileText size={32} color="#f0edeb" style={{ marginBottom: 12 }} />
+                <div style={{ fontSize: 13, color: '#8e7165', fontWeight: 600 }}>Sem faturas geradas</div>
+              </div>
+            )}
+          </div>
+        </div>
 
           {/* Budget Card */}
           <div style={{ backgroundColor: '#fff', borderRadius: 24, padding: isMobile ? 20 : 32, border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
@@ -348,6 +382,31 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Vendedor Card */}
+          <div style={{ backgroundColor: '#fff', borderRadius: 24, padding: isMobile ? 20 : 32, border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
+            <h3 style={{ fontSize: 11, fontWeight: 900, color: '#8e7165', textTransform: 'uppercase', marginBottom: 24, letterSpacing: '1px' }}>Vendedor / Colaborador</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: '#fcf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <User size={24} color="#F25C05" />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#8e7165' }}>Responsável</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#1b1c1b' }}>{vendedorNome}</div>
+              </div>
+            </div>
+            {selectedCliente.dataUltimoContacto && (
+              <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid #f3f4f6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <Clock size={16} color="#F25C05" />
+                  <span style={{ fontSize: 12, color: '#8e7165' }}>Último Contacto:</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#1b1c1b' }}>
+                    {new Date(selectedCliente.dataUltimoContacto).toLocaleDateString('pt-PT')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -516,66 +575,130 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
       {/* List / Table View */}
       {viewMode === 'table' && !isMobile ? (
         <div style={{ backgroundColor: '#fff', borderRadius: 24, overflowX: 'auto', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-          <table style={{ width: '100%', minWidth: '1000px', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: '#fcf9f7' }}>
+          <table style={{ width: '100%', minWidth: 1400, borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead style={{ backgroundColor: '#fcf9f7', position: 'sticky', top: 0, zIndex: 10 }}>
               <tr>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Nome</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Empresa</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Telemovel</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Email</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Categoria</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Origem</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Vendedor</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Processo</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Último Contacto</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Nome</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Categoria</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Empresa</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>NIF</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Telefone</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Email</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Origem</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Processo</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Website</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Morada</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>CP</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Cidade</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Serviços</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Orçamento</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Proposta</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Fatura</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Notas</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Vendedor</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Último Contacto</th>
+                <th style={{ padding: '12px 16px', color: '#8e7165', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', textAlign: 'center', whiteSpace: 'nowrap' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((c, i) => {
                 const vendedor = vendedores.find(v => v.id === c.vendedorId);
                 return (
-                <tr key={c.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fcf9f7'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={() => onSelectCliente(c)}>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 800, color: '#1b1c1b', fontSize: 14 }}>{c.nome}</div>
+                <tr key={c.id} style={{ borderBottom: '1px solid #f3f4f6', transition: 'background 0.2s' }}>
+                  <td style={{ padding: '12px 16px' }}>
+                    <button 
+                      onClick={() => onSelectCliente(c)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontWeight: 700, color: '#1b1c1b', fontSize: 13 }}
+                    >
+                      {c.nome}
+                    </button>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 13 }}>{c.empresa || '—'}</div>
-                  </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#5a4137', fontSize: 12 }}>{c.telemovel || '—'}</div>
-                  </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.email || '—'}</div>
-                  </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 800, backgroundColor: '#fff', color: '#F25C05', border: '1px solid rgba(242, 92, 5, 0.2)' }}>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 9, padding: '3px 8px', borderRadius: 8, fontWeight: 700, backgroundColor: getCategoriaLabel(c.categoria)?.includes('Cliente') ? '#d1fae5' : '#fef3c7', color: '#374151' }}>
                       {getCategoriaLabel(c.categoria)}
                     </span>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, color: '#5a4137', fontSize: 12 }}>
-                      <Globe size={14} color="#F25C05" />
-                      {c.origem || '—'}
-                    </div>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 12, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.empresa || '—'}</div>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 13 }}>{vendedor ? vendedor.nome : '—'}</div>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontWeight: 600, color: '#5a4137', fontSize: 12 }}>{c.nif || '—'}</div>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <span style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 700, backgroundColor: '#f3f4f6', color: '#4b5563' }}>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontWeight: 500, color: '#5a4137', fontSize: 12 }}>{c.telemovel || '—'}</div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontWeight: 500, color: '#8e7165', fontSize: 11, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.email || '—'}</div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontWeight: 600, color: '#5a4137', fontSize: 11 }}>{c.origem || '—'}</div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 9, padding: '3px 8px', borderRadius: 8, fontWeight: 700, backgroundColor: '#f3f4f6', color: '#4b5563' }}>
                       {c.processo || 'sem_processo'}
                     </span>
                   </td>
-                  <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 500, color: '#8e7165', fontSize: 12 }}>{c.dataUltimoContacto || '—'}</div>
+                  <td style={{ padding: '12px 16px' }}>
+                    {c.website ? (
+                      <a href={c.website.startsWith('http') ? c.website : `https://${c.website}`} target="_blank" style={{ fontSize: 10, color: '#3498DB', textDecoration: 'none', maxWidth: 80, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {c.website}
+                      </a>
+                    ) : <span style={{ color: '#ccc', fontSize: 11 }}>—</span>}
                   </td>
-                  <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end', alignItems: 'center' }}>
-                      <button onClick={(e) => { e.stopPropagation(); onVerFicha(c.id); }} title="Ver Ficha" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1b1c1b', display: 'flex', alignItems: 'center' }}><ExternalLink size={18} /></button>
-                      {c.propostaId && <a href={`/admin/orcamento?edit=${c.propostaId}`} onClick={(e) => e.stopPropagation()} target="_blank" title="Orçamento" style={{ color: '#F25C05', display: 'flex', alignItems: 'center' }}><FileText size={18} /></a>}
-                      {c.propostaId && <a href={`/p/${c.propostaId}`} onClick={(e) => e.stopPropagation()} target="_blank" title="Proposta Online" style={{ color: '#10B981', display: 'flex', alignItems: 'center' }}><Eye size={18} /></a>}
-                      {c.categoria === 'cliente' && <button onClick={(e) => { e.stopPropagation(); onFaturar(c); }} title="Gerar Fatura" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1b1c1b', display: 'flex', alignItems: 'center' }}><DollarSign size={18} /></button>}
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 11, color: '#666', maxWidth: 100, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.morada || '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>{c.codigoPostal || '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>{c.cidade || '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 10, color: '#666', maxWidth: 80, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {Array.isArray(c.servicos) ? c.servicos.join(', ') : (c.servicos || '—')}
+                    </span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    {c.orcamentoIds?.length > 0 ? (
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#F25C05' }}>{c.orcamentoIds.length}</span>
+                    ) : <span style={{ color: '#ccc', fontSize: 11 }}>—</span>}
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    {c.propostaId ? (
+                      <a href={`/p/${c.propostaId}`} target="_blank" style={{ fontSize: 10, color: '#3498DB', textDecoration: 'none', fontWeight: 600 }}>Ver →</a>
+                    ) : <span style={{ color: '#ccc', fontSize: 11 }}>—</span>}
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    {c.faturaIds?.length > 0 ? (
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#6366f1' }}>{c.faturaIds.length}</span>
+                    ) : <span style={{ color: '#ccc', fontSize: 11 }}>—</span>}
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 10, color: '#666', maxWidth: 80, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.notasVendedor || '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 12 }}>{vendedor ? vendedor.nome : '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ fontSize: 11, color: '#666' }}>{c.dataUltimoContacto ? c.dataUltimoContacto.split('T')[0] : '—'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onEditar(c); }} 
+                        title="Editar" 
+                        style={{ padding: '6px 10px', borderRadius: 6, backgroundColor: '#3b82f6', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                      >
+                        Editar
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); if (confirm('Tem a certeza que deseja eliminar este cliente?')) onEliminar(c.id); }} 
+                        title="Eliminar" 
+                        style={{ padding: '6px 10px', borderRadius: 6, backgroundColor: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -609,7 +732,7 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: isMobile ? 16 : 40, width: isMobile ? '100%' : 'auto', minWidth: isMobile ? '100%' : 450 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: isMobile ? 16 : 30, width: isMobile ? '100%' : 'auto', minWidth: isMobile ? '100%' : 600 }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Categoria</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: '#F25C05' }}>{getCategoriaLabel(c.categoria)}</span>
@@ -624,6 +747,14 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Orçamento</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: '#1b1c1b' }}>{c.propostaValor ? `${c.propostaValor.toLocaleString()} €` : '—'}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Vendedor</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>{vendedores.find(v => v.id === c.vendedorId)?.nome || '—'}</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 4 }}>Faturas</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#6366f1' }}>{c.faturaIds?.length || 0}</span>
                 </div>
               </div>
 

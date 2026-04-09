@@ -13,6 +13,7 @@ import { Cliente, Proposal, Tarea } from "../types";
 import { NewStatsCard } from "../components/admin/NewStatsCard";
 import { ConviteModal } from "../components/dashboard/ConviteModal";
 import { VendasTarefasTab } from "../components/dashboard/VendasTarefasTab";
+import { VendasComissoesTab } from "../components/dashboard/VendasComissoesTab";
 import { ImportarClientesModal } from "../components/ImportarClientesModal";
 
 interface VendasDashboardProps {
@@ -22,7 +23,7 @@ interface VendasDashboardProps {
 
 export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
   const [, setLocation] = useLocation(); // FIXED: using wouter for SPA navigation
-  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "orcamento" | "clientes" | "propostas" | "faturacao" | "perfil" | "tarefas" | "comissoes">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -798,6 +799,12 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
           </div>
         )}
 
+        {activeTab === "comissoes" && (
+          <div style={{ background: '#fff', padding: 32, borderRadius: 24, boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
+            <VendasComissoesTab vendedorId={vendedor.id} tipo={vendedor.tipo === 'colaborador' ? 'colaborador' : 'vendedor'} />
+          </div>
+        )}
+
       </main>
 
       <ConviteModal
@@ -810,6 +817,7 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         vendedorId={vendedor.id}
+        vendedorNome={vendedor.nome}
         onSuccess={() => {
           setShowImportModal(false);
           loadData();

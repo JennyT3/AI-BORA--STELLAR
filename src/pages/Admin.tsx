@@ -11,6 +11,7 @@ import { Faturacao } from "./admin/Faturacao";
 import { VendoresAdmin } from "./admin/Vendores";
 import { Marketing } from "./admin/Marketing";
 import { TarefasKanban } from "./admin/TarefasKanban";
+import { DelegacoesAdmin } from "./admin/Delegacoes";
 import { exportToExcel } from "../services/exportService";
 import { useAuth } from "../hooks/useAuth";
 import { useAdminData } from "../hooks/useAdminData";
@@ -18,7 +19,7 @@ import { updateSolicitudeStatus } from "../services/solicitudes";
 import { ClienteFormModal } from "../components/admin/ClienteFormModal";
 import { FaturaModal } from "../components/admin/FaturaModal";
 
-type AdminTab = "dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores" | "tarefas" | "marketing";
+type AdminTab = "dashboard" | "orcamento" | "propostas" | "solicitacoes" | "clientes" | "faturacao" | "vendedores" | "delegacoes" | "tarefas" | "marketing";
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
@@ -164,6 +165,7 @@ export function Admin() {
           onLogout={() => logout("admin")}
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           isMobile={isMobile}
+          onNavigate={(tab) => setActiveTab(tab as any)}
         />
 
         <main style={{ 
@@ -276,6 +278,10 @@ export function Admin() {
             <VendoresAdmin
               onNavigateVendas={(id) => navigate(`/vendas?v=${id}`)}
             />
+          )}
+
+          {activeTab === "delegacoes" && (
+            <DelegacoesAdmin />
           )}
 
           {activeTab === "tarefas" && (

@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { Tarea, Cliente, Vendedor } from "../../types";
-import { updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, solicitarTarea } from "../../services/firebase";
+import { updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, solicitarTarea, aprobarSolicitudTarea, rechazarSolicitudTarea, enviarAoCliente, aprobarEntregaTarea, solicitarAlteracoes, TareaEstado, TAREFA_ESTADOS } from "../../services/tareas";
 import { sendDeliveryApprovalEmail } from "../../services/emailService";
 
 const COLUMNAS = [
-  { id: "disponivel", label: "Disponível", cor: "#0284C7", bg: "#E0F2FE" },
-  { id: "candidatura", label: "Em candidatura", cor: "#D97706", bg: "#FEF3C7" },
-  { id: "asignada", label: "Em andamento", cor: "#7C3AED", bg: "#EDE9FE" },
-  { id: "entregue", label: "Entregue", cor: "#2563EB", bg: "#DBEAFE" },
-  { id: "aprovada_admin", label: "Aprovada admin", cor: "#059669", bg: "#D1FAE5" },
-  { id: "aprovada_cliente", label: "Aprovada cliente", cor: "#16A34A", bg: "#DCFCE7" },
-  { id: "paga", label: "Paga", cor: "#9333EA", bg: "#F3E8FF" },
+  { id: "disponivel", label: "Disponível", cor: "#22c55e", bg: "#dcfce7" },
+  { id: "pendente_atribuicao", label: "Aguardando Aprovação", cor: "#f59e0b", bg: "#fef3c7" },
+  { id: "atribuida", label: "Atribuída", cor: "#3b82f6", bg: "#dbeafe" },
+  { id: "em_analise", label: "Em Análise", cor: "#8b5cf6", bg: "#ede9fe" },
+  { id: "em_execucao", label: "Em Execução", cor: "#ec4899", bg: "#fce7f3" },
+  { id: "em_revisao", label: "Em Revisão", cor: "#14b8a6", bg: "#ccfbf1" },
+  { id: "aprovada", label: "Aprovada", cor: "#10b981", bg: "#d1fae5" },
+  { id: "entregue", label: "Entregue", cor: "#f97316", bg: "#ffedd5" },
+  { id: "paga", label: "Paga", cor: "#65a30d", bg: "#ecfccb" },
 ];
 
 interface Props {
@@ -40,8 +42,12 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
     : tareas;
 
   const getCol = (t: Tarea) => {
-    if (t.estado === "disponivel" && t.solicitantes && t.solicitantes.length > 0) return "candidatura";
     return t.estado;
+  };
+
+  const getEstadoLabel = (estado: string) => {
+    const est = TAREFA_ESTADOS.find(e => e.value === estado);
+    return est?.label || estado;
   };
 
   const handleDragStart = (id: string) => { if (isAdmin) setDraggedId(id); };
@@ -49,15 +55,76 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
   const handleDrop = async (colId: string) => {
     if (!isAdmin || !draggedId) return;
     setDraggedId(null); setOverCol(null);
-    const estadoReal = colId === "candidatura" ? "disponivel" : colId as Tarea["estado"];
-    // FIXED: Added error handling instead of empty catch
     try { 
-      await updateTarea(draggedId, { estado: estadoReal }); 
+      await updateTarea(draggedId, { estado: colId as TareaEstado }); 
       onRefresh(); 
     } catch (err) { 
       console.error('Error al mover tarea:', err); 
       alert('Erro ao mover tarefa. Tente novamente.');
     }
+  };
+
+  const handleAprobarSolicitud = async (tarea: Tarea, vendedorId: string, vendedorNome: string) => {
+    setLoading(true);
+    try {
+      await aprobarSolicitudTarea(tarea.id, vendedorId, vendedorNome);
+      onRefresh();
+    } catch (err) {
+      console.error('Error ao aprovar solicitação:', err);
+      alert('Erro ao aprovar solicitação.');
+    }
+    setLoading(false);
+  };
+
+  const handleRechazarSolicitud = async (tarea: Tarea, vendedorId: string, vendedorNome: string) => {
+    const motivo = prompt('Motivo da rejeição (opcional):');
+    setLoading(true);
+    try {
+      await rechazarSolicitudTarea(tarea.id, vendedorId, vendedorNome, motivo || undefined);
+      onRefresh();
+    } catch (err) {
+      console.error('Error ao rejeitar solicitação:', err);
+      alert('Erro ao rejeitar solicitação.');
+    }
+    setLoading(false);
+  };
+
+  const handleEntregarAoCliente = async (tarea: Tarea) => {
+    setLoading(true);
+    try {
+      await enviarAoCliente(tarea.id);
+      onRefresh();
+    } catch (err) {
+      console.error('Error ao enviar ao cliente:', err);
+      alert('Erro ao enviar ao cliente.');
+    }
+    setLoading(false);
+  };
+
+  const handleAprobarEntrega = async (tarea: Tarea) => {
+    setLoading(true);
+    try {
+      await aprobarEntregaTarea(tarea.id);
+      onRefresh();
+    } catch (err) {
+      console.error('Error ao aprobar entrega:', err);
+      alert('Erro ao aprobar entrega.');
+    }
+    setLoading(false);
+  };
+
+  const handleSolicitarAlteracoes = async (tarea: Tarea) => {
+    const nota = prompt('Que alterações são necessárias?');
+    if (!nota) return;
+    setLoading(true);
+    try {
+      await solicitarAlteracoes(tarea.id, nota);
+      onRefresh();
+    } catch (err) {
+      console.error('Error ao solicitar alterações:', err);
+      alert('Erro ao solicitar alterações.');
+    }
+    setLoading(false);
   };
 
   const handleAsignar = async () => {
@@ -112,10 +179,10 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
 
   const handleSolicitar = async (t: Tarea) => {
     if (!vendedorId) return;
+    const vendedorNome = getVendedorNome(vendedorId);
     setLoading(true);
-    // FIXED: Added error handling
     try { 
-      await solicitarTarea(t.id, vendedorId); 
+      await solicitarTarea(t.id, vendedorId, vendedorNome); 
       onRefresh(); 
     } catch (err) { 
       console.error('Error al solicitar tarea:', err); 

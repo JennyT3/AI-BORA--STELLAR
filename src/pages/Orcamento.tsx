@@ -300,6 +300,24 @@ const total = precoTotal;
       const id = await createProposal(proposalData);
       setPropostaId(id);
       
+      // Actualizar cliente con la propuesta vinculada
+      if (clienteIdSeleccionado) {
+        try {
+          const { updateCliente } = await import('../services/firebase');
+          await updateCliente(clienteIdSeleccionado, {
+            propostaId: id,
+            propostaNumero: numeroOrcamento,
+            propostaValor: subtotalComDesconto,
+            categoria: cliente.categoria === 'curioso' ? 'potencial' : cliente.categoria,
+            processo: 'iniciado',
+            servicos: marcas[0]?.servicos || [],
+            dataUltimoContacto: new Date().toISOString()
+          });
+        } catch (err) {
+          console.error('Error al vincular propuesta al cliente:', err);
+        }
+      }
+      
       // Obtener la propuesta para obtener el token de acceso
       const { getProposal } = await import('../services/firebase');
       const propostaCriada = await getProposal(id);
