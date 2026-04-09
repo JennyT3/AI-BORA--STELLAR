@@ -125,12 +125,19 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
   
   for (const cliente of clientesData) {
     try {
-      // Normalizar campos que pueden venir como números desde Excel
-      const nome = cliente.nome != null ? String(cliente.nome).trim() : '';
-      const email = cliente.email != null ? String(cliente.email).trim().toLowerCase() : '';
-      const telemovel = (cliente.telemovel || cliente.telefone) != null ? String(cliente.telemovel || cliente.telefone).trim() : '';
-      const nif = cliente.nif != null ? String(cliente.nif).trim() : '';
-      const codigoPostal = cliente.codigoPostal != null ? String(cliente.codigoPostal).trim() : '';
+      // Normalizar TODOS los campos con ?? para evitar undefined
+      const nome = String(cliente.nome ?? '').trim();
+      const email = String(cliente.email ?? '').trim().toLowerCase();
+      const telemovel = String((cliente.telemovel ?? cliente.telefone ?? '')).trim();
+      const nif = String(cliente.nif ?? '').trim();
+      const empresa = String(cliente.empresa ?? '').trim();
+      const website = String(cliente.website ?? '').trim();
+      const morada = String(cliente.morada ?? '').trim();
+      const codigoPostal = String(cliente.codigoPostal ?? '').trim();
+      const cidade = String(cliente.cidade ?? '').trim();
+      const origem = String(cliente.origem ?? 'Importado').trim();
+      const notasVendedor = String(cliente.notasVendedor ?? '').trim();
+      const dataUltimoContacto = String(cliente.dataUltimoContacto ?? '').trim();
       
       // Usar la función de upsert con deduplicación
       const result = await upsertCliente({
@@ -138,16 +145,16 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
         email: email || undefined,
         telemovel: telemovel || undefined,
         nif: nif || undefined,
-        empresa: cliente.empresa?.trim(),
-        website: cliente.website?.trim(),
-        morada: cliente.morada?.trim(),
+        empresa: empresa || undefined,
+        website: website || undefined,
+        morada: morada || undefined,
         codigoPostal: codigoPostal || undefined,
-        cidade: cliente.cidade?.trim(),
+        cidade: cidade || undefined,
         categoria: 'potencial',
         processo: 'sem_processo',
-        origem: cliente.origem || 'Importado',
-        notasVendedor: cliente.notasVendedor?.trim(),
-        dataUltimoContacto: cliente.dataUltimoContacto,
+        origem,
+        notasVendedor: notasVendedor || undefined,
+        dataUltimoContacto: dataUltimoContacto || undefined,
         servicos: (() => {
           if (Array.isArray(cliente.servicos)) return cliente.servicos;
           if (typeof cliente.servicos === 'string' && cliente.servicos.trim() !== '') {
