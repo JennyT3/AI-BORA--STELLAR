@@ -179,105 +179,135 @@ export function VendasClientesTab({
 
       {/* Table */}
       <div style={{ backgroundColor: "#fff", borderRadius: 10, border: "1px solid #e8e8e8", overflow: "hidden" }}>
-        <div style={{ overflowX: "auto", maxHeight: "60vh" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1000 }}>
+        <div style={{ overflowX: "auto", maxHeight: "70vh" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 1400 }}>
             <thead>
               <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 10 }}>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Nome</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Categoria</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Empresa</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>NIF</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Telefone</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Email</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Origem</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Processo</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Website</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Cidade</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Último Contacto</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Proposta</th>
-                <th style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Ações</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Nome</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Categoria</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Empresa</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>NIF</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Telefone</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Email</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Origem</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Processo</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Website</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Morada</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>CP</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Cidade</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Serviços</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Orçamento</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Proposta</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Fatura</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Notas Vendedor</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "left", whiteSpace: "nowrap" }}>Último Contacto</th>
+                <th style={{ padding: "10px 8px", fontSize: 9, fontWeight: 700, color: "#666", textAlign: "center", whiteSpace: "nowrap" }}>Ações</th>
               </tr>
             </thead>
             <tbody>
               {filteredClientes.map((c) => (
                 <tr key={c.id} style={{ borderTop: "1px solid #f0f0f0" }}>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <input value={editData.nome || ''} onChange={e => setEditData({...editData, nome: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                      <input value={editData.nome || ''} onChange={e => setEditData({...editData, nome: e.target.value})} style={{ width: "100%", padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }} />
                     ) : (
-                      <span style={{ fontWeight: 600, fontSize: 13, color: theme.colors.text.primary }}>{c.nome}</span>
+                      <span style={{ fontWeight: 600, fontSize: 12, color: theme.colors.text.primary }}>{c.nome}</span>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <select value={editData.categoria || ''} onChange={e => setEditData({...editData, categoria: e.target.value})} style={{ padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }}>
+                      <select value={editData.categoria || ''} onChange={e => setEditData({...editData, categoria: e.target.value})} style={{ padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }}>
                         {CATEGORIAS.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
                       </select>
                     ) : (
-                      <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, backgroundColor: getCategoriaColor(c.categoria) + '20', color: getCategoriaColor(c.categoria), fontWeight: 600 }}>
+                      <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 8, backgroundColor: getCategoriaColor(c.categoria) + '20', color: getCategoriaColor(c.categoria), fontWeight: 600 }}>
                         {getCategoriaLabel(c.categoria)}
                       </span>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <input value={editData.empresa || ''} onChange={e => setEditData({...editData, empresa: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                      <input value={editData.empresa || ''} onChange={e => setEditData({...editData, empresa: e.target.value})} style={{ width: "100%", padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }} />
                     ) : (
-                      <span style={{ fontSize: 12, color: "#666" }}>{c.empresa || '—'}</span>
+                      <span style={{ fontSize: 11, color: "#666" }}>{c.empresa || '—'}</span>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <input value={editData.nif || ''} onChange={e => setEditData({...editData, nif: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                      <input value={editData.nif || ''} onChange={e => setEditData({...editData, nif: e.target.value})} style={{ width: "100%", padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }} />
                     ) : (
-                      <span style={{ fontSize: 12, color: "#666" }}>{c.nif || '—'}</span>
+                      <span style={{ fontSize: 11, color: "#666" }}>{c.nif || '—'}</span>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <input value={editData.telemovel || ''} onChange={e => setEditData({...editData, telemovel: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                      <input value={editData.telemovel || ''} onChange={e => setEditData({...editData, telemovel: e.target.value})} style={{ width: "100%", padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }} />
                     ) : (
-                      <a href={`tel:${c.telemovel}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.telemovel || '—'}</a>
+                      <a href={`tel:${c.telemovel}`} style={{ fontSize: 11, color: "#666", textDecoration: "none" }}>{c.telemovel || '—'}</a>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {editingId === c.id ? (
-                      <input value={editData.email || ''} onChange={e => setEditData({...editData, email: e.target.value})} style={{ width: "100%", padding: "6px", borderRadius: 4, border: "1px solid #ddd", fontSize: 12 }} />
+                      <input value={editData.email || ''} onChange={e => setEditData({...editData, email: e.target.value})} style={{ width: "100%", padding: "4px", borderRadius: 4, border: "1px solid #ddd", fontSize: 11 }} />
                     ) : (
-                      <a href={`mailto:${c.email}`} style={{ fontSize: 12, color: "#666", textDecoration: "none" }}>{c.email || '—'}</a>
+                      <a href={`mailto:${c.email}`} style={{ fontSize: 11, color: "#666", textDecoration: "none" }}>{c.email || '—'}</a>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontSize: 11, color: "#666" }}>{c.origem || '—'}</span>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 10, color: "#666" }}>{c.origem || '—'}</span>
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontSize: 10, padding: "3px 8px", borderRadius: 10, backgroundColor: "#f3f4f6", color: "#666", fontWeight: 600 }}>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 8, backgroundColor: "#f3f4f6", color: "#666", fontWeight: 600 }}>
                       {c.processo || 'sem_processo'}
                     </span>
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
                     {c.website ? (
-                      <a href={c.website.startsWith('http') ? c.website : `https://${c.website}`} target="_blank" style={{ fontSize: 11, color: "#3498DB", textDecoration: "none" }}>
-                        {c.website.substring(0, 20)}{c.website.length > 20 ? '...' : ''}
+                      <a href={c.website.startsWith('http') ? c.website : `https://${c.website}`} target="_blank" style={{ fontSize: 10, color: "#3498DB", textDecoration: "none" }}>
+                        {c.website.substring(0, 15)}{c.website.length > 15 ? '...' : ''}
                       </a>
-                    ) : <span style={{ fontSize: 12, color: "#666" }}>—</span>}
+                    ) : <span style={{ fontSize: 11, color: "#666" }}>—</span>}
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontSize: 12, color: "#666" }}>{c.cidade || '—'}</span>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 10, color: "#666", maxWidth: 80, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.morada || '—'}</span>
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <span style={{ fontSize: 11, color: "#666" }}>{c.dataUltimoContacto ? c.dataUltimoContacto.split('T')[0] : '—'}</span>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 11, color: "#666" }}>{c.codigoPostal || '—'}</span>
                   </td>
-                  <td style={{ padding: "10px 12px" }}>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 11, color: "#666" }}>{c.cidade || '—'}</span>
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 10, color: "#666", maxWidth: 80, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {Array.isArray(c.servicos) ? c.servicos.join(', ') : (c.servicos || '—')}
+                    </span>
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    {c.orcamentoIds?.length > 0 ? (
+                      <span style={{ fontSize: 10, color: "#F25C05", fontWeight: 600 }}>{c.orcamentoIds.length}</span>
+                    ) : <span style={{ fontSize: 11, color: "#ccc" }}>—</span>}
+                  </td>
+                  <td style={{ padding: "8px" }}>
                     {hasValidProposta(c) ? (
-                      <a href={`/p/${c.propostaId}`} target="_blank" style={{ fontSize: 11, color: "#3498DB", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-                        {c.propostaNumero || c.propostaId?.slice(0, 8)} <ExternalLink size={10} />
+                      <a href={`/p/${c.propostaId}`} target="_blank" style={{ fontSize: 10, color: "#3498DB", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
+                        {c.propostaNumero || c.propostaId?.slice(0, 6)} <ExternalLink size={8} />
                       </a>
                     ) : (
                       <span style={{ fontSize: 11, color: "#ccc" }}>—</span>
                     )}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                  <td style={{ padding: "8px" }}>
+                    {c.faturaIds?.length > 0 ? (
+                      <span style={{ fontSize: 10, color: "#6366f1", fontWeight: 600 }}>{c.faturaIds.length}</span>
+                    ) : <span style={{ fontSize: 11, color: "#ccc" }}>—</span>}
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 10, color: "#666", maxWidth: 80, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.notasVendedor || '—'}</span>
+                  </td>
+                  <td style={{ padding: "8px" }}>
+                    <span style={{ fontSize: 10, color: "#666" }}>{c.dataUltimoContacto ? c.dataUltimoContacto.split('T')[0] : '—'}</span>
+                  </td>
+                  <td style={{ padding: "8px", textAlign: "center" }}>
                     {editingId === c.id ? (
                       <div style={{ display: "flex", gap: 4, justifyContent: "center" }}>
                         <button onClick={saveEdit} style={{ padding: "4px 8px", borderRadius: 4, backgroundColor: "#10B981", color: "#fff", border: "none", cursor: "pointer" }}><Check size={12} /></button>
