@@ -426,11 +426,14 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
             <thead style={{ backgroundColor: '#fcf9f7' }}>
               <tr>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Nome</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Contacto</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Empresa</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Telemovel</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Email</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Categoria</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Origem</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Empresa/NIF</th>
-                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Estado</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Vendedor</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Processo</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Último Contacto</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
               </tr>
             </thead>
@@ -443,8 +446,18 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                     <div style={{ fontWeight: 800, color: '#1b1c1b', fontSize: 14 }}>{c.nome}</div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.email}</div>
-                    {c.telemovel && <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.telemovel}</div>}
+                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 13 }}>{c.empresa || '—'}</div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ fontWeight: 600, color: '#5a4137', fontSize: 12 }}>{c.telemovel || '—'}</div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.email || '—'}</div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <span style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 800, backgroundColor: '#fff', color: '#F25C05', border: '1px solid rgba(242, 92, 5, 0.2)' }}>
+                      {getCategoriaLabel(c.categoria)}
+                    </span>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, color: '#5a4137', fontSize: 12 }}>
@@ -453,16 +466,15 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                     </div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 800, color: '#1b1c1b', fontSize: 13 }}>{c.empresa || '—'}</div>
-                    {c.nif && <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>NIF: {c.nif}</div>}
+                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 13 }}>{vendedor ? vendedor.nome : '—'}</div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <span style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 800, backgroundColor: '#fff', color: '#F25C05', border: '1px solid rgba(242, 92, 5, 0.2)' }}>
-                      {getCategoriaLabel(c.categoria)}
+                    <span style={{ fontSize: 10, padding: '4px 12px', borderRadius: 100, fontWeight: 700, backgroundColor: '#f3f4f6', color: '#4b5563' }}>
+                      {c.processo || 'sem_processo'}
                     </span>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
-                    <div style={{ fontWeight: 600, color: '#1b1c1b', fontSize: 13 }}>{vendedor ? vendedor.nome : '—'}</div>
+                    <div style={{ fontWeight: 500, color: '#8e7165', fontSize: 12 }}>{c.dataUltimoContacto || '—'}</div>
                   </td>
                   <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end', alignItems: 'center' }}>

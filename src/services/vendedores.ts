@@ -142,7 +142,13 @@ export async function importarClientesParaVendedor(vendedorId: string, clientesD
         origem: cliente.origem || 'Importado',
         notasVendedor: cliente.notasVendedor,
         dataUltimoContacto: cliente.dataUltimoContacto,
-        servicos: cliente.servicos ? cliente.servicos.split(';').map((s: string) => s.trim()) : undefined,
+        servicos: (() => {
+          if (Array.isArray(cliente.servicos)) return cliente.servicos;
+          if (typeof cliente.servicos === 'string' && cliente.servicos.trim() !== '') {
+            return cliente.servicos.split(';').map((s: string) => s.trim());
+          }
+          return [];
+        })(),
         vendedorId,
         importadoPor
       }, vendedorId);

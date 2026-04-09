@@ -84,7 +84,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   const loadClientes = async () => {
     setLoading(true);
     try {
-      const data = await listClientes(100);
+      const data = await listClientes(500);
       setClientes(data);
     } catch (err) {
       console.error(err);

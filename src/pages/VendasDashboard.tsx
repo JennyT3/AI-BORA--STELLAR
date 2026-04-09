@@ -13,6 +13,7 @@ import { Cliente, Proposal, Tarea } from "../types";
 import { NewStatsCard } from "../components/admin/NewStatsCard";
 import { ConviteModal } from "../components/dashboard/ConviteModal";
 import { VendasTarefasTab } from "../components/dashboard/VendasTarefasTab";
+import { ImportarClientesModal } from "../components/ImportarClientesModal";
 
 interface VendasDashboardProps {
   vendedor: Vendedor;
@@ -803,6 +804,16 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
         isOpen={showConviteModal}
         onClose={() => setShowConviteModal(false)}
         vendedor={vendedor}
+      />
+
+      <ImportarClientesModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        vendedorId={vendedor.id}
+        onSuccess={() => {
+          setShowImportModal(false);
+          loadData();
+        }}
       />
     </div>
   );

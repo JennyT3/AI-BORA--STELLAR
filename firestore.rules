@@ -68,14 +68,12 @@ service cloud.firestore {
     // ============================================
     // CLIENTES (protegido)
     // ============================================
-    match /clientes/{id} {
-      // Qualquer um logado pode ler (para listas)
-      allow read: if isAuthenticated();
-      // Só admins podem criar
-      allow create: if isAdmin();
-      // Só admins ou o vendedor asignado podem editar
-      allow update: if isAdmin() || 
-        (isAuthenticated() && resource.data.vendedorId == request.auth.uid);
+    match /clientes/{clienteId} {
+      allow read, write: if isAdmin();
+      allow create: if request.auth != null 
+        && request.resource.data.vendedorId == request.auth.uid;
+      allow read, update: if request.auth != null 
+        && resource.data.vendedorId == request.auth.uid;
       // Só admins podem eliminar
       allow delete: if isAdmin();
     }
