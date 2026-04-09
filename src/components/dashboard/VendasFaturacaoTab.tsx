@@ -1,5 +1,7 @@
 import React from 'react';
 import { theme } from "../../styles/theme";
+import { Download } from "lucide-react";
+import { gerarFaturaPDF } from "../../services/gerarFaturaPDF";
 
 export interface VendasFaturacaoTabProps {
   stats: any;
@@ -45,9 +47,30 @@ export function VendasFaturacaoTab({ stats, propostas, vendedor, clientes, tarea
                 <div style={{ fontWeight: 600, color: theme.colors.text.primary }}>{p.cliente}</div>
                 <div style={{ fontSize: 12, color: theme.colors.text.secondary }}>{p.numeroOrcamento}</div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontWeight: 700, color: "#10B981" }}>{p.valor?.toFixed(2)}€</div>
-                <div style={{ fontSize: 12, color: "#F22283" }}>+{comissao.toFixed(2)}€ comissão</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontWeight: 700, color: "#10B981" }}>{p.valor?.toFixed(2)}€</div>
+                  <div style={{ fontSize: 12, color: "#F22283" }}>+{comissao.toFixed(2)}€ comissão</div>
+                </div>
+                <button 
+                  onClick={async () => {
+                    const doc = await gerarFaturaPDF({
+                      numeroFatura: p.numeroOrcamento || "FAC-AUTO",
+                      dataEmissao: new Date().toLocaleDateString('pt-PT'),
+                      cliente: p.cliente,
+                      servicos: p.servicos || ["Serviços de Marketing"],
+                      subtotal: p.valor || 0,
+                      iva: (p.valor || 0) * 0.23,
+                      total: (p.valor || 0) * 1.23,
+                      tipo: 'cliente'
+                    });
+                    doc.save(`Fatura_${p.numeroOrcamento || p.id}.pdf`);
+                  }}
+                  style={{ background: '#fcf9f7', border: 'none', padding: 8, borderRadius: 8, cursor: 'pointer', color: '#F25C05' }}
+                  title="Descarregar Fatura"
+                >
+                  <Download size={18} />
+                </button>
               </div>
             </div>
           );

@@ -299,7 +299,13 @@ const total = precoTotal;
       };
       const id = await createProposal(proposalData);
       setPropostaId(id);
-      const link = `https://aibora.pt/p/${id}`;
+      
+      // Obtener la propuesta para obtener el token de acceso
+      const { getProposal } = await import('../services/firebase');
+      const propostaCriada = await getProposal(id);
+      const accessToken = propostaCriada?.accessToken || id;
+      
+      const link = `https://aibora.pt/p/${accessToken}`;
       if (cliente.email) {
         sendPropostaLinkEmail({ nome: cliente.nome, email: cliente.email, link, empresa: cliente.empresa }).catch(() => {});
       }

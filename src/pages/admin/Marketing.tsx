@@ -12,11 +12,12 @@ export function Marketing({ clientes }: MarketingProps) {
   const [assunto, setAssunto] = useState("");
   const [mensagemHtml, setMensagemHtml] = useState("");
   const [enviando, setEnviando] = useState(false);
-  const [filtro, setFiltro] = useState("sem_interesse");
+  const [filtro, setFiltro] = useState("todos");
   
-  // Excluímos os "curiosos" por default, e permitimos filtrar
   const targetClients = clientes.filter(c => {
-    if (filtro === "todos") return c.email;
+    if (!c.email) return false;
+    if (filtro === "todos") return true;
+    if (filtro === "leads") return ["potencial", "proposta_enviada", "curioso"].includes(c.categoria);
     return c.email && c.categoria === filtro;
   });
 
@@ -39,12 +40,14 @@ export function Marketing({ clientes }: MarketingProps) {
 
     for (const cliente of targetClients) {
       try {
-        await sendMarketingCampaignEmail({
-          nome: cliente.nome,
-          email: cliente.email!,
-          assunto: assunto,
-          mensagemHtml: mensagemHtml
-        });
+        // El servicio espera (email, assunto, mensagem, link?, nome?)
+        await sendMarketingCampaignEmail(
+          cliente.email!,
+          assunto,
+          mensagemHtml,
+          undefined,
+          cliente.nome
+        );
         sucessos++;
       } catch (e) {
         erros++;
@@ -143,10 +146,11 @@ export function Marketing({ clientes }: MarketingProps) {
             onChange={e => setFiltro(e.target.value)}
             style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "2px solid #e0e0e0", fontSize: 14, fontFamily: "Montserrat, sans-serif", marginBottom: 24 }}
           >
-            <option value="sem_interesse">No Interesados / Sem interesse</option>
-            <option value="lead">Leads (Orçamento Solicitado)</option>
+            <option value="todos">Todos os Contactos</option>
             <option value="cliente">Clientes Ativos</option>
-            <option value="todos">Todos (exceto curiosos)</option>
+            <option value="leads">Leads (Potenciais/Propostas)</option>
+            <option value="sem_interesse">Sem Interesse</option>
+            <option value="curioso">Curiosos</option>
           </select>
 
           <div style={{ background: "#f8FAF4", padding: 16, borderRadius: 16, border: "1px dashed #ccc" }}>

@@ -1,4 +1,4 @@
-import { FileText, Users, Check, Plus, DollarSign, TrendingUp, Target } from "lucide-react";
+import { FileText, Users, Check, Plus, DollarSign, TrendingUp, Target, Download } from "lucide-react";
 import { getStatusColorDashboard, getStatusLabelDashboard, getProposalStatusBadge } from "../../utils/labels";
 import { NewStatsCard } from "../../components/admin/NewStatsCard";
 import { WelcomeHero } from "../../components/admin/WelcomeHero";
@@ -16,13 +16,38 @@ interface DashboardProps {
   isMobile?: boolean;
 }
 
-export function Dashboard({ stats, proposals, solicitudes, clientes, onNovoOrcamento, onNovoCliente, onNovaFatura, onNavigate, isMobile = false }: DashboardProps) {
+export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, onNovoOrcamento, onNovoCliente, onNovaFatura, onNavigate, isMobile = false }: DashboardProps) {
   const clientesAtivos = clientes.filter(c => c.categoria === "cliente").length;
 
   return (
     <div style={{ fontFamily: 'Montserrat, sans-serif' }}>
-      {/* Welcome Hero */}
-      <WelcomeHero isMobile={isMobile} />
+      {/* Welcome Hero & Export */}
+      <div style={{ position: 'relative', marginBottom: 40 }}>
+        <WelcomeHero isMobile={isMobile} />
+        <button 
+          onClick={onExport}
+          style={{ 
+            position: 'absolute', 
+            top: 24, 
+            right: 24, 
+            padding: '12px 24px', 
+            borderRadius: 16, 
+            backgroundColor: '#fff', 
+            color: '#1b1c1b', 
+            border: '1px solid rgba(0,0,0,0.05)', 
+            fontWeight: 800, 
+            fontSize: 13, 
+            cursor: 'pointer', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 8, 
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            zIndex: 20
+          }}
+        >
+          <Download size={18} /> Exportar BD Completa
+        </button>
+      </div>
 
       {/* Stats Grid */}
       <div style={{ 

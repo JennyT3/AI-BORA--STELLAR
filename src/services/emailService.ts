@@ -69,12 +69,27 @@ export async function sendPropostaLinkEmail(clienteEmail: string, clienteNome: s
   });
 }
 
-// Función específica: Notificar respuesta de propuesta
-export async function sendPropostaRespostaEmail(adminEmail: string, clienteNome: string, resposta: string, comentarios?: string) {
-  return sendEmail(adminEmail, 'resposta-proposta', {
-    clienteNome,
-    resposta,
-    comentarios: comentarios || '',
+// Función específica: Notificar respuesta de propuesta (al admin + confirmación al cliente)
+export async function sendPropostaRespostaEmail(params: {
+  nome: string;
+  email: string;
+  resposta: string;
+  empresa?: string;
+  fichaUrl?: string;
+}) {
+  // Email al admin
+  sendEmail('geral@aibora.pt', 'resposta-proposta', {
+    clienteNome: params.nome,
+    clienteEmail: params.email,
+    empresa: params.empresa || '',
+    resposta: params.resposta,
+  }).catch(() => {});
+
+  // Email de confirmação ao cliente
+  return sendEmail(params.email, 'confirmacao-resposta-proposta', {
+    clienteNome: params.nome,
+    resposta: params.resposta,
+    fichaUrl: params.fichaUrl || '',
   });
 }
 

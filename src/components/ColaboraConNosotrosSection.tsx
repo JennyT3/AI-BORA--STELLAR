@@ -51,24 +51,7 @@ export function ColaboraConNosotrosSection({ isOpen = true, onClose }: Props) {
         marcas: [],
       });
 
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            tipo: 'colaboracao',
-            nome: formData.nome,
-            telefone: formData.telefone,
-            empresa: formData.empresa || '',
-            email: formData.email || '',
-            linkedin: formData.linkedin || '',
-            tipoColaboracao: tipo?.nome || '',
-            experiencia: formData.experiencia || '',
-            origem: 'Formulário Colaboração AI BORA',
-          }),
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'no-cors',
-        });
-      } catch (_) {}
+      // Google Script fallback removed as per user request
 
       if (formData.email) {
         sendColaboradorConfirmacao(formData.email, formData.nome).catch(() => {});

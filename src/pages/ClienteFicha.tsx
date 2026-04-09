@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
-import { getCliente, listTareas, db, aprovarTareaPorCliente, getProposal, listRegistosEmailByCliente } from "../services/firebase";
+import { getCliente, listTareas, db, getProposal, listRegistosEmailByCliente } from "../services/firebase";
+import { aprobarTareaPorCliente } from "../services/tareas";
 import { createFaturaMensalLocal, listFaturasByCliente } from "../services/firebase";
 import { Fatura } from "../services/faturas";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
@@ -22,7 +23,11 @@ import {
   Play,
   Eye,
   CreditCard,
-  Plus
+  Plus,
+  Sparkles,
+  Target,
+  Globe,
+  DollarSign
 } from "lucide-react";
 
 export function ClienteFicha() {
@@ -50,7 +55,7 @@ export function ClienteFicha() {
     setAprovingId(tareaId);
     try {
       const tarea = tareas.find(t => t.id === tareaId);
-      await aprobarTarea(tareaId);
+      await aprobarTareaPorCliente(params.id!, tareaId);
       setTareas(tareas.map(t => t.id === tareaId ? { ...t, estado: 'aprovada_cliente' } : t));
       
       if (tarea && cliente && proposta) {
@@ -205,7 +210,7 @@ export function ClienteFicha() {
         {/* WELCOME SECTION */}
         <header style={{ marginBottom: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#F25C05', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>
-            <SparklesIcon size={16} /> Bem-vindo à tua jornada digital
+            <Sparkles size={16} /> Bem-vindo à tua jornada digital
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 900, marginBottom: 16, lineHeight: 1.1 }}>
             Olá, <span style={{ color: '#F25C05' }}>{cliente.nome}</span>.
@@ -393,7 +398,25 @@ export function ClienteFicha() {
                           {fat.status === 'pago_notificado' ? 'Em verificação' : 'Pendente'}
                         </span>
                         {fat.status === 'pendente' && (
-                          <button style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                          <button 
+                            onClick={async () => {
+                              if (!confirm('Confirmas que efetuaste o pagamento?')) return;
+                              try {
+                                const { updateDoc, doc } = await import('firebase/firestore');
+                                await updateDoc(doc(db, 'faturas_recorrentes', fat.id), {
+                                  status: 'pago_notificado',
+                                  dataConfirmacaoCliente: new Date().toISOString(),
+                                  confirmacaoCliente: true
+                                });
+                                alert('Obrigado! O seu pagamento está em verificação. Receberá confirmação em breve.');
+                                const fatData = await listFaturasByCliente(params.id!);
+                                setFaturas(fatData);
+                              } catch (err) {
+                                alert('Erro ao confirmar pagamento. Tente novamente.');
+                              }
+                            }}
+                            style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                          >
                             Já Paguei
                           </button>
                         )}
@@ -586,11 +609,4 @@ export function ClienteFicha() {
   );
 }
 
-function SparklesIcon({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-      <path d="M5 3v4"/><path d="M3 5h4"/><path d="M21 17v4"/><path d="M19 19h4"/>
-    </svg>
-  );
-}
+

@@ -18,7 +18,7 @@ export function Termos() {
 
           <h2 className="font-bold text-2xl mt-12 mb-4 text-text-primary">2. Serviços Prestados</h2>
           <p className="text-text-secondary mb-6">
-            A AI BORA fornece serviços de marketing digital para negócios locais, incluindo a criação de websites, gestão de redes sociais, otimização de Google Business Profile e campanhas de publicidade online, conforme detalhado nos nossos "Packs" e "Planos de Gestão".
+            A AI BORA fornece serviços de marketing digital para negócios locais, incluindo a criação de websites, gestão de redes sociais, otimização de perfil de negócio local e campanhas de publicidade online, conforme detalhado nos nossos "Packs" e "Planos de Gestão".
           </p>
 
           <h2 className="font-bold text-2xl mt-12 mb-4 text-text-primary">3. Pagamentos e Faturação</h2>

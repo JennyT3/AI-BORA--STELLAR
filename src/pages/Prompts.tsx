@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
-import { categories } from '../data/prompts';
+import { categories, prompts } from '../data/prompts';
 import type { Prompt } from '../data/prompts';
 import { PromptCard } from '../components/PromptCard';
 import { Search } from 'lucide-react';
@@ -62,16 +62,38 @@ export function Prompts() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(SHEET_URL)
-      .then(r => r.text())
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    fetch(SHEET_URL, { redirect: 'follow', signal: controller.signal })
+      .then(r => {
+        clearTimeout(timeout);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
       .then(csv => {
-        setSheetPrompts(parseCSV(csv));
+        const parsed = parseCSV(csv);
+        if (parsed.length > 0) {
+          setSheetPrompts(parsed);
+        } else {
+          console.warn('Planilha retornou 0 prompts. Verifica colunas e campo Activo.');
+        }
         setLoadingSheet(false);
       })
-      .catch(() => setLoadingSheet(false));
+      .catch((err) => {
+        clearTimeout(timeout);
+        console.error("Erro ao carregar prompts:", err.name === 'AbortError' ? 'Timeout 10s' : err);
+        setLoadingSheet(false);
+      });
+
+    return () => { clearTimeout(timeout); controller.abort(); };
   }, []);
 
-  const allPrompts = useMemo(() => [...sheetPrompts], [sheetPrompts]);
+  const allPrompts = useMemo(() => {
+    // Usar prompts da planilha se existirem, senão usar os estáticos (se houver)
+    const combined = sheetPrompts.length > 0 ? sheetPrompts : (prompts || []);
+    return combined;
+  }, [sheetPrompts]);
 
   const filteredPrompts = useMemo(() => {
     let result = allPrompts;

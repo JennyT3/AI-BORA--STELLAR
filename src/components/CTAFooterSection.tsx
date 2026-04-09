@@ -46,20 +46,7 @@ export function CTAFooterSection() {
         }
       }
 
-      // Fallback to Google Script (optional)
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            ...formData,
-            origem: 'Formulario Website AIBORA'
-          }),
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'no-cors'
-        });
-      } catch (googleErr) {
-        // Ignore Google Script errors if Firestore succeeded
-      }
+      // Google Script fallback removed as per user request
 
       setSubmitStatus('success');
       setFormData({ nome: '', nomeNegocio: '', telefone: '', email: '', mensagem: '' });

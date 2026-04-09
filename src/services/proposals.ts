@@ -2,8 +2,18 @@ import { db } from './firebase';
 import { collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { generateId } from './firebase';
 
+function generateToken(length = 32): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let token = '';
+  for (let i = 0; i < length; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
 export interface Proposal {
   id: string;
+  accessToken?: string;
   cliente: string;
   email?: string;
   telefone?: string;
@@ -37,13 +47,22 @@ export interface Proposal {
 
 export async function createProposal(data: Partial<Proposal>): Promise<string> {
   const id = generateId();
+  const accessToken = generateToken(32);
   const docData = {
     ...data,
+    accessToken,
     createdAt: new Date().toISOString(),
     validUntil: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString()
   };
   await setDoc(doc(db, 'propostas', id), docData);
   return id;
+}
+
+export async function getProposalByToken(token: string): Promise<Proposal | null> {
+  const q = query(collection(db, 'propostas'), where('accessToken', '==', token), limit(1));
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  return { id: snap.docs[0].id, ...snap.docs[0].data() } as Proposal;
 }
 
 export async function getProposal(id: string): Promise<Proposal | null> {

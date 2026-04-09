@@ -8,8 +8,8 @@ export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 export const EMAIL = "geral@aibora.pt";
 export const EMAIL_LINK = "mailto:geral@aibora.pt";
 
-// Google Script URL - agora vem de variável de ambiente
-export const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || "";
+// Google Script URL removed as per user request
+export const GOOGLE_SCRIPT_URL = "";
 
 // IVA Taxa
 export const IVA_TAXA = 0.23;
@@ -31,7 +31,7 @@ export const SERVICOS_POR_CATEGORIA: Record<string, string[]> = {
   "Design": ["Design de Posts", "Logotipo", "Identidade Corporativa", "Banners e Posters"],
   "Web": ["Landing Page", "Site Catálogo", "Loja Online", "SEO Local"],
   "Multimédia": ["Fotografia Profissional", "Produção de Videos", "Criação de Reels", "Edição de Conteúdo"],
-  "Publicidade": ["Google Ads", "Facebook Ads", "Instagram Ads", "Gestão de Budget"],
+  "Publicidade": ["Facebook Ads", "Instagram Ads", "Gestão de Budget"],
   "Automação": ["Chatbot WhatsApp", "IA e Automação", "Respostas Automáticas", "Fluxos de CRM"],
   "Consultoria": ["Consultoria Estratégica", "Análise de Concorrentes", "Dashboard Excel", "Plano de Marketing"],
 };

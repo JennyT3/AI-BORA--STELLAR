@@ -21,9 +21,10 @@ interface Props {
   vendedorId?: string;
   onRefresh: () => void;
   clienteIdFiltro?: string;
+  onVerFicha?: (id: string) => void;
 }
 
-export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorId, onRefresh, clienteIdFiltro }: Props) {
+export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorId, onRefresh, clienteIdFiltro, onVerFicha }: Props) {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [overCol, setOverCol] = useState<string | null>(null);
   const [modalTarea, setModalTarea] = useState<Tarea | null>(null);
@@ -69,12 +70,13 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
     try { 
       await aprobarTarea(t.id); 
       if (t.clienteEmail) {
-        await sendDeliveryApprovalEmail({
-          nome: t.clienteNome || '',
-          email: t.clienteEmail,
-          tareaTitulo: t.titulo,
-          fichaUrl: `${window.location.origin}/c/${t.clienteId}`
-        });
+        // El servicio espera (email, nome, tareaTitulo, fichaUrl) según la firma del servicio
+        await sendDeliveryApprovalEmail(
+          t.clienteEmail,
+          t.clienteNome || 'Cliente',
+          t.titulo,
+          `${window.location.origin}/c/${t.clienteId}`
+        );
       }
       onRefresh(); 
     } catch {}
@@ -157,6 +159,11 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
                         👤 {t.asignadoNome}
                       </div>
                     )}
+                    {isAdmin && t.solicitantes && t.solicitantes.length > 0 && !t.asignadaA && (
+                      <div style={{ fontSize: 10, color: "#D97706", fontWeight: 700, marginBottom: 4 }}>
+                        🙋‍♂️ {t.solicitantes.length} solicitantes
+                      </div>
+                    )}
                     {t.prazo && (
                       <div style={{ fontSize: 10, color: "#F25C05", marginBottom: 4 }}>📅 {t.prazo}</div>
                     )}
@@ -190,7 +197,15 @@ export function TarefasKanban({ tareas, clientes, vendedores, isAdmin, vendedorI
               <button onClick={() => setModalTarea(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#888" }}>×</button>
             </div>
 
-            <div style={{ fontSize: 13, color: "#444", marginBottom: 8 }}>👤 Cliente: <strong>{modalTarea.clienteNome}</strong></div>
+            <div style={{ fontSize: 13, color: "#444", marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+              👤 Cliente: <strong>{modalTarea.clienteNome}</strong>
+              <button 
+                onClick={() => { setModalTarea(null); onVerFicha?.(modalTarea.clienteId); }} 
+                style={{ background: 'none', border: 'none', color: '#F25C05', cursor: 'pointer', fontSize: 11, fontWeight: 700, textDecoration: 'underline' }}
+              >
+                Ver Ficha
+              </button>
+            </div>
             {modalTarea.asignadoNome && <div style={{ fontSize: 13, color: "#444", marginBottom: 8 }}>🛠 Colaborador: <strong>{modalTarea.asignadoNome}</strong></div>}
             {modalTarea.prazo && <div style={{ fontSize: 13, color: "#F25C05", marginBottom: 8 }}>📅 Prazo: <strong>{modalTarea.prazo}</strong></div>}
             {modalTarea.periodicidade && <div style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>🔁 {modalTarea.periodicidade === "mensal" ? "Mensal" : "Pontual"}</div>}

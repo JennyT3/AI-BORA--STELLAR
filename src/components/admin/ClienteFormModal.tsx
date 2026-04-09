@@ -67,7 +67,7 @@ export function ClienteFormModal(props: ClienteFormModalProps) {
                 <option value="Facebook">Facebook</option>
                 <option value="TikTok">TikTok</option>
                 <option value="LinkedIn">LinkedIn</option>
-                <option value="Google">Google</option>
+
                 <option value="Recomendado">Recomendado</option>
                 <option value="Website">Website</option>
                 <option value="Formulario">Formulário</option>

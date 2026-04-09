@@ -385,6 +385,68 @@ const templates: Record<string, (data: any) => { subject: string; html: string }
         <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
       </td></tr>
       <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
+  }),
+
+  'pedido-cambios': (data) => ({
+    subject: `🔄 ${data.clienteNome} pediu alterações na proposta`,
+    html: wrap(`
+      <tr><td style="padding:48px 40px 16px;">
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🔄 Alterações Solicitadas</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;">Pedido de alterações</h1>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
+          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Cliente:</strong> ${data.clienteNome}</p>
+          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Empresa:</strong> ${data.empresa || 'Não especificada'}</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Proposta ID:</strong> ${data.propostaId}</p>
+        </td></tr></table>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 36px;">O cliente pediu alterações à proposta. Por favor, contacte o cliente para discutir os ajustes necessários.</p>
+        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
+          <a href="${data.linkProposta}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Editar Proposta →</a>
+        </td></tr></table>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+      </td></tr>
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
+  }),
+
+  'confirmacao-resposta-proposta': (data) => ({
+    subject: `Confirmamos a sua resposta, ${data.clienteNome}`,
+    html: wrap(`
+      <tr><td style="padding:48px 40px 16px;">
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">✦ Resposta Registada ✦</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Olá, ${data.clienteNome} 👋</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Obrigado pela sua resposta. Registámos a sua preferência:</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Sua resposta:</strong> ${data.resposta}</p>
+        </td></tr></table>
+        ${data.fichaUrl ? `<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
+          <a href="${data.fichaUrl}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Aceder à minha área →</a>
+        </td></tr></table>` : ''}
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa Ai Bora 💞</p>
+      </td></tr>
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
+  }),
+
+  'certificado-emitido': (data) => ({
+    subject: `🎉 Certificado da AI BORA Academy - ${data.nomeTrilha}`,
+    html: wrap(`
+      <tr><td style="padding:48px 40px 16px;">
+        <p style="font-size:12px;font-weight:700;color:#ff6f2e;text-transform:uppercase;letter-spacing:2px;margin:0 0 10px;">🏆 Certificado Conquistado</p>
+        <h1 style="font-size:26px;font-weight:700;color:#111;margin:0 0 20px;line-height:1.25;">Parabéns, ${data.nomeEstudante}! 🎉</h1>
+        <p style="font-size:15px;color:#444;line-height:1.75;margin:0 0 16px;">Completaste com sucesso a trilha <strong>${data.nomeTrilha}</strong>. O teu certificado está disponível!</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:40px;"><tr><td style="background:#fafafa;border-left:3px solid #ff6f2e;border-radius:0 8px 8px 0;padding:18px 22px;">
+          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Trilha:</strong> ${data.nomeTrilha}</p>
+          <p style="font-size:14px;color:#111;margin:0 0 8px;"><strong>Data de Conclusão:</strong> ${data.dataConclusao}</p>
+          <p style="font-size:14px;color:#111;margin:0;"><strong>Código de Verificação:</strong> ${data.codigoVerificacao}</p>
+        </td></tr></table>
+        <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:0 0 36px;">
+          <a href="${data.linkVerificacao}" style="display:inline-block;padding:16px 52px;background:#ff6f2e;color:#fff;text-decoration:none;font-size:15px;font-weight:700;border-radius:8px;">Ver meu Certificado →</a>
+        </td></tr></table>
+        <p style="font-size:15px;color:#444;margin:0 0 8px;">Partilha a tua conquista no LinkedIn!</p>
+        <p style="font-size:15px;color:#444;margin:0 0 4px;">Com os melhores cumprimentos,</p>
+        <p style="font-size:15px;font-weight:700;color:#111;margin:0 0 40px;">Equipa AI BORA Academy 📚</p>
+      </td></tr>
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:#eee;"></div></td></tr>`)
   })
 
 };

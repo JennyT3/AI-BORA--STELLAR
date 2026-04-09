@@ -101,8 +101,7 @@ export async function solicitarTarea(tareaId: string, vendedorId: string): Promi
   
   await updateTarea(tareaId, {
     solicitantes,
-    asignadaA: vendedorId,
-    estado: 'asignada',
+    estado: 'disponivel', // Se mantiene disponible hasta que el admin asigne
     dataSolicitacao: new Date().toISOString()
   });
 }

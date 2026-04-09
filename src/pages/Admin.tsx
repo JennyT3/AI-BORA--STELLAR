@@ -170,15 +170,16 @@ export function Admin() {
         <main style={{ 
           padding: isMobile ? '24px 16px' : '40px 60px', 
           flex: 1,
-          overflowX: 'hidden'
+          overflowX: 'auto',
+          width: '100%'
         }}>
           {activeTab === "dashboard" && (
-            <Dashboard
-              stats={admin.stats}
-              proposals={admin.proposals}
-              solicitudes={admin.solicitudes}
-              clientes={admin.clientes}
-              onExport={() => exportToExcel(admin.proposals, admin.solicitudes)}
+              <Dashboard
+                stats={admin.stats}
+                proposals={admin.proposals}
+                solicitudes={admin.solicitudes}
+                clientes={admin.clientes}
+                onExport={() => exportToExcel(admin.proposals, admin.solicitudes, admin.clientes, admin.vendedores)}
               onNovoOrcamento={() => navigate("/admin/orcamento")}
               onNovoCliente={() => { admin.setClienteFormData({ nome: "", email: "", telemovel: "", nif: "", morada: "", categoria: "curioso", observacoes: "" }); admin.setShowClienteForm(true); }}
               onNovaFatura={() => admin.abrirFatura({} as any)}
@@ -279,13 +280,14 @@ export function Admin() {
           )}
 
           {activeTab === "tarefas" && (
-            <TarefasKanban
-              tareas={admin.tareas}
-              clientes={admin.clientes}
-              vendedores={admin.vendedores}
-              isAdmin={true}
-              onRefresh={admin.loadTareas}
-            />
+                <TarefasKanban
+                  tareas={admin.tareas}
+                  clientes={admin.clientes}
+                  vendedores={admin.vendedores}
+                  isAdmin={true}
+                  onRefresh={admin.loadTareas}
+                  onVerFicha={(id) => { admin.onVerFicha(id); setActiveTab('clientes'); }}
+                />
           )}
 
           {activeTab === "marketing" && (

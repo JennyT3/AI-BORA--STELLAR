@@ -556,6 +556,60 @@ export function VendasDashboard({ vendedor, onLogout }: VendasDashboardProps) {
               </button>
             </div>
 
+            {/* Academia Bora Lá Card */}
+            <div 
+              onClick={() => window.location.href = '/academia/dashboard'}
+              style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                padding: "20px 24px",
+                borderRadius: 16,
+                background: "linear-gradient(135deg, #ff6f2e 0%, #cb1a74 100%)",
+                cursor: "pointer",
+                marginBottom: 48,
+                boxShadow: "0 8px 24px rgba(255, 111, 46, 0.3)",
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ 
+                  width: 48, 
+                  height: 48, 
+                  borderRadius: 12, 
+                  background: "rgba(255, 255, 255, 0.2)", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center" 
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 4, fontFamily: 'Montserrat, sans-serif' }}>
+                    Academia Bora Lá
+                  </h3>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", margin: 0, fontFamily: 'Montserrat, sans-serif' }}>
+                    Continua a tua formação — tens conteúdo novo disponível
+                  </p>
+                </div>
+              </div>
+              <div style={{ 
+                padding: "10px 20px", 
+                borderRadius: 8, 
+                background: "#fff", 
+                color: "#ff6f2e", 
+                fontWeight: 700, 
+                fontSize: 13,
+                fontFamily: 'Montserrat, sans-serif',
+              }}>
+                Ir para a Academia →
+              </div>
+            </div>
+
             {/* Recent Clients List */}
             <div style={{ backgroundColor: "#ffffff", borderRadius: 24, padding: 32, boxShadow: "0px 20px 40px rgba(90, 65, 55, 0.04)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>

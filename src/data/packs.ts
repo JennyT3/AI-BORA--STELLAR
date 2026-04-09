@@ -8,7 +8,7 @@ export const packs = [
     domain: false,
     features: [
       "Landing page profissional",
-      "Google Business + Google Maps",
+      "Perfil de Negócio Otimizado",
       "Integração WhatsApp Business",
       "3 Fotos de produto/serviço",
       "Diagnóstico básico de 1 rede social",
@@ -44,7 +44,7 @@ export const packs = [
       "Página web até 10 páginas",
       "Domínio próprio incluído",
       "Email profissional com domínio",
-      "Google Ads setup + €100 crédito",
+      "Setup de Publicidade Paga",
       "IA Agents — automação",
       "10 Fotos profissionais + edição",
       "3 Banners + 5 Posters",
@@ -63,7 +63,7 @@ export const packs = [
     features: [
       "Tudo do Pack Completo",
       "Página web custom + e-commerce",
-      "Google + Facebook + Instagram Ads",
+      "Facebook + Instagram Ads",
       "IA Agents avançados — chatbot",
       "Automação completa de processos",
       "20+ Fotos/vídeos profissionais",

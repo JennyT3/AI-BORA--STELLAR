@@ -14,7 +14,7 @@ export const SERVICOS_POR_CATEGORIA: Record<string, string[]> = {
   "Design": ["Design de Posts", "Logotipo", "Identidade Corporativa", "Banners e Posters"],
   "Web": ["Landing Page", "Site Catálogo", "Loja Online", "SEO Local"],
   "Multimédia": ["Fotografia Profissional", "Produção de Videos", "Criação de Reels", "Edição de Conteúdo"],
-  "Publicidade": ["Google Ads", "Facebook Ads", "Instagram Ads", "Gestão de Budget"],
+  "Publicidade": ["Facebook Ads", "Instagram Ads", "Gestão de Budget"],
   "Automação": ["Chatbot WhatsApp", "IA e Automação", "Respostas Automáticas", "Fluxos de CRM"],
   "Consultoria": ["Consultoria Estratégica", "Análise de Concorrentes", "Dashboard Excel", "Plano de Marketing"],
 };

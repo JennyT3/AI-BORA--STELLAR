@@ -28,14 +28,42 @@ export function VendasLogin({ onLogin }: VendasLoginProps) {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
 
-  // Auto-login quando vem ?v=vendedorId desde admin (legacy - manter compatibilidade)
+  // Auto-login quando vem ?v=vendedorId desde admin
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const vendedorId = params.get("v");
-    if (vendedorId) {
-      // Este método usa ID direto - legacy, mas manter para backwards compatibility
-      // Novo fluxo deve usar authService
-    }
+    const autoLogin = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const vendedorId = params.get("v");
+      const isAdmin = params.get("admin") === "true";
+      
+      if (vendedorId && isAdmin) {
+        setLoading(true);
+        try {
+          // Importar dinamicamente para evitar dependências circulares se houver
+          const { getVendedor } = await import("../services/vendedores");
+          const vendedorData = await getVendedor(vendedorId);
+          
+          if (vendedorData && vendedorData.ativo) {
+            const token = createSessionToken({
+              id: vendedorData.id,
+              nome: vendedorData.nome,
+              email: vendedorData.email || '',
+              role: 'vendedor'
+            });
+            
+            saveSession(token);
+            onLogin(vendedorData);
+          } else {
+            setError("Vendedor não encontrado ou inativo.");
+          }
+        } catch (err) {
+          console.error("Erro no auto-login:", err);
+          setError("Erro ao aceder ao painel do vendedor.");
+        }
+        setLoading(false);
+      }
+    };
+    
+    autoLogin();
   }, []);
 
   const handleLogin = async (e: FormEvent) => {

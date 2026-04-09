@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { listProposals, updateProposal, deleteProposal, createCliente, listClientes, updateCliente, deleteCliente, listContactos, Contacto, delegarClienteAVendedor, listVendedoresAtivos, listTareas, createTarea, updateTarea, asignarTarea, aprobarTarea, marcarTareaPaga, getClienteByPropostaId } from "../services/firebase";
 import { listSolicitudes, updateSolicitudeStatus, deleteSolicitude, asignarVendedorASolicitude } from "../services/solicitudes";
-import { sendPropostaRespostaEmail } from "../services/emailService";
+import { sendPropostaRespostaEmail, sendDeliveryApprovalEmail } from "../services/emailService";
 import { Proposal, Solicitude, Cliente, Tarea } from "../types";
 
 interface UseAdminDataOptions {
@@ -154,6 +154,16 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
   const handleAprobarEntrega = async (tareaId: string) => {
     try {
       await aprobarTarea(tareaId);
+      // Email ao cliente a avisar que a entrega foi aprovada pelo admin
+      const tarea = tareas.find(t => t.id === tareaId);
+      if (tarea?.clienteEmail) {
+        sendDeliveryApprovalEmail(
+          tarea.clienteEmail,
+          tarea.clienteNome || '',
+          tarea.titulo || tarea.servicoNome || 'Serviço',
+          new Date().toLocaleDateString('pt-PT')
+        ).catch(() => {});
+      }
       loadTareas();
     } catch (err) {
       console.error(err);
@@ -168,6 +178,24 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     } catch (err) {
       console.error(err);
       alert("Erro ao marcar como paga");
+    }
+  };
+
+  const handleUpdateProcesso = async (clienteId: string, processo: string) => {
+    try {
+      await updateCliente(clienteId, { processo });
+      loadClientes();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateTarefas = async (clienteId: string, tareas: any[]) => {
+    try {
+      await updateCliente(clienteId, { tareas });
+      loadClientes();
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -493,5 +521,7 @@ export function useAdminData({ currentUserId }: UseAdminDataOptions) {
     handleAsignarTarea,
     handleAprobarEntrega,
     handleMarcarPaga,
+    handleUpdateProcesso,
+    handleUpdateTarefas,
   };
 }

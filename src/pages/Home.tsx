@@ -29,6 +29,9 @@ export function Home() {
             <a href="/servicos#simulador" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#F22283", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(242,34,131,0.3)" }}>
               Ver servicos
             </a>
+            <a href="/academia/login" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#ff6f2e", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(255,111,46,0.3)", marginLeft: 12 }}>
+              Bora Lá →
+            </a>
           </div>
         </section>
         <QuemSomosSection />

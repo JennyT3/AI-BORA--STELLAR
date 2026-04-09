@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, AlignJustify, Grid, DollarSign, Search, Filter } from "lucide-react";
+import { Play, Clock, Eye, CheckCircle, Phone, Mail, MapPin, Building, Calendar, FileText, Plus, X, Check, Image, Video, Layout, Send, BarChart3, PenTool, Sparkles, User, ArrowRight, ExternalLink, Trash2, Edit, AlignJustify, Grid, DollarSign, Search, Filter, Target, Globe, MessageSquare } from "lucide-react";
 import { getCategoriaClasses, getCategoriaLabel } from "../../utils/labels";
 import { theme } from "../../styles/theme";
 
@@ -83,12 +83,7 @@ const SERVICOS_TAREFAS: Record<string, { nome: string; descricao: string; icon: 
     { nome: "Produção", descricao: "Gravar e editar", icon: Video },
     { nome: "Publicação", descricao: "Publicar no Instagram", icon: Send },
   ],
-  "Google Ads": [
-    { nome: " auditoria", descricao: "Auditoria da conta atual", icon: BarChart3 },
-    { nome: "Estrutura", descricao: "Estruturar campanhas", icon: Layout },
-    { nome: "Criação", descricao: "Criar anúncios", icon: Image },
-    { nome: "Otimização", descricao: "Ajustar e otimizar", icon: Check },
-  ],
+
   "Chatbot WhatsApp": [
     { nome: "Mapeamento", descricao: "Mapear fluxos", icon: Layout },
     { nome: "Configuração", descricao: "Configurar chatbot", icon: Send },
@@ -426,12 +421,13 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
 
       {/* List / Table View */}
       {viewMode === 'table' && !isMobile ? (
-        <div style={{ backgroundColor: '#fff', borderRadius: 24, overflow: 'hidden', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div style={{ backgroundColor: '#fff', borderRadius: 24, overflowX: 'auto', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+          <table style={{ width: '100%', minWidth: '1000px', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead style={{ backgroundColor: '#fcf9f7' }}>
               <tr>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Nome</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Contacto</th>
+                <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Origem</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Empresa/NIF</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Estado</th>
                 <th style={{ padding: '16px 24px', color: '#8e7165', fontSize: 11, fontWeight: 900, textTransform: 'uppercase' }}>Vendedor</th>
@@ -449,6 +445,12 @@ export function Clientes({ clientes, vendedores, search, onSearchChange, filterC
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.email}</div>
                     {c.telemovel && <div style={{ fontWeight: 600, color: '#8e7165', fontSize: 12 }}>{c.telemovel}</div>}
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, color: '#5a4137', fontSize: 12 }}>
+                      <Globe size={14} color="#F25C05" />
+                      {c.origem || '—'}
+                    </div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ fontWeight: 800, color: '#1b1c1b', fontSize: 13 }}>{c.empresa || '—'}</div>

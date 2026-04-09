@@ -66,9 +66,18 @@ export async function deleteCliente(id: string): Promise<void> {
 }
 
 export async function listClientes(limitNum = 100): Promise<Cliente[]> {
-  const q = query(collection(db, 'clientes'), orderBy('createdAt', 'desc'), limit(limitNum));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente));
+  try {
+    const q = query(collection(db, 'clientes'), orderBy('createdAt', 'desc'), limit(limitNum));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente));
+  } catch (error) {
+    console.error("Erro ao listar clientes com ordenação:", error);
+    // Fallback: tentar listar sem ordenação (caso falte o índice)
+    const q = query(collection(db, 'clientes'), limit(limitNum));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Cliente))
+      .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  }
 }
 
 export async function listClientesByVendedor(vendedorId: string): Promise<Cliente[]> {

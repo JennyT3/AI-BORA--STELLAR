@@ -12,21 +12,25 @@ import { Admin } from "./pages/Admin";
 import { VendasLogin } from "./pages/VendasLogin";
 import { VendasDashboard } from "./pages/VendasDashboard";
 import Academia from "./pages/academia";
+import AcademiaLogin from "./pages/academia/login";
+import AcademiaDashboard from "./pages/academia/dashboard";
+import AcademiaOnboarding from "./pages/academia/onboarding";
+import AcademiaPerfil from "./pages/academia/perfil";
+import AcademiaAula from "./pages/academia/aula";
+import AcademiaTrilha from "./pages/academia/trilha";
+import AcademiaTrilhas from "./pages/academia/trilhas";
+import AcademiaCertificados from "./pages/academia/certificados";
+import AcademiaVerificar from "./pages/academia/verificar";
+import AcademiaComunidade from "./pages/academia/comunidade";
+import AcademiaConsultoria from "./pages/academia/consultoria";
+import AcademiaQuiz from "./pages/academia/quiz";
 import { Analytics } from "@vercel/analytics/react";
-
 import { useAuth } from "./hooks/useAuth";
 
 function VendasApp() {
   const { vendedor, vendedorReady, login, logout } = useAuth();
-
-  if (!vendedorReady) {
-    return <div style={{ minHeight: "100vh" }} />;
-  }
-
-  if (!vendedor) {
-    return <VendasLogin onLogin={(v) => login('vendedor', v)} />;
-  }
-
+  if (!vendedorReady) return <div style={{ minHeight: "100vh" }} />;
+  if (!vendedor) return <VendasLogin onLogin={(v) => login('vendedor', v)} />;
   return <VendasDashboard vendedor={vendedor} onLogout={() => logout('vendedor')} />;
 }
 
@@ -46,7 +50,21 @@ export default function App() {
         <Route path="/c/:id" component={ClienteFicha} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
+
         <Route path="/academia" component={Academia} />
+        <Route path="/academia/login" component={AcademiaLogin} />
+        <Route path="/academia/dashboard" component={AcademiaDashboard} />
+        <Route path="/academia/onboarding" component={AcademiaOnboarding} />
+        <Route path="/academia/perfil" component={AcademiaPerfil} />
+        <Route path="/academia/aula/:id" component={AcademiaAula} />
+        <Route path="/academia/trilha/:id" component={AcademiaTrilha} />
+        <Route path="/academia/trilhas" component={AcademiaTrilhas} />
+        <Route path="/academia/certificados" component={AcademiaCertificados} />
+        <Route path="/academia/verificar/:codigo" component={AcademiaVerificar} />
+        <Route path="/academia/comunidade" component={AcademiaComunidade} />
+        <Route path="/academia/consultoria" component={AcademiaConsultoria} />
+        <Route path="/academia/quiz/:trilhaId" component={AcademiaQuiz} />
+
         <Route>
           <div className="min-h-screen bg-bg flex items-center justify-center text-text-primary">
             <div className="text-center">

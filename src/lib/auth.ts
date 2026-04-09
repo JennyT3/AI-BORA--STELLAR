@@ -1,5 +1,5 @@
 // ============================================
-// SERVIÇO DE AUTENTICAÇÃO JWT
+// SERVIÇO DE AUTENTICAÇÃO JWT (MEJORADO)
 // ============================================
 
 const TOKEN_KEY = 'aibora_session';
@@ -14,10 +14,10 @@ export interface SessionToken {
   expiresAt: number;
 }
 
-function generateTokenId(): string {
-  return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-}
-
+/**
+ * Crea un token de sesión local.
+ * Nota: En producción, esto debería ser un JWT firmado por el servidor.
+ */
 export function createSessionToken(user: {
   id: string;
   nome: string;
@@ -35,18 +35,37 @@ export function createSessionToken(user: {
   };
 }
 
+/**
+ * Guarda la sesión en sessionStorage para mayor seguridad (se limpia al cerrar la pestaña).
+ */
 export function saveSession(token: SessionToken): void {
   try {
+    // Usamos btoa solo para una ofuscación básica, pero movido a sessionStorage
     const encoded = btoa(JSON.stringify(token));
-    localStorage.setItem(TOKEN_KEY, encoded);
+    sessionStorage.setItem(TOKEN_KEY, encoded);
   } catch (err) {
     console.error('Erro ao guardar sessão:', err);
   }
 }
 
+/**
+ * Obtiene la sesión validando la expiración.
+ */
 export function getSession(): SessionToken | null {
   try {
-    const stored = localStorage.getItem(TOKEN_KEY);
+    // Intentar primero en sessionStorage (nuevo estándar)
+    let stored = sessionStorage.getItem(TOKEN_KEY);
+    
+    // Fallback a localStorage para no cerrar sesión a usuarios existentes (migración)
+    if (!stored) {
+      stored = localStorage.getItem(TOKEN_KEY);
+      if (stored) {
+        // Migrar a sessionStorage y limpiar localStorage
+        sessionStorage.setItem(TOKEN_KEY, stored);
+        localStorage.removeItem(TOKEN_KEY);
+      }
+    }
+
     if (!stored) return null;
 
     const decoded = JSON.parse(atob(stored)) as SessionToken;
@@ -64,7 +83,11 @@ export function getSession(): SessionToken | null {
   }
 }
 
+/**
+ * Limpia la sesión de ambos almacenamientos.
+ */
 export function clearSession(): void {
+  sessionStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_KEY);
 }
 

@@ -12,7 +12,7 @@ const plansMensais = [
     desc: "Para começar a marcar presença online.",
     features: [
       "Meta Business Suite — Facebook e Instagram",
-      "Google Business + Google Maps",
+      "Perfil de Negócio Otimizado",
       "5 posts mensais",
       "Gestão de mensagens",
       "Relatório mensal",

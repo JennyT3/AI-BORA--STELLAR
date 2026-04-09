@@ -30,6 +30,33 @@ service cloud.firestore {
     }
 
     // ============================================
+    // ACADEMIA BORA LÁ
+    // ============================================
+    
+    // Usuarios Academia: solo su propio documento
+    match /academia_users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Progresso: solo el usuario dono
+    match /academia_progresso/{docId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
+      allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
+    }
+    
+    // Certificados: lectura pública para verificación, escritura solo dueño
+    match /academia_certificados/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
+    }
+    
+    // Quizzes: lectura pública (preguntas), escritura admin
+    match /academia_quizzes/{quizId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ============================================
     // SOLICITUDES (público - qualquer pessoa pode criar)
     // ============================================
     match /solicitudes/{id} {

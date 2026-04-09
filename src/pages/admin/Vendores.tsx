@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { theme } from "../../styles/theme";
 import { listVendedores, createVendedor, updateVendedor, deleteVendedor, Vendedor } from "../../services/vendedores";
+import { registerVendedor } from "../../services/authService";
 import { notificarNovoColaboradorAdmin, enviarAcessoColaborador } from "../../services/emailService";
 import { Users, Plus, Trash2, Edit, UserPlus, Search, Filter, Calendar, Download, MoreVertical, TrendingUp, Target, Zap, X } from "lucide-react";
 
@@ -13,7 +14,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingVendedor, setEditingVendedor] = useState<Vendedor | null>(null);
-  const [formData, setFormData] = useState({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true });
+  const [formData, setFormData] = useState({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true, password: "" });
   const [isMobile, setIsMobile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,8 +65,25 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
           }).catch(console.error);
         }
       } else {
-        // Criar novo vendedor
-        await createVendedor(formData);
+        // Criar novo vendedor usando authService para garantir que tem password
+        if (!formData.password) {
+          alert("Por favor, defina uma password para o novo vendedor.");
+          setIsSaving(false);
+          return;
+        }
+
+        const authResult = await registerVendedor(formData.email, formData.password, {
+          nome: formData.nome,
+          email: formData.email,
+          telefone: formData.telefone,
+          comissaoPercent: formData.comissaoPercent
+        });
+
+        if (!authResult.success) {
+          alert(`Erro ao criar conta: ${authResult.error}`);
+          setIsSaving(false);
+          return;
+        }
         
         // Notificar admin sobre novo colaborador
         await notificarNovoColaboradorAdmin({
@@ -77,7 +95,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
       await loadVendedores();
       setShowForm(false);
       setEditingVendedor(null);
-      setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true });
+      setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true, password: "" });
     } catch (err) {
       alert("Ocorreu um erro ao guardar os dados.");
     } finally {
@@ -117,7 +135,7 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
             <Download size={18} /> Exportar
           </button>
           <button 
-            onClick={() => { setShowForm(true); setEditingVendedor(null); setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true }); }}
+            onClick={() => { setShowForm(true); setEditingVendedor(null); setFormData({ nome: "", email: "", telefone: "", comissaoPercent: 20, ativo: true, password: "" }); }}
             style={{ flex: 1, padding: "14px 24px", borderRadius: 16, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#fff", border: "none", fontWeight: 800, cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: '0 10px 25px rgba(242,92,5,0.2)' }}
           >
             <UserPlus size={18} strokeWidth={3} /> Novo Vendedor
@@ -182,9 +200,17 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
               <input type="checkbox" checked={formData.ativo} onChange={(e) => setFormData({...formData, ativo: e.target.checked})} style={{ width: 20, height: 20, accentColor: '#F25C05' }} />
               <span style={{ fontSize: 14, fontWeight: 700, color: '#1b1c1b' }}>Vendedor Ativo</span>
             </div>
+            {!editingVendedor && (
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 800, color: '#8e7165', textTransform: 'uppercase', marginBottom: 8, display: 'block' }}>Password Inicial *</label>
+                <input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} placeholder="Mínimo 6 caracteres" style={{ width: "100%", padding: "14px", borderRadius: 12, border: "2px solid #f0edeb", fontSize: 14, fontWeight: 600, outline: 'none' }} />
+              </div>
+            )}
             <div style={{ gridColumn: isMobile ? "span 1" : "span 3", padding: isMobile ? "12px 0" : "12px 0", marginTop: 8 }}>
               <p style={{ fontSize: 12, color: '#8e7165', fontStyle: 'italic' }}>
-                O vendedor receberá um email de acesso e deverá usar "Esqueci a password" para criar a sua senha.
+                {editingVendedor 
+                  ? "Para alterar a password de um vendedor existente, ele deve usar a opção 'Esqueci a password' no login." 
+                  : "Defina uma password inicial para o vendedor. Ele poderá alterá-la mais tarde."}
               </p>
             </div>
           </div>
@@ -237,13 +263,34 @@ export function VendoresAdmin({ onNavigateVendas }: VendoresAdminProps) {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 12, width: isMobile ? "100%" : "auto" }}>
-              <button onClick={() => onNavigateVendas(v.id)} style={{ flex: 1, padding: "12px 20px", borderRadius: 12, backgroundColor: "#1b1c1b", color: "#fff", border: "none", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: 'all 0.2s' }}>
+              <button 
+                onClick={(e) => { e.stopPropagation(); window.open(`/vendas?v=${v.id}&admin=true`, '_blank'); }} 
+                style={{ flex: 1, padding: "12px 20px", borderRadius: 12, backgroundColor: "#1b1c1b", color: "#fff", border: "none", fontSize: 12, fontWeight: 800, cursor: "pointer", transition: 'all 0.2s' }}
+              >
                 Aceder Painel
               </button>
-              <button onClick={() => { setShowForm(true); setEditingVendedor(v); setFormData({ nome: v.nome, email: v.email || "", telefone: v.telefone || "", comissaoPercent: v.comissaoPercent, ativo: v.ativo }); }} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "#f6f3f1", border: "none", cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Edit size={18} color="#5a4137" />
-              </button>
-              <button onClick={() => handleDelete(v.id)} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(186, 26, 26, 0.05)", border: "none", cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <button 
+                  onClick={() => { 
+                    setEditingVendedor(v); 
+                    setFormData({ 
+                      nome: v.nome, 
+                      email: v.email, 
+                      telefone: v.telefone || "", 
+                      comissaoPercent: v.comissaoPercent || 20, 
+                      ativo: v.ativo !== undefined ? v.ativo : true, 
+                      password: "" 
+                    }); 
+                    setShowForm(true); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#fcf9f7', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Edit size={18} color="#F25C05" />
+                </button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleDelete(v.id); }} 
+                style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: "rgba(186, 26, 26, 0.05)", border: "none", cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
                 <Trash2 size={18} color="#ba1a1a" />
               </button>
             </div>

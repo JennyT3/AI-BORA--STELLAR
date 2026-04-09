@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
-import { getProposal, isProposalValid, updateProposal, updateCliente, createTarea } from "../services/firebase";
-import { sendPropostaRespostaEmail } from "../services/emailService";
+import { getProposal, isProposalValid, updateProposal, updateCliente, createTarea, getProposalByToken } from "../services/firebase";
+import { sendEmail } from "../services/emailService";
 import { WHATSAPP_LINK, EMAIL } from "../lib/constants";
 
 export function PropostaPage() {
@@ -12,6 +12,13 @@ export function PropostaPage() {
   const [error, setError] = useState<string | null>(null);
   const [respondendo, setRespondendo] = useState(false);
   const [respostaEnviada, setRespostaEnviada] = useState<"sim" | "nao" | "reagendar" | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     async function loadProposal() {
@@ -24,12 +31,27 @@ export function PropostaPage() {
           return;
         }
 
-        const data = await getProposal(id);
+        let data = null;
+        
+        // Primeiro tenta buscar por token (novo sistema seguro)
+        const tokenData = await getProposalByToken(id);
+        if (tokenData) {
+          data = tokenData;
+        } else {
+          // Fallback: busca por ID (sistema antigo para compatibilidade)
+          data = await getProposal(id);
+        }
         
         if (!data) {
           setError("Proposta não encontrada");
-        } else if (!isProposalValid(id)) {
-          setError("Esta proposta expirou (válida por 10 dias)");
+        } else if (!data.accessToken && !data.clienteId) {
+          // Proposta antiga sem token - verificar validade
+          const aindaValida = await isProposalValid(id);
+          if (!aindaValida) {
+            setError("Esta proposta expirou (válida por 10 dias)");
+          } else {
+            setProposal(data);
+          }
         } else {
           setProposal(data);
         }
@@ -44,22 +66,32 @@ export function PropostaPage() {
 
   const handleResposta = async (tipo: "sim" | "nao" | "reagendar") => {
     if (!proposal || respondendo) return;
+    
+    if (tipo === 'sim' && !confirm("Confirmas a aceitação desta proposta?")) return;
+    
     setRespondendo(true);
     
     try {
       await updateProposal(params.id, {
         resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
         dataResposta: new Date().toISOString(),
+        status: tipo === 'sim' ? 'aceita' : (tipo === 'nao' ? 'recusada' : 'pendente')
       });
 
       if (proposal.email) {
-        sendPropostaRespostaEmail({
-          nome: proposal.cliente || '',
-          email: proposal.email,
-          resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
-          empresa: proposal.empresa,
-          fichaUrl: tipo === 'sim' ? `${window.location.origin}/c/${proposal.clienteId}` : undefined,
+        const emailResposta = tipo === 'reagendar' ? 'Requisitou ajustes' : (tipo === 'sim' ? 'Aceitou' : 'Recusou');
+        sendEmail(proposal.email, 'confirmacao-resposta-proposta', {
+          clienteNome: proposal.cliente,
+          resposta: emailResposta,
+          fichaUrl: tipo === 'sim' ? `${window.location.origin}/c/${proposal.clienteId}` : '',
         }).catch(() => {});
+        
+        if (tipo === 'sim') {
+          sendEmail(proposal.email, 'boas-vindas-cliente', {
+            clienteNome: proposal.cliente,
+            linkFicha: `${window.location.origin}/c/${proposal.clienteId}`,
+          }).catch(() => {});
+        }
       }
 
       if (tipo === "sim" && proposal.clienteId) {
@@ -82,11 +114,10 @@ export function PropostaPage() {
               "Design de Logotipo": ["3 propostas iniciais", "Revisões ilimitadas", "Múltiplos formatos", "Manual de marca básico", "Uso comercial"],
               "Identidade Corporativa": ["Logotipo + variações", "Paleta de cores", "Tipografia", "Cartão de visita", "Pasta corporativa"],
               "Produção de Vídeos": ["Roteiro e storyboard", "Filmagem profissional", "Edição e pós-produção", "Motion graphics", "Entrega em 4K"],
-              "Criação de Reels": ["Conceito criativo", "Roteiro curto", "Edição dinâmica", "Trendy sounds", "Otimização para reach"],
+              "Criação de Reels": ["Conceito criativo", "Roteiro corto", "Edição dinâmica", "Trendy sounds", "Otimização para reach"],
               "Página Web/Landing": ["Design responsivo", "Otimizado para SEO", "Formulários de contacto", "Integração analytics", "SSL incluído"],
               "Loja Online": ["Gestão de produtos", "Pagamentos seguros", "Shipping integrado", "Painel administrativo", "Template profissional"],
-              "SEO Local": ["Google Business otimizado", "Palavras-chave locais", "Backlinks locais", "Gestão de avaliações", "Relatórios mensais"],
-              "Google Ads": ["Pesquisa de Keywords", "Criação de campanhas", "Otimização de bids", "Extensões de anúncios", "Relatórios de ROAS"],
+              "SEO Local": ["Perfil de negócio otimizado", "Palavras-chave locais", "Backlinks locais", "Gestão de avaliações", "Relatórios mensais"],
               "Facebook/Instagram Ads": ["Segmentação avançada", "Criação de creatives", "A/B testing", "Pixel setup", "Relatórios de resultados"],
               "Email Marketing": ["Design de templates", "Automação de emails", "Segmentação de listas", "A/B testing", "Relatórios de abertura"],
               "Chatbot WhatsApp": ["Respostas automáticas", "Menu interativo", "Agendamento de reuniões", "Integração com CRM", "Chatbot com IA"],
@@ -114,6 +145,27 @@ export function PropostaPage() {
           resposta: "reagendar",
           dataResposta: new Date().toISOString(),
         });
+        
+        if (proposal.email) {
+          sendEmail(proposal.email, 'proposta-rejeitada', {
+            clienteNome: proposal.cliente,
+          }).catch(() => {});
+        }
+        
+        if (proposal.vendedorId) {
+          const { getVendedor } = await import('../services/vendedores');
+          if (getVendedor) {
+            const vendedor = await getVendedor(proposal.vendedorId);
+            if (vendedor?.email) {
+              sendEmail(vendedor.email, 'pedido-cambios', {
+                clienteNome: proposal.cliente,
+                empresa: proposal.empresa,
+                propostaId: params.id,
+                linkProposta: `${window.location.origin}/admin/orcamento?edit=${params.id}`,
+              }).catch(() => {});
+            }
+          }
+        }
       }
 
       if (tipo === "nao" && proposal.clienteId) {
@@ -231,135 +283,59 @@ export function PropostaPage() {
       </div>
     );
   }
-
-  // Calculate correct values - valor already includes discount (total with IVA after discount)
-  const numMarcas = proposal.marcas || 1;
-  const valorTotalComIVA = proposal.valor || 0;
-  const subtotal = valorTotalComIVA / 1.23;
-  const iva = valorTotalComIVA - subtotal;
-  const valorPorMarcaSemIVA = numMarcas > 1 ? subtotal / numMarcas : subtotal;
-
   return (
-    <div style={{ minHeight: '100vh', background: '#1A1A1A', color: '#ffffff', fontFamily: 'Montserrat, sans-serif' }}>
-      {/* HERO */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px 20px', background: 'linear-gradient(135deg, #1A1A1A 0%, #2a1a0a 100%)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,92,5,0.18) 0%, transparent 70%)', pointerEvents: 'none' }}></div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <img src="/logo.png" alt="AI BORA" style={{ width: 50, height: 50, borderRadius: 10 }} />
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#ffffff' }}>AI <span style={{ color: '#F25C05' }}>BORA</span></div>
+    <div style={{ minHeight: '100vh', background: '#1A1A1A', color: '#fff', fontFamily: 'Montserrat, sans-serif', paddingBottom: 100 }}>
+      {/* Header / Logo */}
+      <header style={{ padding: '32px 24px', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <img src="/logo.png" alt="AI BORA" style={{ height: 40 }} />
         </div>
-        
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#F25C05', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 }}>
-          Proposta exclusiva para
-        </p>
-        <p style={{ fontSize: 18, fontWeight: 600, color: '#ffffff', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 16 }}>
-          {proposal.cliente}
-        </p>
-        
-        <h1 style={{ fontSize: 26, fontWeight: 900, lineHeight: 1.2, marginBottom: 16, color: '#ffffff', maxWidth: 450 }}>
-          Marketing digital para o teu negócio <span style={{ color: '#F25C05' }}>crescer.</span>
-        </h1>
-        
-        <p style={{ fontSize: 14, color: '#cccccc', maxWidth: 400, lineHeight: 1.5, marginBottom: 20 }}>
-          Propomos uma presença digital forte para o teu sucesso.
-        </p>
-        
-        {/* Valor Box */}
-        <div style={{ background: 'rgba(242,92,5,0.15)', border: '2px solid #F25C05', borderRadius: 16, padding: '20px 32px', marginBottom: 20 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#ffffff', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>
-            VALOR POR MARCA (SEM IVA)
-          </div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: '#F25C05' }}>
-            {valorPorMarcaSemIVA.toFixed(2)} €
-          </div>
-          {proposal.desconto > 0 && (
-            <div style={{ fontSize: 11, color: '#10B981', marginTop: 6 }}>
-              Desconto: -{proposal.desconto.toFixed(2)} €
-            </div>
-          )}
-          <div style={{ fontSize: 13, color: '#cccccc', marginTop: 8, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            Total com IVA: {valorTotalComIVA.toFixed(2)} €
-          </div>
-        </div>
-        
-        <p style={{ fontSize: 13, color: '#aaaaaa', marginBottom: 16 }}>
-          Vamos trabalhar juntas?
-        </p>
-        
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button
-            onClick={() => handleResposta("sim")}
-            disabled={respondendo}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#10B981', color: '#fff', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 50, border: 'none', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
-          >
-            {respondendo ? '...' : '✅ Sim, aceito esta proposta'}
-          </button>
+      </header>
 
-          <button
-            onClick={() => handleResposta("reagendar")}
-            disabled={respondendo}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#F25C05', color: '#fff', fontSize: 13, fontWeight: 700, padding: '12px 24px', borderRadius: 50, border: 'none', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
-          >
-            ↩ Quero rever a proposta
-          </button>
-
-          <button
-            onClick={() => handleResposta("nao")}
-            disabled={respondendo}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: 12, fontWeight: 600, padding: '10px 20px', borderRadius: 50, border: '1px solid rgba(255,255,255,0.3)', cursor: respondendo ? 'not-allowed' : 'pointer', opacity: respondendo ? 0.7 : 1 }}
-          >
-            Não tenho interesse
-          </button>
-        </div>
-      </section>
-
-      {/* QUEM SOMOS */}
-      <section style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 16, color: '#ffffff' }}>
-              Marketing digital <span style={{ color: '#F25C05' }}>que realmente funciona.</span>
-            </h2>
-            <p style={{ fontSize: 16, color: '#cccccc', lineHeight: 1.8, maxWidth: 500, marginBottom: 32 }}>
-              A AI BORA é uma empresa especializada em ajudar negócios locais a crescer na internet. Somos o teu parceiro digital — com foco em resultados concretos e atenção prioritária.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 32 }}>
-              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 24, textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>💪</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>Proximidade</div>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 24, textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>📈</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>Crescimento</div>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 24, textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>🎯</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>Prioridade</div>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 24, textAlign: 'center' }}>
-                <div style={{ fontSize: 36, marginBottom: 8 }}>❤️</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>Satisfação</div>
-              </div>
-            </div>
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px' }}>
+        {/* Hero Section */}
+        <section style={{ textAlign: 'center', marginBottom: 80 }}>
+          <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(242,92,5,0.1)', color: '#F25C05', borderRadius: 100, fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 24 }}>
+            Proposta Personalizada
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="https://i.imgur.com/FL1CGDf.png" alt="AI BORA Studio" style={{ width: '100%', maxWidth: 500, borderRadius: 20, objectFit: 'cover', minHeight: 400 }} />
+          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, letterSpacing: -2 }}>
+            Olá, {proposal.cliente}.<br />
+            Vamos elevar o teu negócio?
+          </h1>
+          <p style={{ fontSize: 18, color: '#888', maxWidth: 600, margin: '0 auto', lineHeight: 1.6 }}>
+            Analisámos o teu perfil e preparámos uma estratégia focada em resultados reais para a <span style={{ color: '#fff', fontWeight: 700 }}>{proposal.empresa || 'tua empresa'}</span>.
+          </p>
+        </section>
+
+        {/* Serviços Selecionados */}
+        <section style={{ marginBottom: 100 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 12 }}>Serviços Propostos</h2>
+            <div style={{ width: 40, height: 4, background: '#F25C05', margin: '0 auto' }}></div>
           </div>
-        </div>
-      </section>
 
-      {/* DIVISOR */}
-      <div style={{ height: 2, background: 'linear-gradient(90deg, transparent, rgba(242,92,5,0.5), transparent)', margin: '0 24px' }}></div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
+            {proposal.servicos?.map((servico: any, idx: number) => {
+              const nome = typeof servico === 'string' ? servico : (servico.nome || servico);
+              return (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: 32, transition: 'transform 0.3s' }}>
+                  <div style={{ width: 48, height: 48, background: '#F25C05', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 24 }}>
+                    ✨
+                  </div>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 12 }}>{nome}</h3>
+                  <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6 }}>
+                    Solução completa e personalizada para garantir o melhor desempenho do teu negócio nesta área.
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
-      {/* SERVIÇOS */}
-      <section style={{ background: 'rgba(255,255,255,0.02)', padding: '60px 24px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: '#F25C05', marginBottom: 8 }}>O que fazemos</p>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, marginBottom: 16, color: '#ffffff' }}>
-            Serviços <span style={{ color: '#F25C05' }}>exclusivos</span>
-          </h2>
-          <p style={{ fontSize: 16, color: '#cccccc', maxWidth: 500, margin: '0 auto 60px' }}>
+        {/* Porquê nós? */}
+        <section style={{ background: '#fff', color: '#1A1A1A', borderRadius: 40, padding: '80px 40px', marginBottom: 100, textAlign: 'center' }}>
+          <h2 style={{ fontSize: 32, fontWeight: 900, marginBottom: 20 }}>Porquê a AI BORA?</h2>
+          <p style={{ fontSize: 16, color: '#666', maxWidth: 500, margin: '0 auto 60px' }}>
             Tudo o que o teu negócio precisa para ter uma presença digital forte e profissional.
           </p>
           
@@ -368,10 +344,9 @@ export function PropostaPage() {
               { icon: "📱", title: "Marketing Digital", desc: "Gestão completa das tuas redes sociais com conteúdo de qualidade e estratégia definida.", tags: ["Instagram", "Facebook", "LinkedIn"], highlight: proposal?.servicos?.some((s: string) => s.includes('Redes') || s.includes('Marketing') || s.includes('Gestão')) },
               { icon: "📊", title: "Consultoria", desc: "Estratégia digital personalizada para o teu negócio crescer.", tags: ["Análise", "Planeamento", "Relatórios"], highlight: proposal?.servicos?.some((s: string) => s.includes('Consultoria') || s.includes('Análise') || s.includes('Estratégica')) },
               { icon: "🎨", title: "Design & Identidade", desc: "Identidade visual profissional que representa a tua marca com credibilidade.", tags: ["Logótipo", "Posts", "Banners"], highlight: proposal?.servicos?.some((s: string) => s.includes('Design') || s.includes('Logotipo') || s.includes('Identidade')) },
-              { icon: "💻", title: "Website", desc: "Site moderno, rápido e otimizado para aparecer no Google e converter visitantes.", tags: ["Landing Page", "SEO", "Mobile"], highlight: proposal?.servicos?.some((s: string) => s.includes('Web') || s.includes('Landing') || s.includes('Site')) },
-              { icon: "🎬", title: "Multimédia", desc: "Fotografia e vídeo profissional que mostra o melhor do teu negócio.", tags: ["Fotografia", "Reels", "Edição"], highlight: proposal?.servicos?.some((s: string) => s.includes('Video') || s.includes('Foto') || s.includes('Multimédia')) },
-              { icon: "📢", title: "Publicidade Paga", desc: "Campanhas pagas geridas por especialistas para maximizar o teu investimento.", tags: ["Google Ads", "Meta Ads"], highlight: proposal?.servicos?.some((s: string) => s.includes('Ads') || s.includes('Google') || s.includes('Publicidade')) },
-              { icon: "⚡", title: "Automação & IA", desc: "Automatiza processos repetitivos e responde aos clientes 24/7 com inteligência artificial.", tags: ["Chatbot", "WhatsApp Auto", "CRM"], highlight: proposal?.servicos?.some((s: string) => s.includes('Chatbot') || s.includes('Automação') || s.includes('IA')) },
+              { icon: "💻", title: "Website", desc: "Site moderno, rápido e otimizado para motores de busca e converter visitantes.", tags: ["Landing Page", "SEO", "Mobile"], highlight: proposal?.servicos?.some((s: string) => s.includes('Web') || s.includes('Landing') || s.includes('Site')) },
+              { icon: "📢", title: "Publicidade Paga", desc: "Campanhas pagas geridas por especialistas para maximizar o teu investimento.", tags: ["Meta Ads"], highlight: proposal?.servicos?.some((s: string) => s.includes('Ads') || s.includes('Publicidade')) },
+              { icon: "⚡", title: "Automação & IA", desc: "Automatiza processos repetitivos e responde aos clientes 24/7 con inteligência artificial.", tags: ["Chatbot", "WhatsApp Auto", "CRM"], highlight: proposal?.servicos?.some((s: string) => s.includes('Chatbot') || s.includes('Automação') || s.includes('IA')) },
             ].map((servico, index) => (
               <div key={index} style={{ 
                 background: servico.highlight ? 'rgba(242,92,5,0.1)' : 'rgba(255,255,255,0.04)', 
@@ -381,112 +356,104 @@ export function PropostaPage() {
                 transition: 'all 0.3s',
                 textAlign: 'left'
               }}>
-                <div style={{ fontSize: 40, marginBottom: 16 }}>{servico.icon}</div>
-                <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 8, color: '#ffffff' }}>{servico.title}</div>
-                <div style={{ fontSize: 13, color: '#cccccc', lineHeight: 1.6, marginBottom: 16 }}>{servico.desc}</div>
+                <div style={{ fontSize: 32, marginBottom: 16 }}>{servico.icon}</div>
+                <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: '#1A1A1A' }}>{servico.title}</h3>
+                <p style={{ fontSize: 14, color: '#666', lineHeight: 1.5, marginBottom: 16 }}>{servico.desc}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {servico.tags.map((tag, i) => (
-                    <span key={i} style={{ 
-                      fontSize: 11, 
-                      fontWeight: 600, 
-                      color: servico.highlight ? '#F25C05' : 'rgba(255,255,255,0.5)', 
-                      background: servico.highlight ? 'rgba(242,92,5,0.2)' : 'rgba(255,255,255,0.08)', 
-                      border: `1px solid ${servico.highlight ? 'rgba(242,92,5,0.4)' : 'rgba(255,255,255,0.1)'}`, 
-                      borderRadius: 20, 
-                      padding: '4px 12px' 
-                    }}>{tag}</span>
+                  {servico.tags.map(tag => (
+                    <span key={tag} style={{ fontSize: 10, fontWeight: 700, padding: '4px 8px', background: '#f0f0f0', borderRadius: 4, color: '#888' }}>{tag}</span>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* PORTFÓLIO */}
-      <section style={{ padding: '60px 24px', maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: '#F25C05', marginBottom: 8 }}>Portfólio</p>
-        <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, marginBottom: 16, color: '#ffffff' }}>
-          O nosso <span style={{ color: '#F25C05' }}>trabalho</span>
-        </h2>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginTop: 24 }}>
-          {[
-            { src: '/branding.webp', tag: 'Branding' },
-            { src: '/mopack.webp', tag: 'Packaging' },
-            { src: '/foto-criativa.webp', tag: 'Fotografia' },
-            { src: '/antes.webp', tag: 'Posição Local' },
-            { src: '/depois.webp', tag: 'Produtos' },
-            { src: '/estudio.webp', tag: 'Design' },
-          ].map((item, i) => (
-            <div key={i} style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', aspectRatio: '4/3', background: 'rgba(255,255,255,0.05)' }}>
-              <img src={item.src} alt={item.tag} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(26,26,26,0.9), transparent)', padding: '20px' }}>
-                <span style={{ background: '#F25C05', color: '#fff', fontSize: 11, fontWeight: 800, padding: '6px 14px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1 }}>{item.tag}</span>
-              </div>
+        {/* Investimento */}
+        <section style={{ textAlign: 'center', marginBottom: 100 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 40 }}>O teu Investimento</h2>
+          <div style={{ background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)', borderRadius: 32, padding: '60px 40px', display: 'inline-block', minWidth: 320 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, opacity: 0.9 }}>Valor Total do Projeto</p>
+            <div style={{ fontSize: 'clamp(40px, 8vw, 64px)', fontWeight: 900, marginBottom: 8, letterSpacing: -2 }}>
+              {Number(proposal.valor || proposal.total || 0).toLocaleString('pt-PT', { minimumFractionDigits: 2 })}€
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA FINAL */}
-      <section style={{ padding: '60px 24px', textAlign: 'center', background: 'linear-gradient(135deg, #1A1A1A 0%, #2a1a0a 100%)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', bottom: -100, left: '50%', transform: 'translateX(-50%)', width: 600, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,92,5,0.15) 0%, transparent 70%)' }}></div>
-        
-        <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 24, color: '#ffffff' }}>
-          Pronto para começar, <span style={{ color: '#F25C05' }}>{proposal.cliente}?</span>
-        </h2>
-        
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href={WHATSAPP_LINK} target="_blank" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#25D366', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', boxShadow: '0 8px 32px rgba(37,211,102,0.4)' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>
-          <a href={`mailto:${EMAIL}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'transparent', color: '#fff', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, padding: '14px 32px', borderRadius: 50, textDecoration: 'none', border: '2px solid rgba(255,255,255,0.3)' }}>
-            ✉️ Email
-          </a>
-        </div>
-      </section>
-
-      {/* RODAPÉ */}
-      <footer style={{ background: '#111', padding: '40px 24px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 16 }}>
-          <img src="/logo.png" alt="AI BORA" style={{ width: 60, height: 60, borderRadius: 12, marginBottom: 12 }} />
-          <div style={{ fontSize: 18, fontWeight: 900, color: '#ffffff' }}>
-            AI <span style={{ color: '#F25C05' }}>BORA</span>
+            <p style={{ fontSize: 14, opacity: 0.8 }}>+ IVA à taxa legal em vigor</p>
           </div>
-        </div>
-        
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
-          <a href="https://instagram.com/aibora.pt" target="_blank" style={{ width: 40, height: 40, borderRadius: '50%', background: '#E1306C', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a href="https://www.facebook.com/aibora.pt/" target="_blank" style={{ width: 40, height: 40, borderRadius: '50%', background: '#1877F2', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          </a>
-          <a href="https://x.com/boraweb3" target="_blank" style={{ width: 40, height: 40, borderRadius: '50%', background: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', border: '1px solid #333' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-        </div>
-        
-        <div style={{ fontSize: 13, color: '#aaaaaa', lineHeight: 2 }}>
-          <div>{EMAIL}</div>
-          <div>+351 936 021 747</div>
-          <div>www.aibora.pt</div>
-        </div>
-        {proposal.createdAt && (
-          <div style={{ marginTop: 24, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: '#888888' }}>
-            Esta proposta foi preparada exclusivamente para {proposal.cliente} a {new Date(proposal.createdAt).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' })} e tem validade de 10 dias.
+        </section>
+
+        {/* CTA / Resposta */}
+        <section style={{ textAlign: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: isMobile ? 24 : 40, padding: isMobile ? '40px 20px' : '80px 40px' }}>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, marginBottom: 16 }}>Pronto para começar?</h2>
+          <p style={{ color: '#888', marginBottom: 48 }}>Escolha uma das opções abaixo para prosseguirmos.</p>
+          
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: 16 }}>
+            <button 
+              onClick={() => handleResposta('sim')}
+              disabled={respondendo}
+              style={{ width: isMobile ? '100%' : 'auto', background: '#F25C05', color: '#fff', border: 'none', padding: '18px 40px', borderRadius: 16, fontSize: 16, fontWeight: 800, cursor: 'pointer', transition: 'transform 0.2s' }}
+            >
+              {respondendo ? 'A processar...' : 'Sim, aceito a proposta! ✅'}
+            </button>
+            <button 
+              onClick={() => handleResposta('reagendar')}
+              disabled={respondendo}
+              style={{ width: isMobile ? '100%' : 'auto', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', padding: '18px 40px', borderRadius: 16, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
+            >
+              Quero ajustar detalhes 📝
+            </button>
+            <button 
+              onClick={() => { if (confirm('Tens a certeza que não tens interesse?')) handleResposta('nao'); }}
+              disabled={respondendo}
+              style={{ width: isMobile ? '100%' : 'auto', background: 'transparent', color: '#555', border: '1px solid #333', padding: '18px 40px', borderRadius: 16, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Não tenho interesse
+            </button>
           </div>
-        )}
+        </section>
+
+        {/* CONTACT FLOATING BAR - RESPONSIVE & ACTIVE */}
+        <div style={{ 
+          position: 'fixed', 
+          bottom: isMobile ? 16 : 24, 
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          width: isMobile ? '95%' : '90%', 
+          maxWidth: 450, 
+          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+          backdropFilter: 'blur(10px)',
+          borderRadius: 24, 
+          padding: isMobile ? '10px 16px' : '12px 24px', 
+          display: 'flex', 
+          justifyContent: 'space-around', 
+          alignItems: 'center', 
+          boxShadow: '0 20px 40px rgba(0,0,0,0.15)', 
+          zIndex: 100,
+          border: '1px solid rgba(0,0,0,0.05)'
+        }}>
+          <a href={`https://wa.me/${WHATSAPP_LINK.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" style={{ color: '#1b1c1b', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? 4 : 8, textDecoration: 'none', fontWeight: 800, fontSize: isMobile ? 10 : 13 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            {!isMobile && "WhatsApp"}
+          </a>
+          <a href={`mailto:${EMAIL}`} style={{ color: '#1b1c1b', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? 4 : 8, textDecoration: 'none', fontWeight: 800, fontSize: isMobile ? 10 : 13 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: '#F25C05', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            {!isMobile && "Email"}
+          </a>
+          <a href="https://www.facebook.com/aibora.ptt" target="_blank" rel="noreferrer" style={{ color: '#1b1c1b', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: isMobile ? 4 : 8, textDecoration: 'none', fontWeight: 800, fontSize: isMobile ? 10 : 13 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: '#1877F2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </div>
+            {!isMobile && "Facebook"}
+          </a>
+        </div>
+      </main>
+
+      <footer style={{ padding: '40px 24px', textAlign: 'center', color: '#444', fontSize: 12 }}>
+        © {new Date().getFullYear()} AI BORA · Marketing Digital de Resultados
       </footer>
-
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
