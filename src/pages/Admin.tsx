@@ -142,7 +142,6 @@ export function Admin() {
         userName={currentUser?.nome || ""}
         onLogout={() => logout("admin")}
         proposalCount={admin.proposals.length}
-        solicitudCount={admin.solicitudes.filter(s => s.status === "pendente").length}
         clienteCount={admin.clientes.length}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}

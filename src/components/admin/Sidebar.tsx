@@ -9,7 +9,6 @@ import {
   X,
   Settings,
   Plus,
-  Target,
   Megaphone
 } from 'lucide-react';
 
@@ -19,7 +18,6 @@ interface SidebarProps {
   userName: string;
   onLogout: () => void;
   proposalCount: number;
-  solicitudCount: number;
   clienteCount: number;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -32,7 +30,6 @@ export function Sidebar({
   onTabChange, 
   onLogout,
   proposalCount,
-  solicitudCount,
   clienteCount,
   collapsed = false,
   isMobile = false,

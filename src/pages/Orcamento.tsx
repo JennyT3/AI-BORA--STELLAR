@@ -401,7 +401,6 @@ const total = precoTotal;
             window.location.href = "/admin"; 
           }}
           proposalCount={0}
-          solicitudCount={0}
           clienteCount={0}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}

@@ -1,14 +1,12 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  FilePlus2, 
   FileText, 
   Users, 
   DollarSign, 
   LogOut,
   CheckSquare,
   User,
-  X,
   Plus,
   TrendingUp
 } from 'lucide-react';

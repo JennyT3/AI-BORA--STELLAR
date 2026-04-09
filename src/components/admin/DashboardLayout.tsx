@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../admin/Sidebar';
-import { DashboardOverview } from '../dashboard/DashboardOverview';
 import { theme } from '../../styles/theme';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -11,11 +10,10 @@ interface DashboardLayoutProps {
   userName: string;
   onLogout: () => void;
   proposalCount: number;
-  solicitudCount: number;
   clienteCount: number;
 }
 
-export function DashboardLayout({ children, activeTab, onTabChange, userName, onLogout, proposalCount, solicitudCount, clienteCount }: DashboardLayoutProps) {
+export function DashboardLayout({ children, activeTab, onTabChange, userName, onLogout, proposalCount, clienteCount }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -106,7 +104,6 @@ export function DashboardLayout({ children, activeTab, onTabChange, userName, on
           userName={userName}
           onLogout={onLogout}
           proposalCount={proposalCount}
-          solicitudCount={solicitudCount}
           clienteCount={clienteCount}
           collapsed={isTablet}
           onToggleCollapse={isTablet ? undefined : undefined}

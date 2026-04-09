@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Menu, X, LogOut, User, Award, MessageSquare, Zap, BookOpen, Home, Users, HelpCircle } from 'lucide-react';
+import { Menu, X, LogOut, User, Award, MessageSquare, Zap, Home, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAcademiaAuth } from '../hooks/useAcademiaAuth';
 

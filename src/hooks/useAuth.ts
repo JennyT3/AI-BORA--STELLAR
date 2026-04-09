@@ -32,6 +32,7 @@ export interface Vendedor {
   comissaoPercent?: number;
   ativo?: boolean;
   fotoPerfil?: string;
+  createdAt?: string;
 }
 
 export function useAuth() {
