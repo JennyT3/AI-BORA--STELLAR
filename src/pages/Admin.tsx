@@ -207,41 +207,29 @@ export function Admin() {
         }}>
           {activeTab === "dashboard" && (
               <>
-                {showQuickProposal ? (
-                  <div className="max-w-2xl mx-auto">
-                    <QuickProposalForm 
-                      onSuccess={(proposalId) => {
-                        admin.loadProposals();
-                        setShowQuickProposal(false);
-                      }}
-                      onCancel={() => setShowQuickProposal(false)}
-                    />
+                <>
+                  <div className="mb-8 flex justify-center">
+                    <button
+                      onClick={() => navigate('/admin/orcamento')}
+                      className="px-10 py-5 bg-gradient-to-r from-orange-500 to-fuchsia-600 text-white font-bold text-xl rounded-2xl flex items-center gap-4 hover:opacity-90 transition-all transform hover:scale-[1.02] shadow-lg"
+                    >
+                      <span className="text-2xl">➕</span>
+                      Crear Propuesta
+                    </button>
                   </div>
-                ) : (
-                  <>
-                    <div className="mb-8 flex justify-center">
-                      <button
-                        onClick={() => setShowQuickProposal(true)}
-                        className="px-10 py-5 bg-gradient-to-r from-orange-500 to-fuchsia-600 text-white font-bold text-xl rounded-2xl flex items-center gap-4 hover:opacity-90 transition-all transform hover:scale-[1.02] shadow-lg"
-                      >
-                        <span className="text-2xl">➕</span>
-                        New Quick Proposal
-                      </button>
-                    </div>
-                    <Dashboard
-                      stats={admin.stats}
-                      proposals={admin.proposals}
-                      solicitudes={admin.solicitudes}
-                      clientes={admin.clientes}
-                      onExport={() => exportToExcel(admin.proposals, admin.solicitudes, admin.clientes, admin.vendedores)}
+                  <Dashboard
+                    stats={admin.stats}
+                    proposals={admin.proposals}
+                    solicitudes={admin.solicitudes}
+                    clientes={admin.clientes}
+                    onExport={() => exportToExcel(admin.proposals, admin.solicitudes, admin.clientes, admin.vendedores)}
                     onNovoOrcamento={() => navigate("/admin/orcamento")}
                     onNovoCliente={() => { admin.setClienteFormData({ nome: "", email: "", telemovel: "", nif: "", morada: "", categoria: "curioso", observacoes: "" }); admin.setShowClienteForm(true); }}
                     onNovaFatura={() => admin.abrirFatura({} as any)}
                     onNavigate={tab => setActiveTab(tab as AdminTab)}
                     isMobile={isMobile}
                   />
-                  </>
-                )}
+                </>
               </>
             )}
 

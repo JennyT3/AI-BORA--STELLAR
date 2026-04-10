@@ -380,7 +380,7 @@ const total = precoTotal;
       const propostaCriada = await getProposal(id);
       const accessToken = propostaCriada?.accessToken || id;
       
-      const link = `https://aibora.pt/p/${accessToken}`;
+      const link = `${window.location.origin}/proposal/${accessToken}`;
       // 1. Ya mostrado arriba inmediatamente tras la llamada al contrato
 
       // 2. Intentar enviar email (puede fallar, no bloquea la UI)

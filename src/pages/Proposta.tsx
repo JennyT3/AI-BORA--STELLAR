@@ -182,6 +182,11 @@ export function PropostaPage() {
       }
 
       setRespostaEnviada(tipo);
+      if (tipo === 'sim') {
+        setTimeout(() => {
+          setLocation(`/tareas/${params.id}`);
+        }, 2000);
+      }
     } catch (err: any) {
       console.error("Error saving response:", err);
       alert("Could not save your response. Please try again.");

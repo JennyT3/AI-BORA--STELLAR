@@ -293,9 +293,9 @@ export default function PagamentoPage() {
           }}
         >
           {processing ? (
-            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing & Splitting...</>
+            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Procesando Pago...</>
           ) : (
-            <><Zap size={18} /> Pay {fatura?.valorTotal?.toFixed(2) || '0.00'} USDC (70/30 auto-split)</>
+            <><Zap size={18} /> Pagar con Stellar</>
           )}
         </button>
 

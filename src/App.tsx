@@ -34,6 +34,7 @@ import RegisterPage from "./pages/Register";
 import SelectionPage from "./pages/Selection";
 import ClientePage from "./pages/Cliente";
 import ColaboradorPage from "./pages/Colaborador";
+import TareasPage from "./pages/Tareas";
 
 function VendasApp() {
   const { vendedor, vendedorReady, login, logout } = useAuth();
@@ -55,10 +56,12 @@ export default function App() {
         <Route path="/orcamento" component={Orcamento} />
         <Route path="/admin/orcamento" component={Orcamento} />
         <Route path="/p/:id" component={PropostaPage} />
+        <Route path="/proposal/:id" component={PropostaPage} />
         <Route path="/c/:id" component={ClienteFicha} />
         <Route path="/cliente/login/:token" component={ClienteLoginPage} />
         <Route path="/cliente/login" component={ClienteLoginPage} />
         <Route path="/pagamento/:id" component={PagamentoPage} />
+        <Route path="/tareas/:id" component={TareasPage} />
         <Route path="/verify/:hash" component={VerifyPage} />
         <Route path="/stellar" component={StellarPayPage} />
         <Route path="/register" component={RegisterPage} />
