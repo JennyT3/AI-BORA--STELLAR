@@ -13,6 +13,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { createProposal } from "../services/firebase";
 import { sendPropostaLinkEmail } from "../services/emailService";
+import { storeProposalOnChain } from "../services/soroban";
 
 import { OrcamentoForm } from '../components/OrcamentoForm';
 
@@ -277,6 +278,15 @@ const total = precoTotal;
     try {
       const doc = await criarPDF();
       const pdfBlob = doc.output('blob');
+      
+      // Calculate SHA-256 of PDF
+      const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+      const pdfHashBuffer = await crypto.subtle.digest('SHA-256', pdfArrayBuffer);
+      const pdfHashArray = Array.from(new Uint8Array(pdfHashBuffer));
+      const pdfHash = pdfHashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      console.log('📄 PDF SHA-256:', pdfHash);
+      
       const proposalData = { 
         cliente: cliente.nome, 
         empresa: cliente.empresa || '', 
@@ -295,8 +305,34 @@ const total = precoTotal;
         dataCriacao: dataCriacaoStr, 
         dataValidade: dataValidadeStr, 
         temOrcamentoPDF: true,
-        criadoPor: currentUser?.id || 'admin'
+        criadoPor: currentUser?.id || 'admin',
+        pdfHash: pdfHash
       };
+      
+      // Store on Soroban smart contract
+      let stellarTxHash = '';
+      let stellarExplorerUrl = '';
+      try {
+        const stellarResult = await storeProposalOnChain(
+          numeroOrcamento || `PROP-${Date.now()}`,
+          cliente.email || 'unknown@email.com',
+          pdfHash,
+          totalConDescuento,
+          import.meta.env.VITE_STELLAR_ADMIN_SECRET || localStorage.getItem('aibora_stellar_secret') || ''
+        );
+        stellarTxHash = stellarResult.txHash;
+        stellarExplorerUrl = stellarResult.explorerUrl;
+        console.log('✅ Stored on Soroban contract:', stellarTxHash);
+      } catch (stellarErr) {
+        console.warn('⚠️ Soroban storage failed (non-critical):', stellarErr);
+      }
+      
+      // Add Stellar data to proposal
+      if (stellarTxHash) {
+        proposalData.stellarTxHash = stellarTxHash;
+        proposalData.stellarExplorerUrl = stellarExplorerUrl;
+      }
+      
       const id = await createProposal(proposalData);
       setPropostaId(id);
       
@@ -327,7 +363,17 @@ const total = precoTotal;
       if (cliente.email) {
         sendPropostaLinkEmail({ nome: cliente.nome, email: cliente.email, link, empresa: cliente.empresa }).catch(() => {});
       }
-      navigator.clipboard.writeText(link).then(() => { const pdfUrl = URL.createObjectURL(pdfBlob); window.open(pdfUrl, '_blank'); setTimeout(() => { alert(`Proposal saved.\n\nUnique link copied:\n${link}`); }, 500); });
+      navigator.clipboard.writeText(link).then(() => { 
+        const pdfUrl = URL.createObjectURL(pdfBlob); 
+        window.open(pdfUrl, '_blank'); 
+        
+        let successMsg = `Proposal saved successfully!\n\nUnique link copied:\n${link}`;
+        if (stellarTxHash) {
+          successMsg += `\n\n🔗 Stellar Transaction:\n${stellarTxHash}\n\nView on explorer:\n${stellarExplorerUrl}`;
+        }
+        
+        setTimeout(() => { alert(successMsg); }, 500); 
+      });
     } catch (err) { console.error(err); alert("Could not save proposal: " + err.message); }
   };
 

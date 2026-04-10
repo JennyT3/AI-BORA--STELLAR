@@ -90,11 +90,10 @@ export async function executePaymentSplit(
       const txResult = await server.getTransaction(result.hash);
       
       // Parse the result to get the amounts
-      const [adminAmt, collabAmt] = txResult.resultMetaXdr?.v3()?.sorobanMeta()?.returnValue()?.vec()?.get(0)?.i128()?
-        .map((v: any, idx: number) => {
-          const val = v.i128();
-          return idx === 0 ? adminAmt : collabAmt;
-        }) || [0, 0];
+      const returnValue = txResult.resultMetaXdr?.v3()?.sorobanMeta()?.returnValue();
+      const vec = returnValue?.vec();
+      const adminAmt = vec ? Number(vec.get(0)?.i128()?.lo() ?? 0) : 0;
+      const collabAmt = vec ? Number(vec.get(1)?.i128()?.lo() ?? 0) : 0;
       
       return {
         success: true,
