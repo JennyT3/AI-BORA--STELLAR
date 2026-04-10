@@ -3,6 +3,7 @@ import { useLocation, useRoute } from 'wouter';
 import { Loader, CheckCircle, AlertCircle, ExternalLink, Zap } from 'lucide-react';
 import { getPaymentLink, marcarComoPago } from '../services/pagamentos';
 import { getFatura } from '../services/faturas';
+import { executePaymentSplit, createPaymentOnChain } from '../services/paymentSplitter';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -17,13 +18,13 @@ export default function PagamentoPage() {
   const [processing, setProcessing] = useState(false);
   const [paid, setPaid] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [splitTxHash, setSplitTxHash] = useState<string | null>(null);
 
   useEffect(() => {
     if (!match || !params?.id) return;
     
     const id = params.id;
     
-    // DEMO MODE — se ejecuta PRIMERO, antes de cualquier Firebase
     if (id === 'test' || id === 'demo') {
       setPaymentLink({ id: 'test', faturaId: 'test-fatura', clienteId: 'test-client' });
       setFatura({
@@ -38,11 +39,9 @@ export default function PagamentoPage() {
       return;
     }
     
-    // Solo llega aquí si NO es demo mode
     loadPaymentData(id);
   }, [params?.id]);
 
-  // Esta función ahora solo se usa para IDs reales de Firebase
   const loadPaymentData = async (id: string) => {
     setLoading(true);
     try {
@@ -80,7 +79,9 @@ export default function PagamentoPage() {
     
     setProcessing(true);
     setError(null);
+    
     try {
+      // Step 1: Send USDC payment via x402
       const res = await fetch(`${API_URL}/api/stellar-pay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,14 +91,45 @@ export default function PagamentoPage() {
           memo: `AIBORA invoice ${fatura.numero}`,
         }),
       });
+      
       const data = await res.json();
-      if (data.success) {
-        setTxHash(data.txHash);
-        setPaid(true);
-        await marcarComoPago(paymentLink.id);
-      } else {
+      
+      if (!data.success) {
         setError(data.error || 'Payment failed. Try again.');
+        setProcessing(false);
+        return;
       }
+      
+      setTxHash(data.txHash);
+      
+      // Step 2: Execute 70/30 split on-chain via PaymentSplitter contract
+      const adminSecret = import.meta.env.VENDOR_SECRET;
+      if (adminSecret) {
+        const paymentId = `payment-${paymentLink.faturaId}`;
+        const amountInStroops = Math.floor((fatura.valorTotal || 1) * 10_000_000); // Convert to stroops
+        
+        // Create payment split on chain
+        await createPaymentOnChain(paymentId, amountInStroops, adminSecret);
+        
+        // Execute the split
+        const splitResult = await executePaymentSplit(paymentId, adminSecret);
+        
+        if (splitResult.success) {
+          setSplitTxHash(splitResult.txHash || null);
+          
+          console.log('✅ Split executed on-chain:');
+          console.log(`  Admin: ${splitResult.adminAmount} USDC`);
+          console.log(`  Collaborator: ${splitResult.collaboratorAmount} USDC`);
+          console.log(`  Explorer: ${splitResult.explorerUrl}`);
+        } else {
+          console.error('Split failed:', splitResult.error);
+        }
+      }
+      
+      // Mark as paid in Firestore
+      await marcarComoPago(paymentLink.id);
+      setPaid(true);
+      
     } catch (err: any) {
       setError(err?.message || 'Network error');
     } finally {
@@ -105,7 +137,6 @@ export default function PagamentoPage() {
     }
   };
 
-  // ── Loading ──
   if (loading) return (
     <div style={styles.center}>
       <Loader size={40} color="#F25C05" style={{ animation: 'spin 1s linear infinite' }} />
@@ -114,7 +145,6 @@ export default function PagamentoPage() {
     </div>
   );
 
-  // ── Success ──
   if (paid) return (
     <div style={styles.center}>
       <div style={styles.card}>
@@ -122,23 +152,43 @@ export default function PagamentoPage() {
         <h1 style={{ fontSize: 24, fontWeight: 900, color: '#1b1c1b', marginBottom: 8 }}>
           Payment confirmed! ✅
         </h1>
-        <p style={{ color: '#666', marginBottom: 24 }}>
+        <p style={{ color: '#666', marginBottom: 16 }}>
           Your invoice has been paid via Stellar x402 (USDC testnet).
         </p>
+        <p style={{ color: '#F25C05', fontWeight: 700, marginBottom: 24 }}>
+          70/30 split executed on-chain via PaymentSplitter contract
+        </p>
+        
         {txHash && (
-          <a
-            href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.explorerBtn}
-          >
-            <ExternalLink size={16} />
-            View on Stellar Explorer
-          </a>
+          <div style={{ marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Payment Transaction:</p>
+            <a
+              href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.explorerBtn}
+            >
+              <ExternalLink size={16} />
+              View on Stellar Explorer
+            </a>
+          </div>
         )}
-        <div style={{ marginTop: 24, padding: '12px 16px', backgroundColor: '#f0fdf4', borderRadius: 8, fontSize: 12, color: '#166534', wordBreak: 'break-all' }}>
-          <strong>TX Hash:</strong><br />{txHash}
-        </div>
+        
+        {splitTxHash && (
+          <div style={{ marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Split Transaction:</p>
+            <a
+              href={`https://stellar.expert/explorer/testnet/tx/${splitTxHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...styles.explorerBtn, backgroundColor: '#F25C05' }}
+            >
+              <ExternalLink size={16} />
+              View Split on Blockchain
+            </a>
+          </div>
+        )}
+        
         <button
           onClick={() => setLocation(`/c/${paymentLink?.clienteId}`)}
           style={{ ...styles.btn, marginTop: 24, backgroundColor: '#1b1c1b' }}
@@ -149,7 +199,6 @@ export default function PagamentoPage() {
     </div>
   );
 
-  // ── Error ──
   if (error && !fatura) return (
     <div style={styles.center}>
       <div style={styles.card}>
@@ -160,11 +209,9 @@ export default function PagamentoPage() {
     </div>
   );
 
-  // ── Main ──
   return (
     <div style={styles.center}>
       <div style={styles.card}>
-        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <Zap size={32} color="#F25C05" />
@@ -176,9 +223,11 @@ export default function PagamentoPage() {
           <p style={{ color: '#666', fontSize: 14 }}>
             Secure on-chain payment via Stellar testnet (USDC)
           </p>
+          <p style={{ color: '#F25C05', fontSize: 12, fontWeight: 600, marginTop: 8 }}>
+            Payment automatically splits 70/30 on-chain
+          </p>
         </div>
 
-        {/* Invoice details */}
         {fatura && (
           <div style={{ backgroundColor: '#f8f7f4', borderRadius: 12, padding: 20, marginBottom: 24 }}>
             <Row label="Invoice no." value={fatura.numero} />
@@ -198,30 +247,26 @@ export default function PagamentoPage() {
           </div>
         )}
 
-        {/* Stellar badge */}
         <div style={{ backgroundColor: '#eff6ff', borderRadius: 8, padding: '10px 14px', marginBottom: 20, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
           <span style={{ fontSize: 18 }}>⭐</span>
           <div>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#1d4ed8', margin: 0 }}>Powered by Stellar x402</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#1d4ed8', margin: 0 }}>Powered by Stellar x402 + Soroban</p>
             <p style={{ fontSize: 11, color: '#3b82f6', margin: 0 }}>
-              Fast settlement · Near-zero fees · Blockchain verified
+              Fast settlement · On-chain split · Transparent distribution
             </p>
           </div>
         </div>
 
-        {/* Wallet info */}
         <div style={{ backgroundColor: '#fef3c7', borderRadius: 6, padding: '8px 12px', marginBottom: 16, fontSize: 11, color: '#92400e', textAlign: 'center' }}>
           💳 Paying from: GBM4USEN... (testnet wallet)
         </div>
 
-        {/* Error inline */}
         {error && (
           <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
             ⚠️ {error}
           </div>
         )}
 
-        {/* Pay button */}
         <button
           onClick={handleStellarPay}
           disabled={processing}
@@ -232,14 +277,14 @@ export default function PagamentoPage() {
           }}
         >
           {processing ? (
-            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing on Stellar...</>
+            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing & Splitting...</>
           ) : (
-            <><Zap size={18} /> Pay {fatura?.valorTotal?.toFixed(2) || '0.00'} USDC on Stellar</>
+            <><Zap size={18} /> Pay {fatura?.valorTotal?.toFixed(2) || '0.00'} USDC (70/30 auto-split)</>
           )}
         </button>
 
         <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', marginTop: 12 }}>
-          Stellar testnet · x402 protocol · No real funds used
+          Stellar testnet · x402 protocol · Soroban PaymentSplitter
         </p>
 
         <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 16, borderTop: '1px solid #e5e7eb' }}>
