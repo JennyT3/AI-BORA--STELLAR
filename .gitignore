@@ -62,3 +62,8 @@ coverage/
 .env.local
 node_modules/
 *.mjs
+
+# Rust build artifacts
+contracts/**/target/
+contracts/**/Cargo.lock
+**/*.wasm
