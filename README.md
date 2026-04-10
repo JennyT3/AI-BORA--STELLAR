@@ -12,14 +12,16 @@
 
 ### ✅ Soroban Smart Contracts
 - **ProposalRegistry** (`CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5`)
-  - Store proposal PDF hashes on-chain
+  - Store proposal PDF hashes on-chain (SHA-256)
   - Track status: pending → accepted → paid
   - Verify document integrity
+  - **Connected to /admin/orcamento and QuickProposalForm**
   
 - **PaymentSplitter** (`CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P`)
   - Automatic 70/30 distribution
   - Admin receives 70%, collaborator receives 30%
   - Called automatically after each payment
+  - **Connected to /pagamento page**
   
 - **AgentRegistry** (NEW)
   - Register AI agents and their service rates
@@ -33,13 +35,19 @@
   2. Decides if price is acceptable
   3. Pays automatically via x402
   4. Calls `execute_split` on PaymentSplitter contract
-  5. Distributes profits 70/30 on-chain
+  5. Distributes profits 70/30
 
 ### ✅ MPP (Machine Payments Protocol)
 - **server-mpp.ts**: SAC transfer endpoint
 - Direct on-chain settlement
 - Lower fees than x402
 - Compatible with standard Stellar wallets
+
+### ✅ Frontend Integration
+- **/admin/orcamento**: Generates proposal PDF → calculates SHA-256 → stores on ProposalRegistry contract
+- **/admin QuickProposalForm**: Same flow for quick proposals
+- **/pagamento**: Pays USDC → triggers PaymentSplitter.execute_split() → 70/30 distribution
+- **All hashes visible on Stellar Expert**
 
 ### ✅ Interoperability
 - Multiple contracts communicate
@@ -189,27 +197,69 @@ Both are implemented for complete hackathon compliance.
 
 ## 📄 PDF Hash Verification
 
-Every proposal PDF generates a SHA-256 hash that is stored on-chain:
+Every proposal PDF generates a SHA-256 hash that is stored on-chain in the ProposalRegistry smart contract:
 
-```bash
-# Generate PDF
-jsPDF → PDF file
+```typescript
+// In /admin/orcamento or /admin QuickProposalForm:
 
-# Calculate hash
-const hash = await crypto.subtle.digest('SHA-256', pdfBuffer);
-const hexHash = Array.from(new Uint8Array(hash))
+// 1. Generate PDF
+const doc = await criarPDF();
+const pdfBlob = doc.output('blob');
+
+// 2. Calculate SHA-256
+const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+const pdfHashBuffer = await crypto.subtle.digest('SHA-256', pdfArrayBuffer);
+const pdfHash = Array.from(new Uint8Array(pdfHashBuffer))
   .map(b => b.toString(16).padStart(2, '0'))
   .join('');
 
-# Store on-chain
-await storeProposalOnChain(proposalId, clientEmail, hexHash, amount);
+// 3. Store on Soroban ProposalRegistry
+const stellarResult = await storeProposalOnChain(
+  proposalId,
+  clientEmail,
+  pdfHash,
+  amount
+);
+
+// 4. Save proposal with Stellar transaction hash
+await createProposal({
+  ...proposalData,
+  pdfHash,
+  stellarTxHash: stellarResult.txHash,
+  stellarExplorerUrl: stellarResult.explorerUrl
+});
 ```
 
 **Verify on Stellar Expert:**
 1. Go to https://stellar.expert/explorer/testnet
-2. Search for transaction
+2. Search for transaction hash
 3. View `store_proposal` invocation
-4. Hex hash is visible in transaction data
+4. See PDF SHA-256 hash in transaction data
+
+**Flow:**
+```
+/admin/orcamento (Admin creates proposal)
+  ↓
+Generate PDF with jsPDF
+  ↓
+Calculate SHA-256 hash
+  ↓
+ProposalRegistry.store_proposal()
+  ↓
+Transaction on Stellar testnet
+  ↓
+Save to Firestore with txHash
+  ↓
+Client views proposal
+  ↓
+Client pays USDC
+  ↓
+PaymentSplitter.execute_split()
+  ↓
+70% admin + 30% collaborator
+  ↓
+All transactions visible on Stellar Expert
+```
 
 ---
 
