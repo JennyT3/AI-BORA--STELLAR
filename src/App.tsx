@@ -33,6 +33,7 @@ import StellarPayPage from "./pages/StellarPay";
 import RegisterPage from "./pages/Register";
 import SelectionPage from "./pages/Selection";
 import ClientePage from "./pages/Cliente";
+import ColaboradorPage from "./pages/Colaborador";
 
 function VendasApp() {
   const { vendedor, vendedorReady, login, logout } = useAuth();
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/selection" component={SelectionPage} />
         <Route path="/cliente" component={ClientePage} />
         <Route path="/cliente/:token" component={ClientePage} />
+        <Route path="/colaborador/:id" component={ColaboradorPage} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
 
