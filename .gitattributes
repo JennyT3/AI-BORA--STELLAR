@@ -1,2 +1,11 @@
+# Rust contracts
 contracts/**/*.rs linguist-language=Rust
 contracts/**/*.toml linguist-language=TOML
+
+# Ignore compiled artifacts
+contracts/**/target/** linguist-vendored
+**/*.wasm linguist-vendored
+
+# TypeScript frontend
+src/**/*.ts linguist-language=TypeScript
+src/**/*.tsx linguist-language=TypeScript
