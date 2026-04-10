@@ -1,6 +1,6 @@
 # AI BORA - Stellar Blockchain B2B Sales Platform
 
-B2B sales platform with **real Stellar blockchain payments**. Built for Stellar Hacks: Agents hackathon (April 2026).
+B2B sales platform with **real Stellar blockchain payments** and **Soroban smart contracts**. Built for Stellar Hacks: Agents hackathon (April 2026).
 
 ## 🚀 Quick Start
 
@@ -14,34 +14,29 @@ npm run dev
 1. **Home** → Click "Get Started"
 2. **Register** → Create account with Passkey (fingerprint/Face ID)
 3. **Selection** → Choose: Company / Request Service / Work
-4. **Admin** → Create proposal → Generates PDF + Stellar TX hash
+4. **Admin** → Create proposal → Generates PDF + stores hash on Stellar blockchain
 5. **Client** → Receives email → Views proposal → Pays with Stellar
 6. **Payment** → Real transaction on Stellar testnet → Auto-distribute to team
 
 ## 🏗️ Architecture
 
-- **Frontend**: React + Vite + Tailwind
-- **Auth**: WebAuthn Passkey (no password)
+- **Frontend**: React + Vite + Tailwind + TypeScript
+- **Smart Contracts**: Soroban (Rust) - 2 contracts deployed on testnet
+- **Blockchain**: Stellar testnet via Soroban SDK
+- **Auth**: WebAuthn Passkey (no passwords)
 - **Database**: Firebase Firestore
-- **Payments**: Stellar blockchain (testnet)
 - **Roles**: Admin / Client / Collaborator
 
-## 🔗 Key Features
+## 🔗 Smart Contracts (Testnet)
 
-- ✅ Passkey authentication (WebAuthn)
-- ✅ PDF generation with hash stored on Stellar
-- ✅ Real Stellar transactions on testnet
-- ✅ Auto-distribution payments to team
-- ✅ Multi-language (EN/PT)
+| Contract | ID | Functions |
+|----------|-----|-----------|
+| **ProposalRegistry** | `CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5` | store_proposal, get_proposal, update_status |
+| **PaymentSplitter** | `CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P` | create_payment, execute_split, get_payment |
 
-## 📦 Tech Stack
-
-- React + TypeScript
-- Vite
-- Tailwind CSS
-- Firebase (Auth + Firestore)
-- Stellar SDK
-- jsPDF
+### Payment Distribution
+- Admin: 70%
+- Collaborator: 30%
 
 ## ⚠️ Setup
 
