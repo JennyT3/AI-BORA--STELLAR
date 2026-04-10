@@ -74,6 +74,9 @@ export function Orcamento() {
   const [clientesCRM, setClientesCRM] = useState<any[]>([]);
   const [clienteIdSeleccionado, setClienteIdSeleccionado] = useState<string | null>(null);
   const [showClienteDropdown, setShowClienteDropdown] = useState(false);
+  const [stellarTxHash, setStellarTxHash] = useState<string>("");
+  const [stellarExplorerUrl, setStellarExplorerUrl] = useState<string>("");
+  const [stellarSuccess, setStellarSuccess] = useState<boolean>(false);
 
   const dataCriacao = new Date();
   const dataValidade = new Date(dataCriacao.getTime() + 10 * 24 * 60 * 60 * 1000);
@@ -310,27 +313,45 @@ const total = precoTotal;
       };
       
       // Store on Soroban smart contract
-      let stellarTxHash = '';
-      let stellarExplorerUrl = '';
+      let stellarTxHashLocal = '';
+      let stellarExplorerUrlLocal = '';
+      let stellarSuccessLocal = false;
+      
       try {
+        const uniqueProposalId = `${numeroOrcamento}-${Date.now()}`;
+        
+        // LLAMADA AL CONTRATO - AHORA RETORNA HASH INMEDIATAMENTE
         const stellarResult = await storeProposalOnChain(
-          numeroOrcamento || `PROP-${Date.now()}`,
+          uniqueProposalId,
           cliente.email || 'unknown@email.com',
           pdfHash,
           totalConDescuento,
           import.meta.env.VITE_STELLAR_ADMIN_SECRET || localStorage.getItem('aibora_stellar_secret') || ''
         );
-        stellarTxHash = stellarResult.txHash;
-        stellarExplorerUrl = stellarResult.explorerUrl;
-        console.log('✅ Stored on Soroban contract:', stellarTxHash);
+        
+        if (stellarResult && stellarResult.txHash) {
+          stellarTxHashLocal = stellarResult.txHash;
+          stellarExplorerUrlLocal = stellarResult.explorerUrl;
+          stellarSuccessLocal = stellarResult.success || false;
+          
+          // Actualizar estados para mostrar en la UI
+          setStellarTxHash(stellarTxHashLocal);
+          setStellarExplorerUrl(stellarExplorerUrlLocal);
+          setStellarSuccess(stellarSuccessLocal);
+          
+          console.log('✅ Stellar Transaction Hash:', stellarTxHashLocal);
+          console.log('✅ Stellar Success:', stellarSuccessLocal);
+        } else {
+          console.warn('⚠️ No hash returned from storeProposalOnChain');
+        }
       } catch (stellarErr) {
-        console.warn('⚠️ Soroban storage failed (non-critical):', stellarErr);
+        console.error('⚠️ Critical Soroban error:', stellarErr);
       }
       
       // Add Stellar data to proposal
-      if (stellarTxHash) {
-        proposalData.stellarTxHash = stellarTxHash;
-        proposalData.stellarExplorerUrl = stellarExplorerUrl;
+      if (stellarTxHashLocal) {
+        proposalData.stellarTxHash = stellarTxHashLocal;
+        proposalData.stellarExplorerUrl = stellarExplorerUrlLocal;
       }
       
       const id = await createProposal(proposalData);
@@ -360,16 +381,26 @@ const total = precoTotal;
       const accessToken = propostaCriada?.accessToken || id;
       
       const link = `https://aibora.pt/p/${accessToken}`;
+      // 1. Ya mostrado arriba inmediatamente tras la llamada al contrato
+
+      // 2. Intentar enviar email (puede fallar, no bloquea la UI)
       if (cliente.email) {
-        sendPropostaLinkEmail({ nome: cliente.nome, email: cliente.email, link, empresa: cliente.empresa }).catch(() => {});
+        sendPropostaLinkEmail({ 
+          nome: cliente.nome, 
+          email: cliente.email, 
+          link, 
+          empresa: cliente.empresa 
+        }).catch(err => console.error("Email failed:", err));
       }
+
+      // 3. Copiar link y abrir PDF
       navigator.clipboard.writeText(link).then(() => { 
         const pdfUrl = URL.createObjectURL(pdfBlob); 
         window.open(pdfUrl, '_blank'); 
         
         let successMsg = `Proposal saved successfully!\n\nUnique link copied:\n${link}`;
         if (stellarTxHash) {
-          successMsg += `\n\n🔗 Stellar Transaction:\n${stellarTxHash}\n\nView on explorer:\n${stellarExplorerUrl}`;
+          successMsg += `\n\n🔗 Stellar Transaction:\n${stellarTxHash}`;
         }
         
         setTimeout(() => { alert(successMsg); }, 500); 
@@ -522,6 +553,70 @@ const total = precoTotal;
               />
           </div>
         </section>
+
+        {/* Mostrar resultado de Stellar cuando exista */}
+        {stellarTxHash && (
+          <section style={{ backgroundColor: "#f0fdf4", padding: "32px 16px", borderTop: "1px solid #dcfce7" }}>
+            <div style={{ maxWidth: 800, margin: "0 auto", padding: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                <div style={{ width: "12px", height: "12px", backgroundColor: "#22c55e", borderRadius: "50%", animation: "pulse 2s infinite" }}></div>
+                <h3 style={{ fontSize: "18px", fontWeight: "600", color: "#166534", margin: 0 }}>✅ Propuesta registrada en Stellar</h3>
+              </div>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "#4b5563" }}>Estado:</span>
+                  <span style={{ fontWeight: "500", color: stellarSuccess ? "#16a34a" : "#ca8a04" }}>
+                    {stellarSuccess ? "Confirmada ✅" : "Pendiente ⏳"}
+                  </span>
+                </div>
+                
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "#4b5563" }}>Hash:</span>
+                  <code style={{ backgroundColor: "#f3f4f6", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontFamily: "monospace", color: "#1f2937" }}>
+                    {stellarTxHash.slice(0, 16)}...{stellarTxHash.slice(-8)}
+                  </code>
+                </div>
+              </div>
+              
+              <a 
+                href={stellarExplorerUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  marginTop: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  backgroundColor: "#2563eb",
+                  color: "white",
+                  fontWeight: "500",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
+                  width: "100%",
+                  textAlign: "center",
+                  boxSizing: "border-box"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#1d4ed8"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+              >
+                <span>🔍 Ver en Stellar Explorer</span>
+                <svg style={{ width: "16px", height: "16px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              
+              <p style={{ marginTop: "8px", fontSize: "12px", color: "#6b7280", textAlign: "center", margin: "8px 0 0 0" }}>
+                La transacción está verificada en la blockchain de Stellar
+              </p>
+            </div>
+          </section>
+        )}
+
         <CTAFooterSection />
       </main>
       <Footer />

@@ -4,7 +4,7 @@ const CONTRACT_ID = 'CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5';
 const RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
 
-const server = new StellarSdk.SorobanRpc.Server(RPC_URL, { allowHttp: true });
+const server = new StellarSdk.SorobanRpc.Server(RPC_URL);
 
 async function waitForTransaction(hash: string, retries = 20): Promise<StellarSdk.SorobanRpc.GetTransactionResponse> {
   for (let i = 0; i < retries; i++) {
@@ -15,14 +15,35 @@ async function waitForTransaction(hash: string, retries = 20): Promise<StellarSd
   throw new Error('Transaction timeout');
 }
 
+export interface InvokeContractResult {
+  txHash: string;
+  success: boolean;
+  explorerUrl: string;
+}
+
 export async function invokeContract(
   method: string,
   args: StellarSdk.xdr.ScVal[],
   secretKey: string
-): Promise<any> {
+): Promise<InvokeContractResult> {
+  console.log('--- START invokeContract ---');
+  console.log('Method:', method);
+  
   const sourceKeypair = StellarSdk.Keypair.fromSecret(secretKey);
-  const sourceAccount = await server.getAccount(sourceKeypair.publicKey());
+  const publicKey = sourceKeypair.publicKey();
+  console.log('1. Source Public Key:', publicKey);
+
+  let sourceAccount;
+  try {
+    sourceAccount = await server.getAccount(publicKey);
+    console.log('2. Source Account loaded, sequence:', sourceAccount.sequenceNumber());
+  } catch (accErr) {
+    console.error('❌ Error loading account:', accErr);
+    throw new Error(`Failed to load account ${publicKey}. Is it funded on testnet?`);
+  }
+
   const contract = new StellarSdk.Contract(CONTRACT_ID);
+  console.log('3. Contract ID:', CONTRACT_ID);
 
   const tx = new StellarSdk.TransactionBuilder(sourceAccount, {
     fee: '100000',
@@ -32,17 +53,65 @@ export async function invokeContract(
     .setTimeout(30)
     .build();
 
-  const prepared = await server.prepareTransaction(tx);
-  prepared.sign(sourceKeypair);
+  console.log('4. Transaction built');
 
+  let prepared;
+  try {
+    prepared = await server.prepareTransaction(tx);
+    console.log('5. Transaction prepared (simulation successful)');
+  } catch (prepErr: any) {
+    console.error('❌ Simulation/Preparation failed:', prepErr);
+    // Extraer detalles si es posible
+    if (prepErr.response?.data) {
+        console.error('Detail:', JSON.stringify(prepErr.response.data));
+    }
+    throw prepErr;
+  }
+
+  prepared.sign(sourceKeypair);
+  console.log('6. Transaction signed');
+
+  // ENVIAR TRANSACCIÓN
+  console.log('7. Sending to network...');
   const response = await server.sendTransaction(prepared);
 
   if (response.status === 'ERROR') {
-    throw new Error('Transaction error: ' + response.errorResult?.toString());
+    console.error('❌ Submission ERROR:', response.errorResultXdr);
+    throw new Error('Transaction submission error: ' + response.status);
   }
 
-  const result = await waitForTransaction(response.hash);
-  return result;
+  const txHash = response.hash;
+  console.log('✅ Transaction submitted! Hash:', txHash);
+  const explorerUrl = `https://stellar.expert/explorer/testnet/tx/${txHash}`;
+
+  // AHORA intentar esperar confirmación
+  let success = false;
+  try {
+    console.log('8. Waiting for confirmation...');
+    const waitResponse = await waitForTransaction(txHash);
+    success = waitResponse.status === 'SUCCESS';
+    console.log('🏁 Confirmation status:', waitResponse.status);
+    if (!success) {
+        console.error('❌ Transaction failed execution:', waitResponse.resultXdr);
+    }
+  } catch (waitError) {
+    console.warn('⚠️ Wait failed, but hash is preserved:', txHash);
+  }
+
+  return { txHash, success, explorerUrl };
+}
+
+/**
+ * Convierte un string hexadecimal a Uint8Array (bytes)
+ * Compatible con navegador (no usa Buffer de Node.js)
+ */
+function hexToBytes(hex: string): Uint8Array {
+  const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex;
+  const bytes = new Uint8Array(cleanHex.length / 2);
+  for (let i = 0; i < cleanHex.length; i += 2) {
+    bytes[i / 2] = parseInt(cleanHex.substring(i, i + 2), 16);
+  }
+  return bytes;
 }
 
 export async function storeProposalOnChain(
@@ -51,28 +120,41 @@ export async function storeProposalOnChain(
   pdfHash: string,
   amount: number,
   secretKey: string
-): Promise<{ txHash: string; explorerUrl: string }> {
+): Promise<InvokeContractResult | null> {
   const adminKey = secretKey || import.meta.env.VITE_STELLAR_ADMIN_SECRET;
-  if (!adminKey) throw new Error('No admin secret key configured');
+  if (!adminKey) {
+      console.error('❌ No STELLAR_ADMIN_SECRET found in env or localStorage');
+      throw new Error('No admin secret key configured');
+  }
+
+  console.log('Preparing store_proposal args...');
+  console.log('  proposalId:', proposalId);
+  console.log('  clientEmail:', clientEmail);
+  console.log('  pdfHash (hex):', pdfHash);
+  console.log('  amount:', amount);
+
+  // Convertir el hash hexadecimal a bytes
+  const pdfHashBytes = hexToBytes(pdfHash);
+  console.log('  pdfHash (bytes):', new TextEncoder().encode(pdfHashBytes.toString()).toString());
 
   const args = [
+    // id: String (proposal_id)
     StellarSdk.nativeToScVal(proposalId, { type: 'string' }),
+    // client_email: String
     StellarSdk.nativeToScVal(clientEmail, { type: 'string' }),
-    StellarSdk.nativeToScVal(pdfHash, { type: 'string' }),
-    StellarSdk.nativeToScVal(Math.round(amount * 10_000_000), { type: 'i128' }),
+    // pdf_hash: Bytes
+    StellarSdk.nativeToScVal(pdfHashBytes, { type: 'bytes' }),
+    // amount: i128 (BigInt)
+    StellarSdk.nativeToScVal(BigInt(Math.round(amount)), { type: 'i128' }),
   ];
 
+  console.log('Arguments prepared successfully');
+
   try {
-    const result = await invokeContract('store_proposal', args, adminKey);
-    const txHash = result.hash || '';
-    console.log('✅ Proposal stored on chain:', txHash);
-    return {
-      txHash,
-      explorerUrl: `https://stellar.expert/explorer/testnet/tx/${txHash}`
-    };
+    return await invokeContract('store_proposal', args, adminKey);
   } catch (err: any) {
-    console.warn('⚠️ Blockchain storage failed (non-critical):', err.message);
-    return { txHash: '', explorerUrl: '' };
+    console.error('❌ storeProposalOnChain top-level error:', err.message || err);
+    return null;
   }
 }
 
@@ -85,7 +167,9 @@ export async function updateProposalStatus(
   if (!adminKey) return;
 
   const args = [
+    // id: String
     StellarSdk.nativeToScVal(proposalId, { type: 'string' }),
+    // new_status: String
     StellarSdk.nativeToScVal(newStatus, { type: 'string' }),
   ];
 

@@ -4,6 +4,7 @@ import { Loader, CheckCircle, AlertCircle, ExternalLink, Zap } from 'lucide-reac
 import { getPaymentLink, marcarComoPago } from '../services/pagamentos';
 import { getFatura } from '../services/faturas';
 import { executePaymentSplit, createPaymentOnChain } from '../services/paymentSplitter';
+import { procesarPagoColaboradores } from '../services/paymentToTasks';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -128,6 +129,21 @@ export default function PagamentoPage() {
       
       // Mark as paid in Firestore
       await marcarComoPago(paymentLink.id);
+      
+      // Step 3: Mark tasks as paid and register commissions
+      if (paymentLink.clienteId) {
+        try {
+          await procesarPagoColaboradores(
+            paymentLink.clienteId,
+            fatura.valorTotal || 0,
+            paymentLink.id
+          );
+          console.log('✅ Tasks updated and commissions registered');
+        } catch (taskErr) {
+          console.warn('⚠️ Could not update tasks (non-critical):', taskErr);
+        }
+      }
+      
       setPaid(true);
       
     } catch (err: any) {
