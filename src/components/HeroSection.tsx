@@ -1,168 +1,201 @@
 import { motion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
-import { WHATSAPP_LINK } from '../lib/constants';
 import { Link } from 'wouter';
+import { ArrowRight, FileText, Rocket } from 'lucide-react';
 
 export function HeroSection() {
   return (
     <section 
       style={{ 
-        backgroundColor: '#000000',
+        backgroundColor: '#0a0a0a',
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
       }} 
-      className="w-full py-20 sm:py-24 lg:py-32 pt-28 sm:pt-32 lg:pt-36"
+      className="w-full"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        
+        {/* Logo/Brand */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginBottom: 40 }}
+        >
+          <span style={{ 
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 900,
+            fontSize: 14,
+            color: '#F25C05',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase'
+          }}>
+            AI BORA
+          </span>
+        </motion.div>
 
-          <div className="flex-1 w-full flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+        {/* Main Title - VERY EYE CATCHING */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          style={{
+            color: '#FFFFFF',
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+            lineHeight: 1.1,
+            marginBottom: 24
+          }}
+        >
+          PAY WITH
+          <br />
+          <span style={{ color: '#F25C05' }}>STELLAR</span>
+        </motion.h1>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.22,1,0.36,1] }}
+        {/* Subtitle - EXPLAINS WHAT IT DOES */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          style={{
+            color: 'rgba(255,255,255,0.7)',
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 400,
+            fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+            lineHeight: 1.6,
+            maxWidth: '600px',
+            margin: '0 auto 48px'
+          }}
+        >
+          B2B Sales Platform with <strong style={{ color: '#fff' }}>REAL Stellar blockchain payments</strong>. 
+          Create proposals, send to clients, accept with fingerprint, pay on-chain. 
+          <span style={{ color: '#22c55e' }}> Verified. Instant. Free.</span>
+        </motion.p>
+
+        {/* Two Simple Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}
+        >
+          {/* GET STARTED - Goes to Register with Passkey */}
+          <Link href="/register">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               style={{
+                backgroundColor: '#F25C05',
                 color: '#FFFFFF',
                 fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 900,
-                fontSize: 'clamp(1.5rem, 4.5vw, 2.25rem)',
-                lineHeight: 1.25,
-                letterSpacing: '-0.02em',
-                marginTop: '1rem',
-                maxWidth: '550px'
+                fontWeight: 700,
+                fontSize: '1.1rem',
+                padding: '18px 36px',
+                borderRadius: 50,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                boxShadow: '0 4px 20px rgba(242,92,5,0.4)'
               }}
             >
-              Accelerate revenue for your local business.
-            </motion.h1>
+              <Rocket size={20} />
+              Get Started
+              <ArrowRight size={18} />
+            </motion.button>
+          </Link>
 
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: 80 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: [0.22,1,0.36,1] }}
-              style={{ 
-                height: '4px', 
-                backgroundColor: '#F25C05', 
-                borderRadius: '2px'
-              }}
-              className="mx-auto lg:mx-0"
-            />
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.22,1,0.36,1] }}
+          {/* DOCS - Goes to documentation */}
+          <Link href="/verify/test">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               style={{
-                color: 'rgba(255,255,255,0.85)',
+                backgroundColor: 'transparent',
+                color: '#FFFFFF',
                 fontFamily: 'Montserrat, sans-serif',
-                fontWeight: 400,
-                fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
-                lineHeight: 1.5,
-                maxWidth: '480px'
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                padding: '18px 36px',
+                borderRadius: 50,
+                border: '2px solid rgba(255,255,255,0.3)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10
               }}
             >
-              Integrated digital solutions so your company never stops growing.
-            </motion.p>
+              <FileText size={20} />
+              Docs
+            </motion.button>
+          </Link>
+        </motion.div>
 
-            {/* CTA buttons — side by side on all breakpoints */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4, ease: [0.22,1,0.36,1] }}
-              className="flex flex-row gap-3 items-center justify-center lg:justify-start pt-2"
-            >
-              <motion.a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{
-                  backgroundColor: '#25D366',
-                  color: '#FFFFFF',
-                  fontFamily: 'Montserrat, sans-serif',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  height: '40px',
-                  borderRadius: '50px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  padding: '0 1rem',
-                  boxShadow: '0 4px 12px rgba(37,211,102,0.35)',
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
-                  letterSpacing: '0.02em',
-                  minWidth: 'auto'
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Talk to us
-              </motion.a>
-
-              <Link href="/servicos">
-                <motion.button
-                  whileHover={{ scale: 1.05, borderColor: '#F25C05' }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: '2px solid rgba(242,92,5,0.6)',
-                    color: '#FFFFFF',
-                    fontFamily: 'Montserrat, sans-serif',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    height: '40px',
-                    borderRadius: '50px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    padding: '0 1rem',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    letterSpacing: '0.02em',
-                    transition: 'all 0.2s ease',
-                    minWidth: 'auto'
-                  }}
-                >
-                  View services
-                  <ArrowRight size={14} />
-                </motion.button>
-              </Link>
-            </motion.div>
+        {/* Flow Diagram - Shows the steps */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          style={{ marginTop: 60 }}
+        >
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: 8, 
+            flexWrap: 'wrap',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: '0.85rem',
+            color: 'rgba(255,255,255,0.5)'
+          }}>
+            <span style={{ color: '#F25C05', fontWeight: 600 }}>1.</span>
+            <span>Admin creates proposal</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600 }}>2.</span>
+            <span>Client receives link</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600 }}>3.</span>
+            <span>Client accepts</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
+            
+            <span style={{ color: '#22c55e', fontWeight: 600 }}>4.</span>
+            <span style={{ color: '#22c55e' }}>Pay with Stellar</span>
+            
+            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
+            
+            <span style={{ color: '#22c55e', fontWeight: 600 }}>5.</span>
+            <span style={{ color: '#22c55e' }}>Auto-distribute to team</span>
           </div>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.25, ease: [0.22,1,0.36,1] }}
-            className="flex-1 w-full mt-8 lg:mt-0"
+        {/* TX Hash Demo */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          style={{ marginTop: 40, padding: '16px 24px', backgroundColor: 'rgba(34,197,94,0.1)', borderRadius: 12, display: 'inline-block' }}
+        >
+          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', color: '#22c55e', marginBottom: 8 }}>
+            ✅ Real Stellar Testnet Transaction
+          </p>
+          <a 
+            href="https://stellar.expert/explorer/testnet/tx/227828308b72a57f6df4ab4346ad7f9811a682bc3eee7cfc30c1011fe89de549"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}
           >
-            <div style={{ 
-              borderRadius: '24px', 
-              overflow: 'hidden',
-              boxShadow: '0 25px 80px rgba(242,34,131,0.25)'
-            }}>
-              <video
-                src="/hero-video.mp4"
-                autoPlay
-                muted
-                loop
-                playsInline
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block'
-                }}
-              />
-            </div>
-          </motion.div>
+            TX: 227828308b72a57f6df4ab4346ad7f9811a682bc3eee7cfc30c1011fe89de549 ↗
+          </a>
+        </motion.div>
 
-        </div>
       </div>
     </section>
   );

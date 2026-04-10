@@ -4,6 +4,8 @@ import { Loader, CheckCircle, AlertCircle, ExternalLink, Zap } from 'lucide-reac
 import { getPaymentLink, marcarComoPago } from '../services/pagamentos';
 import { getFatura } from '../services/faturas';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 export default function PagamentoPage() {
   const [match, params] = useRoute('/pagamento/:id');
   const [, setLocation] = useLocation();
@@ -17,14 +19,52 @@ export default function PagamentoPage() {
   const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
-    if (match && params?.id) loadPaymentData(params.id);
-  }, [match, params]);
+    if (!match || !params?.id) return;
+    
+    const id = params.id;
+    
+    // DEMO MODE — se ejecuta PRIMERO, antes de cualquier Firebase
+    if (id === 'test' || id === 'demo') {
+      setPaymentLink({ id: 'test', faturaId: 'test-fatura', clienteId: 'test-client' });
+      setFatura({
+        numero: 'TEST-2026-001',
+        descricao: 'AI BORA Demo Invoice',
+        dataVencimento: '15/04/2026',
+        valorTotal: 1.00,
+        clienteId: 'test-client',
+        status: 'pending'
+      });
+      setLoading(false);
+      return;
+    }
+    
+    // Solo llega aquí si NO es demo mode
+    loadPaymentData(id);
+  }, [params?.id]);
 
+  // Esta función ahora solo se usa para IDs reales de Firebase
   const loadPaymentData = async (id: string) => {
     setLoading(true);
     try {
       const link = await getPaymentLink(id);
-      if (!link) { setError('Payment link not found'); return; }
+      
+      if (!link) {
+        if (id === 'test' || id === 'demo') {
+          setPaymentLink({ id: 'test', faturaId: 'test-fatura', clienteId: 'test-client' });
+          setFatura({
+            numero: 'TEST-2026-001',
+            descricao: 'Demo Invoice - No payment required',
+            dataVencimento: '15/04/2026',
+            valorTotal: 1.00,
+            clienteId: 'test-client'
+          });
+          setLoading(false);
+          return;
+        }
+        setError('Payment link not found');
+        return;
+      }
+      
       setPaymentLink(link);
       const faturaData = await getFatura(link.faturaId);
       setFatura(faturaData);
@@ -37,10 +77,11 @@ export default function PagamentoPage() {
 
   const handleStellarPay = async () => {
     if (!fatura || !paymentLink) return;
+    
     setProcessing(true);
     setError(null);
     try {
-      const res = await fetch('/api/stellar-pay', {
+      const res = await fetch(`${API_URL}/api/stellar-pay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -147,7 +188,7 @@ export default function PagamentoPage() {
               <span style={{ fontWeight: 700, color: '#1b1c1b' }}>Total</span>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: 24, fontWeight: 900, color: '#F25C05' }}>
-                  {fatura.valorTotal?.toFixed(2) || '0.00'}€
+                  {fatura.valorTotal?.toFixed(2) || '0.00'} USDC
                 </span>
                 <div style={{ fontSize: 11, color: '#9ca3af' }}>
                   ≈ {fatura.valorTotal?.toFixed(2) || '0.00'} USDC (testnet)
@@ -166,6 +207,11 @@ export default function PagamentoPage() {
               Fast settlement · Near-zero fees · Blockchain verified
             </p>
           </div>
+        </div>
+
+        {/* Wallet info */}
+        <div style={{ backgroundColor: '#fef3c7', borderRadius: 6, padding: '8px 12px', marginBottom: 16, fontSize: 11, color: '#92400e', textAlign: 'center' }}>
+          💳 Paying from: GBM4USEN... (testnet wallet)
         </div>
 
         {/* Error inline */}

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Navbar } from "../components/Navbar";
-import { CTAFooterSection } from "../components/CTAFooterSection";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
-import { Footer } from "../components/Footer";
 import { SimuladorServicios } from "../components/SimuladorServicios";
+import { SimpleRequestModal } from "../components/SimpleRequestModal";
 
 const fotos = [
   { src: "/antes.webp", label: "Before" },
@@ -15,6 +14,9 @@ const fotos = [
 ];
 
 export function Servicos() {
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<{ id: string; nome: string }[]>([]);
+
   return (
     <div className="min-h-screen bg-bg">
       <Navbar />
@@ -30,6 +32,17 @@ export function Servicos() {
             </p>
           </div>
         </section>
+
+        <div className="bg-gradient-to-r from-orange-500 to-fuchsia-600 py-8">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <button
+              onClick={() => setShowRequestModal(true)}
+              className="px-10 py-5 bg-white text-gray-900 font-bold text-xl rounded-2xl flex items-center gap-4 mx-auto hover:scale-105 transition-transform shadow-lg"
+            >
+              🛒 Request Service
+            </button>
+          </div>
+        </div>
 
         <SimuladorServicios />
 
@@ -57,10 +70,31 @@ export function Servicos() {
           </div>
         </section>
 
-        <CTAFooterSection />
+        <div style={{ textAlign: 'center', padding: '40px 16px', backgroundColor: '#1A1A1A' }}>
+          <a 
+            href="/" 
+            style={{ 
+              display: 'inline-block',
+              padding: '16px 32px',
+              backgroundColor: '#F25C05',
+              color: '#fff',
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 700,
+              fontSize: 14,
+              borderRadius: 50,
+              textDecoration: 'none'
+            }}
+          >
+            ← Back to Home
+          </a>
+        </div>
       </main>
-      <Footer />
       <FloatingWhatsApp />
+      <SimpleRequestModal 
+        isOpen={showRequestModal} 
+        onClose={() => setShowRequestModal(false)}
+        servicosSelecionados={selectedServices}
+      />
     </div>
   );
 }

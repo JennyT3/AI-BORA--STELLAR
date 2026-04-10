@@ -1,165 +1,39 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
+    
     // ============================================
-    // HELPER FUNCTIONS
+    // PERMISOS ABIERTOS PARA HACKATHON
+    // Todo el mundo puede leer y escribir en todo
     // ============================================
-    
-    // Check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
+    match /{document=**} {
+      allow read, write: if true;
     }
     
-    // Check if the user is admin (role on the vendedor document)
-    function isAdmin() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/vendedores/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/vendedores/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    // Check if the user is the owner vendedor
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-    
-    // Check if the vendedor can access the cliente
-    function canAccessCliente() {
-      return isAdmin() || 
-        (isAuthenticated() && resource.data.vendedorId == request.auth.uid);
-    }
-
-    // ============================================
-    // ACADEMIA BORA LÁ
-    // ============================================
-    
-    // Academia users: only their own document
-    match /academia_users/{userId} {
-      allow read, write: if isAuthenticated() && request.auth.uid == userId;
-    }
-    
-    // Progress: only the owning user
-    match /academia_progresso/{docId} {
-      allow read: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
-      allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
-    }
-    
-    // Certificates: public read for verification, write only by owner
-    match /academia_certificados/{docId} {
-      allow read: if true;
-      allow write: if isAuthenticated() && (resource == null || resource.data.user_id == request.auth.uid);
-    }
-    
-    // Quizzes: public read (questions), writes disabled
-    match /academia_quizzes/{quizId} {
+    // EXCEPCIONES: Solo lectura para seguridad
+    match /vendedores/{id} {
       allow read: if true;
       allow write: if false;
     }
-
-    // ============================================
-    // SOLICITUDES (public - anyone can create)
-    // ============================================
-    match /solicitudes/{id} {
-      allow create: if request.resource.data.keys().hasAll(['nome', 'telefone']);
-      allow read: if isAuthenticated();
-      allow update, delete: if isAdmin();
+    
+    match /comisiones/{id} {
+      allow read: if true;
+      allow write: if false;
     }
-
-    // ============================================
-    // CLIENTES (protected)
-    // ============================================
-    match /clientes/{clienteId} {
-      allow read, write: if isAdmin();
-      allow create: if request.auth != null 
-        && request.resource.data.vendedorId == request.auth.uid;
-      allow read, update: if request.auth != null 
-        && resource.data.vendedorId == request.auth.uid;
-      // Only admins may delete
-      allow delete: if isAdmin();
-    }
-
-    // ============================================
-    // PROPOSTAS (protected)
-    // ============================================
-    match /propostas/{id} {
-      // Authenticated users can read
-      allow read: if isAuthenticated();
-      // Only admins can create
-      allow create: if isAdmin();
-      // Only owner can update specific fields (resposta)
-      allow update: if isAuthenticated() && 
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resposta', 'dataResposta', 'respondidoPor']);
-      // Only admins can delete
-      allow delete: if isAdmin();
-    }
-
-    // ============================================
-    // VENDEDORES (highly sensitive)
-    // ============================================
-    match /vendedores/{id} {
-      // Only the vendedor may read their own data
-      allow read: if isAuthenticated() && request.auth.uid == id;
-      // Only admins can create/edit
-      allow write: if isAdmin();
-    }
-
-    // ============================================
-    // TAREFAS (protected)
-    // ============================================
-    match /tareas/{id} {
-      // Authenticated can read
-      allow read: if isAuthenticated();
-      // Only admins can create
-      allow create: if isAdmin();
-      // Admin or assigned vendor can update
-      allow update: if isAdmin() || 
-        (isAuthenticated() && resource.data.asignadaA == request.auth.uid);
-      // Only admins can delete
-      allow delete: if isAdmin();
-    }
-
-    // ============================================
-    // FATURAS (highly sensitive - admin only)
-    // ============================================
+    
     match /faturas/{id} {
-      allow read, write, delete: if isAdmin();
+      allow read: if true;
+      allow write: if false;
     }
     
     match /faturas_recorrentes/{id} {
-      allow read, write, delete: if isAdmin();
+      allow read: if true;
+      allow write: if false;
     }
-
-    // ============================================
-    // CONTACTOS (public create, protected read)
-    // ============================================
-    match /contactos/{id} {
-      // Anyone may create (no auth) for public forms
-      allow create: if request.resource.data.keys().hasAll(['nome', 'email']);
-      // Only authenticated users may read
-      allow read: if isAuthenticated();
-      // Only admins may update/delete
-      allow update, delete: if isAdmin();
-    }
-
-    // ============================================
-    // EMAIL LOGS (admin only)
-    // ============================================
+    
     match /registos_email/{id} {
-      allow read, write, delete: if isAdmin();
-    }
-
-    // ============================================
-    // COMISSÕES (highly sensitive - admin only)
-    // ============================================
-    match /comisiones/{id} {
-      allow read, write, delete: if isAdmin();
-    }
-
-    // ============================================
-    // DEFAULT DENY (maximum security)
-    // ============================================
-    match /{document=**} {
-      allow read, write: if false;
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

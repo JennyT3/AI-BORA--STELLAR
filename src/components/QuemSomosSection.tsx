@@ -11,11 +11,6 @@ export function QuemSomosSection() {
       image: "/jenny-photo.jpg"
     },
     {
-      name: "Aylen Fuente",
-      role: "Co-Founder & Chief Marketing Officer",
-      image: "/aylen-photo.jpg"
-    },
-    {
       name: "Bora",
       role: "Customer Experience AI",
       image: "/bora-photo..jpg"

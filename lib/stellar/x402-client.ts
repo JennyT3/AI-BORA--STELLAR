@@ -145,6 +145,6 @@ export const stellarConfig = {
   horizonUrl: networkConfig.horizonUrl,
   usdcAddress: usdcToken.address,
   facilitatorUrl: FACILITATOR_URL,
-  vendorPublicKey: process.env.VENDOR_PUBLIC || '',
-  clientSecretKey: process.env.CLIENT_SECRET || '',
+  vendorPublicKey: (globalThis as any).process?.env?.STELLAR_VENDOR_PUBLIC || '',
+  clientSecretKey: (globalThis as any).process?.env?.STELLAR_CLIENT_SECRET || '',
 };

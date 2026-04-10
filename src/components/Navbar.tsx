@@ -44,13 +44,19 @@ export function Navbar() {
           </div>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           <Link href="/servicos" className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">Services</Link>
           <button onClick={() => scrollToSection('quem-somos')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">About us</button>
           <button onClick={() => scrollToSection('processo')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">How it works</button>
           <button onClick={() => scrollToSection('faq')} className="text-sm font-bold text-text-primary hover:text-[#F22283] transition-colors">FAQ</button>
           <Link href="/prompts" className="text-sm font-bold text-[#F25C05] hover:text-[#F22283] transition-colors">Prompts AI</Link>
           <Link href="/academia" className="text-sm font-bold text-[#F25C05] hover:text-[#F22283] transition-colors">Academy</Link>
+          
+          {/* Hackathon Demo Links */}
+          <Link href="/stellar" className="text-sm font-bold text-[#7c3aed] hover:text-[#6d28d9] transition-colors bg-purple-50 px-3 py-1.5 rounded">Stellar Wallet</Link>
+          <Link href="/admin" className="text-sm font-bold text-[#1d4ed8] hover:text-[#1e40af] transition-colors bg-blue-50 px-3 py-1.5 rounded">Admin Panel</Link>
+          <Link href="/pagamento/test" className="text-sm font-bold text-[#059669] hover:text-[#047857] transition-colors bg-green-50 px-3 py-1.5 rounded">Demo Pago</Link>
+          
           <motion.button
             onClick={() => scrollToSection('contacto')}
             whileHover={{ scale: 1.03 }}
@@ -83,6 +89,12 @@ export function Navbar() {
           <button onClick={() => scrollToSection('faq')} className="text-xl font-bold text-text-primary hover:text-[#F22283]">FAQ</button>
           <Link href="/prompts" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#F25C05]">Prompts AI</Link>
           <Link href="/academia" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#F25C05]">Academy</Link>
+          
+          {/* Hackathon Demo Links - Mobile */}
+          <Link href="/stellar" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#7c3aed] bg-purple-50 px-4 py-2 rounded">Stellar Wallet</Link>
+          <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#1d4ed8] bg-blue-50 px-4 py-2 rounded">Admin Panel</Link>
+          <Link href="/pagamento/test" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-[#059669] bg-green-50 px-4 py-2 rounded">Demo Pago</Link>
+          
           <button
             onClick={() => scrollToSection('contacto')}
             className="text-white font-bold px-8 py-4 rounded-full text-lg shadow-lg"

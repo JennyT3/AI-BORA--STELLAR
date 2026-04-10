@@ -94,48 +94,36 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
         />
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions - BIG BUTTONS */}
       <div style={{ 
         display: "grid", 
-        gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", 
-        gap: 16, 
+        gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)", 
+        gap: 20, 
         marginBottom: 48 
       }}>
         <button 
           onClick={onNovoOrcamento} 
-          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          style={{ padding: "28px 32px", borderRadius: 20, background: "linear-gradient(135deg, #F25C05 0%, #F22283 100%)", color: "#fff", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 20, fontSize: 18, fontWeight: 800, boxShadow: "0 8px 24px rgba(242,92,5,0.35)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Plus size={16} strokeWidth={3} /></div>
-          New quote
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><FileText size={28} strokeWidth={2} /></div>
+          <div className="text-left">
+            <div style={{ fontSize: 20 }}>📄 Generate Proposal</div>
+            <div style={{ fontSize: 13, opacity: 0.85 }}>Create PDF with Stellar hash</div>
+          </div>
         </button>
         <button 
           onClick={onNovoCliente} 
-          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+          style={{ padding: "28px 32px", borderRadius: 20, background: "linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)", color: "#fff", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 20, fontSize: 18, fontWeight: 800, boxShadow: "0 8px 24px rgba(6,182,212,0.35)", transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#F25C05", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Users size={16} /></div>
-          New client
-        </button>
-        <button 
-          onClick={onNovaFatura} 
-          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-        >
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#1b1c1b", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><DollarSign size={16} /></div>
-          New invoice
-        </button>
-        <button 
-          onClick={() => onNavigate("faturacao")} 
-          style={{ padding: "14px 20px", borderRadius: 16, backgroundColor: "#fff", color: "#1b1c1b", border: "1px solid rgba(0,0,0,0.05)", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontSize: 13, fontWeight: 800, boxShadow: "0 4px 12px rgba(0,0,0,0.02)", transition: 'all 0.2s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-        >
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "#1b1c1b" }}><Target size={16} /></div>
-          Invoicing
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}><Users size={28} /></div>
+          <div className="text-left">
+            <div style={{ fontSize: 20 }}>➕ New Client</div>
+            <div style={{ fontSize: 13, opacity: 0.85 }}>Add 3-question quick form</div>
+          </div>
         </button>
       </div>
 
@@ -246,7 +234,7 @@ export function Dashboard({ stats, proposals, solicitudes, clientes, onExport, o
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontWeight: 900, color: "#1b1c1b", fontSize: 14 }}>{p.valor?.toLocaleString()} €</div>
+                    <div style={{ fontWeight: 900, color: "#1b1c1b", fontSize: 14 }}>{p.valor?.toLocaleString()} USDC</div>
                     <div style={{ fontSize: 9, fontWeight: 900, color: badge.textColor, textTransform: 'uppercase' }}>{badge.text}</div>
                   </div>
                 </div>

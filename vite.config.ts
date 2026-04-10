@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'process.env.VENDOR_PUBLIC': JSON.stringify(env.VENDOR_PUBLIC),
+      'process.env.CLIENT_SECRET': JSON.stringify(env.CLIENT_SECRET),
     },
     resolve: {
       alias: {
@@ -17,6 +19,13 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
     },
     build: {
       rollupOptions: {

@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs, orderBy, limit, addDoc } from 'firebase/firestore';
 import { generateId } from './firebase';
 
 export interface PaymentLink {
@@ -15,6 +15,29 @@ export interface PaymentLink {
   expiresAt: Date;
   paidAt?: Date;
   createdAt: Date;
+}
+
+export async function criarPaymentLinkSimples(proposalId: string, clienteEmail: string, clienteId: string, valor: number, descricao: string): Promise<PaymentLink> {
+  const paymentLink: PaymentLink = {
+    id: generateId(),
+    faturaId: proposalId,
+    clienteId,
+    clienteEmail,
+    valor,
+    descricao,
+    status: 'pendente',
+    expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+    createdAt: new Date()
+  };
+
+  const docData = {
+    ...paymentLink,
+    expiresAt: paymentLink.expiresAt.toISOString(),
+    createdAt: paymentLink.createdAt.toISOString()
+  };
+
+  await setDoc(doc(db, 'payment_links', paymentLink.id), docData);
+  return paymentLink;
 }
 
 export async function criarPaymentLink(faturaId: string): Promise<PaymentLink | null> {
@@ -43,7 +66,7 @@ export async function criarPaymentLink(faturaId: string): Promise<PaymentLink | 
         payment_method_types: ['card'],
         line_items: [{
           price_data: {
-            currency: 'eur',
+            currency: 'usdc',
             product_data: {
               name: `Invoice ${fatura.numero}`,
               description: fatura.descricao || 'Ai Bora services'
@@ -134,7 +157,7 @@ export function getStripeCheckoutUrl(sessionId: string): string {
 export function getRevolutCheckoutUrl(amount: number, email: string, description: string): string {
   const params = new URLSearchParams({
     amount: String(Math.round(amount * 100)),
-    currency: 'EUR',
+    currency: 'USDC',
     email,
     title: description
   });

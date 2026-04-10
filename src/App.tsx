@@ -28,6 +28,11 @@ import AcademiaConsultoria from "./pages/academia/consultoria";
 import AcademiaQuiz from "./pages/academia/quiz";
 import { Analytics } from "@vercel/analytics/react";
 import { useAuth } from "./hooks/useAuth";
+import VerifyPage from "./pages/Verify";
+import StellarPayPage from "./pages/StellarPay";
+import RegisterPage from "./pages/Register";
+import SelectionPage from "./pages/Selection";
+import ClientePage from "./pages/Cliente";
 
 function VendasApp() {
   const { vendedor, vendedorReady, login, logout } = useAuth();
@@ -53,6 +58,12 @@ export default function App() {
         <Route path="/cliente/login/:token" component={ClienteLoginPage} />
         <Route path="/cliente/login" component={ClienteLoginPage} />
         <Route path="/pagamento/:id" component={PagamentoPage} />
+        <Route path="/verify/:hash" component={VerifyPage} />
+        <Route path="/stellar" component={StellarPayPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/selection" component={SelectionPage} />
+        <Route path="/cliente" component={ClientePage} />
+        <Route path="/cliente/:token" component={ClientePage} />
         <Route path="/admin" component={Admin} />
         <Route path="/vendas" component={VendasApp} />
 

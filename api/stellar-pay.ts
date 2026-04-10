@@ -1,8 +1,22 @@
-import { sendStellarPayment, eurToUsdc, stellarConfig } from '../lib/stellar/x402-client';
+import { sendStellarPayment, eurToUsdc } from '../lib/stellar/x402-client';
+
+const CLIENT_SECRET = process.env.STELLAR_CLIENT_SECRET;
+const VENDOR_PUBLIC = process.env.STELLAR_VENDOR_PUBLIC;
+
+if (!CLIENT_SECRET || !VENDOR_PUBLIC) {
+  console.error('Missing STELLAR_CLIENT_SECRET or STELLAR_VENDOR_PUBLIC environment variables');
+}
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!CLIENT_SECRET || !VENDOR_PUBLIC) {
+    return res.status(500).json({ 
+      error: 'Server configuration error: Missing Stellar credentials',
+      details: 'Please configure STELLAR_CLIENT_SECRET and STELLAR_VENDOR_PUBLIC in Vercel'
+    });
   }
 
   const { faturaId, amountEur, memo } = req.body;
@@ -14,8 +28,8 @@ export default async function handler(req: any, res: any) {
   const amountUsdc = eurToUsdc(parseFloat(amountEur));
 
   const result = await sendStellarPayment(
-    stellarConfig.clientSecretKey,
-    stellarConfig.vendorPublicKey,
+    CLIENT_SECRET,
+    VENDOR_PUBLIC,
     amountUsdc,
     memo || `AIBORA invoice ${faturaId}`
   );
