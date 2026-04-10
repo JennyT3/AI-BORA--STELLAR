@@ -1,6 +1,6 @@
 # AI BORA - Stellar Blockchain B2B Sales Platform
 
-B2B sales platform with **real Stellar blockchain payments** and **Soroban smart contracts**. Built for Stellar Hacks: Agents hackathon (April 2026).
+B2B sales platform with **real Stellar blockchain payments**, **Soroban smart contracts**, and **x402 autonomous agent payments**. Built for Stellar Hacks: Agents hackathon (April 2026).
 
 ## 🚀 Quick Start
 
@@ -18,6 +18,25 @@ npm run dev
 5. **Client** → Receives email → Views proposal → Pays with Stellar
 6. **Payment** → Real transaction on Stellar testnet → Auto-distribute to team
 
+## 🤖 x402 Autonomous Agent Payments
+
+AI agents can autonomously pay for API services using the x402 protocol:
+
+```bash
+# Start x402 server (paid AI endpoints)
+npx tsx server-x402.ts
+
+# Run autonomous agent
+npx tsx agent-x402.ts
+```
+
+### x402 Protected Endpoints
+- `GET /api/ai/marketing-plan` - $0.01 USDC
+- `GET /api/ai/sales-script` - $0.005 USDC  
+- `GET /api/ai/contract-draft` - $0.02 USDC
+
+The agent automatically handles 402 Payment Required responses and signs payments with Soroban auth entries.
+
 ## 🏗️ Architecture
 
 - **Frontend**: React + Vite + Tailwind + TypeScript
@@ -25,6 +44,7 @@ npm run dev
 - **Blockchain**: Stellar testnet via Soroban SDK
 - **Auth**: WebAuthn Passkey (no passwords)
 - **Database**: Firebase Firestore
+- **Payment Protocol**: x402 (HTTP 402 for machine payments)
 - **Roles**: Admin / Client / Collaborator
 
 ## 🔗 Smart Contracts (Testnet)
