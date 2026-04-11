@@ -534,7 +534,7 @@ export function Orcamento() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 800, color: colors.dark, fontSize: 16 }}>
-                    {txStatus === 'confirmed' ? '✅ On Blockchain!' : '⚡ Demo Mode'}
+                    {txStatus === 'confirmed' ? '✅ On Stellar!' : '⚡ Demo Mode'}
                   </div>
                   <div style={{ fontSize: 13, color: '#666' }}>
                     Hash: {txHash.slice(0, 12)}...
@@ -728,7 +728,7 @@ export function Orcamento() {
             New Quote / Proposal
           </h1>
           <p style={{ color: '#666', marginBottom: 32 }}>
-            Create professional proposal with blockchain verification
+            Create professional proposal with Stellar verification
           </p>
 
           <div style={{ display: 'grid', gap: 20, background: 'white', padding: 32, borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
@@ -959,7 +959,7 @@ export function Orcamento() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, marginTop: 20 }}>
               <div>
                 <label style={{ fontSize: 14, fontWeight: 700, color: colors.dark, marginBottom: 8, display: 'block' }}>
-                  Total Amount (€)
+                  Total Amount (XLM - Stellar)
                 </label>
                 <input
                   type="number"
@@ -1064,7 +1064,7 @@ export function Orcamento() {
               {step === 'generating' ? (
                 <><Loader2 size={24} className="spin" /> Generating PDF...</>
               ) : step === 'blockchain' ? (
-                <><Loader2 size={24} className="spin" /> Storing on Blockchain...</>
+                <><Loader2 size={24} className="spin" /> Storing on Stellar...</>
               ) : step === 'success' ? (
                 <>✓ Proposal Created!</>
               ) : (

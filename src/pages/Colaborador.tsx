@@ -384,17 +384,22 @@ export default function ColaboradorPage() {
       <div style={styles.infoBanner}>
         <div style={{ fontSize: 24 }}>⭐</div>
         <div>
-          <p style={styles.infoTitle}>70/30 automatic payments via Soroban</p>
+          <p style={styles.infoTitle}>💰 70/30 automatic payments via Stellar</p>
           <p style={styles.infoText}>
-            When the client pays, the <strong>PaymentSplitter</strong> smart contract automatically
-            distributes: 70% to the company, 30% to you. All on-chain, transparent, verifiable on{' '}
+            <strong>How it works:</strong><br/>
+            1. Client accepts proposal → Tasks created<br/>
+            2. You complete the work<br/>
+            3. Admin approves → Client receives invoice<br/>
+            4. Client pays → <strong>PaymentSplitter</strong> auto-splits:<br/>
+            • 70% → Company (Admin)<br/>
+            • 30% → You (automatic via Stellar)<br/><br/>
             <a
-              href="https://stellar.expert/explorer/testnet"
+              href="https://stellar.expert/exlporer/testnet"
               target="_blank"
               rel="noopener noreferrer"
               style={styles.link}
             >
-              Stellar Expert
+              View on Stellar Explorer →
             </a>
           </p>
         </div>
