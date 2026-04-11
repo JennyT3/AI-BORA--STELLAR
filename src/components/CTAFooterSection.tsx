@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Bot, ExternalLink } from 'lucide-react';
 import { useSectionInView } from '../hooks/useSectionInView';
-import { WHATSAPP_LINK, GOOGLE_SCRIPT_URL } from '../lib/constants';
-import { WhatsAppIcon } from './icons/WhatsAppIcon';
 import { createContacto } from '../services/firebase';
 import { sendMensagemConfirmacao } from '../services/emailService';
 
@@ -25,7 +23,6 @@ export function CTAFooterSection() {
     setSubmitStatus('idle');
 
     try {
-      // Save to Firestore
       await createContacto({
         nome: formData.nome,
         negocio: formData.nomeNegocio,
@@ -37,7 +34,6 @@ export function CTAFooterSection() {
         status: 'pendente',
       });
 
-      // Send confirmation email if email provided
       if (formData.email) {
         try {
           await sendMensagemConfirmacao(formData.email, formData.nome);
@@ -45,8 +41,6 @@ export function CTAFooterSection() {
           console.error('Failed to send confirmation email:', emailErr);
         }
       }
-
-      // Google Script fallback removed as per user request
 
       setSubmitStatus('success');
       setFormData({ nome: '', nomeNegocio: '', telefone: '', email: '', mensagem: '' });
@@ -68,62 +62,112 @@ export function CTAFooterSection() {
   };
 
   return (
-    <section id="contacto" className="py-12 bg-bg">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
+    <section id="contacto" style={{ backgroundColor: '#F8F7F4', padding: '80px 16px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }} ref={ref}>
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="card rounded-[1.5rem] p-6 md:p-8 relative overflow-hidden bg-white shadow-lg border border-black/5"
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 24,
+            padding: '48px',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+            border: '1px solid rgba(0,0,0,0.05)'
+          }}
         >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[400px] h-[150px] bg-fuchsia-brand/10 blur-[80px] rounded-full pointer-events-none" />
-
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 relative z-10 items-stretch">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 48 }}>
             
-            <div className="flex flex-col space-y-4">
-              <div className="text-center md:text-left">
-                <h2 style={{fontSize:"clamp(18px, 2.5vw, 24px)",fontWeight:900,lineHeight:1.2,marginBottom:"8px",maxWidth:"220px"}}>Ready to get started?<br />  <span className="text-fuchsia-brand">Talk to us today.</span></h2>
-                <p className="text-xs text-text-secondary font-medium">We reply within 24 hours.</p>
+            <div>
+              <div style={{ marginBottom: 24 }}>
+                <div style={{ width: 36, height: 3, backgroundColor: '#F25C05', marginBottom: 16, borderRadius: 2 }} />
+                <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 'clamp(24px, 3vw, 32px)', color: '#1A1A1A', margin: '0 0 8px' }}>
+                  Ready to get started?
+                </h2>
+                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, color: '#666', margin: 0 }}>
+                  We reply within 24 hours.
+                </p>
               </div>
 
               <a 
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-[#25D366]/10 border border-[#25D366]/20 rounded-xl p-4 flex items-center gap-3 hover:bg-[#25D366]/20 transition-colors duration-300"
+                href="/agent-x402-demo"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  backgroundColor: '#F25C05',
+                  borderRadius: 12,
+                  padding: '16px 20px',
+                  marginBottom: 16,
+                  textDecoration: 'none',
+                  transition: 'transform 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
-                <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center shadow-[0_4px_12px_rgba(37,211,102,0.4)] group-hover:scale-110 transition-transform duration-300">
-                  <WhatsAppIcon size={20} />
+                <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Bot size={20} color="#FFFFFF" />
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-text-primary mb-0">Chat on WhatsApp</div>
-                  <div className="text-[#25D366] text-xs font-bold">Replies in minutes</div>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, color: '#FFFFFF' }}>
+                    Watch AI Pay AI Demo
+                  </div>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
+                    See autonomous payments in action
+                  </div>
                 </div>
               </a>
 
-              <ul className="space-y-2">
+              <a 
+                href="https://github.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  backgroundColor: '#1A1A1A',
+                  borderRadius: 12,
+                  padding: '16px 20px',
+                  textDecoration: 'none'
+                }}
+              >
+                <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ExternalLink size={18} color="#FFFFFF" />
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, color: '#FFFFFF' }}>
+                    Documentation
+                  </div>
+                  <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+                    GitHub repository
+                  </div>
+                </div>
+              </a>
+
+              <ul style={{ marginTop: 24, padding: 0, listStyle: 'none' }}>
                 {[
-                  "No obligation — free introductory chat",
+                  "No commitment — free demo",
                   "Response within 24 hours",
-                  "Portuguese company, support in Portuguese",
-                  "Pay only when you go live"
+                  "On-chain payments via Stellar",
+                  "70/30 automatic distribution"
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-text-secondary font-medium">
-                    <div className="w-4 h-4 rounded-full bg-surface2 border border-black/5 flex items-center justify-center shrink-0">
-                      <Check size={10} className="text-fuchsia-brand" />
+                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <div style={{ width: 18, height: 18, borderRadius: '50%', backgroundColor: '#F25C0515', border: '1px solid #F25C0530', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Check size={10} color="#F25C05" />
                     </div>
-                    {item}
+                    <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: '#555' }}>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-surface2 border border-black/5 rounded-xl p-5">
-              <form className="space-y-3" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-2 gap-3">
+            <div style={{ backgroundColor: '#F8F7F4', borderRadius: 16, padding: 24 }}>
+              <form style={{ display: 'flex', flexDirection: 'column', gap: 12 }} onSubmit={handleSubmit}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
-                    <label htmlFor="nome" className="block text-xs font-bold text-text-primary mb-1">Name <span className="text-fuchsia-brand">*</span></label>
+                    <label style={{ display: 'block', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>Name *</label>
                     <input 
                       type="text" 
                       id="nome" 
@@ -131,88 +175,92 @@ export function CTAFooterSection() {
                       value={formData.nome}
                       onChange={handleChange}
                       placeholder="Your name"
-                      className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#FFFFFF', fontSize: 13, fontFamily: 'Montserrat', outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="nomeNegocio" className="block text-xs font-bold text-text-primary mb-1">Business <span className="text-fuchsia-brand">*</span></label>
+                    <label style={{ display: 'block', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>Business *</label>
                     <input 
                       type="text" 
                       id="nomeNegocio" 
                       required
                       value={formData.nomeNegocio}
                       onChange={handleChange}
-                      placeholder="e.g. Bakery"
-                      className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
+                      placeholder="Company name"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#FFFFFF', fontSize: 13, fontFamily: 'Montserrat', outline: 'none' }}
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div>
-                    <label htmlFor="telefone" className="block text-xs font-bold text-text-primary mb-1">Mobile <span className="text-fuchsia-brand">*</span></label>
+                    <label style={{ display: 'block', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>Mobile *</label>
                     <input 
                       type="tel" 
                       id="telefone" 
                       required
                       value={formData.telefone}
                       onChange={handleChange}
-                      placeholder="+351 9XX XXX XXX"
-                      className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
+                      placeholder="+1 555 123 4567"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#FFFFFF', fontSize: 13, fontFamily: 'Montserrat', outline: 'none' }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-xs font-bold text-text-primary mb-1">Email</label>
+                    <label style={{ display: 'block', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>Email</label>
                     <input 
                       type="email" 
                       id="email" 
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="you@example.com"
-                      className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors shadow-sm"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#FFFFFF', fontSize: 13, fontFamily: 'Montserrat', outline: 'none' }}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="mensagem" className="block text-xs font-bold text-text-primary mb-1">Message</label>
+                  <label style={{ display: 'block', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>Message</label>
                   <textarea 
                     id="mensagem" 
-                    rows={2}
+                    rows={3}
                     value={formData.mensagem}
                     onChange={handleChange}
-                    placeholder="Tell us about your business..."
-                    className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-fuchsia-brand focus:ring-1 focus:ring-fuchsia-brand transition-colors resize-none shadow-sm"
+                    placeholder="Tell us about your needs..."
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #ddd', backgroundColor: '#FFFFFF', fontSize: 13, fontFamily: 'Montserrat', outline: 'none', resize: 'vertical' }}
                   />
                 </div>
 
                 {submitStatus === 'success' && (
-                  <div className="bg-green-100 border border-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium">
-                    ✅ Sent successfully!
+                  <div style={{ backgroundColor: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '10px 12px', borderRadius: 8, fontSize: 13, fontFamily: 'Montserrat' }}>
+                    Sent successfully!
                   </div>
                 )}
                 
                 {submitStatus === 'error' && (
-                  <div className="bg-red-100 border border-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-medium">
-                    ❌ Something went wrong. Try WhatsApp.
+                  <div style={{ backgroundColor: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '10px 12px', borderRadius: 8, fontSize: 13, fontFamily: 'Montserrat' }}>
+                    Something went wrong. Try again.
                   </div>
                 )}
 
                 <motion.button
-                  whileHover={{ scale: 1.02, boxShadow: '0 4px 12px rgba(242,34,131,0.3)' }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-grad text-white font-bold text-xs h-9 rounded-full flex items-center justify-center gap-2 mt-1 shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #F25C05, #F22283)',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    padding: '12px',
+                    borderRadius: 50,
+                    border: 'none',
+                    cursor: isSubmitting ? 'wait' : 'pointer',
+                    fontFamily: 'Montserrat, sans-serif'
+                  }}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>Send message →</>
-                  )}
+                  {isSubmitting ? 'Sending...' : 'Send message'}
                 </motion.button>
               </form>
             </div>

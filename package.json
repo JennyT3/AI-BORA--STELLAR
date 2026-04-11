@@ -35,6 +35,7 @@
     "passkey-kit": "^0.12.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.14.0",
     "resend": "^6.10.0",
     "stripe": "^22.0.1",
     "tailwind-merge": "^3.5.0",

@@ -1,103 +1,126 @@
-import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+
+const TEAM = [
+  {
+    name: "Jenny Tejedor",
+    role: "Founder & Technical Lead",
+    desc: "Creator of AI BORA",
+    image: "/jenny-photo.jpg",
+    hasImage: true
+  },
+  {
+    name: "Bora AI",
+    role: "AI Payment Agent",
+    desc: "Autonomous x402 engine",
+    hasImage: false,
+    emoji: "🤖"
+  },
+  {
+    name: "Stellar Network",
+    role: "Blockchain Infrastructure",
+    desc: "Fast, low-cost transactions",
+    image: "/stellar-logo.png",
+    hasImage: true,
+    isStellar: true
+  }
+];
 
 export function QuemSomosSection() {
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
-
-  const teamMembers = [
-    {
-      name: "Jenny Tejedor",
-      role: "Founder, CEO & Technical Lead",
-      image: "/jenny-photo.jpg"
-    },
-    {
-      name: "Bora",
-      role: "Customer Experience AI",
-      image: "/bora-photo..jpg"
-    }
-  ];
-
-  useEffect(() => {
-    teamMembers.forEach((member, index) => {
-      const img = new Image();
-      img.onload = () => setLoadedImages(prev => ({ ...prev, [index]: true }));
-      img.onerror = () => setImageErrors(prev => ({ ...prev, [index]: true }));
-      img.src = member.image;
-    });
-  }, []);
-
-  const handleImageError = (index: number) => {
-    setImageErrors(prev => ({ ...prev, [index]: true }));
-  };
-
   return (
-    <section id="quem-somos" className="py-24" style={{ backgroundColor: '#F5F2F0' }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section style={{ backgroundColor: '#F8F7F4', padding: '80px 16px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         
-        {/* Title with accent bar */}
-        <div className="mb-8">
-          <div className="w-16 h-1 mb-3" style={{ backgroundColor: '#F25C05' }}></div>
-          <h2 style={{fontSize:"clamp(28px, 4vw, 42px)",fontWeight:900,fontFamily:'Montserrat',lineHeight:1.2}} className="text-text-primary">
-            Who we are
-          </h2>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <motion.div
+            initial={{ width: 0 }}
+            whileInView={{ width: 60 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ height: '3px', backgroundColor: '#F25C05', borderRadius: '2px', margin: '0 auto 16px' }}
+          />
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', color: '#1A1A1A', margin: '0 0 12px' }}
+          >
+            Who we <span style={{ color: '#F25C05' }}>are</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 16, color: '#666', margin: 0, maxWidth: 500, marginLeft: 'auto', marginRight: 'auto' }}
+          >
+            The team building autonomous B2B payments
+          </motion.p>
         </div>
 
-        {/* Two paths — below title */}
-        <div className="mb-12">
-          <p className="text-lg md:text-xl text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
-            The team that lets you choose two paths:<br/>
-            <span className="font-semibold text-text-primary">We either teach you how to do it, or we do it all for you.</span>
-          </p>
-        </div>
-
-        {/* Team Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center mb-12">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="flex flex-col items-center text-center w-full max-w-xs">
-              <div className="w-56 h-56 mb-4 overflow-hidden" style={{ borderRadius: '12px' }}>
-                {imageErrors[index] ? (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-4xl text-gray-400">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                ) : !loadedImages[index] ? (
-                  <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center">
-                    <span className="text-4xl text-gray-300">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          {TEAM.map((member, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: 16,
+                padding: '32px 24px',
+                textAlign: 'center',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              <div style={{
+                width: 100,
+                height: 100,
+                borderRadius: member.isStellar ? 16 : '50%',
+                backgroundColor: member.hasImage ? '#f0f0f0' : `linear-gradient(135deg, ${i === 0 ? '#F25C05' : i === 1 ? '#F22283' : '#14b8a6'}, ${i === 0 ? '#F22283' : i === 1 ? '#22c55e' : '#0ea5e9'})`,
+                margin: '0 auto 20px',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 40,
+                border: member.isStellar ? '2px solid #14b8a6' : 'none'
+              }}>
+                {member.hasImage ? (
                   <img 
-                    src={member.image}
+                    src={member.image} 
                     alt={member.name}
-                    className="w-full h-full object-cover"
-                    onError={() => handleImageError(index)}
+                    style={{ 
+                      width: member.isStellar ? 60 : '100%', 
+                      height: member.isStellar ? 60 : '100%', 
+                      objectFit: member.isStellar ? 'contain' : 'cover' 
+                    }}
+                    onError={(e) => { 
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      if ((e.target as HTMLImageElement).parentElement) {
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = `<span style="font-size: 36px;">${member.emoji || member.name.charAt(0)}</span>`;
+                      }
+                    }}
                   />
+                ) : (
+                  <span style={{ fontSize: 40 }}>{member.emoji}</span>
                 )}
               </div>
-              <h4 className="text-xl font-bold text-text-primary" style={{fontFamily:'Montserrat'}}>
+              <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 18, color: '#1A1A1A', margin: '0 0 4px' }}>
                 {member.name}
               </h4>
-              <p className="text-sm text-text-secondary mt-1" style={{fontFamily:'Montserrat', fontWeight: 600}}>
+              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: '#F25C05', margin: '0 0 8px', fontWeight: 600 }}>
                 {member.role}
               </p>
-            </div>
+              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#888', margin: 0 }}>
+                {member.desc}
+              </p>
+            </motion.div>
           ))}
-        </div>
-
-        {/* Main copy */}
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-lg text-text-secondary leading-relaxed" style={{fontFamily:'Montserrat'}}>
-            AIBORA was born with a simple mission: make digital marketing straightforward for local businesses in Portugal.
-          </p>
-        </div>
-
-        {/* Commitment */}
-        <div className="text-center mt-8">
-          <h3 className="text-xl font-bold" style={{fontFamily:'Montserrat', color: '#E11D48'}}>
-            Fully committed to your success
-          </h3>
         </div>
 
       </div>

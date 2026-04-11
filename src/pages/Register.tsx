@@ -55,7 +55,7 @@ export default function Register() {
           localStorage.setItem('aibora_passkey_user', 'true');
           localStorage.setItem('aibora_passkey_id', userIdHex);
           setCreated(true);
-          setTimeout(() => setLocation('/selection'), 1500);
+          setTimeout(() => setLocation('/onboarding'), 1500);
         }
       } else {
         const credential = await navigator.credentials.get({
@@ -69,7 +69,7 @@ export default function Register() {
         if (credential) {
           localStorage.setItem('aibora_passkey_user', 'true');
           setCreated(true);
-          setTimeout(() => setLocation('/selection'), 1500);
+          setTimeout(() => setLocation('/onboarding'), 1500);
         }
       }
     } catch (err: any) {

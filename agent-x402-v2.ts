@@ -94,15 +94,29 @@ async function callResource(path: string) {
     console.log(`   Status: ${firstTry.status}`);
     
     if (firstTry.status === 402) {
+      // Decode payment header manually (server sends as PAYMENT-REQUIRED)
+      const rawHeader = firstTry.headers.get('payment-required') 
+        || firstTry.headers.get('PAYMENT-REQUIRED')
+        || firstTry.headers.get('x-payment-required');
+      
+      if (!rawHeader) {
+        console.log("   ❌ No payment header found");
+        return { success: false };
+      }
+
+      const decoded = JSON.parse(Buffer.from(rawHeader, "base64").toString("utf8"));
+      const accept = decoded.accepts?.[0];
+      const amountRaw = parseInt(accept?.amount || "0");
+      const price = amountRaw / 10_000_000;
+      
+      console.log(`   💳 Payment required: $${price} USDC`);
+      console.log(`   📬 Pay to: ${accept?.payTo}`);
+
       const paymentRequired = httpClient.getPaymentRequiredResponse((name) =>
-        firstTry.headers.get(name),
+        firstTry.headers.get(name) || firstTry.headers.get(name.toUpperCase()),
       );
       
-      // Parse price from header
-      const priceMatch = paymentRequired.maxAmountRequired.match(/\$?([\d.]+)/);
-      const price = priceMatch ? parseFloat(priceMatch[1]) : 0;
-      
-      console.log(`   💳 Payment required: ${paymentRequired.maxAmountRequired} ${paymentRequired.asset}`);
+      const priceMatch = ["ok"];
       
       // DECISION: Is the price acceptable?
       const maxPrice = MAX_PRICES[path] || 0.50; // Default max 50 cents

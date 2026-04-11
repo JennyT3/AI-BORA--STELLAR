@@ -293,9 +293,9 @@ export default function PagamentoPage() {
           }}
         >
           {processing ? (
-            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Procesando Pago...</>
+            <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> Processing Payment...</>
           ) : (
-            <><Zap size={18} /> Pagar con Stellar</>
+            <><Zap size={18} /> Pay with Stellar</>
           )}
         </button>
 

@@ -9,6 +9,7 @@ export function PropostaPage() {
   const params = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [proposal, setProposal] = useState<any>(null);
+  const [proposalId, setProposalId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [respondendo, setRespondendo] = useState(false);
   const [respostaEnviada, setRespostaEnviada] = useState<"sim" | "nao" | "reagendar" | null>(null);
@@ -36,10 +37,12 @@ export function PropostaPage() {
         // Try secure token lookup first
         const tokenData = await getProposalByToken(id);
         if (tokenData) {
+          setProposalId(tokenData.id);
           data = tokenData;
         } else {
           // Fallback: lookup by ID (legacy compatibility)
           data = await getProposal(id);
+          if (data) setProposalId(data.id);
         }
         
         if (!data) {
@@ -72,7 +75,7 @@ export function PropostaPage() {
     setRespondendo(true);
     
     try {
-      await updateProposal(params.id, {
+      await updateProposal(proposalId || params.id, {
         resposta: tipo === 'reagendar' ? 'reagendar' : tipo,
         dataResposta: new Date().toISOString(),
         status: tipo === 'sim' ? 'aceita' : (tipo === 'nao' ? 'recusada' : 'pendente')

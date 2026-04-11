@@ -1,27 +1,26 @@
 import { motion } from 'motion/react';
-import { SectionBadge } from './SectionBadge';
 import { useSectionInView } from '../hooks/useSectionInView';
 
 const steps = [
   {
     num: "01",
-    title: "Introductory call",
-    desc: "We learn your business and what your customers need."
+    title: "AI Agent discovers",
+    desc: "Autonomous agent finds services and reads pricing"
   },
   {
     num: "02",
-    title: "Digital diagnosis",
-    desc: "We audit your current presence and define the plan."
+    title: "402 Protocol",
+    desc: "Agent reads Payment Required header"
   },
   {
     num: "03",
-    title: "Fast execution",
-    desc: "We implement everything. No heavy lifting on your side."
+    title: "Auto-payment",
+    desc: "Pays via Stellar USDC if price is acceptable"
   },
   {
     num: "04",
-    title: "Real results",
-    desc: "Monitoring and monthly tweaks included."
+    title: "70/30 Split",
+    desc: "On-chain distribution to collaborators"
   }
 ];
 
@@ -29,42 +28,75 @@ export function ComoFuncionaSection() {
   const { ref, isInView } = useSectionInView();
 
   return (
-    <section id="processo" className="py-24 bg-surface">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" ref={ref}>
+    <section id="processo" style={{ backgroundColor: '#0a0a0a', padding: '80px 16px' }} ref={ref}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <SectionBadge text="HOW IT WORKS" />
-          <motion.h2 
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6"
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={isInView ? { width: 60 } : { width: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{ 
+              height: '3px', 
+              backgroundColor: '#F25C05', 
+              borderRadius: '2px',
+              margin: '0 auto 16px'
+            }}
+          />
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 900,
+              fontSize: 'clamp(28px, 4vw, 42px)',
+              color: '#FFFFFF',
+              margin: 0
+            }}
           >
-            From first contact to <span className="underline-gradient">live</span>
+            How it <span style={{ color: '#F25C05' }}>works</span>
           </motion.h2>
         </div>
 
-        <div className="relative mt-20">
-          {/* Connecting Line (Desktop) */}
-          <div className="hidden lg:block absolute top-7 left-[10%] right-[10%] h-[2px] bg-grad opacity-30" />
-
-          <div className="grid lg:grid-cols-4 gap-12 lg:gap-8 relative z-10">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 24 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-                transition={{ duration: 0.6, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-col items-center lg:items-start text-center lg:text-left"
-              >
-                <div className="w-14 h-14 rounded-full bg-grad flex items-center justify-center mb-6 shadow-md">
-                  <span className="font-black text-xl text-white">{step.num}</span>
-                </div>
-                <h3 className="font-bold text-xl text-text-primary mb-3">{step.title}</h3>
-                <p className="text-text-secondary leading-relaxed max-w-[280px] font-medium">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
+          {steps.map((step, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              style={{
+                textAlign: 'center',
+                padding: '32px 20px',
+                backgroundColor: 'rgba(255,255,255,0.03)',
+                borderRadius: 16,
+                border: '1px solid rgba(255,255,255,0.08)'
+              }}
+            >
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #F25C05, #F22283)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                boxShadow: '0 4px 20px rgba(242,92,5,0.3)'
+              }}>
+                <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 18, color: '#FFFFFF' }}>
+                  {step.num}
+                </span>
+              </div>
+              <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 16, color: '#FFFFFF', margin: '0 0 8px' }}>
+                {step.title}
+              </h3>
+              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.5 }}>
+                {step.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
       </div>

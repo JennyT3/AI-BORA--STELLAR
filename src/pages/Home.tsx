@@ -1,46 +1,38 @@
 import { HeroSection } from '../components/HeroSection';
 import { StellarTransactionMarquee } from '../components/StellarTransactionMarquee';
+import { ServicesSection } from '../components/ServicesSection';
 import { ComoFuncionaSection } from '../components/ComoFuncionaSection';
-import { NossoTrabalhoSection } from '../components/NossoTrabalhoSection';
 import { QuemSomosSection } from '../components/QuemSomosSection';
 import { ColaboraConNosotrosSection } from '../components/ColaboraConNosotrosSection';
-import { FAQSection } from '../components/FAQSection';
 import { CTAFooterSection } from '../components/CTAFooterSection';
-import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
 import { Footer } from '../components/Footer';
 
 export function Home() {
   return (
-    <div className="min-h-screen bg-bg">
+    <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a' }}>
       <main>
+        {/* Dark: Hero */}
         <HeroSection />
+        
+        {/* Green wave effect */}
         <StellarTransactionMarquee />
+        
+        {/* Dark: How it works */}
         <ComoFuncionaSection />
-        <NossoTrabalhoSection />
-        <section style={{ backgroundColor: "#F5F2F0", padding: "64px 16px", textAlign: "center" }}>
-          <div style={{ maxWidth: 560, margin: "0 auto" }}>
-            <div style={{ width: 36, height: 3, backgroundColor: "#F25C05", margin: "0 auto 16px", borderRadius: 2 }} />
-            <h2 style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: "clamp(20px, 3.5vw, 30px)", color: "#1A1A1A", margin: "0 0 12px" }}>
-              O que precisas para o teu negocio?
-            </h2>
-            <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: 14, color: "#4A4A4A", margin: "0 0 28px", lineHeight: 1.5 }}>
-              Escolhe os servicos, monta o teu pacote e pede orcamento sem compromisso.
-            </p>
-            <a href="/servicos#simulador" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#F22283", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(242,34,131,0.3)" }}>
-              Ver servicos
-            </a>
-            <a href="/academia/login" style={{ display: "inline-block", fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, backgroundColor: "#ff6f2e", color: "#ffffff", padding: "14px 32px", borderRadius: 100, textDecoration: "none", boxShadow: "0 4px 16px rgba(255,111,46,0.3)", marginLeft: 12 }}>
-              Bora Lá →
-            </a>
-          </div>
-        </section>
+        
+        {/* Light: Services */}
+        <ServicesSection />
+        
+        {/* Light: Team */}
         <QuemSomosSection />
+        
+        {/* Dark: Collaborate */}
         <ColaboraConNosotrosSection />
-        <FAQSection />
+        
+        {/* Light: CTA */}
         <CTAFooterSection />
       </main>
       <Footer />
-      <FloatingWhatsApp />
     </div>
   );
 }

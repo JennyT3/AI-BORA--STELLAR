@@ -11,7 +11,7 @@ export default function TareasPage() {
   const proposalId = params?.id;
 
   const [loading, setLoading] = useState(true);
-  const [tareas, setTareas] = useState<Tarea[]>([]);
+  const [tareas, setTasks] = useState<Tarea[]>([]);
   const [proposal, setProposal] = useState<any>(null);
   const [copying, setCopying] = useState(false);
 
@@ -29,7 +29,7 @@ export default function TareasPage() {
         const q = query(collection(db, 'tareas'), where('propostaId', '==', proposalId));
         const snap = await getDocs(q);
         const tasks = snap.docs.map(d => ({ id: d.id, ...d.data() } as Tarea));
-        setTareas(tasks);
+        setTasks(tasks);
       } catch (err) {
         console.error("Error loading tasks:", err);
       } finally {
@@ -39,32 +39,32 @@ export default function TareasPage() {
     loadData();
   }, [proposalId]);
 
-  const handleAsignarme = async (tareaId: string) => {
+  const handleAssignMe = async (taskId: string) => {
     try {
       // In a real app, we'd get the current user ID. For now, let's use a mock or prompt.
-      const colabName = prompt("Introduce tu nombre para asignarte la tarea:");
+      const colabName = prompt("Enter your name to assign the task:");
       if (!colabName) return;
 
-      await updateTarea(tareaId, {
+      await updateTarea(taskId, {
         estado: 'atribuida',
         asignadoNombre: colabName,
         dataAtribuicao: new Date().toISOString()
       });
 
-      setTareas(prev => prev.map(t => 
-        t.id === tareaId ? { ...t, estado: 'atribuida', asignadoNombre: colabName } : t
+      setTasks(prev => prev.map(t => 
+        t.id === taskId ? { ...t, estado: 'atribuida', asignadoNombre: colabName } : t
       ));
-      alert("Tarea asignada correctamente.");
+      alert("Task assigned successfully.");
     } catch (err) {
-      alert("Error al asignar tarea.");
+      alert("Error assigning task.");
     }
   };
 
   const handleSendPaymentLink = () => {
     setCopying(true);
-    const paymentLink = `${window.location.origin}/pagamento/${proposalId}`;
+    const paymentLink = `${window.location.origin}/payment-flow/${proposalId}`;
     navigator.clipboard.writeText(paymentLink).then(() => {
-      alert("¡Link de pago copiado al portapapeles!\n\n" + paymentLink);
+      alert("Payment flow link copied to clipboard!\n\n" + paymentLink);
       setCopying(false);
     });
   };
@@ -84,58 +84,58 @@ export default function TareasPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div>
             <div style={styles.logo}>AI BORA</div>
-            <h1 style={styles.title}>Servicios de la Propuesta</h1>
-            <p style={styles.subtitle}>Propuesta: {proposal?.numeroOrcamento || proposalId} - Cliente: {proposal?.cliente}</p>
+            <h1 style={styles.title}>Proposal Services</h1>
+            <p style={styles.subtitle}>Proposal: {proposal?.numeroOrcamento || proposalId} - Client: {proposal?.cliente}</p>
           </div>
           <button 
             onClick={handleSendPaymentLink}
             style={styles.btnPayment}
           >
             <Send size={18} />
-            {copying ? 'Copiando...' : 'Enviar Link de Pago al Cliente'}
+            {copying ? 'Copying...' : 'Send Payment Link to Client'}
           </button>
         </div>
       </div>
 
-      <div style={styles.tareasContainer}>
-        <h2 style={styles.sectionTitle}>Servicios Disponibles</h2>
+      <div style={styles.tasksContainer}>
+        <h2 style={styles.sectionTitle}>Available Services</h2>
         
         {tareas.length === 0 ? (
-          <p style={{ color: '#666', textAlign: 'center', padding: '40px' }}>No hay servicios creados para esta propuesta.</p>
+          <p style={{ color: '#666', textAlign: 'center', padding: '40px' }}>No services created for this proposal.</p>
         ) : (
-          tareas.map(tarea => (
-            <div key={tarea.id} style={styles.tareaCard}>
-              <div style={styles.tareaHeader}>
+          tareas.map(task => (
+            <div key={task.id} style={styles.taskCard}>
+              <div style={styles.taskHeader}>
                 <div>
-                  <h3 style={styles.tareaTitulo}>{tarea.titulo}</h3>
-                  <p style={styles.tareaDesc}>{tarea.descricao}</p>
+                  <h3 style={styles.taskTitle}>{task.titulo}</h3>
+                  <p style={styles.taskDesc}>{task.descricao}</p>
                 </div>
-                <div style={{ ...styles.estadoBadge, ...getEstadoStyle(tarea.estado) }}>
-                  {tarea.estado.replace('_', ' ')}
+                <div style={{ ...styles.statusBadge, ...getStatusStyle(task.estado) }}>
+                  {task.estado.replace('_', ' ')}
                 </div>
               </div>
               
-              <div style={styles.tareaInfo}>
+              <div style={styles.taskInfo}>
                 <div>
-                  <p style={styles.tareaLabel}>Precio Cliente</p>
-                  <p style={styles.tareaMonto}>€{tarea.valorCliente || 0}</p>
+                  <p style={styles.taskLabel}>Client Price</p>
+                  <p style={styles.taskAmount}>${task.valorCliente || 0}</p>
                 </div>
                 <div style={{ backgroundColor: 'rgba(34, 197, 94, 0.05)', padding: '12px 20px', borderRadius: 12, border: '1px dashed #22c55e' }}>
-                  <p style={styles.tareaLabel}>Tu Comisión (30%)</p>
-                  <p style={{ ...styles.tareaMonto, color: '#22c55e' }}>€{((tarea.valorCliente || 0) * 0.3).toFixed(2)}</p>
+                  <p style={styles.taskLabel}>Your Commission (30%)</p>
+                  <p style={{ ...styles.taskAmount, color: '#22c55e' }}>${((task.valorCliente || 0) * 0.3).toFixed(2)}</p>
                 </div>
               </div>
               
-              {tarea.estado === 'disponivel' ? (
+              {task.estado === 'disponivel' ? (
                 <button
-                  onClick={() => handleAsignarme(tarea.id)}
-                  style={styles.btnAceptar}
+                  onClick={() => handleAssignMe(task.id)}
+                  style={styles.btnAccept}
                 >
-                  Asignarme
+                  Assign Me
                 </button>
               ) : (
-                <div style={styles.asignadaInfo}>
-                  Asignada a: <strong>{tarea.asignadoNombre || 'Colaborador'}</strong>
+                <div style={styles.assignedInfo}>
+                  Assigned to: <strong>{task.asignadoNombre || 'Collaborator'}</strong>
                 </div>
               )}
             </div>
@@ -146,10 +146,10 @@ export default function TareasPage() {
       <div style={styles.infoBanner}>
         <div style={{ fontSize: 24 }}>⭐</div>
         <div>
-          <p style={styles.infoTitle}>Distribución Automática 70/30</p>
+          <p style={styles.infoTitle}>Automatic 70/30 Distribution</p>
           <p style={styles.infoText}>
-            Al usar el link de pago, el cliente paga en USDC vía Stellar. 
-            El contrato <strong>PaymentSplitter</strong> enviará el 70% a la administración y el 30% directamente a tu wallet una vez completada la tarea.
+            When using the payment link, the client pays in USDC via Stellar. 
+            The <strong>PaymentSplitter</strong> contract will send 70% to the company and 30% directly to your wallet once the task is completed.
           </p>
         </div>
       </div>
@@ -157,13 +157,16 @@ export default function TareasPage() {
   );
 }
 
-function getStatusStyle(estado: string) {
+function getStatusStyle(status: string) {
   const styles: Record<string, any> = {
     disponivel: { backgroundColor: '#eff6ff', color: '#1d4ed8' },
+    available: { backgroundColor: '#eff6ff', color: '#1d4ed8' },
     atribuida: { backgroundColor: '#fef3c7', color: '#92400e' },
+    assigned: { backgroundColor: '#fef3c7', color: '#92400e' },
     paga: { backgroundColor: '#f0fdf4', color: '#166534' },
+    paid: { backgroundColor: '#f0fdf4', color: '#166534' },
   };
-  return styles[estado] || styles.disponivel;
+  return styles[status] || styles.disponivel;
 }
 
 const styles = {
@@ -220,7 +223,7 @@ const styles = {
     boxShadow: '0 8px 20px rgba(242, 34, 131, 0.25)',
     transition: 'all 0.2s',
   },
-  tareasContainer: {
+  tasksContainer: {
     maxWidth: 800,
     margin: '0 auto 40px',
   },
@@ -230,7 +233,7 @@ const styles = {
     marginBottom: 24,
     color: '#1b1c1b',
   },
-  tareaCard: {
+  taskCard: {
     backgroundColor: '#fff',
     borderRadius: 24,
     padding: 32,
@@ -238,32 +241,32 @@ const styles = {
     boxShadow: '0 10px 30px rgba(0,0,0,0.03)',
     border: '1px solid rgba(0,0,0,0.02)',
   },
-  tareaHeader: {
+  taskHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 24,
   },
-  tareaTitulo: {
+  taskTitle: {
     fontWeight: 800,
     fontSize: 22,
     color: '#1b1c1b',
     margin: 0,
   },
-  tareaDesc: {
+  taskDesc: {
     fontSize: 14,
     color: '#64748b',
     marginTop: 8,
     lineHeight: 1.5,
   },
-  estadoBadge: {
+  statusBadge: {
     padding: '6px 14px',
     borderRadius: 100,
     fontSize: 11,
     fontWeight: 800,
     textTransform: 'uppercase' as const,
   },
-  tareaInfo: {
+  taskInfo: {
     display: 'flex',
     alignItems: 'center',
     gap: 40,
@@ -272,20 +275,20 @@ const styles = {
     backgroundColor: '#fcf9f7',
     borderRadius: 20,
   },
-  tareaLabel: {
+  taskLabel: {
     fontSize: 11,
     color: '#94a3b8',
     fontWeight: 800,
     textTransform: 'uppercase' as const,
     marginBottom: 4,
   },
-  tareaMonto: {
+  taskAmount: {
     fontWeight: 900,
     fontSize: 28,
     color: '#1b1c1b',
     margin: 0,
   },
-  btnAceptar: {
+  btnAccept: {
     width: '100%',
     padding: '18px',
     backgroundColor: '#1b1c1b',
@@ -297,7 +300,7 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
-  asignadaInfo: {
+  assignedInfo: {
     textAlign: 'center' as const,
     padding: '18px',
     backgroundColor: '#f1f5f9',

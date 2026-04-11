@@ -1,91 +1,148 @@
 import { Link } from 'wouter';
-import { Mail, Phone, Menu, GraduationCap } from 'lucide-react';
+import { Mail, Phone, Bot, ExternalLink } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-surface2 border-t border-black/5 pt-12 pb-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer style={{ backgroundColor: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      
+      {/* Banner */}
+      <div style={{ 
+        backgroundColor: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
+        background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
+        padding: '24px 16px',
+        textAlign: 'center'
+      }}>
+        <a 
+          href="https://aibora.pt/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 8 }}>
+            <Bot size={24} color="#fff" />
+            <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 20, color: '#fff' }}>
+              AI BORA
+            </span>
+          </div>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, color: 'rgba(255,255,255,0.9)', margin: 0 }}>
+            B2B Sales Platform with AI Agents and Stellar Payments
+          </p>
+          <span style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: 6, 
+            marginTop: 12,
+            padding: '8px 16px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 100,
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#fff'
+          }}>
+            Visit aibora.pt <ExternalLink size={12} />
+          </span>
+        </a>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-
-          {/* Logo + AI BORA + description */}
-          <div className="space-y-4">
-            <Link href="/">
-              <div className="cursor-pointer flex items-center gap-3">
-                <img src="/logo.png" alt="" className="h-8 w-auto" />
-                <span className="text-lg font-black text-text-primary tracking-tight">AI BORA</span>
-              </div>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 16px' }}>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 40, marginBottom: 40 }}>
+          
+          {/* Logo + description */}
+          <div>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', marginBottom: 16 }}>
+              <img src="/logo.png" alt="" style={{ height: 24, width: 'auto' }} />
+              <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 12, color: '#F25C05', letterSpacing: '0.1em' }}>
+                AI BORA
+              </span>
             </Link>
-            <p className="text-sm text-text-secondary leading-relaxed font-normal line-clamp-3">
-              We help local businesses grow with artificial intelligence. No jargon—just real results.
+            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.6 }}>
+              Autonomous B2B payments with AI agents and Stellar blockchain.
             </p>
-            {/* Social links */}
-            <div className="flex items-center gap-3 pt-1">
-              <a href="https://instagram.com/aibora.pt" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center hover:border-fuchsia-brand hover:text-fuchsia-brand transition-colors text-text-secondary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </a>
-              <a href="https://facebook.com/aibora.ptt" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center hover:border-fuchsia-brand hover:text-fuchsia-brand transition-colors text-text-secondary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
-              </a>
-              <a href="https://www.linkedin.com/company/aibora-pt" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="w-8 h-8 rounded-full bg-white border border-black/10 flex items-center justify-center hover:border-fuchsia-brand hover:text-fuchsia-brand transition-colors text-text-secondary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" />
-                </svg>
-              </a>
-            </div>
           </div>
 
-          {/* Quick links */}
+          {/* Platform */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Explore</h4>
-            <ul className="space-y-2">
-              <li><Link href="/servicos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Services</Link></li>
-              <li><Link href="/prompts" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">AI prompts</Link></li>
-              <li><a href="/#quem-somos" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">About us</a></li>
-              <li><a href="/#processo" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">How it works</a></li>
+            <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 11, color: '#F25C05', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Platform
+            </h4>
+            <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: 8 }}>
+                <Link href="/agent-x402-demo" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  AI Demo
+                </Link>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <Link href="/onboarding" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  Agent Onboarding
+                </Link>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <Link href="/admin" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  Admin Dashboard
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Academy */}
+          {/* Resources */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Learning</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/academia" className="flex items-center gap-2 text-sm font-black text-[#F22283] hover:text-[#F25C05] transition-colors">
-                  <GraduationCap size={16} /> Bora Lá Academy
-                </Link>
+            <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 11, color: '#F25C05', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Resources
+            </h4>
+            <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: 8 }}>
+                <a href="https://github.com/JennyT3/AI-BORA--STELLAR" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  GitHub / Docs
+                </a>
               </li>
-              <li><Link href="/academia/trilhas" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">AI learning paths</Link></li>
-              <li><Link href="/academia/certificados" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Certificates</Link></li>
-              <li><Link href="/academia/consultoria" className="text-sm font-medium text-text-secondary hover:text-fuchsia-brand transition-colors">Teach with us</Link></li>
+              <li style={{ marginBottom: 8 }}>
+                <a href="https://stellar.expert/explorer/testnet" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  Stellar Explorer
+                </a>
+              </li>
+              <li style={{ marginBottom: 8 }}>
+                <a href="https://aibora.pt/" target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  AI BORA Website
+                </a>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="font-bold text-text-primary mb-4 uppercase tracking-wider text-xs">Contact</h4>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-sm font-medium text-text-secondary">
-                <Mail size={16} className="text-fuchsia-brand shrink-0 mt-0.5" />
-                <a href="mailto:geral@aibora.pt" className="hover:text-fuchsia-brand transition-colors">geral@aibora.pt</a>
+            <h4 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 11, color: '#F25C05', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 }}>
+              Contact
+            </h4>
+            <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Mail size={14} color="#F25C05" />
+                <a href="mailto:geral@aibora.pt" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  geral@aibora.pt
+                </a>
               </li>
-              <li className="flex items-start gap-2 text-sm font-medium text-text-secondary">
-                <Phone size={16} className="text-fuchsia-brand shrink-0 mt-0.5" />
-                <a href="tel:+351936021747" className="hover:text-fuchsia-brand transition-colors">+351 936 021 747</a>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Phone size={14} color="#F25C05" />
+                <a href="tel:+351936021747" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
+                  +351 936 021 747
+                </a>
               </li>
             </ul>
           </div>
 
         </div>
 
-        <div className="text-center pt-8 border-t border-black/5">
-          <p className="text-xs text-text-muted font-medium">
-            © {new Date().getFullYear()} AI BORA · All rights reserved · Made with ❤️ by the AI BORA team
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+            &copy; {new Date().getFullYear()} AI BORA. All rights reserved.
           </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Bot size={16} color="#F25C05" />
+            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+              Powered by AI Agents on Stellar
+            </span>
+          </div>
         </div>
 
       </div>

@@ -1,73 +1,169 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useRoute } from 'wouter';
-import { Loader2, CheckCircle, Clock, TrendingUp, Wallet } from 'lucide-react';
+import { useRoute } from 'wouter';
+import { Loader2, CheckCircle, Clock, TrendingUp, Wallet, ExternalLink } from 'lucide-react';
+import { db } from '../services/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { Tarea, updateTarea, iniciarTarea, executarTarea, entregarTarea, TAREFA_ESTADOS } from '../services/tareas';
 
-interface Tarea {
+interface Task {
   id: string;
-  titulo: string;
-  clienteNombre: string;
-  estado: 'disponible' | 'en_progreso' | 'en_revision' | 'entregado';
-  monto: number;
-  fechaLimite: string;
+  title: string;
+  clientName: string;
+  status: TareaEstado;
+  amount: number;
+  commission: number;
+  deadline: string;
+  propostaId?: string;
 }
 
+type TareaEstado = 'disponivel' | 'pendente_atribuicao' | 'atribuida' | 'em_analise' | 'em_execucao' | 'em_revisao' | 'aprovada' | 'entregue' | 'paga';
+
 export default function ColaboradorPage() {
-  const [match, params] = useRoute('/colaborador/:id');
-  const [, setLocation] = useLocation();
-  
+  const [match, params] = useRoute('/collaborator/:id');
+
   const [loading, setLoading] = useState(true);
-  const [tareas, setTareas] = useState<Tarea[]>([]);
-  const [totalGanado, setTotalGanado] = useState(0);
-  const [tareasDisponibles, setTareasDisponibles] = useState(0);
-  
+  const [tasks, setTasks] = useState<Tarea[]>([]);
+  const [availableTasks, setAvailableTasks] = useState<Tarea[]>([]);
+  const [totalEarned, setTotalEarned] = useState(0);
+  const [colaboradorId, setColaboradorId] = useState<string | null>(null);
+  const [colaboradorName, setColaboradorName] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    // Simular carga de tareas del colaborador
-    setTimeout(() => {
-      const mockTareas: Tarea[] = [
-        {
-          id: '1',
-          titulo: 'Gestão de Redes Sociais',
-          clienteNombre: 'Empresa ABC',
-          estado: 'disponible',
-          monto: 500,
-          fechaLimite: '2026-04-15',
-        },
-        {
-          id: '2',
-          titulo: 'Design de Logotipo',
-          clienteNombre: 'Startup XYZ',
-          estado: 'en_progreso',
-          monto: 300,
-          fechaLimite: '2026-04-12',
-        },
-        {
-          id: '3',
-          titulo: 'Criação de Reels',
-          clienteNombre: 'Loja 123',
-          estado: 'en_revision',
-          monto: 200,
-          fechaLimite: '2026-04-10',
-        },
-      ];
-      setTareas(mockTareas);
-      setTotalGanado(850);
-      setTareasDisponibles(mockTareas.filter(t => t.estado === 'disponible').length);
+    const id = params?.id;
+    
+    if (id && id !== 'demo') {
+      setColaboradorId(id);
+      loadCollaboratorData(id);
+    } else {
+      loadDemoData();
+    }
+  }, [params?.id]);
+
+  const loadDemoData = () => {
+    const mockTasks: Tarea[] = [
+      {
+        id: '1',
+        titulo: 'Social Media Management',
+        clienteNome: 'Company ABC',
+        clienteId: 'client-1',
+        estado: 'atribuida',
+        valorCliente: 500,
+        prazo: '2026-04-15',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: '2',
+        titulo: 'Logo Design',
+        clienteNome: 'Startup XYZ',
+        clienteId: 'client-2',
+        estado: 'em_execucao',
+        valorCliente: 300,
+        prazo: '2026-04-12',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: '3',
+        titulo: 'Reels Creation',
+        clienteNome: 'Shop 123',
+        clienteId: 'client-3',
+        estado: 'em_revisao',
+        valorCliente: 200,
+        prazo: '2026-04-10',
+        createdAt: new Date().toISOString(),
+      },
+    ];
+    setTasks(mockTasks.filter(t => t.estado !== 'disponivel'));
+    setAvailableTasks([]);
+    setTotalEarned(850);
+    setLoading(false);
+    setColaboradorName('Demo User');
+  };
+
+  const loadCollaboratorData = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Load tasks assigned to this collaborator
+      const q = query(
+        collection(db, 'tareas'),
+        where('asignadaA', '==', id),
+        orderBy('createdAt', 'desc')
+      );
+      const snap = await getDocs(q);
+      const assignedTasks = snap.docs.map(d => ({ id: d.id, ...d.data() } as Tarea));
+      
+      // Load available tasks (disponivel)
+      const qAvailable = query(
+        collection(db, 'tareas'),
+        where('estado', '==', 'disponivel'),
+        orderBy('createdAt', 'desc')
+      );
+      const snapAvailable = await getDocs(qAvailable);
+      const available = snapAvailable.docs.map(d => ({ id: d.id, ...d.data() } as Tarea));
+      
+      setTasks(assignedTasks);
+      setAvailableTasks(available);
+      
+      // Calculate total earned from paid tasks
+      const paidTasks = assignedTasks.filter(t => t.estado === 'paga');
+      const earned = paidTasks.reduce((sum, t) => {
+        const commission = t.comissaoColaboradorValor || (t.valorCliente || 0) * 0.3;
+        return sum + commission;
+      }, 0);
+      setTotalEarned(earned);
+      
+    } catch (err: any) {
+      console.error('Error loading collaborator data:', err);
+      setError('Could not load your tasks. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
-  
-  const handleAceptarTarea = (tareaId: string) => {
-    setTareas(prev => prev.map(t =>
-      t.id === tareaId ? { ...t, estado: 'en_progreso' as const } : t
-    ));
+    }
   };
-  
-  const handleEntregar = (tareaId: string) => {
-    setTareas(prev => prev.map(t =>
-      t.id === tareaId ? { ...t, estado: 'en_revision' as const } : t
-    ));
+
+  const handleStartTask = async (taskId: string) => {
+    try {
+      await iniciarTarea(taskId);
+      loadCollaboratorData(colaboradorId!);
+    } catch (err) {
+      alert('Error starting task. Please try again.');
+    }
   };
-  
+
+  const handleMarkInProgress = async (taskId: string) => {
+    try {
+      await executarTarea(taskId);
+      loadCollaboratorData(colaboradorId!);
+    } catch (err) {
+      alert('Error updating task. Please try again.');
+    }
+  };
+
+  const handleDeliver = async (taskId: string) => {
+    const links = prompt('Enter delivery links (comma separated):');
+    if (!links) return;
+    
+    try {
+      await entregarTarea(taskId, [], links.split(',').map(l => l.trim()));
+      loadCollaboratorData(colaboradorId!);
+    } catch (err) {
+      alert('Error delivering task. Please try again.');
+    }
+  };
+
+  const getStatusStyle = (status: TareaEstado) => {
+    const estado = TAREFA_ESTADOS.find(e => e.value === status);
+    return {
+      backgroundColor: estado?.color ? `${estado.color}20` : '#f3f4f6',
+      color: estado?.color || '#6b7280',
+    };
+  };
+
+  const getStatusLabel = (status: TareaEstado) => {
+    const estado = TAREFA_ESTADOS.find(e => e.value === status);
+    return estado?.label || status;
+  };
+
   if (loading) {
     return (
       <div style={styles.center}>
@@ -76,7 +172,24 @@ export default function ColaboradorPage() {
       </div>
     );
   }
-  
+
+  if (error) {
+    return (
+      <div style={styles.center}>
+        <div style={{ textAlign: 'center', maxWidth: 400 }}>
+          <p style={{ color: '#dc2626', marginBottom: 16 }}>{error}</p>
+          <button onClick={() => loadCollaboratorData(colaboradorId!)} style={styles.btnRetry}>
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const inProgressTasks = tasks.filter(t => ['atribuida', 'em_analise', 'em_execucao'].includes(t.estado));
+  const reviewTasks = tasks.filter(t => t.estado === 'em_revisao');
+  const paidTasks = tasks.filter(t => t.estado === 'paga');
+
   return (
     <div style={styles.container}>
       {/* Header */}
@@ -84,113 +197,197 @@ export default function ColaboradorPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={styles.logo}>AI BORA</div>
           <div>
-            <h1 style={styles.title}>Panel del Colaborador</h1>
-            <p style={styles.subtitle}>Tu trabajo, tu pago, todo en blockchain</p>
+            <h1 style={styles.title}>Collaborator Dashboard</h1>
+            <p style={styles.subtitle}>
+              {colaboradorName ? `Welcome, ${colaboradorName}` : 'Your work, your payment — all on blockchain'}
+            </p>
           </div>
         </div>
       </div>
-      
+
       {/* Stats */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
           <Wallet size={24} color="#F25C05" />
           <div>
-            <p style={styles.statLabel}>Ganado este mes</p>
-            <p style={styles.statValue}>€{totalGanado}</p>
+            <p style={styles.statLabel}>Total Earned</p>
+            <p style={styles.statValue}>${totalEarned.toFixed(2)}</p>
           </div>
         </div>
-        
+
         <div style={styles.statCard}>
           <CheckCircle size={24} color="#22c55e" />
           <div>
-            <p style={styles.statLabel}>Tareas completadas</p>
-            <p style={styles.statValue}>3</p>
+            <p style={styles.statLabel}>Paid Tasks</p>
+            <p style={styles.statValue}>{paidTasks.length}</p>
           </div>
         </div>
-        
+
         <div style={styles.statCard}>
           <Clock size={24} color="#3b82f6" />
           <div>
-            <p style={styles.statLabel}>En revisión</p>
-            <p style={styles.statValue}>1</p>
+            <p style={styles.statLabel}>In Review</p>
+            <p style={styles.statValue}>{reviewTasks.length}</p>
           </div>
         </div>
-        
+
         <div style={styles.statCard}>
           <TrendingUp size={24} color="#8b5cf6" />
           <div>
-            <p style={styles.statLabel}>Disponibles</p>
-            <p style={styles.statValue}>{tareasDisponibles}</p>
+            <p style={styles.statLabel}>In Progress</p>
+            <p style={styles.statValue}>{inProgressTasks.length}</p>
           </div>
         </div>
       </div>
-      
-      {/* Tareas */}
-      <div style={styles.tareasContainer}>
-        <h2 style={styles.sectionTitle}>Tareas asignadas</h2>
-        
-        {tareas.map(tarea => (
-          <div key={tarea.id} style={styles.tareaCard}>
-            <div style={styles.tareaHeader}>
-              <div>
-                <h3 style={styles.tareaTitulo}>{tarea.titulo}</h3>
-                <p style={styles.tareaCliente}>Cliente: {tarea.clienteNombre}</p>
+
+      {/* Available Tasks */}
+      {availableTasks.length > 0 && (
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Available Tasks ({availableTasks.length})</h2>
+          <p style={styles.sectionSubtitle}>Request to work on these tasks. Admin will approve your request.</p>
+          
+          {availableTasks.map(task => (
+            <div key={task.id} style={styles.taskCard}>
+              <div style={styles.taskHeader}>
+                <div>
+                  <h3 style={styles.taskTitle}>{task.titulo}</h3>
+                  <p style={styles.taskClient}>Client: {task.clienteNome || 'Unknown'}</p>
+                </div>
+                <div style={{ ...styles.statusBadge, ...getStatusStyle(task.estado) }}>
+                  {getStatusLabel(task.estado)}
+                </div>
               </div>
-              <div style={{ ...styles.estadoBadge, ...getEstadoStyle(tarea.estado) }}>
-                {tarea.estado.replace('_', ' ')}
+
+              <div style={styles.taskInfo}>
+                <div>
+                  <p style={styles.taskLabel}>Client Price</p>
+                  <p style={styles.taskAmount}>${task.valorCliente || 0}</p>
+                  <p style={styles.taskCommission}>Your 30%: ${((task.valorCliente || 0) * 0.3).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p style={styles.taskLabel}>Deadline</p>
+                  <p style={styles.taskDate}>{task.prazo || 'Flexible'}</p>
+                </div>
               </div>
-            </div>
-            
-            <div style={styles.tareaInfo}>
-              <div>
-                <p style={styles.tareaLabel}>Monto</p>
-                <p style={styles.tareaMonto}>€{tarea.monto}</p>
-                <p style={styles.tareaComision}>Tu 30%: €{(tarea.monto * 0.3).toFixed(2)}</p>
-              </div>
-              <div>
-                <p style={styles.tareaLabel}>Fecha límite</p>
-                <p style={styles.tareaFecha}>{tarea.fechaLimite}</p>
-              </div>
-            </div>
-            
-            {tarea.estado === 'disponible' && (
-              <button
-                onClick={() => handleAceptarTarea(tarea.id)}
-                style={styles.btnAceptar}
+
+              <button 
+                onClick={() => {
+                  const name = prompt('Enter your name to request this task:');
+                  if (name) {
+                    import('../services/tareas').then(({ solicitarTarea }) => {
+                      solicitarTarea(task.id, colaboradorId || 'demo', name);
+                      alert('Request sent! Wait for admin approval.');
+                      loadCollaboratorData(colaboradorId!);
+                    });
+                  }
+                }}
+                style={styles.btnRequest}
               >
-                Aceptar tarea
+                Request Task
               </button>
-            )}
-            
-            {tarea.estado === 'en_progreso' && (
-              <button
-                onClick={() => handleEntregar(tarea.id)}
-                style={styles.btnEntregar}
-              >
-                Marcar como entregado
-              </button>
-            )}
-            
-            {tarea.estado === 'en_revision' && (
-              <div style={styles.enRevision}>
-                <p>✓ En revisión por el cliente</p>
-                <p style={styles.enRevisionSub}>
-                  El pago se procesará automáticamente vía Stellar
-                </p>
-              </div>
-            )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* My Tasks */}
+      <div style={styles.section}>
+        <h2 style={styles.sectionTitle}>My Tasks ({tasks.length})</h2>
+
+        {tasks.length === 0 ? (
+          <div style={styles.emptyState}>
+            <p>No tasks assigned yet.</p>
+            <p style={styles.emptySubtext}>Available tasks will appear above for you to request.</p>
           </div>
-        ))}
+        ) : (
+          tasks.map(task => (
+            <div key={task.id} style={styles.taskCard}>
+              <div style={styles.taskHeader}>
+                <div>
+                  <h3 style={styles.taskTitle}>{task.titulo}</h3>
+                  <p style={styles.taskClient}>Client: {task.clienteNome || 'Unknown'}</p>
+                </div>
+                <div style={{ ...styles.statusBadge, ...getStatusStyle(task.estado) }}>
+                  {getStatusLabel(task.estado)}
+                </div>
+              </div>
+
+              <div style={styles.taskInfo}>
+                <div>
+                  <p style={styles.taskLabel}>Client Price</p>
+                  <p style={styles.taskAmount}>${task.valorCliente || 0}</p>
+                  <p style={styles.taskCommission}>
+                    Your commission: ${(task.comissaoColaboradorValor || ((task.valorCliente || 0) * 0.3)).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <p style={styles.taskLabel}>Deadline</p>
+                  <p style={styles.taskDate}>{task.prazo || 'Flexible'}</p>
+                </div>
+              </div>
+
+              {task.estado === 'atribuida' && (
+                <button onClick={() => handleStartTask(task.id)} style={styles.btnStart}>
+                  Start Task
+                </button>
+              )}
+
+              {task.estado === 'em_analise' && (
+                <button onClick={() => handleMarkInProgress(task.id)} style={styles.btnProgress}>
+                  Mark as In Progress
+                </button>
+              )}
+
+              {task.estado === 'em_execucao' && (
+                <button onClick={() => handleDeliver(task.id)} style={styles.btnDeliver}>
+                  Deliver Work
+                </button>
+              )}
+
+              {task.estado === 'em_revisao' && (
+                <div style={styles.inReview}>
+                  <p style={{ margin: 0 }}>Under admin review</p>
+                  <p style={styles.inReviewSub}>
+                    Once approved, payment will be processed automatically via Stellar
+                  </p>
+                </div>
+              )}
+
+              {task.estado === 'aprovada' && (
+                <div style={styles.approved}>
+                  <p style={{ margin: 0 }}>Approved by admin - awaiting client payment</p>
+                </div>
+              )}
+
+              {task.estado === 'paga' && (
+                <div style={styles.paid}>
+                  <CheckCircle size={16} color="#22c55e" />
+                  <span>Payment received on Stellar</span>
+                  {task.propostaId && (
+                    <a 
+                      href={`https://stellar.expert/explorer/testnet/tx/${task.propostaId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.linkBtn}
+                    >
+                      <ExternalLink size={12} /> View TX
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
-      
+
       {/* Info Banner */}
       <div style={styles.infoBanner}>
         <div style={{ fontSize: 24 }}>⭐</div>
         <div>
-          <p style={styles.infoTitle}>Pagos 70/30 vía Soroban</p>
+          <p style={styles.infoTitle}>70/30 automatic payments via Soroban</p>
           <p style={styles.infoText}>
-            Cuando el cliente paga, el contrato <strong>PaymentSplitter</strong> distribuye automáticamente:
-            70% al vendedor, 30% a ti. Todo on-chain, transparente, verificable en{' '}
+            When the client pays, the <strong>PaymentSplitter</strong> smart contract automatically
+            distributes: 70% to the company, 30% to you. All on-chain, transparent, verifiable on{' '}
             <a
               href="https://stellar.expert/explorer/testnet"
               target="_blank"
@@ -206,16 +403,6 @@ export default function ColaboradorPage() {
   );
 }
 
-function getEstadoStyle(estado: string) {
-  const styles: Record<string, any> = {
-    disponible: { backgroundColor: '#eff6ff', color: '#1d4ed8' },
-    en_progreso: { backgroundColor: '#fef3c7', color: '#92400e' },
-    en_revision: { backgroundColor: '#f0fdf4', color: '#166534' },
-    entregado: { backgroundColor: '#f0fdf4', color: '#166534' },
-  };
-  return styles[estado] || styles.disponible;
-}
-
 const styles = {
   center: {
     minHeight: '100vh',
@@ -228,27 +415,23 @@ const styles = {
     minHeight: '100vh',
     backgroundColor: '#f8f7f4',
     padding: '40px 60px',
-  } as const,
-  header: {
-    marginBottom: 40,
-  } as const,
-  logo: {
     fontFamily: 'Montserrat, sans-serif',
+  } as const,
+  header: { marginBottom: 40 } as const,
+  logo: {
     fontWeight: 900,
-    fontSize: 14,
+    fontSize: 12,
     color: '#F25C05',
     letterSpacing: '0.3em',
     textTransform: 'uppercase' as const,
   },
   title: {
-    fontFamily: 'Montserrat, sans-serif',
     fontWeight: 900,
     fontSize: 28,
     color: '#1b1c1b',
     margin: 0,
   },
   subtitle: {
-    fontFamily: 'Montserrat, sans-serif',
     color: '#666',
     fontSize: 14,
     marginTop: 4,
@@ -269,92 +452,78 @@ const styles = {
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
   },
   statLabel: {
-    fontFamily: 'Montserrat, sans-serif',
     fontSize: 12,
     color: '#666',
     margin: 0,
   },
   statValue: {
-    fontFamily: 'Montserrat, sans-serif',
     fontWeight: 900,
     fontSize: 24,
     color: '#1b1c1b',
     margin: '4px 0 0 0',
   },
-  tareasContainer: {
-    marginBottom: 40,
-  },
+  section: { marginBottom: 40 },
   sectionTitle: {
-    fontFamily: 'Montserrat, sans-serif',
     fontWeight: 900,
     fontSize: 20,
-    marginBottom: 20,
+    marginBottom: 8,
     color: '#1b1c1b',
   },
-  tareaCard: {
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+  },
+  taskCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 24,
     marginBottom: 16,
     boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
   },
-  tareaHeader: {
+  taskHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 16,
   },
-  tareaTitulo: {
-    fontFamily: 'Montserrat, sans-serif',
+  taskTitle: {
     fontWeight: 700,
     fontSize: 18,
     color: '#1b1c1b',
     margin: 0,
   },
-  tareaCliente: {
-    fontFamily: 'Montserrat, sans-serif',
+  taskClient: {
     fontSize: 14,
     color: '#666',
     marginTop: 4,
   },
-  estadoBadge: {
+  statusBadge: {
     padding: '6px 12px',
     borderRadius: 100,
     fontSize: 12,
     fontWeight: 700,
     textTransform: 'uppercase' as const,
   },
-  tareaInfo: {
-    display: 'flex',
-    gap: 24,
-    marginBottom: 16,
-  },
-  tareaLabel: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontSize: 12,
-    color: '#999',
-    margin: 0,
-  },
-  tareaMonto: {
-    fontFamily: 'Montserrat, sans-serif',
+  taskInfo: { display: 'flex', gap: 24, marginBottom: 16 },
+  taskLabel: { fontSize: 12, color: '#999', margin: 0 },
+  taskAmount: {
     fontWeight: 700,
     fontSize: 20,
     color: '#F25C05',
     margin: '4px 0',
   },
-  tareaComision: {
-    fontFamily: 'Montserrat, sans-serif',
+  taskCommission: {
     fontSize: 12,
     color: '#22c55e',
     fontWeight: 600,
   },
-  tareaFecha: {
-    fontFamily: 'Montserrat, sans-serif',
+  taskDate: {
     fontSize: 14,
     color: '#1b1c1b',
     marginTop: 4,
   },
-  btnAceptar: {
+  btnRequest: {
     width: '100%',
     padding: '14px',
     backgroundColor: '#F25C05',
@@ -364,9 +533,30 @@ const styles = {
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    fontFamily: 'Montserrat, sans-serif',
   },
-  btnEntregar: {
+  btnStart: {
+    width: '100%',
+    padding: '14px',
+    backgroundColor: '#3b82f6',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 12,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  btnProgress: {
+    width: '100%',
+    padding: '14px',
+    backgroundColor: '#8b5cf6',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 12,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  btnDeliver: {
     width: '100%',
     padding: '14px',
     backgroundColor: '#22c55e',
@@ -376,22 +566,70 @@ const styles = {
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    fontFamily: 'Montserrat, sans-serif',
   },
-  enRevision: {
+  btnRetry: {
+    padding: '12px 24px',
+    backgroundColor: '#F25C05',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 8,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  inReview: {
     padding: '14px',
-    backgroundColor: '#f0fdf4',
+    backgroundColor: '#ccfbf1',
     borderRadius: 12,
     textAlign: 'center' as const,
-    fontFamily: 'Montserrat, sans-serif',
+    color: '#0f766e',
+    fontSize: 14,
+    fontWeight: 600,
+  },
+  inReviewSub: { fontSize: 12, color: '#14b8a6', marginTop: 4 },
+  approved: {
+    padding: '14px',
+    backgroundColor: '#d1fae5',
+    borderRadius: 12,
+    textAlign: 'center' as const,
     color: '#166534',
     fontSize: 14,
     fontWeight: 600,
   },
-  enRevisionSub: {
+  paid: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: '14px',
+    backgroundColor: '#f0fdf4',
+    borderRadius: 12,
+    color: '#166534',
+    fontSize: 14,
+    fontWeight: 600,
+  },
+  linkBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    marginLeft: 8,
+    padding: '4px 8px',
+    backgroundColor: '#1d4ed8',
+    color: '#fff',
+    borderRadius: 4,
+    textDecoration: 'none',
     fontSize: 12,
-    color: '#4ade80',
-    marginTop: 4,
+  },
+  emptyState: {
+    textAlign: 'center' as const,
+    padding: '40px',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    color: '#666',
+  },
+  emptySubtext: {
+    fontSize: 13,
+    color: '#999',
+    marginTop: 8,
   },
   infoBanner: {
     backgroundColor: '#eff6ff',
@@ -402,21 +640,16 @@ const styles = {
     gap: 16,
   },
   infoTitle: {
-    fontFamily: 'Montserrat, sans-serif',
     fontWeight: 700,
     fontSize: 14,
     color: '#1d4ed8',
     margin: '0 0 8px 0',
   },
   infoText: {
-    fontFamily: 'Montserrat, sans-serif',
     fontSize: 13,
     color: '#3b82f6',
     lineHeight: 1.6,
     margin: 0,
   },
-  link: {
-    color: '#1d4ed8',
-    textDecoration: 'underline',
-  },
+  link: { color: '#1d4ed8', textDecoration: 'underline' },
 };

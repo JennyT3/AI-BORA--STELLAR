@@ -1,41 +1,26 @@
 import { motion } from 'motion/react';
 import { Link } from 'wouter';
-import { ArrowRight, FileText, Rocket } from 'lucide-react';
+import { ArrowRight, Bot, Zap, Users, DollarSign, ExternalLink, FileText } from 'lucide-react';
 
 export function HeroSection() {
   return (
-    <section 
-      style={{ 
-        backgroundColor: '#0a0a0a',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }} 
-      className="w-full"
-    >
-      <div className="max-w-4xl mx-auto px-6 text-center">
+    <section style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
         
-        {/* Logo/Brand */}
+        {/* Logo + Brand */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          style={{ marginBottom: 40 }}
+          style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
         >
-          <span style={{ 
-            fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 900,
-            fontSize: 14,
-            color: '#F25C05',
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase'
-          }}>
+          <img src="/logo.png" alt="" style={{ height: 32, width: 'auto' }} />
+          <span style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 900, fontSize: 14, color: '#F25C05', letterSpacing: '0.3em', textTransform: 'uppercase' }}>
             AI BORA
           </span>
         </motion.div>
 
-        {/* Main Title - VERY EYE CATCHING */}
+        {/* Main Title */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,45 +29,111 @@ export function HeroSection() {
             color: '#FFFFFF',
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 900,
-            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-            lineHeight: 1.1,
-            marginBottom: 24
+            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+            lineHeight: 1.2,
+            marginBottom: 20
           }}
         >
-          PAY WITH
+          AI Agents That Pay
           <br />
-          <span style={{ color: '#F25C05' }}>STELLAR</span>
+          <span style={{ color: '#F25C05' }}>Each Other</span> Automatically
         </motion.h1>
 
-        {/* Subtitle - EXPLAINS WHAT IT DOES */}
-        <motion.p
+        {/* What is x402 */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
+          style={{ marginBottom: 24 }}
+        >
+          <div style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: 8, 
+            backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+            padding: '8px 16px', 
+            borderRadius: 100,
+            border: '1px solid rgba(34, 197, 94, 0.3)'
+          }}>
+            <FileText size={14} color="#22c55e" />
+            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, fontWeight: 600, color: '#22c55e' }}>
+              x402 = HTTP 402 Payment Required for AI Agents
+            </span>
+          </div>
+        </motion.div>
+
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
           style={{
-            color: 'rgba(255,255,255,0.7)',
+            color: 'rgba(255,255,255,0.8)',
             fontFamily: 'Montserrat, sans-serif',
-            fontWeight: 400,
-            fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+            fontWeight: 500,
+            fontSize: 'clamp(1rem, 2vw, 1.2rem)',
             lineHeight: 1.6,
-            maxWidth: '600px',
-            margin: '0 auto 48px'
+            maxWidth: '700px',
+            margin: '0 auto 32px'
           }}
         >
-          B2B Sales Platform with <strong style={{ color: '#fff' }}>REAL Stellar blockchain payments</strong>. 
-          Create proposals, send to clients, accept with fingerprint, pay on-chain. 
-          <span style={{ color: '#22c55e' }}> Verified. Instant. Free.</span>
+          When an AI agent encounters a <span style={{ color: '#F25C05', fontWeight: 600 }}>402 Payment Required</span> response,
+          it reads the price, decides if acceptable, and pays automatically via Stellar USDC.
+          <span style={{ color: '#22c55e', fontWeight: 600 }}> No human intervention needed.</span>
         </motion.p>
 
-        {/* Two Simple Buttons */}
+        {/* Features */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}
+          style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}
         >
-          {/* GET STARTED - Goes to Register with Passkey */}
-          <Link href="/register">
+          {[
+            { icon: Bot, label: 'AI pays AI', desc: 'Machine-to-machine payments' },
+            { icon: Zap, label: 'x402 Protocol', desc: 'HTTP 402 for AI agents' },
+            { icon: DollarSign, label: '70/30 Split', desc: 'On-chain distribution' },
+            { icon: Users, label: 'Collaborators', desc: 'Automatic payouts' },
+          ].map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 16,
+                  padding: '16px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12
+                }}
+              >
+                <Icon size={22} color="#F25C05" />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontFamily: 'Montserrat,sans-serif', fontWeight: 700, color: '#fff', fontSize: '0.9rem' }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontFamily: 'Montserrat,sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)' }}>
+                    {item.desc}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}
+        >
+          <Link href="/agent-x402-demo">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -91,25 +142,24 @@ export function HeroSection() {
                 color: '#FFFFFF',
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 700,
-                fontSize: '1.1rem',
-                padding: '18px 36px',
+                fontSize: '1rem',
+                padding: '14px 28px',
                 borderRadius: 50,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
+                gap: 8,
                 boxShadow: '0 4px 20px rgba(242,92,5,0.4)'
               }}
             >
-              <Rocket size={20} />
-              Get Started
-              <ArrowRight size={18} />
+              <Bot size={18} />
+              Watch AI Pay AI
+              <ArrowRight size={16} />
             </motion.button>
           </Link>
 
-          {/* DOCS - Goes to documentation */}
-          <Link href="/verify/test">
+          <Link href="/admin">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -118,82 +168,90 @@ export function HeroSection() {
                 color: '#FFFFFF',
                 fontFamily: 'Montserrat, sans-serif',
                 fontWeight: 600,
-                fontSize: '1.1rem',
-                padding: '18px 36px',
+                fontSize: '0.95rem',
+                padding: '14px 28px',
                 borderRadius: 50,
                 border: '2px solid rgba(255,255,255,0.3)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10
+                gap: 8
               }}
             >
-              <FileText size={20} />
-              Docs
+              Try B2B Flow
             </motion.button>
           </Link>
+
+          <a href="https://github.com/JennyT3/AI-BORA--STELLAR" target="_blank" rel="noopener noreferrer">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                color: '#FFFFFF',
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 600,
+                fontSize: '0.95rem',
+                padding: '14px 28px',
+                borderRadius: 50,
+                border: '2px solid rgba(255,255,255,0.1)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
+              <FileText size={16} />
+              Docs
+              <ExternalLink size={14} />
+            </motion.button>
+          </a>
         </motion.div>
 
-        {/* Flow Diagram - Shows the steps */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          style={{ marginTop: 60 }}
-        >
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            gap: 8, 
-            flexWrap: 'wrap',
-            fontFamily: 'Montserrat, sans-serif',
-            fontSize: '0.85rem',
-            color: 'rgba(255,255,255,0.5)'
-          }}>
-            <span style={{ color: '#F25C05', fontWeight: 600 }}>1.</span>
-            <span>Admin creates proposal</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600 }}>2.</span>
-            <span>Client receives link</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600 }}>3.</span>
-            <span>Client accepts</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
-            
-            <span style={{ color: '#22c55e', fontWeight: 600 }}>4.</span>
-            <span style={{ color: '#22c55e' }}>Pay with Stellar</span>
-            
-            <span style={{ color: '#F25C05', fontWeight: 600, marginLeft: 16 }}>→</span>
-            
-            <span style={{ color: '#22c55e', fontWeight: 600 }}>5.</span>
-            <span style={{ color: '#22c55e' }}>Auto-distribute to team</span>
-          </div>
-        </motion.div>
-
-        {/* TX Hash Demo */}
+        {/* How It Works */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          style={{ marginTop: 40, padding: '16px 24px', backgroundColor: 'rgba(34,197,94,0.1)', borderRadius: 12, display: 'inline-block' }}
+          style={{ marginTop: 40 }}
         >
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', color: '#22c55e', marginBottom: 8 }}>
-            ✅ Real Stellar Testnet Transaction
-          </p>
-          <a 
-            href="https://stellar.expert/explorer/testnet/tx/227828308b72a57f6df4ab4346ad7f9811a682bc3eee7cfc30c1011fe89de549"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', textDecoration: 'none' }}
-          >
-            TX: 227828308b72a57f6df4ab4346ad7f9811a682bc3eee7cfc30c1011fe89de549 ↗
-          </a>
+          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: 12, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            How It Works
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
+            {[
+              { num: '1', text: 'Agent discovers service', color: '#F25C05' },
+              { num: '2', text: 'Reads 402 header', color: '#F25C05' },
+              { num: '3', text: 'Pays via x402', color: '#F22283' },
+              { num: '4', text: 'Split 70/30 on-chain', color: '#22c55e' },
+            ].map((step, i) => (
+              <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ color: step.color, fontWeight: 700 }}>{step.num}.</span>
+                <span>{step.text}</span>
+                {i < 3 && <span style={{ marginLeft: 8, marginRight: 8, opacity: 0.3 }}>→</span>}
+              </span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Quick Links */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          style={{ marginTop: 32 }}
+        >
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem' }}>
+            <Link to="/onboarding" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>
+              Agent Onboarding
+            </Link>
+            <Link to="/collaborator/demo" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>
+              Collaborator Panel
+            </Link>
+            <Link to="/payment-flow/demo" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>
+              Payment Demo
+            </Link>
+          </div>
         </motion.div>
 
       </div>
