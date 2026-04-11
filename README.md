@@ -146,7 +146,7 @@ node setup.mjs
 |----------|-----|-----------|
 | **ProposalRegistry** | `CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5` | `store_proposal`, `get_proposal`, `update_status`, `verify_hash` |
 | **PaymentSplitter** | `CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P` | `create_payment`, `execute_split`, `get_payment` |
-| **AgentRegistry** | *(to be deployed)* | `register_agent`, `get_agent`, `update_rates`, `record_payment` |
+| **AgentRegistry** | `CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M` | `register_agent`, `get_agent`, `update_rates`, `record_payment` |
 
 ### Payment Distribution
 - Admin: 70%
