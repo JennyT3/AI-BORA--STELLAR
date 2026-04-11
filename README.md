@@ -285,57 +285,6 @@ Allows necessary domains:
 
 ---
 
-## 📊 Complete Test Flow
-
-### End-to-End Demo
-
-```bash
-# 1. Setup everything
-./setup.sh
-
-# 2. Register as empresa (company)
-# http://localhost:3000/register
-# → Create passkey
-# → Select "Empresa"
-
-# 3. Create proposal
-# /admin → "New Quick Proposal"
-# → Fill form
-# → Generate PDF
-# → Hash stored on-chain
-# → Check: stellar.expert/explorer/testnet/tx/{txHash}
-
-# 4. Client receives email, accepts proposal
-# /proposal/{id}
-# → Client clicks "Accept"
-# → Status updates in ProposalRegistry
-
-# 5. Cliente pays with USDC
-# /pagamento/{id}
-# → Pay button
-# → x402 payment
-# → PaymentSplitter.execute_split() called
-# → 70% to admin, 30% to collaborator
-# → Both transactions visible on Stellar Expert
-
-# 6. Collaborator views earnings
-# /colaborador/{id}
-# → See pending tasks
-# → See completed payments
-# → See 30% commission from each job
-
-# 7. Run autonomous agent
-npx tsx agent-x402-v2.ts
-# → Discovers AI service
-# → Reads 402 header
-# → Decides price acceptable
-# → Pays automatically
-# → Calls execute_split on-chain
-# → Check transaction on Stellar Expert
-```
-
----
-
 ## 🧪 Smart Contract Tests
 
 ```bash
@@ -362,95 +311,22 @@ Tests include:
 
 ---
 
-## 📺 Demo Video (3 minutes)
-
-**Key scenes:**
-
-1. **Platform Overview** (15s)
-   - Show home page
-   - Click "Get Started"
-   
-2. **Passkey Registration** (30s)
-   - Create account with fingerprint
-   - No password needed
-   
-3. **Proposal Creation** (30s)
-   - Admin creates proposal
-   - PDF generated
-   - Hash stored on-chain
-   - Show transaction on Stellar Expert
-   
-4. **Client Flow** (30s)
-   - Client receives email
-   - Opens proposal
-   - Accepts
-   
-5. **Payment & Split** (45s)
-   - Client pays USDC
-   - PaymentSplitter auto-distributes 70/30
-   - Show both transactions on Stellar Expert
-   
-6. **Autonomous Agent** (30s)
-   - Run `npx tsx agent-x402-v2.ts`
-   - Show agent discovering service
-   - Paying automatically
-   - Calling execute_split
-
-7. **Wrap-up** (10s)
-   - Show collaborator panel
-   - MPP endpoint
-   - Smart contract addresses
-
----
-
 ## 🛠️ Tech Stack
 
 - **Frontend**: React + Vite + Tailwind + TypeScript
 - **Smart Contracts**: Soroban (Rust) - 3 contracts deployed
 - **Blockchain**: Stellar testnet via Soroban SDK
-- **Auth**: WebAuthn Passkey + Clerk (optional)
+- **Auth**: WebAuthn Passkey + Clerk
 - **Database**: Firebase Firestore
 - **Payment Protocols**: x402 + MPP
 - **Roles**: Admin / Client / Collaborator
 
 ---
 
-## ⚠️ Setup Checklist
-
-Before demo:
-
-- [ ] Stellar accounts funded via Friendbot
-- [ ] USDC trustline added (Circle testnet)
-- [ ] `.env` configured with real Firebase/Stellar keys
-- [ ] All servers running (frontend + x402 + MPP)
-- [ ] Test account created with Passkey
-- [ ] Sample proposal created
-- [ ] Zoom/Screen recording ready
-- [ ] Stellar Expert tabs open for live viewing
-
----
-
-## 📄 License
-
-MIT
-
----
-
-## 🙏 Acknowledgments
-
-- Stellar Foundation for Soroban
-- x402 Protocol for HTTP 402 machine payments
-- Circle for USDC testnet issuer
-- Firebase for real-time database
-- Clerk for authentication
-
----
-
 ## 📞 Support
 
-- GitHub Issues: https://github.com/your-repo/aibora/issues
-- Discord: #stellar-hacks
-- Email: support@aibora.pt
+- Email: geral@aibora.pt
+- Website: https://aibora.pt
 
 ---
 
