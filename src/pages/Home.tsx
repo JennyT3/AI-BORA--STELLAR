@@ -1,5 +1,6 @@
 import { HeroSection } from '../components/HeroSection';
 import { StellarTransactionMarquee } from '../components/StellarTransactionMarquee';
+import { PaymentFlowsSection } from '../components/PaymentFlowsSection';
 import { ServicesSection } from '../components/ServicesSection';
 import { ComoFuncionaSection } from '../components/ComoFuncionaSection';
 import { QuemSomosSection } from '../components/QuemSomosSection';
@@ -16,6 +17,9 @@ export function Home() {
         
         {/* Green wave effect */}
         <StellarTransactionMarquee />
+        
+        {/* Payment Flows */}
+        <PaymentFlowsSection />
         
         {/* Dark: How it works */}
         <ComoFuncionaSection />

@@ -198,13 +198,12 @@ setCurrentStep(6);
     addLine(`═`.repeat(40), 'output');
     addLine(``, 'output');
 
-    const total = totalSpent || 0.035;
+    const displayTotal = totalSpent || 0.035;
     addLine(`Payment Distribution:`, 'info');
     addLine(``, 'output');
     
-    const total = totalSpent || 0.035;
-    addLine(`  💼 Company (70%):       $${(total * 0.7).toFixed(4)} USDC`, 'success');
-    addLine(`  👤 Collaborator (30%): $${(total * 0.3).toFixed(4)} USDC`, 'success');
+    addLine(`  💼 Company (70%):       $${(displayTotal * 0.7).toFixed(4)} USDC`, 'success');
+    addLine(`  👤 Collaborator (30%): $${(displayTotal * 0.3).toFixed(4)} USDC`, 'success');
     addLine(``, 'output');
     addLine(`Contract: ${PAYMENT_SPLITTER.substring(0, 30)}...`, 'output');
     addLine(``, 'output');
@@ -254,25 +253,25 @@ setCurrentStep(6);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0a0a0a', fontFamily: 'Montserrat, sans-serif' }}>
-      {/* TWO PAYMENT FLOWS EXPLAINED */}
+      {/* TWO PAYMENT FLOWS */}
       <div style={{ padding: '16px 24px', background: 'linear-gradient(135deg, #1a1a2e 0%, #0f172a 100%)', borderBottom: '1px solid rgba(242,92,5,0.3)' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           <div style={{ padding: 16, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#22c55e', marginBottom: 8 }}>💰 FLUJO 1: B2B (Principal)</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#22c55e', marginBottom: 8 }}>💰 FLOW 1: B2B (Main)</div>
             <p style={{ fontSize: 12, color: '#aaa', margin: 0, lineHeight: 1.5 }}>
-              1. Empresa crea propuesta → 2. Cliente acepta → 3. Colaborador trabaja → 4. Admin aprueba → 5. <strong>Cliente paga invoice</strong> → 6. Split 70/30 automático
+              1. Company creates proposal → 2. Client accepts → 3. Collaborator works → 4. Admin approves → 5. <strong>Client pays invoice</strong> → 6. 70/30 automatic split
             </p>
             <p style={{ fontSize: 11, color: '#666', margin: '8px 0 0' }}>
-              ← Este es tu flujo principal de ingresos
+              ← Your main income source
             </p>
           </div>
           <div style={{ padding: 16, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#F25C05', marginBottom: 8 }}>🤖 FLUJO 2: Micropagos de AI (Extra)</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#F25C05', marginBottom: 8 }}>🤖 FLOW 2: AI Micropayments</div>
             <p style={{ fontSize: 12, color: '#aaa', margin: 0, lineHeight: 1.5 }}>
-              Tu API dice "402 Payment Required" → AI Agent externo paga → Split automático 70/30
+              Your API returns 402 → External AI Agent pays → Automatic 70/30 split
             </p>
             <p style={{ fontSize: 11, color: '#666', margin: '8px 0 0' }}>
-              Ingreso adicional por tu API
+              Extra income from your API
             </p>
           </div>
         </div>
