@@ -16,17 +16,20 @@
   - Track status: pending → accepted → paid
   - Verify document integrity
   - **Connected to /admin/orcamento and QuickProposalForm**
+  - Deployed and verified on Stellar Expert (14+ invocations)
   
 - **PaymentSplitter** (`CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P`)
   - Automatic 70/30 distribution
   - Admin receives 70%, collaborator receives 30%
   - Called automatically after each payment
   - **Connected to /pagamento page**
+  - Deployed and verified on Stellar Expert
   
-- **AgentRegistry** (NEW)
+- **AgentRegistry** (`CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M`)
   - Register AI agents and their service rates
   - Track total earned per agent
   - Enable inter-contract interoperability
+  - Deployed and verified on Stellar Expert
 
 ### ✅ x402 Autonomous Agent Payments
 - **server-x402.ts**: Paid AI endpoints (402 Payment Required)

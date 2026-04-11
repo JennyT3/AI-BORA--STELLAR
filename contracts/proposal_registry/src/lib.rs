@@ -1,7 +1,5 @@
 #![no_std]
-use soroban_sdk::{
-    contract, contractimpl, contracttype, testutils::Address as _, Address, Bytes, Env, String,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Bytes, Env, String};
 
 #[contracttype]
 pub struct Proposal {

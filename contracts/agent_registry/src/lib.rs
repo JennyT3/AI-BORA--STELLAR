@@ -1,7 +1,5 @@
 #![no_std]
-use soroban_sdk::{
-    contract, contractimpl, contracttype, testutils::Address as _, Address, Env, Map, String,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, String};
 
 #[contracttype]
 pub enum AgentService {
@@ -81,11 +79,11 @@ impl AgentRegistry {
     }
 
     /// Get price for a specific service from an agent
-    pub fn get_service_price(env: Env, agent: Address, service: AgentService) -> Option<i128> {
+    pub fn get_service_price(env: Env, agent: Address, service: AgentService) -> i128 {
         if let Some(agent_data) = env.storage().instance().get::<Address, Agent>(&agent) {
-            agent_data.services.get(service).copied()
+            agent_data.services.get(service).unwrap_or(0)
         } else {
-            None
+            0
         }
     }
 

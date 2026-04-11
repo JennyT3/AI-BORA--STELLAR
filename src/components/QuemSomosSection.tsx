@@ -19,9 +19,8 @@ const TEAM = [
     name: "Stellar Network",
     role: "Blockchain Infrastructure",
     desc: "Fast, low-cost transactions",
-    image: "/stellar-logo.png",
-    hasImage: true,
-    isStellar: true
+    hasImage: false,
+    emoji: "🔗"
   }
 ];
 
