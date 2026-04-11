@@ -6,7 +6,7 @@ const HORIZON_URL = 'https://horizon-testnet.stellar.org';
 const FRIENDBOT_URL = 'https://friendbot.stellar.org';
 const EXPLORER_URL = 'https://stellar.expert/explorer/testnet';
 
-const ADMIN_PUBLIC = 'GBM4USEN622JABS37BVEHK43HASCX7PSRDMB37PKL53R725OFOHNWL3B';
+const ADMIN_PUBLIC = 'GDQX74MG4TVG7BBZCLDCOEOQX2PADCTRUIDAWG5KLIQ64LYURC5XC7CN';
 
 interface WalletState {
   publicKey: string;

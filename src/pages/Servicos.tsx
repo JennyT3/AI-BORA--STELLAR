@@ -10,6 +10,7 @@ const colors = {
   magenta: '#cb1a74',
   dark: '#1c1b1b',
   light: '#fcf9f8',
+  gray: '#888888',
 };
 
 const fotos = [

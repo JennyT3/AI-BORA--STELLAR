@@ -121,8 +121,21 @@ export default function Register() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="mb-10"
         >
+          <div style={{
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #F25C05 0%, #F22283 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            boxShadow: '0 8px 40px rgba(242, 92, 5, 0.4)'
+          }}>
+            <span style={{ fontSize: 36 }}>🤖</span>
+          </div>
           <span style={{ 
             fontFamily: 'Montserrat, sans-serif',
             fontWeight: 900,
@@ -145,7 +158,7 @@ export default function Register() {
             fontWeight: 900,
             fontSize: 'clamp(2rem, 5vw, 3rem)',
             lineHeight: 1.1,
-            marginBottom: 8
+            marginBottom: 12
           }}
         >
           Create Account
@@ -156,10 +169,11 @@ export default function Register() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           style={{
-            color: 'rgba(255,255,255,0.6)',
+            color: '#A0A0A0',
             fontFamily: 'Montserrat, sans-serif',
-            fontSize: '1rem',
-            marginBottom: 40
+            fontSize: '1.1rem',
+            marginBottom: 40,
+            fontWeight: 500
           }}
         >
           Use your device's biometric - one click, no password
@@ -208,9 +222,14 @@ export default function Register() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-8 text-gray-500 text-base"
+          style={{
+            marginTop: 32,
+            color: '#6B6B6B',
+            fontSize: 14,
+            fontFamily: 'Montserrat, sans-serif'
+          }}
         >
-          🔐 Uses fingerprint or Face ID - no password needed
+          Uses fingerprint or Face ID • No password needed
         </motion.p>
 
         <motion.a

@@ -6,8 +6,8 @@ interface WelcomeHeroProps {
 }
 
 export function WelcomeHero({ 
-  descricao = "Your ecosystem is processing 4.2k requests today. All systems operational.",
-  badgeText = "OVERVIEW SYSTEM",
+  descricao = "Your ecosystem is processing requests. All systems operational.",
+  badgeText = "⚡ LIVE SYSTEM",
   isMobile 
 }: WelcomeHeroProps) {
   return (

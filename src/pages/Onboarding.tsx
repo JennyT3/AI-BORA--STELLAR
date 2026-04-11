@@ -229,38 +229,41 @@ export default function Onboarding() {
         animate={{ opacity: 1, y: 0 }}
         style={{
           padding: '20px 24px',
-          background: 'white',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+          borderBottom: 'none',
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
-          boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
+          gap: 16,
+          boxShadow: '0 4px 30px rgba(0,0,0,0.2)'
         }}
       >
         <div style={{
-          width: 44,
-          height: 44,
-          borderRadius: '50%',
+          width: 56,
+          height: 56,
+          borderRadius: '16px',
           background: `linear-gradient(135deg, ${colors.orange} 0%, ${colors.magenta} 100%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: `0 4px 15px ${colors.orange}40`
+          boxShadow: `0 4px 20px ${colors.orange}60`,
+          fontSize: 28
         }}>
-          <Bot size={22} color="white" />
+          🤖
         </div>
         <div>
-          <div style={{ fontWeight: 800, color: colors.dark, fontSize: 16 }}>
-            AIBORA Agent
+          <div style={{ fontWeight: 900, color: 'white', fontSize: 20, letterSpacing: '-0.5px' }}>
+            AI BORA
           </div>
           <div style={{ fontSize: 12, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 8, height: 8, background: '#10b981', borderRadius: '50%' }}></span>
-            Online
+            <span style={{ width: 8, height: 8, background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' }}></span>
+            <span style={{ color: '#10b981', fontWeight: 600 }}>AI Assistant</span>
           </div>
         </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Sparkles size={16} color={colors.orange} />
-          <span style={{ fontSize: 12, color: colors.gray, fontWeight: 600 }}>AI Powered</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <a href="/" style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, textDecoration: 'none', fontWeight: 500 }}>Exit</a>
+          <div style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12, color: 'white', fontWeight: 600 }}>
+            Stellar Powered
+          </div>
         </div>
       </motion.div>
 

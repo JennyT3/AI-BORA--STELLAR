@@ -170,14 +170,14 @@ export function Admin() {
         <h3 style={{ fontFamily: 'Montserrat', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
           📄 Sample Proposal (with Stellar Hash)
         </h3>
-        <a 
-          href="https://stellar.expert/explorer/testnet/tx/227828308b72a57f6df4ab4346ad7f9811a682bc3eee7cfc30c1011fe89de549"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontSize: 12, color: '#F25C05', textDecoration: 'none', fontWeight: 600 }}
-        >
-          View on Explorer →
-        </a>
+<a 
+           href="https://stellar.expert/explorer/testnet"
+           target="_blank"
+           rel="noopener noreferrer"
+           style={{ fontSize: 12, color: '#F25C05', textDecoration: 'none', fontWeight: 600 }}
+         >
+           View on Stellar Explorer →
+         </a>
       </div>
       <div style={{ 
         background: '#F8F7F4', 
@@ -212,15 +212,23 @@ export function Admin() {
       <h3 style={{ fontFamily: 'Montserrat', fontSize: 14, fontWeight: 700, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
         <Bot size={18} color="#F25C05" /> How AI BORA Works
       </h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
         {[
-          { step: '1', title: 'Create Proposal', desc: 'Admin creates proposal → PDF with Stellar hash' },
-          { step: '2', title: 'Client Accepts', desc: 'Client receivesSecure link → Accepts proposal' },
-          { step: '3', title: 'Tasks Created', desc: 'Services become tasks → Assigned to collaborators' },
-          { step: '4', title: 'AI Agent Pays', desc: 'Agent discovers services → Pays via x402 protocol' },
-          { step: '5', title: '70/30 Split', desc: 'PaymentSplitter contract → Auto distribution' },
+          { step: '1', title: 'Create Proposal', desc: 'Admin creates proposal → PDF with Stellar hash', link: '/admin/orcamento' },
+          { step: '2', title: 'Client Accepts', desc: 'Client receivesSecure link → Accepts proposal', link: '#' },
+          { step: '3', title: 'Tasks Created', desc: 'Services become tasks → Assigned to collaborators', link: '#' },
+          { step: '4', title: 'AI Agent Pays', desc: 'Agent discovers services → Pays via x402 protocol', link: '/agent-x402-demo' },
+          { step: '5', title: '70/30 Split', desc: 'PaymentSplitter contract → Auto distribution', link: '/agent-x402-demo' },
         ].map((item, i) => (
-          <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: 8, padding: 12 }}>
+          <a key={i} href={item.link} style={{ 
+            background: 'rgba(255,255,255,0.05)', 
+            borderRadius: 8, 
+            padding: 12,
+            textDecoration: 'none',
+            color: 'inherit',
+            display: 'block',
+            transition: 'all 0.2s'
+          }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <span style={{ 
                 width: 24, 
@@ -236,7 +244,7 @@ export function Admin() {
               <span style={{ fontSize: 12, fontWeight: 600 }}>{item.title}</span>
             </div>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>{item.desc}</p>
-          </div>
+          </a>
         ))}
       </div>
       <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>

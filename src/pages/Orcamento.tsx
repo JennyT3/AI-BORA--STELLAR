@@ -353,24 +353,32 @@ export function Orcamento() {
   };
 
   const handleCreateProposal = async () => {
-    if (!cliente.nome || totalConDescuento <= 0) {
-      alert("Please enter client name and total amount");
+    if (!cliente.nome) {
+      alert("Please enter client name");
+      return;
+    }
+    if (totalConDescuento <= 0) {
+      alert("Please enter a total amount");
       return;
     }
 
     setStep('generating');
+    console.log('[Proposal] Starting PDF generation...');
     
     try {
+      console.log('[Proposal] Creating PDF...');
       const doc = await criarPDF();
       const blob = doc.output('blob');
       setPdfBlob(blob);
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
+      console.log('[Proposal] PDF created, generating hash...');
 
       const arrayBuffer = await blob.arrayBuffer();
       const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const pdfHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      console.log('[Proposal] Hash:', pdfHash);
 
       const proposalData = {
         cliente: cliente.nome,
@@ -392,39 +400,61 @@ export function Orcamento() {
         status: 'pending'
       };
 
+      console.log('[Proposal] Saving to Firestore...');
       const id = await createProposal(proposalData);
       setProposalId(id);
+      console.log('[Proposal] Proposal ID:', id);
 
       const { getProposal } = await import('../services/firebase');
       const propostaCriada = await getProposal(id);
       const accessToken = propostaCriada?.accessToken || id;
       const link = `${window.location.origin}/proposal/${accessToken}`;
       setProposalLink(link);
+      console.log('[Proposal] Link:', link);
 
       setStep('blockchain');
+      console.log('[Proposal] Storing on blockchain...');
       const uniqueId = `${numeroOrcamentoInput}-${Date.now()}`;
-      const result = await storeProposalOnChain(uniqueId, cliente.email, pdfHash, totalConDescuento, '');
+      
+      const secretKey = localStorage.getItem('aibora_stellar_secret') || import.meta.env.VITE_VENDOR_SECRET || import.meta.env.VENDOR_SECRET || '';
+      console.log('[Proposal] Using secret key:', secretKey ? 'Yes (' + secretKey.slice(0, 8) + '...)' : 'No');
+      
+      let result: any = null;
+      if (secretKey && secretKey.startsWith('SC')) {
+        try {
+          result = await storeProposalOnChain(uniqueId, cliente.email, pdfHash, totalConDescuento, secretKey);
+        } catch (e: any) {
+          console.log('[Proposal] Blockchain error (continuing anyway):', e.message);
+        }
+      } else {
+        console.log('[Proposal] ⚠️ No stellar key - running in DEMO mode');
+        result = { txHash: 'demo-' + Date.now(), explorerUrl: '', status: 'demo' };
+        setTxStatus('demo');
+      }
       
       if (result) {
         setTxHash(result.txHash);
         setExplorerUrl(result.explorerUrl);
         setTxStatus(result.status as any);
+        console.log('[Proposal] Blockchain tx:', result.txHash);
       }
 
       if (cliente.email) {
-        sendPropostaLinkEmail({ 
-          nome: cliente.nome, 
-          email: cliente.email, 
+        console.log('[Proposal] Sending email...');
+        sendPropostaLinkEmail(
+          cliente.email, 
+          cliente.nome, 
           link, 
-          empresa: cliente.empresa 
-        }).catch(() => {});
+          dataValidadeStr
+        ).catch((e) => console.log('[Proposal] Email error:', e));
       }
 
       setStep('success');
+      console.log('[Proposal] Done!');
 
-    } catch (err) {
-      console.error(err);
-      alert("Error: " + err.message);
+    } catch (err: any) {
+      console.error('[Proposal] Error:', err);
+      alert("Error: " + (err?.message || err?.toString() || 'Unknown error'));
       setStep('form');
     }
   };
@@ -436,7 +466,16 @@ export function Orcamento() {
   };
 
   const openExplorer = () => {
-    if (explorerUrl) window.open(explorerUrl, '_blank');
+    if (txHash) {
+      const url = txHash.startsWith('demo') 
+        ? `https://stellar.expert/explorer/testnet`
+        : `https://stellar.expert/explorer/testnet/tx/${txHash}`;
+      window.open(url, '_blank');
+    } else if (explorerUrl) {
+      window.open(explorerUrl, '_blank');
+    } else {
+      window.open('https://stellar.expert/explorer/testnet', '_blank');
+    }
   };
 
   const openPDF = () => {
@@ -1002,7 +1041,7 @@ export function Orcamento() {
 
             <button
               onClick={handleCreateProposal}
-              disabled={step === 'generating' || step === 'blockchain' || !cliente.nome || totalConDescuento <= 0}
+              disabled={step === 'generating' || step === 'blockchain'}
               style={{
                 marginTop: 20,
                 width: '100%',
@@ -1013,22 +1052,36 @@ export function Orcamento() {
                 borderRadius: 16,
                 fontSize: 18,
                 fontWeight: 800,
-                cursor: 'pointer',
+                cursor: step === 'generating' || step === 'blockchain' ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 12,
-                opacity: step === 'generating' || step === 'blockchain' ? 0.7 : (!cliente.nome || totalConDescuento <= 0) ? 0.5 : 1
+                opacity: step === 'generating' || step === 'blockchain' ? 0.7 : 1,
+                boxShadow: '0 4px 20px rgba(242, 92, 5, 0.3)'
               }}
             >
               {step === 'generating' ? (
                 <><Loader2 size={24} className="spin" /> Generating PDF...</>
               ) : step === 'blockchain' ? (
                 <><Loader2 size={24} className="spin" /> Storing on Blockchain...</>
+              ) : step === 'success' ? (
+                <>✓ Proposal Created!</>
               ) : (
                 <>Create Proposal + Store on Blockchain</>
               )}
             </button>
+            
+            {!cliente.nome && (
+              <p style={{ marginTop: 8, color: colors.orange, fontSize: 12, textAlign: 'center' }}>
+                ⚠️ Please enter client name
+              </p>
+            )}
+            {cliente.nome && totalConDescuento <= 0 && (
+              <p style={{ marginTop: 8, color: colors.orange, fontSize: 12, textAlign: 'center' }}>
+                ⚠️ Please enter total amount above
+              </p>
+            )}
           </div>
         </div>
       </main>
