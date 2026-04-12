@@ -25,7 +25,7 @@ export default function Onboarding() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [step, setStep] = useState<'name' | 'role_selection' | 'company_details' | 'client_preference' | 'skills' | 'complete' | 'loading'>('loading');
+  const [step, setStep] = useState<'has_account' | 'name' | 'role_selection' | 'company_details' | 'client_preference' | 'skills' | 'complete'>('has_account');
   const [userData, setUserData] = useState({
     name: '',
     role: '',
@@ -37,46 +37,29 @@ export default function Onboarding() {
   const initialized = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check authentication on mount
-  useEffect(() => {
-    const hasPasskey = localStorage.getItem('aibora_passkey_user');
-    const isAuthenticated = localStorage.getItem('aibora_authenticated');
-    
-    if (!hasPasskey) {
-      // No passkey, redirect to register
-      setLocation('/register');
-      return;
-    }
-    
-    if (isAuthenticated) {
-      // Already completed onboarding, go to admin
-      setLocation('/admin');
-      return;
-    }
-    
-    setStep('name');
-  }, [setLocation]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
 
   useEffect(() => {
-    if (initialized.current || step === 'loading') return;
+    if (initialized.current) return;
     initialized.current = true;
 
     const startConversation = async () => {
-      await addAgentMessage("👋 Hi! I'm your AIBORA onboarding assistant.");
-      await addAgentMessage("Let's get you set up. First, what's your name?", [], true, "Your full name...");
-      setStep('name');
+      await addAgentMessage("👋 Welcome to AI BORA!");
+      await addAgentMessage("Do you already have an account?", [
+        { label: '✅ Yes, I have an account', value: 'has_account' },
+        { label: '❌ No, I\'m new here', value: 'new_user' }
+      ]);
+      setStep('has_account');
     };
 
     startConversation();
   }, []);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const addAgentMessage = (text: string | React.ReactNode, options?: { label: string; value: string; icon?: string }[], showInput?: boolean, placeholder?: string): Promise<void> => {
     return new Promise((resolve) => {
@@ -98,168 +81,121 @@ export default function Onboarding() {
 
   const addUserMessage = (text: string) => {
     setMessages(prev => [...prev, {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       text,
       sender: 'user'
     }]);
   };
 
-  const handleNameSubmit = async () => {
-    if (!inputValue.trim()) return;
-    
-    const name = inputValue.trim();
-    setUserData(prev => ({ ...prev, name }));
-    addUserMessage(name);
-    setInputValue('');
-    
-    await addAgentMessage(`Nice to meet you, ${name}! 😊`);
-    await addAgentMessage("What brings you to AIBORA today?", [
-      { label: "🏢 I want to sell services (I'm a Company)", value: 'company', icon: 'building' },
-      { label: "💼 I want to work on projects (Collaborator)", value: 'worker', icon: 'briefcase' },
-      { label: "🛒 I need services done (Client)", value: 'client', icon: 'shopping' }
-    ]);
-    setStep('role_selection');
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
   };
 
-  const handleRoleSelect = async (role: string, label: string) => {
-    setUserData(prev => ({ ...prev, role }));
+  const handleInputSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+    processInput(inputValue.trim());
+    setInputValue('');
+  };
+
+  const handleOptionClick = (value: string, label: string) => {
     addUserMessage(label);
-    
-    if (role === 'company') {
-      await addAgentMessage("Great! Let's set up your company profile.");
-      await addAgentMessage("What's your company or business name?", [], true, "Company name...");
-      setStep('company_details');
-    } else if (role === 'worker') {
-      await addAgentMessage("Perfect! You're looking to join as a collaborator.");
-      await addAgentMessage("Do you already work with a specific company, or would you like us to match you with available projects?", [
-        { label: "I work with a specific company", value: 'has_company' },
-        { label: "Match me with available projects", value: 'freelancer' }
-      ]);
-      setStep('company_details');
-    } else if (role === 'client') {
-      await addAgentMessage("Awesome! Let's find the right services for you.");
-      await addAgentMessage("Do you already have a preferred company to work with, or would you like us to recommend the best match?", [
-        { label: "I have a specific company in mind", value: 'has_company' },
-        { label: "Help me find the best service provider", value: 'need_recommendation' }
-      ]);
-      setStep('client_preference');
-    }
+    processInput(value);
   };
 
-  const handleCompanyPreference = async (preference: string) => {
-    if (userData.role === 'worker') {
-      if (preference === 'has_company') {
-        setUserData(prev => ({ ...prev, hasCompany: true }));
-        addUserMessage("I work with a specific company");
-        await addAgentMessage("Which company do you work with?", [], true, "Company name...");
-      } else {
-        setUserData(prev => ({ ...prev, hasCompany: false }));
-        addUserMessage("Match me with projects");
-        await addAgentMessage("Great! You'll be able to browse available projects.");
-        await addAgentMessage("What are your main skills or expertise?", [], true, "e.g., Design, Development, Marketing...");
-        setStep('skills');
-        return;
-      }
-    } else if (userData.role === 'client') {
-      if (preference === 'has_company') {
-        setUserData(prev => ({ ...prev, hasCompany: true }));
-        addUserMessage("I have a specific company");
-        await addAgentMessage("What's the company name?", [], true, "Company name...");
-      } else {
-        setUserData(prev => ({ ...prev, hasCompany: false }));
-        addUserMessage("Help me find a provider");
-        await addAgentMessage("Perfect! I'll take you to our services catalog where you can browse and compare providers.");
-        setTimeout(() => completeOnboarding('client'), 1500);
-        return;
-      }
-    }
-    setStep('company_details');
-  };
+  const processInput = async (value: string) => {
+    switch (step) {
+      case 'has_account':
+        if (value === 'has_account') {
+          addUserMessage('Yes, I have an account');
+          await addAgentMessage("Great! Let's verify your identity with your passkey.");
+          // Redirect to register (passkey verification)
+          setTimeout(() => {
+            localStorage.setItem('aibora_onboarding_complete', 'true');
+            setLocation('/register');
+          }, 1000);
+        } else {
+          addUserMessage("No, I'm new here");
+          await addAgentMessage("Welcome! Let's get you set up.");
+          await addAgentMessage("First, what's your name?", [], true, "Your full name...");
+          setStep('name');
+        }
+        break;
 
-  const handleCompanySubmit = async () => {
-    if (!inputValue.trim()) return;
-    
-    const companyName = inputValue.trim();
-    setUserData(prev => ({ ...prev, companyName }));
-    addUserMessage(companyName);
-    setInputValue('');
-    
-    if (userData.role === 'company') {
-      await addAgentMessage(`Excellent! ${companyName} is now registered.`);
-      await addAgentMessage("You can now create proposals and manage clients.");
-      setTimeout(() => completeOnboarding('company'), 1000);
-    } else if (userData.role === 'worker') {
-      await addAgentMessage(`Got it! You're associated with ${companyName}.`);
-      await addAgentMessage("What are your main skills?", [], true, "e.g., React, UI Design, Copywriting...");
-      setStep('skills');
-    } else if (userData.role === 'client') {
-      await addAgentMessage(`Perfect! We'll connect you with ${companyName}.`);
-      setTimeout(() => completeOnboarding('client'), 1000);
-    }
-  };
+      case 'name':
+        setUserData(prev => ({ ...prev, name: value }));
+        addUserMessage(value);
+        await addAgentMessage(`Nice to meet you, ${value}! 👋`);
+        await addAgentMessage(`What type of user are you?`, [
+          { label: '🏢 Company / Business', value: 'company', icon: '🏢' },
+          { label: '👤 Looking for Services', value: 'client', icon: '👤' },
+          { label: '💼 Collaborator / Freelancer', value: 'worker', icon: '💼' }
+        ]);
+        setStep('role_selection');
+        break;
 
-  const handleSkillsSubmit = async () => {
-    if (!inputValue.trim()) return;
-    
-    const skills = inputValue.trim();
-    setUserData(prev => ({ ...prev, skills }));
-    addUserMessage(skills);
-    setInputValue('');
-    
-    await addAgentMessage("Great! Your profile is complete.");
-    await addAgentMessage("You'll receive notifications when projects matching your skills are available.");
-    setTimeout(() => completeOnboarding('worker'), 1000);
+      case 'role_selection':
+        setUserData(prev => ({ ...prev, role: value }));
+        if (value === 'company') {
+          await addAgentMessage("Great! A business account.");
+          await addAgentMessage("What's your company name?", [], true, "Company name...");
+          setStep('company_details');
+        } else if (value === 'client') {
+          await addAgentMessage("Perfect! You're looking for services.");
+          await addAgentMessage("What services are you interested in?", [
+            { label: '📊 Marketing', value: 'marketing', icon: '📊' },
+            { label: '📝 Copywriting', value: 'copywriting', icon: '📝' },
+            { label: '🔧 Development', value: 'development', icon: '🔧' },
+            { label: '📈 All Services', value: 'all', icon: '📈' }
+          ]);
+          setStep('client_preference');
+        } else {
+          await addAgentMessage("Great! You want to collaborate with us.");
+          await addAgentMessage("What are your main skills?", [], true, "e.g., Marketing, Design, Development...");
+          setStep('skills');
+        }
+        break;
+
+      case 'company_details':
+        setUserData(prev => ({ ...prev, companyName: value, hasCompany: true }));
+        addUserMessage(value);
+        await addAgentMessage(`Excellent, ${userData.name}! ${value} sounds like a great company.`);
+        setTimeout(() => completeOnboarding('company'), 1500);
+        break;
+
+      case 'client_preference':
+        addUserMessage(value);
+        await addAgentMessage("Great choice!");
+        setTimeout(() => completeOnboarding('client'), 1000);
+        break;
+
+      case 'skills':
+        setUserData(prev => ({ ...prev, skills: value }));
+        addUserMessage(value);
+        await addAgentMessage("Great! Your profile is complete.");
+        setTimeout(() => completeOnboarding('worker'), 1000);
+        break;
+
+      case 'complete':
+        break;
+    }
   };
 
   const completeOnboarding = (role: string) => {
     setStep('complete');
     
-    localStorage.setItem('aibora_authenticated', 'true');
+    // Save onboarding data
+    localStorage.setItem('aibora_onboarding_complete', 'true');
     localStorage.setItem('aibora_role', role);
     localStorage.setItem('aibora_user_name', userData.name);
     if (userData.companyName) localStorage.setItem('aibora_company_name', userData.companyName);
     if (userData.skills) localStorage.setItem('aibora_skills', userData.skills);
     
+    // Redirect to register to create passkey
     setTimeout(() => {
-      switch (role) {
-        case 'company':
-          setLocation('/admin');
-          break;
-        case 'client':
-          setLocation('/servicos');
-          break;
-        case 'worker':
-          setLocation('/colaborador/demo');
-          break;
-      }
-    }, 800);
+      setLocation('/register');
+    }, 2000);
   };
-
-  // Loading state while checking authentication
-  if (step === 'loading') {
-    return (
-      <div style={{ 
-        minHeight: '100vh', 
-        backgroundColor: '#fcf9f8',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ 
-            width: 48, 
-            height: 48, 
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #ff6f2e',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 16px'
-          }} />
-          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ 
@@ -314,14 +250,13 @@ export default function Onboarding() {
         </div>
       </motion.div>
 
-      {/* Chat Area */}
+      {/* Chat container */}
       <div style={{ 
         flex: 1, 
-        overflow: 'auto',
+        overflow: 'auto', 
         padding: '24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 16,
         maxWidth: 800,
         width: '100%',
         margin: '0 auto'
@@ -338,7 +273,8 @@ export default function Onboarding() {
                 maxWidth: '85%',
                 display: 'flex',
                 gap: 12,
-                flexDirection: message.sender === 'agent' ? 'row' : 'row-reverse'
+                flexDirection: message.sender === 'agent' ? 'row' : 'row-reverse',
+                marginBottom: 16
               }}
             >
               {message.sender === 'agent' && (
@@ -375,113 +311,92 @@ export default function Onboarding() {
                     {message.options.map((option, idx) => (
                       <motion.button
                         key={idx}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          if (step === 'role_selection') handleRoleSelect(option.value, option.label);
-                          else if (step === 'company_details' || step === 'client_preference') handleCompanyPreference(option.value);
-                        }}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        onClick={() => handleOptionClick(option.value, option.label)}
                         style={{
-                          padding: '14px 18px',
-                          background: 'rgba(255,111,46,0.08)',
-                          border: '2px solid rgba(255,111,46,0.2)',
+                          background: 'linear-gradient(135deg, rgba(242, 92, 5, 0.1) 0%, rgba(242, 34, 131, 0.1) 100%)',
+                          border: '2px solid rgba(242, 92, 5, 0.3)',
                           borderRadius: 12,
-                          color: colors.orange,
-                          fontWeight: 700,
-                          fontSize: 14,
+                          padding: '12px 16px',
                           cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'all 0.2s',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 12
+                          gap: 10,
+                          fontSize: 14,
+                          fontWeight: 600,
+                          color: colors.dark,
+                          transition: 'all 0.2s',
+                          width: '100%',
+                          textAlign: 'left'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = colors.orange;
-                          e.currentTarget.style.color = 'white';
-                          e.currentTarget.style.borderColor = colors.orange;
+                          e.currentTarget.style.border = '2px solid rgba(242, 92, 5, 0.6)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(242, 92, 5, 0.2) 0%, rgba(242, 34, 131, 0.2) 100%)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'rgba(255,111,46,0.08)';
-                          e.currentTarget.style.color = colors.orange;
-                          e.currentTarget.style.borderColor = 'rgba(255,111,46,0.2)';
+                          e.currentTarget.style.border = '2px solid rgba(242, 92, 5, 0.3)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(242, 92, 5, 0.1) 0%, rgba(242, 34, 131, 0.1) 100%)';
                         }}
                       >
-                        <span style={{ fontSize: 20 }}>{option.label.split(' ')[0]}</span>
-                        <span>{option.label.split(' ').slice(1).join(' ')}</span>
-                        <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
+                        <span style={{ fontSize: 20 }}>{option.icon}</span>
+                        {option.label}
                       </motion.button>
                     ))}
                   </div>
                 )}
-
+                
                 {message.input && step !== 'complete' && (
-                  <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                    <input
-                      type="text"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          if (step === 'name') handleNameSubmit();
-                          else if (step === 'company_details') handleCompanySubmit();
-                          else if (step === 'skills') handleSkillsSubmit();
-                        }
-                      }}
-                      placeholder={message.inputPlaceholder || "Type here..."}
-                      autoFocus
-                      style={{
-                        flex: 1,
-                        padding: '12px 16px',
-                        border: '2px solid rgba(255,111,46,0.3)',
-                        borderRadius: 12,
-                        fontSize: 14,
-                        fontFamily: 'Montserrat, sans-serif',
-                        outline: 'none',
-                        background: 'rgba(255,255,255,0.5)'
-                      }}
-                    />
-                    <button
-                      onClick={() => {
-                        if (step === 'name') handleNameSubmit();
-                        else if (step === 'company_details') handleCompanySubmit();
-                        else if (step === 'skills') handleSkillsSubmit();
-                      }}
-                      disabled={!inputValue.trim()}
-                      style={{
-                        padding: '12px',
-                        background: colors.orange,
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 12,
-                        cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
-                        opacity: inputValue.trim() ? 1 : 0.5,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <Send size={18} />
-                    </button>
-                  </div>
+                  <form onSubmit={handleInputSubmit} style={{ marginTop: 16 }}>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <input
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        placeholder={message.inputPlaceholder || 'Type your answer...'}
+                        autoFocus
+                        style={{
+                          flex: 1,
+                          padding: '12px 16px',
+                          borderRadius: 12,
+                          border: '2px solid rgba(0,0,0,0.1)',
+                          fontSize: 15,
+                          outline: 'none',
+                          fontFamily: 'Montserrat, sans-serif'
+                        }}
+                      />
+                      <motion.button
+                        type="submit"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                          background: `linear-gradient(135deg, ${colors.orange} 0%, ${colors.magenta} 100%)`,
+                          border: 'none',
+                          borderRadius: 12,
+                          padding: '12px 20px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 15px rgba(242, 92, 5, 0.3)'
+                        }}
+                      >
+                        <Send size={18} color="white" />
+                      </motion.button>
+                    </div>
+                  </form>
                 )}
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
-        {/* Typing Indicator */}
         {isTyping && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{
-              alignSelf: 'flex-start',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              marginLeft: 48
-            }}
+            style={{ display: 'flex', gap: 12, alignSelf: 'flex-start' }}
           >
             <div style={{
               width: 36,
@@ -495,68 +410,78 @@ export default function Onboarding() {
               <Bot size={18} color="white" />
             </div>
             <div style={{
-              padding: '16px 20px',
               background: 'white',
+              padding: '14px 20px',
               borderRadius: '20px 20px 20px 4px',
               boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-              display: 'flex',
-              gap: 4,
-              alignItems: 'center'
+              border: '1px solid rgba(0,0,0,0.04)'
             }}>
-              <span style={{ animation: 'bounce 1s infinite', color: colors.orange, fontSize: 20 }}>.</span>
-              <span style={{ animation: 'bounce 1s infinite 0.2s', color: colors.orange, fontSize: 20 }}>.</span>
-              <span style={{ animation: 'bounce 1s infinite 0.4s', color: colors.orange, fontSize: 20 }}>.</span>
+              <motion.div
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+                style={{ fontSize: 14, color: '#666' }}
+              >
+                Typing...
+              </motion.div>
             </div>
           </motion.div>
         )}
-
+        
         <div ref={messagesEndRef} />
-        <style>{`
-          @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-          }
-        `}</style>
       </div>
 
-      {/* Loading overlay */}
+      {/* Complete state */}
       {step === 'complete' && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(255,255,255,0.95)',
+            background: 'rgba(0,0,0,0.8)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flexDirection: 'column',
-            gap: 20,
             zIndex: 50
           }}
         >
-          <div style={{
-            width: 60,
-            height: 60,
-            border: `4px solid ${colors.orange}`,
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ color: colors.dark, fontWeight: 800, fontSize: 20, marginBottom: 8 }}>
-              Setting up your account...
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={{
+              background: 'white',
+              borderRadius: 24,
+              padding: '48px',
+              textAlign: 'center',
+              maxWidth: 400,
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+            }}
+          >
+            <div style={{ fontSize: 64, marginBottom: 20 }}>🎉</div>
+            <h2 style={{ fontSize: 28, fontWeight: 900, color: colors.dark, margin: '0 0 12px', fontFamily: 'Montserrat, sans-serif' }}>
+              You're all set!
+            </h2>
+            <p style={{ fontSize: 16, color: '#666', marginBottom: 24, fontFamily: 'Montserrat, sans-serif' }}>
+              Now let's create your secure passkey
             </p>
-            <p style={{ color: colors.gray, fontSize: 14 }}>
-              {userData.name} {userData.companyName && `@ ${userData.companyName}`}
-            </p>
-          </div>
-          <style>{`
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          `}</style>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(242, 92, 5, 0.1) 0%, rgba(242, 34, 131, 0.1) 100%)',
+              borderRadius: 12,
+              padding: '16px',
+              marginBottom: 24
+            }}>
+              <p style={{ fontSize: 14, color: '#333', margin: 0, fontFamily: 'Montserrat, sans-serif' }}>
+                <strong>Redirecting to passkey setup...</strong>
+              </p>
+            </div>
+            <motion.div
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              style={{ color: colors.orange }}
+            >
+              ⏳ Please wait...
+            </motion.div>
+          </motion.div>
         </motion.div>
       )}
     </div>

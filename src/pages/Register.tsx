@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { KeyRound, Loader2, ArrowLeft } from 'lucide-react';
 
 export default function Register() {
@@ -15,15 +15,35 @@ export default function Register() {
     const hasPasskey = localStorage.getItem('aibora_passkey_user');
     const isAuthenticated = localStorage.getItem('aibora_authenticated');
     
+    // Already has passkey and authenticated - go to admin
     if (hasPasskey && isAuthenticated) {
-      // Already registered and onboarded, go to admin
       setLocation('/admin');
-    } else if (hasPasskey) {
-      // Registered but not onboarded, go to onboarding
-      setLocation('/onboarding');
-    } else {
-      setChecking(false);
+      return;
     }
+    
+    // Has passkey but not authenticated - check onboarding
+    if (hasPasskey) {
+      const onboardingComplete = localStorage.getItem('aibora_onboarding_complete');
+      if (onboardingComplete) {
+        // They have passkey and completed onboarding, just need to authenticate
+        setChecking(false);
+      } else {
+        // Has passkey but no onboarding - go to onboarding
+        setLocation('/onboarding');
+        return;
+      }
+    }
+    
+    // No passkey - check if they completed onboarding first
+    const onboardingComplete = localStorage.getItem('aibora_onboarding_complete');
+    if (!onboardingComplete) {
+      // No onboarding done - go to onboarding first
+      setLocation('/onboarding');
+      return;
+    }
+    
+    // Completed onboarding, no passkey - show register
+    setChecking(false);
   }, [setLocation]);
 
   if (checking) {
@@ -79,8 +99,9 @@ export default function Register() {
         if (credential) {
           localStorage.setItem('aibora_passkey_user', 'true');
           localStorage.setItem('aibora_passkey_id', userIdHex);
+          localStorage.setItem('aibora_authenticated', 'true');
           setCreated(true);
-          setTimeout(() => setLocation('/onboarding'), 1500);
+          setTimeout(() => setLocation('/admin'), 1500);
         }
       } else {
         const credential = await navigator.credentials.get({
@@ -94,8 +115,9 @@ export default function Register() {
 
         if (credential) {
           localStorage.setItem('aibora_passkey_user', 'true');
+          localStorage.setItem('aibora_authenticated', 'true');
           setCreated(true);
-          setTimeout(() => setLocation('/onboarding'), 1500);
+          setTimeout(() => setLocation('/admin'), 1500);
         }
       }
     } catch (err: any) {
@@ -130,11 +152,14 @@ export default function Register() {
           <h2 className="text-4xl font-black text-white mb-3" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             Welcome to <span style={{ color: '#F25C05' }}>AI BORA</span>!
           </h2>
-          <p className="text-gray-400 text-lg">Redirecting...</p>
+          <p className="text-gray-400 text-lg">Redirecting to dashboard...</p>
         </motion.div>
       </div>
     );
   }
+
+  // Get user name from onboarding
+  const userName = localStorage.getItem('aibora_user_name') || 'there';
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -160,7 +185,7 @@ export default function Register() {
             margin: '0 auto 24px',
             boxShadow: '0 8px 40px rgba(242, 92, 5, 0.4)'
           }}>
-            <span style={{ fontSize: 36 }}>🤖</span>
+            <span style={{ fontSize: 36 }}>🔐</span>
           </div>
           <span style={{ 
             fontFamily: 'Montserrat, sans-serif',
@@ -187,7 +212,7 @@ export default function Register() {
             marginBottom: 12
           }}
         >
-          Create Account
+          Welcome, {userName}!
         </motion.h1>
 
         <motion.p
@@ -202,8 +227,22 @@ export default function Register() {
             fontWeight: 500
           }}
         >
-          Use your device's biometric - one click, no password
+          Create your secure passkey<br/>
+          <span className="text-orange-400">No password needed</span>
         </motion.p>
+
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="mb-6"
+          >
+            <div className="p-4 bg-red-500/20 border-2 border-red-500 rounded-xl text-red-400 text-sm flex items-start gap-3">
+              <span>⚠️</span>
+              <span>{error}</span>
+            </div>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -217,11 +256,16 @@ export default function Register() {
             className="w-full py-6 px-8 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-2xl flex items-center justify-center gap-4 hover:opacity-90 transition-all transform hover:scale-[1.02] shadow-lg shadow-orange-500/30 disabled:opacity-50"
           >
             {loading ? (
-              <Loader2 className="w-7 h-7 animate-spin" />
+              <>
+                <Loader2 className="w-7 h-7 animate-spin" />
+                <span className="text-xl">Creating passkey...</span>
+              </>
             ) : (
-              <KeyRound className="w-7 h-7" />
+              <>
+                <KeyRound className="w-7 h-7" />
+                <span className="text-xl">🔐 Create Passkey</span>
+              </>
             )}
-            <span className="text-xl">🔐 Create Account with Passkey</span>
           </button>
 
           <button
@@ -234,16 +278,6 @@ export default function Register() {
           </button>
         </motion.div>
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-xl text-red-400 text-base"
-          >
-            {error}
-          </motion.div>
-        )}
-
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -255,18 +289,18 @@ export default function Register() {
             fontFamily: 'Montserrat, sans-serif'
           }}
         >
-          Uses fingerprint or Face ID • No password needed
+          Uses Face ID, Touch ID, or Windows Hello
         </motion.p>
 
         <motion.a
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          href="/"
+          href="/onboarding"
           className="mt-6 inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-base"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          Back to onboarding
         </motion.a>
       </motion.div>
     </div>
