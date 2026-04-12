@@ -25,7 +25,7 @@ export default function Onboarding() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [step, setStep] = useState<'name' | 'role_selection' | 'company_details' | 'client_preference' | 'skills' | 'complete'>('name');
+  const [step, setStep] = useState<'name' | 'role_selection' | 'company_details' | 'client_preference' | 'skills' | 'complete' | 'loading'>('loading');
   const [userData, setUserData] = useState({
     name: '',
     role: '',
@@ -37,6 +37,26 @@ export default function Onboarding() {
   const initialized = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Check authentication on mount
+  useEffect(() => {
+    const hasPasskey = localStorage.getItem('aibora_passkey_user');
+    const isAuthenticated = localStorage.getItem('aibora_authenticated');
+    
+    if (!hasPasskey) {
+      // No passkey, redirect to register
+      setLocation('/register');
+      return;
+    }
+    
+    if (isAuthenticated) {
+      // Already completed onboarding, go to admin
+      setLocation('/admin');
+      return;
+    }
+    
+    setStep('name');
+  }, [setLocation]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -46,7 +66,7 @@ export default function Onboarding() {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    if (initialized.current) return;
+    if (initialized.current || step === 'loading') return;
     initialized.current = true;
 
     const startConversation = async () => {
@@ -214,6 +234,32 @@ export default function Onboarding() {
       }
     }, 800);
   };
+
+  // Loading state while checking authentication
+  if (step === 'loading') {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        backgroundColor: '#fcf9f8',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            width: 48, 
+            height: 48, 
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #ff6f2e',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ color: '#666', fontFamily: 'Montserrat, sans-serif' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 

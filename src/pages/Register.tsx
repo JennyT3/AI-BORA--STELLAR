@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'motion/react';
 import { KeyRound, Loader2, ArrowLeft } from 'lucide-react';
@@ -8,6 +8,31 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [created, setCreated] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  // Check if already authenticated
+  useEffect(() => {
+    const hasPasskey = localStorage.getItem('aibora_passkey_user');
+    const isAuthenticated = localStorage.getItem('aibora_authenticated');
+    
+    if (hasPasskey && isAuthenticated) {
+      // Already registered and onboarded, go to admin
+      setLocation('/admin');
+    } else if (hasPasskey) {
+      // Registered but not onboarded, go to onboarding
+      setLocation('/onboarding');
+    } else {
+      setChecking(false);
+    }
+  }, [setLocation]);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+      </div>
+    );
+  }
 
   const handlePasskey = async (isSignup: boolean) => {
     if (!window.PublicKeyCredential) {
