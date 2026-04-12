@@ -122,40 +122,45 @@ export async function storeProposalOnChain(
   amount: number,
   secretKey: string
 ): Promise<InvokeContractResult | null> {
-  const adminKey = secretKey || import.meta.env.VITE_STELLAR_ADMIN_SECRET;
+  console.log('=== storeProposalOnChain ===');
+  
+  // Use passed key or get from env
+  const adminKey = secretKey || import.meta.env.VITE_VENDOR_SECRET;
+  
+  console.log('  Secret key:', adminKey ? `${adminKey.slice(0, 4)}...${adminKey.slice(-4)}` : 'NOT FOUND');
+  console.log('  Proposal ID:', proposalId);
+  console.log('  Client:', clientEmail);
+  console.log('  Amount:', amount, 'USDC');
+
   if (!adminKey) {
-      console.error('❌ No STELLAR_ADMIN_SECRET found in env or localStorage');
-      throw new Error('No admin secret key configured');
+    console.error('❌ No VITE_VENDOR_SECRET in .env');
+    throw new Error('Add VITE_VENDOR_SECRET to .env file');
   }
 
-  console.log('Preparing store_proposal args...');
-  console.log('  proposalId:', proposalId);
-  console.log('  clientEmail:', clientEmail);
-  console.log('  pdfHash (hex):', pdfHash);
-  console.log('  amount:', amount);
+  if (!adminKey.startsWith('S')) {
+    console.error('❌ Invalid key format');
+    throw new Error('Secret key must start with S');
+  }
 
-  // Convertir el hash hexadecimal a bytes
+  // Convert hash to bytes
   const pdfHashBytes = hexToBytes(pdfHash);
-  console.log('  pdfHash (bytes):', new TextEncoder().encode(pdfHashBytes.toString()).toString());
 
   const args = [
-    // id: String (proposal_id)
     StellarSdk.nativeToScVal(proposalId, { type: 'string' }),
-    // client_email: String
     StellarSdk.nativeToScVal(clientEmail, { type: 'string' }),
-    // pdf_hash: Bytes
     StellarSdk.nativeToScVal(pdfHashBytes, { type: 'bytes' }),
-    // amount: i128 (BigInt)
-    StellarSdk.nativeToScVal(BigInt(Math.round(amount)), { type: 'i128' }),
+    StellarSdk.nativeToScVal(BigInt(Math.round(amount * 1000000)), { type: 'i128' }), // USDC has 6 decimals
   ];
 
-  console.log('Arguments prepared successfully');
+  console.log('  Calling contract store_proposal...');
 
   try {
-    return await invokeContract('store_proposal', args, adminKey);
+    const result = await invokeContract('store_proposal', args, adminKey);
+    console.log('✅ Contract result:', result);
+    return result;
   } catch (err: any) {
-    console.error('❌ storeProposalOnChain top-level error:', err.message || err);
-    return null;
+    console.error('❌ Contract error:', err.message);
+    throw err;
   }
 }
 

@@ -53,6 +53,14 @@ export function Orcamento() {
   const [explorerUrl, setExplorerUrl] = useState<string>("");
   const [txStatus, setTxStatus] = useState<'confirmed' | 'pending' | 'demo'>('pending');
   const [copied, setCopied] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const dataCriacao = new Date();
@@ -241,7 +249,7 @@ export function Orcamento() {
       if (marca.servicos.length > 0) {
         autoTable(doc, { 
           startY: y, 
-          head: [["#", "Services included", subtotalMarca.toFixed(2) + " € ex VAT"]], 
+          head: [["#", "Services included", subtotalMarca.toFixed(2) + " USDC ex VAT"]], 
           body: marca.servicos.map((s, i) => [(i + 1).toString(), s, ""]), 
           theme: "plain", 
           headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 7.5, fontStyle: "bold", cellPadding: 3 }, 
@@ -282,7 +290,7 @@ export function Orcamento() {
     doc.text("MONTHLY TOTAL (incl. 23% VAT)", 158, y + 7, { align: "center" });
     doc.setFontSize(17); 
     doc.setFont("helvetica", "bold"); 
-    doc.text(totalConDescuento.toFixed(2) + " €", 194, y + 18, { align: "right" });
+    doc.text(totalConDescuento.toFixed(2) + " USDC", 194, y + 18, { align: "right" });
 
     let ty = y + 4;
     const linhaFin = (label: string, valor: string, bold: boolean, cor: [number, number, number]) => { 
@@ -297,10 +305,10 @@ export function Orcamento() {
       ty += 7; 
     };
     
-    linhaFin("Subtotal (ex VAT):", subtotalComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
-    if (descuentoAplicado > 0) linhaFin("Discount:", "- " + descuentoAplicado.toFixed(2) + " €", false, [242, 92, 5]);
-    linhaFin("VAT (23%):", ivaComDesconto.toFixed(2) + " €", false, [80, 80, 80]);
-    linhaFin("TOTAL DUE:", totalConDescuento.toFixed(2) + " €", true, [242, 92, 5]);
+    linhaFin("Subtotal (ex VAT):", subtotalComDesconto.toFixed(2) + " USDC", false, [80, 80, 80]);
+    if (descuentoAplicado > 0) linhaFin("Discount:", "- " + descuentoAplicado.toFixed(2) + " USDC", false, [242, 92, 5]);
+    linhaFin("VAT (23%):", ivaComDesconto.toFixed(2) + " USDC", false, [80, 80, 80]);
+    linhaFin("TOTAL DUE:", totalConDescuento.toFixed(2) + " USDC", true, [242, 92, 5]);
 
     ty += 6;
     if (ty > 238) { doc.addPage(); ty = 18; }
@@ -416,27 +424,41 @@ export function Orcamento() {
       console.log('[Proposal] Storing on blockchain...');
       const uniqueId = `${numeroOrcamentoInput}-${Date.now()}`;
       
-      const secretKey = localStorage.getItem('aibora_stellar_secret') || import.meta.env.VITE_VENDOR_SECRET || import.meta.env.VENDOR_SECRET || '';
-      console.log('[Proposal] Using secret key:', secretKey ? 'Yes (' + secretKey.slice(0, 8) + '...)' : 'No');
+      // Get secret key - VITE_ prefix required for Vite to expose it
+      const secretKey = localStorage.getItem('aibora_stellar_secret') || 
+                         import.meta.env.VITE_VENDOR_SECRET || '';
+      
+      console.log('[Proposal] ENV VITE_VENDOR_SECRET:', import.meta.env.VITE_VENDOR_SECRET ? 'SET' : 'NOT SET');
+      console.log('[Proposal] Secret key:', secretKey ? `FOUND (${secretKey.slice(0, 4)}...${secretKey.slice(-4)})` : 'NOT FOUND');
+      console.log('[Proposal] PDF Hash:', pdfHash.slice(0, 20) + '...');
+      console.log('[Proposal] Amount:', totalConDescuento, 'USDC');
       
       let result: any = null;
-      if (secretKey && secretKey.startsWith('SC')) {
+      if (secretKey && secretKey.startsWith('S')) {
         try {
+          console.log('[Proposal] Calling storeProposalOnChain...');
           result = await storeProposalOnChain(uniqueId, cliente.email, pdfHash, totalConDescuento, secretKey);
+          console.log('[Proposal] Result:', result);
         } catch (e: any) {
-          console.log('[Proposal] Blockchain error (continuing anyway):', e.message);
+          console.error('[Proposal] Blockchain ERROR:', e.message);
+          console.error('[Proposal] Full error:', e);
+          setTxStatus('error');
         }
       } else {
-        console.log('[Proposal] ⚠️ No stellar key - running in DEMO mode');
-        result = { txHash: 'demo-' + Date.now(), explorerUrl: '', status: 'demo' };
+        console.warn('[Proposal] ⚠️ No secret key - DEMO mode');
+        result = { txHash: 'demo-' + Date.now(), explorerUrl: '', success: false };
         setTxStatus('demo');
       }
       
-      if (result) {
+      if (result && result.txHash && result.txHash !== 'error') {
         setTxHash(result.txHash);
-        setExplorerUrl(result.explorerUrl);
-        setTxStatus(result.status as any);
-        console.log('[Proposal] Blockchain tx:', result.txHash);
+        setExplorerUrl(result.explorerUrl || `https://stellar.expert/explorer/testnet/tx/${result.txHash}`);
+        setTxStatus(result.success !== false ? 'confirmed' : 'pending');
+        console.log('[Proposal] ✅ Hash:', result.txHash);
+      } else {
+        console.warn('[Proposal] No real hash, using demo');
+        setTxStatus('demo');
+        setTxHash('demo-' + Date.now());
       }
 
       if (cliente.email) {
@@ -719,19 +741,28 @@ export function Orcamento() {
           clienteCount={0}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          isMobile={isMobile}
+          onCloseMobile={() => setSidebarCollapsed(true)}
         />
       )}
       
-      <main style={{ flex: 1, padding: '40px', marginLeft: isAdminMode ? (sidebarCollapsed ? 80 : 280) : 0, overflow: 'auto' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: colors.dark, marginBottom: 8 }}>
+      <main style={{ 
+        flex: 1, 
+        padding: isMobile ? '16px' : '40px', 
+        marginLeft: isAdminMode ? (sidebarCollapsed ? (isMobile ? 0 : 80) : (isMobile ? 0 : 280)) : 0, 
+        overflow: 'auto',
+        width: '100%',
+        transition: 'margin-left 0.3s ease'
+      }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
+          <h1 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 900, color: colors.dark, marginBottom: 8 }}>
             New Quote / Proposal
           </h1>
-          <p style={{ color: '#666', marginBottom: 32 }}>
+          <p style={{ color: '#666', marginBottom: isMobile ? 16 : 32, fontSize: isMobile ? 14 : 16 }}>
             Create professional proposal with Stellar verification
           </p>
 
-          <div style={{ display: 'grid', gap: 20, background: 'white', padding: 32, borderRadius: 20, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'grid', gap: isMobile ? 12 : 20, background: 'white', padding: isMobile ? 16 : 32, borderRadius: isMobile ? 12 : 20, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             
             <div>
               <label style={{ fontSize: 14, fontWeight: 700, color: colors.dark, marginBottom: 8, display: 'block' }}>
@@ -959,7 +990,7 @@ export function Orcamento() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16, marginTop: 20 }}>
               <div>
                 <label style={{ fontSize: 14, fontWeight: 700, color: colors.dark, marginBottom: 8, display: 'block' }}>
-                  Total Amount (XLM - Stellar)
+                  Total Amount (USDC)
                 </label>
                 <input
                   type="number"
@@ -995,7 +1026,7 @@ export function Orcamento() {
               </div>
               <div>
                 <label style={{ fontSize: 14, fontWeight: 700, color: colors.dark, marginBottom: 8, display: 'block' }}>
-                  Discount €
+                  Discount USDC
                 </label>
                 <input
                   type="number"
@@ -1021,21 +1052,21 @@ export function Orcamento() {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontWeight: 600 }}>Subtotal:</span>
-                <span>{subtotalComDesconto.toFixed(2)} €</span>
+                <span>{subtotalComDesconto.toFixed(2)} USDC</span>
               </div>
               {descuentoAplicado > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, color: colors.orange }}>
                   <span style={{ fontWeight: 600 }}>Discount:</span>
-                  <span>-{descuentoAplicado.toFixed(2)} €</span>
+                  <span>-{descuentoAplicado.toFixed(2)} USDC</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontWeight: 600 }}>VAT (23%):</span>
-                <span>{ivaComDesconto.toFixed(2)} €</span>
+                <span>{ivaComDesconto.toFixed(2)} USDC</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, fontWeight: 800, color: colors.orange, marginTop: 12, paddingTop: 12, borderTop: '2px solid rgba(255,111,46,0.3)' }}>
                 <span>TOTAL:</span>
-                <span>{totalConDescuento.toFixed(2)} €</span>
+                <span>{totalConDescuento.toFixed(2)} USDC</span>
               </div>
             </div>
 
