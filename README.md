@@ -8,61 +8,451 @@
 
 ---
 
-## 🎯 Hackathon Criteria (x402 + MPP + Soroban)
+## ⚠️ IMPORTANTE: Tres Modos de Pago Independientes
 
-### ✅ Soroban Smart Contracts
-- **ProposalRegistry** (`CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5`)
-  - Store proposal PDF hashes on-chain (SHA-256)
-  - Track status: pending → accepted → paid
-  - Verify document integrity
-  - **Connected to /admin/orcamento and QuickProposalForm**
-  - Deployed and verified on Stellar Expert (14+ invocations)
-  
-- **PaymentSplitter** (`CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P`)
-  - Automatic 70/30 distribution
-  - Admin receives 70%, collaborator receives 30%
-  - Called automatically after each payment
-  - **Connected to /pagamento page**
-  - Deployed and verified on Stellar Expert
-  
-- **AgentRegistry** (`CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M`)
-  - Register AI agents and their service rates
-  - Track total earned per agent
-  - Enable inter-contract interoperability
-  - Deployed and verified on Stellar Expert
+**Cada transacción usa UNO y solo UNO de estos modos. No son etapas de un flujo combinado.**
 
-### ✅ x402 Autonomous Agent Payments
-- **server-x402.ts**: Paid AI endpoints (402 Payment Required)
-- **agent-x402-v2.ts**: Autonomous agent that:
-  1. Reads 402 header dynamically
-  2. Decides if price is acceptable
-  3. Pays automatically via x402
-  4. Calls `execute_split` on PaymentSplitter contract
-  5. Distributes profits 70/30
+| Modo | Usuario | Interfaz | Protocolo | Negociación |
+|------|---------|----------|-------------|-------------|
+| **UI Tradicional** | Humano | Web (`/pagamento`) | USDC directo | Manual (acepta propuesta) |
+| **x402** | Agente IA | API | x402 protocol | Automática (threshold configurable) |
+| **MPP** | Agente IA | API | Stellar SAC | Ninguna (precio fijo) |
 
-### ✅ MPP (Machine Payments Protocol)
-- **server-mpp.ts**: SAC transfer endpoint
-- Direct on-chain settlement
-- Lower fees than x402
-- Compatible with standard Stellar wallets
+---
 
-### ✅ Frontend Integration
-- **/admin/orcamento**: Generates proposal PDF → calculates SHA-256 → stores on ProposalRegistry contract
-- **/admin QuickProposalForm**: Same flow for quick proposals
-- **/pagamento**: Pays USDC → triggers PaymentSplitter.execute_split() → 70/30 distribution
-- **All hashes visible on Stellar Expert**
+## 🤔 ¿Qué Modo Usar?
 
-### ✅ Interoperability
-- Multiple contracts communicate
-- AgentRegistry tracks payments from PaymentSplitter
-- ProposalRegistry updates status from frontend
-- Full end-to-end transparency
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ¿QUIÉN INICIA EL PAGO?                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│   ┌─────────────────┐                                           │
+│   │   ¿Es humano?   │                                           │
+│   └────────┬────────┘                                           │
+│            │                                                     │
+│     ┌──────┴──────┐                                              │
+│     │             │                                              │
+│    SÍ           NO                                               │
+│     │             │                                              │
+│     ▼             ▼                                              │
+│  ┌──────────┐  ┌─────────────────┐                              │
+│  │  Modo UI │  │ ¿Tiene soporte  │                              │
+│  │Tradicional│  │    x402?        │                              │
+│  └──────────┘  └────────┬────────┘                              │
+│                         │                                        │
+│                  ┌──────┴──────┐                                 │
+│                  │             │                                 │
+│                 SÍ           NO                                  │
+│                  │             │                                 │
+│                  ▼             ▼                                 │
+│            ┌─────────┐   ┌─────────┐                            │
+│            │  Modo   │   │  Modo   │                            │
+│            │  x402   │   │   MPP   │                            │
+│            └─────────┘   └─────────┘                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### ✅ Documentation & Git History
-- Comprehensive README
-- Clear commit history: `feat:`, `fix:`, `chore:`
-- Rust workspace configured for GitHub detection
-- Unit tests in all contracts
+---
+
+## 🏗️ Arquitectura: Tres Flujos Separados
+
+### Diagrama A: Flujo Cliente Humano (UI Tradicional)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUJO A: CLIENTE HUMANO                                   │
+│                    Interfaz Web + Pago Manual                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │   ADMIN     │    │   CLIENTE   │    │  COLABORADOR │    │  STELLAR    │  │
+│  │  (Humano)   │    │  (Humano)   │    │  (Humano)    │    │  Blockchain │  │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘    └──────┬──────┘  │
+│         │                  │                  │                  │         │
+│         │                  │                  │                  │         │
+│         ▼                  │                  │                  │         │
+│  ┌─────────────┐           │                  │                  │         │
+│  │ /admin/     │           │                  │                  │         │
+│  │ orcamento   │           │                  │                  │         │
+│  │             │           │                  │                  │         │
+│  │ 1. Crea     │           │                  │                  │         │
+│  │    propuesta│           │                  │                  │         │
+│  │ 2. Genera   │           │                  │                  │         │
+│  │    PDF      │           │                  │                  │         │
+│  │ 3. Calcula  │           │                  │                  │         │
+│  │    SHA-256  │           │                  │                  │         │
+│  └──────┬──────┘           │                  │                  │         │
+│         │                  │                  │                  │         │
+│         │    ┌─────────────┴─────────────┐    │                  │         │
+│         │    │                           │    │                  │         │
+│         └───►│  ProposalRegistry         │◄───┤                  │         │
+│              │  .store_proposal()        │    │                  │         │
+│              │                           │    │                  │         │
+│              │  TX Hash → Stellar        │────┼──────────────────►│         │
+│              └───────────────────────────┘    │                  │         │
+│                                              │                  │         │
+│         Link ──────────────────────────────►│                  │         │
+│                                              │                  │         │
+│                                     ┌────────┴────────┐        │         │
+│                                     │ /proposal/:id    │        │         │
+│                                     │                  │        │         │
+│                                     │ 2. Cliente      │        │         │
+│                                     │    acepta       │        │         │
+│                                     └────────┬────────┘        │         │
+│                                              │                  │         │
+│                                     ┌────────┴────────┐        │         │
+│                                     │ Tareas asignadas │        │         │
+│                                     │ al colaborador   │        │         │
+│                                     └────────┬────────┘        │         │
+│                                              │                  │         │
+│                                     ┌────────┴────────┐        │         │
+│                                     │ /colaborador/:id │        │         │
+│                                     │                  │        │         │
+│                                     │ 3. Completa      │        │         │
+│                                     │    tareas        │        │         │
+│                                     └────────┬────────┘        │         │
+│                                              │                  │         │
+│                                     ┌────────┴────────┐        │         │
+│                                     │ Admin aprueba    │        │         │
+│                                     └────────┬────────┘        │         │
+│                                              │                  │         │
+│                                     ┌────────┴────────┐        │         │
+│                                     │ /pagamento/:id  │        │         │
+│                                     │                  │        │         │
+│                                     │ 4. Cliente paga  │        │         │
+│                                     │    USDC          │        │         │
+│                                     └────────┬────────┘        │         │
+│                                              │                  │         │
+│                                              │                  │         │
+│                                     ┌────────┴───────────────────────┐    │
+│                                     │    PaymentSplitter             │    │
+│                                     │    .execute_split()            │    │
+│                                     │                                │    │
+│                                     │    ┌──────────┐  ┌──────────┐  │    │
+│                                     │    │  70%     │  │   30%    │  │    │
+│                                     │    │ Vendedor │  │ Colabor  │  │    │
+│                                     │    └──────────┘  └──────────┘  │    │
+│                                     └────────────────────────────────┘    │
+│                                              │                  │         │
+│                                              └─────────────────►│         │
+│                                                                 │         │
+│                                     TX Hash visible en:          │         │
+│                                     stellar.expert/explorer      │         │
+│                                                                 │         │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Endpoints usados:**
+- `/admin/orcamento` - Crear propuesta
+- `/proposal/:id` - Cliente acepta
+- `/colaborador/:id` - Colaborador completa
+- `/pagamento/:id` - Cliente paga USDC
+
+---
+
+### Diagrama B: Flujo Agente IA (x402 Protocol)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUJO B: AGENTE IA x402                                   │
+│                    HTTP 402 Payment Required                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐                         ┌─────────────────┐           │
+│  │   AI AGENT      │                         │  X402 SERVER    │           │
+│  │  (Autónomo)     │                         │  (Port 3002)    │           │
+│  └────────┬────────┘                         └────────┬────────┘           │
+│           │                                           │                    │
+│           │  1. GET /api/ai/marketing-plan             │                    │
+│           │────────────────────────────────────────────►│                    │
+│           │                                           │                    │
+│           │  2. 402 Payment Required                  │                    │
+│           │    Header: PAYMENT-REQUIRED: base64(...)    │                    │
+│           │    Body: { accepts: [{ amount: "100000",  │                    │
+│           │                         asset: "native",    │                    │
+│           │                         payTo: "GDQX..." }] }│                    │
+│           │◄────────────────────────────────────────────│                    │
+│           │                                           │                    │
+│           │  ┌───────────────────────────────────┐     │                    │
+│           │  │ 3. ¿Precio < threshold?           │     │                    │
+│           │  │    threshold = MAX_PRICES[service]│     │                    │
+│           │  │    (0.05 USDC para marketing-plan) │     │                    │
+│           │  └──────────────┬────────────────────┘     │                    │
+│           │                 │                          │                    │
+│           │         ┌───────┴───────┐                  │                    │
+│           │         │               │                  │                    │
+│           │        SÍ             NO                   │                    │
+│           │         │               │                  │                    │
+│           │         ▼               ▼                  │                    │
+│           │   [CONTINUAR]    [RECHAZAR]               │                    │
+│           │         │                                │                    │
+│           │         │  4. Firma transacción Stellar   │                    │
+│           │         │     clave: CLIENT_SECRET        │                    │
+│           │         │                                │                    │
+│           │         │  5. GET /api/ai/marketing-plan  │                    │
+│           │         │     Header: X-Payment-Signature│                    │
+│           │         ──────────────────────────────────►                    │
+│           │         │                                │                    │
+│           │         │  6. 200 OK + contenido         │                    │
+│           │         │    { data: { title, sections }}│                    │
+│           │         │◄────────────────────────────────│                    │
+│           │         │                                │                    │
+│           │         │  7. Opcional: Llamar split     │                    │
+│           │         │     PaymentSplitter.execute_split()                  │
+│           │         │                                │                    │
+│           │         └────────────────────────────────┼────────────────────►│
+│           │                                          │                    │
+│           │                                   ┌──────┴──────┐              │
+│           │                                   │ STELLAR     │              │
+│           │                                   │ BLOCKCHAIN  │              │
+│           │                                   │             │              │
+│           │                                   │ TX Visible: │              │
+│           │                                   │ stellar.expert              │
+│           │                                   └─────────────┘              │
+│           │                                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Componentes:**
+- `agent-x402-v2.ts` - Agente autónomo que descubre y paga servicios
+- `server-x402.ts` - Servidor que retorna 402 y entrega contenido tras pago
+
+**Endpoints usados:**
+- `GET /api/ai/marketing-plan` - Retorna 402 si no hay pago
+- `GET /api/ai/sales-script` - Retorna 402 si no hay pago
+- `GET /api/ai/contract-draft` - Retorna 402 si no hay pago
+
+**Ejecutar:**
+```bash
+# Terminal 1: Servidor x402
+npx tsx server-x402.ts
+
+# Terminal 2: Agente autónomo
+npx tsx agent-x402-v2.ts
+```
+
+---
+
+### Diagrama C: Flujo Agente IA (MPP - Machine Payments Protocol)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUJO C: AGENTE IA MPP                                    │
+│                    Direct SAC Transfer                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐                         ┌─────────────────┐           │
+│  │   AI AGENT      │                         │  MPP SERVER     │           │
+│  │  (Autónomo)     │                         │  (Port 3003)    │           │
+│  └────────┬────────┘                         └────────┬────────┘           │
+│           │                                           │                    │
+│           │  1. GET /mpp/services                     │                    │
+│           │────────────────────────────────────────────►                    │
+│           │                                           │                    │
+│           │  2. Lista de servicios:                    │                    │
+│           │    [                                       │                    │
+│           │      { id: "marketing-plan",              │                    │
+│           │        price: "0.01 USDC",                │                    │
+│           │        sacMemo: "ai:marketing-plan" },    │                    │
+│           │      { id: "sales-script",                │                    │
+│           │        price: "0.005 USDC",               │                    │
+│           │        sacMemo: "ai:sales-script" },       │                    │
+│           │      ...                                   │                    │
+│           │    ]                                       │                    │
+│           │◄────────────────────────────────────────────│                    │
+│           │                                           │                    │
+│           │  3. Agente construye transacción:          │                    │
+│           │     - destination: ADMIN_PUBLIC           │                    │
+│           │     - amount: 0.01 USDC                    │                    │
+│           │     - memo: "ai:marketing-plan"            │                    │
+│           │                                           │                    │
+│           │  4. Envía transacción a Stellar Network     │                    │
+│           │     ────────────────────────────────────────────────────────►   │
+│           │                                           │                    │
+│           │                              ┌────────────┴────────────┐       │
+│           │                              │ STELLAR BLOCKCHAIN       │       │
+│           │                              │                          │       │
+│           │                              │ 5. MPP Server detecta    │       │
+│           │                              │    transacción por memo   │       │
+│           │                              │    "ai:marketing-plan"    │       │
+│           │                              │                          │       │
+│           │                              │ 6. Procesa y entrega     │       │
+│           │                              │    contenido             │       │
+│           │                              └────────────┬────────────┘       │
+│           │                                           │                    │
+│           │  7. Contenido entregado                    │                    │
+│           │◄────────────────────────────────────────────│                    │
+│           │                                           │                    │
+│           │  8. PaymentSplitter ejecuta automáticamente│                    │
+│           │     ──────────────────────────────────────┼───────────────────►│
+│           │                                           │                    │
+│           │                              ┌────────────┴────────────┐       │
+│           │                              │ PaymentSplitter          │       │
+│           │                              │ .execute_split()         │       │
+│           │                              │                          │       │
+│           │                              │  70% → Vendedor          │       │
+│           │                              │  30% → Colaborador       │       │
+│           │                              └──────────────────────────┘       │
+│           │                                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Componentes:**
+- `server-mpp.ts` - Servidor que acepta SAC transfers
+- Cualquier wallet Stellar puede pagar directamente
+
+**Endpoints usados:**
+- `GET /mpp/services` - Lista servicios y precios
+- `POST /mpp/pay` - Recibe transacción firmada
+
+**Ejecutar:**
+```bash
+# Terminal: Servidor MPP
+npx tsx server-mpp.ts
+```
+
+---
+
+## 📊 Comparación de Protocolos
+
+| Característica | UI Tradicional | x402 Protocol | MPP Protocol |
+|---------------|----------------|---------------|---------------|
+| **Usuario** | Humano con navegador | Agente IA autónomo | Agente IA o wallet |
+| **Interfaz** | Web (`/pagamento`) | API REST | API REST / Wallet |
+| **Protocolo** | USDC directo | HTTP 402 | Stellar SAC |
+| **Negociación** | Manual (acepta propuesta) | Automática (threshold) | Sin negociación |
+| **Facilitador** | No requiere | Sí (server-x402) | No |
+| **Fees** | Estándar Stellar | Mayores (402 overhead) | Menores (directo) |
+| **Complejidad** | Baja | Media | Baja |
+| **Uso ideal** | B2B tradicional | APIs dinámicas | Pagos simples |
+
+**⚠️ Cada transacción usa UNO y solo UNO de estos modos. No son etapas de un flujo combinado.**
+
+---
+
+## 📖 Ejemplos Detallados
+
+### Ejemplo A: María (Cliente Humano)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ EJEMPLO A: FLUJO CLIENTE HUMANO                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ María (admin) crea propuesta en /admin/orcamento               │
+│                                                                 │
+│ 1. María llena:                                                 │
+│    - Cliente: João da Silva                                     │
+│    - Servicios: Marketing Plan - €1500                          │
+│    - Colaborador: Ana (30%)                                     │
+│                                                                 │
+│ 2. Sistema genera PDF con hash SHA-256                          │
+│    → store_proposal() en ProposalRegistry                       │
+│    → TX: https://stellar.expert/.../tx/abc123                   │
+│                                                                 │
+│ 3. Link enviado: https://ai-bora.com/proposal/xYz               │
+│                                                                 │
+│ 4. João (cliente) accede y acepta                               │
+│    → Tareas asignadas a Ana                                      │
+│                                                                 │
+│ 5. Ana completa tareas                                          │
+│    → María aprueba                                               │
+│                                                                 │
+│ 6. João paga en /pagamento/xYz                                  │
+│    → USDC enviado a PaymentSplitter                              │
+│    → execute_split() distribuye:                                 │
+│       • 70% (€1050) → María                                      │
+│       • 30% (€450) → Ana                                         │
+│                                                                 │
+│ RESULTADO: Transacción única on-chain                           │
+│ Verificable en Stellar Expert                                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Ejemplo B: Bot-A (Agente IA con x402)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ EJEMPLO B: FLUJO AGENTE IA x402                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ Bot-A (agente IA) necesita un marketing plan                   │
+│                                                                 │
+│ 1. Bot-A descubre servicio:                                     │
+│    GET http://localhost:3002/api/ai/marketing-plan              │
+│                                                                 │
+│ 2. Server responde 402:                                         │
+│    PAYMENT-REQUIRED: eyJ4ND...                                  │
+│    { accepts: [{ amount: "100000",         // 0.01 USDC        │
+│                  asset: "native",                               │
+│                  payTo: "GDQX74MG4..." }] }                     │
+│                                                                 │
+│ 3. Bot-A decide:                                                │
+│    MAX_PRICE["marketing-plan"] = 0.05 USDC                     │
+│    0.01 USDC < 0.05 USDC? → SÍ, ACEPTA                          │
+│                                                                 │
+│ 4. Bot-A firma transacción con CLIENT_SECRET                    │
+│    → Crea payment payload para x402                             │
+│                                                                 │
+│ 5. Bot-A reenvía request con header:                            │
+│    X-Payment-Signature: base64(...)                             │
+│    GET /api/ai/marketing-plan                                    │
+│                                                                 │
+│ 6. Server verifica firma y entrega:                            │
+│    200 OK                                                       │
+│    { data: { title: "Marketing Plan",                           │
+│              sections: [...] } }                                │
+│                                                                 │
+│ 7. Opcional: PaymentSplitter.execute_split()                    │
+│    → 70% Vendedor, 30% Colaborador                              │
+│                                                                 │
+│ RESULTADO: Agente autónomo pagó y recibió contenido             │
+│ Sin intervención humana                                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Ejemplo C: Bot-C (Agente IA con MPP)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ EJEMPLO C: FLUJO AGENTE IA MPP                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ Bot-C (agente IA) quiere contenido sin negociar                │
+│                                                                 │
+│ 1. Bot-C consulta servicios:                                    │
+│    GET http://localhost:3003/mpp/services                       │
+│                                                                 │
+│ 2. Recibe lista:                                                │
+│    [ marketing-plan: 0.01 USDC,                                │
+│      sales-script: 0.005 USDC,                                 │
+│      contract-draft: 0.02 USDC ]                                │
+│                                                                 │
+│ 3. Bot-C construye transacción Stellar:                         │
+│    - destination: GDQX74MG4TVG7BBZCLDCOEOQ...                   │
+│    - amount: 0.01 USDC                                          │
+│    - memo: "ai:marketing-plan"                                   │
+│    - Firma con su clave privada                                 │
+│                                                                 │
+│ 4. Bot-C envía a Stellar Network                                │
+│    → Transacción incluida en bloque                             │
+│                                                                 │
+│ 5. MPP Server detecta transacción por memo                      │
+│    → Procesa "ai:marketing-plan"                                │
+│    → Entrega contenido                                          │
+│                                                                 │
+│ 6. PaymentSplitter ejecuta automáticamente                      │
+│    → 70% Vendedor, 30% Colaborador                              │
+│                                                                 │
+│ RESULTADO: Pago directo sin facilitador                        │
+│ Menor fee, más simple                                           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -73,69 +463,17 @@
 cp .env.example .env
 # Edit .env with your keys (Stellar testnet, Firebase, Clerk)
 
-# 2. Run automated setup
-chmod +x setup.sh
-./setup.sh
+# 2. Run frontend
+npm run dev
 
-# Or use Node.js version
-node setup.mjs
+# 3. Run x402 server (para agentes IA)
+npx tsx server-x402.ts
 
-# This will:
-# - Install dependencies
-# - Fund Stellar accounts via Friendbot
-# - Add USDC trustline
-# - Start all servers (frontend, x402, MPP)
+# 4. Run MPP server (para pagos directos)
+npx tsx server-mpp.ts
 
-# 3. Open browser
+# 5. Open browser
 # http://localhost:3000
-```
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐
-│  Frontend (React)│
-│  - Passkey Auth  │
-│  - PDF Generation│
-│  - Stellar Pay   │
-└────────┬─────────┘
-         │
-         ├─► /register → WebAuthn Passkey
-         ├─► /admin → Create proposals
-         ├─► /proposal/:id → Client accepts
-         ├─► /pagamento/:id → Client pays (USDC)
-         │                    ↓
-         │          PaymentSplitter.execute_split()
-         │                    ↓
-         │          Admin (70%) + Collaborator (30%)
-         │                    ↓
-         └─► /colaborador/:id → View earnings
-
-┌─────────────────────┐
-│  x402 Server (3002) │
-│  - GET /api/ai/*    │  402 Payment Required
-│  - Returns AI data  │
-└────────┬────────────┘
-         │
-         ├─► Agent discovers service
-         ├─► Agent reads price
-         ├─► Agent pays via x402
-         └─► Agent calls execute_split
-
-┌─────────────────────┐
-│  MPP Server (3003)  │
-│  - POST /mpp/pay   │  SAC Transfer
-│  - Direct settlement│
-└─────────────────────┘
-
-┌────────────────────────┐
-│  Soroban Contracts     │
-│  - ProposalRegistry    │
-│  - PaymentSplitter     │
-│  - AgentRegistry       │
-└────────────────────────┘
 ```
 
 ---
@@ -152,162 +490,6 @@ node setup.mjs
 - Admin: 70%
 - Collaborator: 30%
 - On-chain, transparent, verified
-
----
-
-## 🤖 x402 Autonomous Agent Flow
-
-### 1. Start the x402 server
-```bash
-npx tsx server-x402.ts
-```
-
-### 2. Run the autonomous agent
-```bash
-npx tsx agent-x402-v2.ts
-```
-
-### What it does:
-1. **Discovers** service endpoints
-2. **Reads** 402 Payment Required header
-3. **Decides** if price is acceptable (under configured threshold)
-4. **Pays** automatically via x402 protocol
-5. **Calls** PaymentSplitter.execute_split() on-chain
-6. **Distributes** 70/30 automatically
-
----
-
-## 🏛️ MPP (Machine Payments Protocol)
-
-### Start the MPP server
-```bash
-npx tsx server-mpp.ts
-```
-
-### Endpoints
-- `GET /mpp/services` - List available AI services
-- `POST /mpp/pay` - Accept SAC transfer
-
-### Comparison
-| Protocol | Settlement | Fees | Requires Facilitator |
-|----------|-----------|------|-----------------------|
-| **x402** | On-chain | Higher | Yes |
-| **MPP** | On-chain | Lower | No |
-
-Both are implemented for complete hackathon compliance.
-
----
-
-## 📄 PDF Hash Verification
-
-Every proposal PDF generates a SHA-256 hash that is stored on-chain in the ProposalRegistry smart contract:
-
-```typescript
-// In /admin/orcamento or /admin QuickProposalForm:
-
-// 1. Generate PDF
-const doc = await criarPDF();
-const pdfBlob = doc.output('blob');
-
-// 2. Calculate SHA-256
-const pdfArrayBuffer = await pdfBlob.arrayBuffer();
-const pdfHashBuffer = await crypto.subtle.digest('SHA-256', pdfArrayBuffer);
-const pdfHash = Array.from(new Uint8Array(pdfHashBuffer))
-  .map(b => b.toString(16).padStart(2, '0'))
-  .join('');
-
-// 3. Store on Soroban ProposalRegistry
-const stellarResult = await storeProposalOnChain(
-  proposalId,
-  clientEmail,
-  pdfHash,
-  amount
-);
-
-// 4. Save proposal with Stellar transaction hash
-await createProposal({
-  ...proposalData,
-  pdfHash,
-  stellarTxHash: stellarResult.txHash,
-  stellarExplorerUrl: stellarResult.explorerUrl
-});
-```
-
-**Verify on Stellar Expert:**
-1. Go to https://stellar.expert/explorer/testnet
-2. Search for transaction hash
-3. View `store_proposal` invocation
-4. See PDF SHA-256 hash in transaction data
-
-**Flow:**
-```
-/admin/orcamento (Admin creates proposal)
-  ↓
-Generate PDF with jsPDF
-  ↓
-Calculate SHA-256 hash
-  ↓
-ProposalRegistry.store_proposal()
-  ↓
-Transaction on Stellar testnet
-  ↓
-Save to Firestore with txHash
-  ↓
-Client views proposal
-  ↓
-Client pays USDC
-  ↓
-PaymentSplitter.execute_split()
-  ↓
-70% admin + 30% collaborator
-  ↓
-All transactions visible on Stellar Expert
-```
-
----
-
-## 🔐 Security
-
-### Authentication
-- **WebAuthn Passkey**: Fingerprint/Face ID, no passwords
-- **Clerk Auth**: Optional, for production
-
-### CSP Configuration
-Allows necessary domains:
-- `connect-src`: Firebase, Stellar testnet, Horizon, friendbot
-- No external script injection
-- Safe defaults
-
-### Smart Contract Security
-- `require_auth()` on all state-changing functions
-- Admin-only operations
-- No unprotected external calls
-
----
-
-## 🧪 Smart Contract Tests
-
-```bash
-# Run all contract tests
-cargo test --all
-
-# Run specific contract
-cargo test -p proposal_registry
-cargo test -p payment_splitter
-cargo test -p agent_registry
-
-# With coverage
-cargo tarpaulin --all
-```
-
-Tests include:
-- ✅ store_proposal with PDF hash
-- ✅ update_status transitions
-- ✅ verify_hash consistency
-- ✅ create_payment with 70/30 split
-- ✅ execute_split returns correct amounts
-- ✅ register_agent with service rates
-- ✅ record_payment updates earnings
 
 ---
 
