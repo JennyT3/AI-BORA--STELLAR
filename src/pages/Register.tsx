@@ -32,7 +32,7 @@ export default function Register() {
             challenge,
             rp: {
               name: 'AI BORA',
-              id: window.location.hostname === 'localhost' ? 'localhost' : 'aibora.com'
+              id: window.location.hostname
             },
             user: {
               id: userId,
@@ -62,7 +62,8 @@ export default function Register() {
           publicKey: {
             challenge,
             timeout: 60000,
-            userVerification: 'preferred'
+            userVerification: 'preferred',
+            rpId: window.location.hostname
           }
         });
 
