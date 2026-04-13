@@ -68,3 +68,7 @@ contracts/**/target/
 contracts/**/Cargo.lock
 **/*.wasm
 target/
+
+# Test snapshots
+test_snapshots/
+**/test_snapshots/
