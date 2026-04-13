@@ -2,7 +2,10 @@ import { Keypair, Networks, TransactionBuilder, Memo, Operation, Asset, Account 
 
 const HORIZON_URL = 'https://horizon-testnet.stellar.org';
 
-const ADMIN_SECRET = process.env.STELLAR_ADMIN_SECRET || process.env.VENDOR_SECRET || 'SBG5JH646SESBLJTBMJB362X6Y2F23ELZQG4OVVR3IXTC4U7LHAORB6E';
+const ADMIN_SECRET = process.env.STELLAR_ADMIN_SECRET || process.env.VENDOR_SECRET;
+if (!ADMIN_SECRET) {
+  throw new Error('ADMIN_SECRET must be set in environment');
+}
 const ADMIN_PUBLIC = process.env.STELLAR_ADMIN_PUBLIC || process.env.VENDOR_PUBLIC || 'GDQX74MG4TVG7BBZCLDCOEOQX2PADCTRUIDAWG5KLIQ64LYURC5XC7CN';
 
 export default async function handler(req: any, res: any) {

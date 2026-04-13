@@ -4,7 +4,7 @@ import { Send, Eye, Loader2, CheckCircle, CreditCard, ExternalLink } from 'lucid
 import { createProposal } from '../../services/proposals';
 import { createCliente, getClienteByEmail } from '../../services/clientes';
 import { criarPaymentLinkSimples } from '../../services/pagamentos';
-import { storeProposalOnChain } from '../../services/soroban';
+import { signAndSubmitProposal } from '../../services/stellar-signer';
 import jsPDF from 'jspdf';
 
 function generateProposalPDF(clientName: string, service: string, proposalId: string, stellarHash: string): string {
@@ -77,20 +77,31 @@ export function QuickProposalForm({ onSuccess, onCancel }: QuickProposalFormProp
       
       console.log('📄 PDF SHA-256:', pdfHash);
       
-      // Store on Soroban smart contract
+      // Store on Soroban smart contract using secure signing service
       let stellarResult = { txHash: '', explorerUrl: '', success: false };
       try {
-        const secretKey = import.meta.env.VITE_STELLAR_ADMIN_SECRET || localStorage.getItem('aibora_stellar_secret') || '';
-        if (secretKey) {
-          stellarResult = await storeProposalOnChain(
-            `PROP-${Date.now()}`,
-            formData.clientEmail,
-            pdfHash,
-            0,
-            secretKey
-          );
-          setStellarHash(stellarResult.txHash);
-          console.log('✅ Stored on Soroban:', stellarResult.txHash);
+        console.log('🔐 Using secure signing service (Freighter or server-side)');
+        const result = await signAndSubmitProposal(
+          `PROP-${Date.now()}`,
+          formData.clientEmail,
+          pdfHash,
+          0
+        );
+        
+        if (result.success && result.txHash) {
+          stellarResult = { 
+            txHash: result.txHash, 
+            explorerUrl: result.explorerUrl || '', 
+            success: true 
+          };
+          setStellarHash(result.txHash);
+          console.log('✅ Stored on Soroban:', result.txHash);
+          console.log('📊 Method:', result.method);
+        } else if (result.method === 'demo') {
+          stellarResult = { txHash: 'demo', explorerUrl: '', success: false };
+          console.warn('⚠️ Demo mode - no signing method available');
+        } else {
+          console.warn('⚠️ Signing failed:', result.error);
         }
       } catch (stellarErr) {
         console.warn('⚠️ Soroban storage failed (non-critical):', stellarErr);

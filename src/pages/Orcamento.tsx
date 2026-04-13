@@ -8,6 +8,7 @@ import autoTable from "jspdf-autotable";
 import { createProposal } from "../services/proposals";
 import { sendPropostaLinkEmail } from "../services/emailService";
 import { storeProposalOnChain } from "../services/soroban";
+import { signAndSubmitProposal, isFreighterAvailable, getFreighterPublicKey } from "../services/stellar-signer";
 
 const colors = {
   orange: '#ff6f2e',
@@ -424,41 +425,47 @@ export function Orcamento() {
       console.log('[Proposal] Storing on blockchain...');
       const uniqueId = `${numeroOrcamentoInput}-${Date.now()}`;
       
-      // Get secret key - VITE_ prefix required for Vite to expose it
-      const secretKey = localStorage.getItem('aibora_stellar_secret') || 
-                         import.meta.env.VITE_VENDOR_SECRET || '';
+      // SECURITY: Never read secret keys from localStorage or env in frontend
+      // Use secure signing service (Freighter or server-side)
+      console.log('[Proposal] Checking for Freighter wallet...');
+      const hasFreighter = await isFreighterAvailable();
+      console.log('[Proposal] Freighter available:', hasFreighter);
       
-      console.log('[Proposal] ENV VITE_VENDOR_SECRET:', import.meta.env.VITE_VENDOR_SECRET ? 'SET' : 'NOT SET');
-      console.log('[Proposal] Secret key:', secretKey ? `FOUND (${secretKey.slice(0, 4)}...${secretKey.slice(-4)})` : 'NOT FOUND');
+      if (hasFreighter) {
+        console.log('[Proposal] ✅ Using Freighter wallet for signing');
+        const publicKey = await getFreighterPublicKey();
+        console.log('[Proposal] Freighter public key:', publicKey?.slice(0, 10) + '...');
+      } else {
+        console.log('[Proposal] ⚠️ No Freighter, using server-side signing');
+      }
+      
       console.log('[Proposal] PDF Hash:', pdfHash.slice(0, 20) + '...');
       console.log('[Proposal] Amount:', totalConDescuento, 'USDC');
       
-      let result: any = null;
-      if (secretKey && secretKey.startsWith('S')) {
-        try {
-          console.log('[Proposal] Calling storeProposalOnChain...');
-          result = await storeProposalOnChain(uniqueId, cliente.email, pdfHash, totalConDescuento, secretKey);
-          console.log('[Proposal] Result:', result);
-        } catch (e: any) {
-          console.error('[Proposal] Blockchain ERROR:', e.message);
-          console.error('[Proposal] Full error:', e);
-          setTxStatus('error');
-        }
-      } else {
-        console.warn('[Proposal] ⚠️ No secret key - DEMO mode');
-        result = { txHash: 'demo-' + Date.now(), explorerUrl: '', success: false };
-        setTxStatus('demo');
-      }
+      // Use secure signing service (Freighter or server fallback)
+      const result = await signAndSubmitProposal(
+        uniqueId,
+        cliente.email,
+        pdfHash,
+        totalConDescuento
+      );
       
-      if (result && result.txHash && result.txHash !== 'error') {
+      console.log('[Proposal] Signing result:', result);
+      
+      if (result.success && result.txHash) {
         setTxHash(result.txHash);
         setExplorerUrl(result.explorerUrl || `https://stellar.expert/explorer/testnet/tx/${result.txHash}`);
-        setTxStatus(result.success !== false ? 'confirmed' : 'pending');
-        console.log('[Proposal] ✅ Hash:', result.txHash);
-      } else {
-        console.warn('[Proposal] No real hash, using demo');
+        setTxStatus('confirmed');
+        console.log('[Proposal] ✅ Transaction confirmed:', result.txHash);
+        console.log('[Proposal] Method:', result.method);
+      } else if (result.method === 'demo') {
+        setTxHash(result.txHash || `demo-${Date.now()}`);
+        setExplorerUrl('https://stellar.expert/explorer/testnet');
         setTxStatus('demo');
-        setTxHash('demo-' + Date.now());
+        console.warn('[Proposal] ⚠️ Running in demo mode - no signing method available');
+      } else {
+        setTxStatus('error');
+        console.error('[Proposal] ❌ Signing failed:', result.error);
       }
 
       if (cliente.email) {

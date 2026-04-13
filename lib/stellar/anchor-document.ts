@@ -1,6 +1,9 @@
 import { Keypair, Networks, TransactionBuilder, Memo, Operation, Asset } from '@stellar/stellar-sdk';
 
-const VENDOR_SECRET = process.env.STELLAR_VENDOR_SECRET || process.env.VENDOR_SECRET || 'SBG5JH646SESBLJTBMJB362X6Y2F23ELZQG4OVVR3IXTC4U7LHAORB6E';
+const VENDOR_SECRET = process.env.STELLAR_VENDOR_SECRET || process.env.VENDOR_SECRET;
+if (!VENDOR_SECRET) {
+  throw new Error('VENDOR_SECRET must be set in environment');
+}
 const VENDOR_PUBLIC = process.env.VENDOR_PUBLIC || 'GDQX74MG4TVG7BBZCLDCOEOQX2PADCTRUIDAWG5KLIQ64LYURC5XC7CN';
 const API_URL = (globalThis as any).process?.env?.VITE_API_URL || 'http://localhost:3001';
 
