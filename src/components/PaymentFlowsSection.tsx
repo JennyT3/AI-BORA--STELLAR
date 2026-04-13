@@ -187,16 +187,16 @@ export function PaymentFlowsSection() {
               <div style={{ fontSize: 10, color: '#666' }}>No intermediaries, instant settlement</div>
             </div>
 
-            <a href="https://stellar.expert/explorer/testnet" target="_blank" rel="noopener noreferrer">
+            <Link href="/mpp-demo">
               <button style={{ 
                 marginTop: 16, width: '100%', padding: '12px 16px', 
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
                 border: 'none', borderRadius: 10, color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
               }}>
-                View Transactions <ExternalLink size={14} />
+                Try MPP Demo <ArrowRight size={14} />
               </button>
-            </a>
+            </Link>
           </motion.div>
         </div>
 

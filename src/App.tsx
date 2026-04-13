@@ -16,6 +16,7 @@ import ColaboradorPage from "./pages/Colaborador";
 import TareasPage from "./pages/Tareas";
 import PaymentFlowPage from "./pages/PaymentFlow";
 import AgentX402DemoPage from "./pages/AgentX402Demo";
+import MppDemoPage from "./pages/MppDemo";
 import TestConnectionPage from "./pages/TestConnection";
 import Academy from "./pages/academia/Academy";
 
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="/colaborador/:id" component={ColaboradorPage} />
         <Route path="/admin" component={Admin} />
         <Route path="/agent-x402-demo" component={AgentX402DemoPage} />
+        <Route path="/mpp-demo" component={MppDemoPage} />
         <Route path="/test-connection" component={TestConnectionPage} />
         <Route path="/academy" component={Academy} />
         <Route>
