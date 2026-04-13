@@ -236,6 +236,8 @@ mod test {
         let admin_receiver = Address::generate(&env);
         let collaborator = Address::generate(&env);
 
+        env.mock_all_auths();
+
         let payment_id = client.create_payment(
             &admin,
             &String::from_str(&env, "pay-001"),
@@ -265,6 +267,8 @@ mod test {
         let token = Address::generate(&env);
         let admin_receiver = Address::generate(&env);
         let collaborator = Address::generate(&env);
+
+        env.mock_all_auths();
 
         // Test with prime number - remainder must go to collaborator
         client.create_payment(
@@ -302,6 +306,8 @@ mod test {
         let token = Address::generate(&env);
         let admin_receiver = Address::generate(&env);
         let collaborator = Address::generate(&env);
+
+        env.mock_all_auths();
 
         client.create_payment(
             &admin,

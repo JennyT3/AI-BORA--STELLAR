@@ -106,29 +106,29 @@ impl ProposalRegistry {
 
         if let Some(mut proposal) = env.storage().instance().get::<String, Proposal>(&id) {
             // Validate status transitions
-            let current_status = proposal.status.as_ref();
-            let valid_transition = match current_status {
-                "pending" => new_status.as_ref() == "accepted" || new_status.as_ref() == "rejected",
-                "accepted" => new_status.as_ref() == "paid" || new_status.as_ref() == "rejected",
-                "paid" => new_status.as_ref() == "completed",
-                _ => false,
-            };
+            let current = proposal.status.clone();
+            let new_stat = new_status.clone();
+
+            let valid_transition = (current == String::from_str(&env, "pending")
+                && (new_stat == String::from_str(&env, "accepted")
+                    || new_stat == String::from_str(&env, "rejected")))
+                || (current == String::from_str(&env, "accepted")
+                    && (new_stat == String::from_str(&env, "paid")
+                        || new_stat == String::from_str(&env, "rejected")))
+                || (current == String::from_str(&env, "paid")
+                    && new_stat == String::from_str(&env, "completed"));
 
             if !valid_transition {
-                panic!(
-                    "Invalid status transition: {} -> {}",
-                    current_status,
-                    new_status.as_ref()
-                );
+                panic!("Invalid status transition");
             }
 
             // Update status
-            proposal.status = new_status.clone();
+            proposal.status = new_stat.clone();
             env.storage().instance().set(&id, &proposal);
 
             // Extend TTL based on status
             // Paid proposals need longer TTL for audit trail
-            let ttl_extension = if new_status == String::from_str(&env, "paid") {
+            let ttl_extension = if new_stat == String::from_str(&env, "paid") {
                 PAID_TTL_EXTEND
             } else {
                 TTL_EXTEND
@@ -207,6 +207,9 @@ mod test {
         let admin = Address::generate(&env);
         let pdf_hash = Bytes::from_slice(&env, b"abc123def456");
 
+        // Mock auth for admin
+        env.mock_all_auths();
+
         client.store_proposal(
             &admin,
             &String::from_str(&env, "prop-001"),
@@ -231,12 +234,20 @@ mod test {
         let admin = Address::generate(&env);
         let pdf_hash = Bytes::from_slice(&env, b"abc123def456");
 
+        env.mock_all_auths();
+
         client.store_proposal(
             &admin,
             &String::from_str(&env, "prop-002"),
             &String::from_str(&env, "client@example.com"),
             &pdf_hash,
             &1000000000,
+        );
+
+        client.update_status(
+            &admin,
+            &String::from_str(&env, "prop-002"),
+            &String::from_str(&env, "accepted"),
         );
 
         client.update_status(
@@ -259,6 +270,8 @@ mod test {
 
         let admin = Address::generate(&env);
         let pdf_hash = Bytes::from_slice(&env, b"abc123def456");
+
+        env.mock_all_auths();
 
         client.store_proposal(
             &admin,
@@ -289,6 +302,8 @@ mod test {
 
         let admin = Address::generate(&env);
         let pdf_hash = Bytes::from_slice(&env, b"abc123def456");
+
+        env.mock_all_auths();
 
         client.store_proposal(
             &admin,

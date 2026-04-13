@@ -113,6 +113,8 @@ mod test {
         services.set(AgentService::MarketingAnalysis, 1000000); // 0.1 USDC
         services.set(AgentService::SalesScript, 500000); // 0.05 USDC
 
+        env.mock_all_auths();
+
         client.register_agent(
             &agent_addr,
             &String::from_str(&env, "AI Agent Alpha"),
@@ -134,6 +136,9 @@ mod test {
         let agent_addr = Address::generate(&env);
         let payer = Address::generate(&env);
         let services = Map::new(&env);
+
+        env.mock_all_auths();
+        env.mock_all_auths();
 
         client.register_agent(
             &agent_addr,
@@ -160,9 +165,11 @@ mod test {
         let mut services = Map::new(&env);
         services.set(AgentService::ContractDraft, 2000000); // 0.2 USDC
 
+        env.mock_all_auths();
+
         client.register_agent(&agent_addr, &String::from_str(&env, "Legal AI"), &services);
 
         let price = client.get_service_price(&agent_addr, &AgentService::ContractDraft);
-        assert_eq!(price, Some(2000000));
+        assert_eq!(price, 2000000);
     }
 }
