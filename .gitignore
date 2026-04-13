@@ -67,3 +67,4 @@ node_modules/
 contracts/**/target/
 contracts/**/Cargo.lock
 **/*.wasm
+target/
