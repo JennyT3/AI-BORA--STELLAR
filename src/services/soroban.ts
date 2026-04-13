@@ -1,11 +1,7 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
+import { CONTRACT_IDS, SOROBAN_CONFIG } from '../config/contracts';
 
-const CONTRACT_ID = 'CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5';
-const AGENT_REGISTRY_ID = 'CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M';
-const RPC_URL = 'https://soroban-testnet.stellar.org';
-const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
-
-const server = new StellarSdk.SorobanRpc.Server(RPC_URL);
+const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL);
 
 async function waitForTransaction(hash: string, retries = 20): Promise<StellarSdk.SorobanRpc.GetTransactionResponse> {
   for (let i = 0; i < retries; i++) {
@@ -48,7 +44,7 @@ export async function invokeContract(
 
   const tx = new StellarSdk.TransactionBuilder(sourceAccount, {
     fee: '100000',
-    networkPassphrase: NETWORK_PASSPHRASE,
+    networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(method, ...args))
     .setTimeout(30)
@@ -189,12 +185,12 @@ export async function updateProposalStatus(
 
 export async function getProposalFromChain(proposalId: string): Promise<any> {
   try {
-    const contract = new StellarSdk.Contract(CONTRACT_ID);
+const contract = new StellarSdk.Contract(CONTRACT_IDS.PROPOSAL_REGISTRY);
     const account = await server.getAccount(import.meta.env.VITE_STELLAR_ADMIN_PUBLIC || '');
     
     const tx = new StellarSdk.TransactionBuilder(account, {
       fee: '100',
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
     })
       .addOperation(contract.call('get_proposal', StellarSdk.nativeToScVal(proposalId, { type: 'string' })))
       .setTimeout(10)

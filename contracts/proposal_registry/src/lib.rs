@@ -95,6 +95,9 @@ impl ProposalRegistry {
     /// - pending → accepted → paid → completed
     /// - pending → rejected
     ///
+    /// # Security
+    /// Validates status transitions to prevent invalid state changes.
+    ///
     /// # TTL
     /// Extends TTL to ensure proposal survives while active.
     /// For "paid" status, extends even more for audit trail.
@@ -102,6 +105,23 @@ impl ProposalRegistry {
         admin.require_auth();
 
         if let Some(mut proposal) = env.storage().instance().get::<String, Proposal>(&id) {
+            // Validate status transitions
+            let current_status = proposal.status.as_ref();
+            let valid_transition = match current_status {
+                "pending" => new_status.as_ref() == "accepted" || new_status.as_ref() == "rejected",
+                "accepted" => new_status.as_ref() == "paid" || new_status.as_ref() == "rejected",
+                "paid" => new_status.as_ref() == "completed",
+                _ => false,
+            };
+
+            if !valid_transition {
+                panic!(
+                    "Invalid status transition: {} -> {}",
+                    current_status,
+                    new_status.as_ref()
+                );
+            }
+
             // Update status
             proposal.status = new_status.clone();
             env.storage().instance().set(&id, &proposal);
@@ -138,7 +158,12 @@ impl ProposalRegistry {
     ///
     /// Use this if a proposal is about to expire but needs more time.
     /// Extends ALL instance storage TTL by ~200 days.
-    pub fn extend_proposal_ttl(env: Env) {
+    ///
+    /// # Security
+    /// Requires admin authorization to prevent unauthorized TTL extensions.
+    pub fn extend_proposal_ttl(env: Env, admin: Address) {
+        admin.require_auth();
+
         // Extend all instance storage TTL
         // Note: This extends TTL for ALL proposals in this contract
         env.storage()
@@ -274,7 +299,7 @@ mod test {
         );
 
         // Extend TTL should not fail
-        client.extend_proposal_ttl();
+        client.extend_proposal_ttl(&admin);
 
         // Proposal should still exist
         let proposal = client.get_proposal(&String::from_str(&env, "prop-004"));

@@ -132,6 +132,11 @@ impl PaymentSplitter {
             panic!("Payment already executed - cannot split again");
         }
 
+        // Validate that payment was created by authorized admin
+        if payment.admin_address != admin {
+            panic!("Only the admin who created this payment can execute it");
+        }
+
         // Validate amounts
         if payment.admin_amount <= 0 {
             panic!("Invalid admin amount: must be positive");
@@ -189,7 +194,12 @@ impl PaymentSplitter {
     /// Manually extend payment TTL.
     ///
     /// Extends ALL instance storage TTL by ~200 days.
-    pub fn extend_payment_ttl(env: Env) {
+    ///
+    /// # Security
+    /// Requires admin authorization to prevent unauthorized TTL extensions.
+    pub fn extend_payment_ttl(env: Env, admin: Address) {
+        admin.require_auth();
+
         env.storage()
             .instance()
             .extend_ttl(TTL_THRESHOLD, TTL_EXTEND);
@@ -302,7 +312,7 @@ mod test {
             &collaborator,
         );
 
-        client.extend_payment_ttl();
+        client.extend_payment_ttl(&admin);
 
         assert!(client.payment_exists(&String::from_str(&env, "pay-004")));
     }

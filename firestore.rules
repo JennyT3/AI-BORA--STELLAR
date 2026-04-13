@@ -4,51 +4,91 @@ service cloud.firestore {
     
     // ============================================
     // AI BORA - Firestore Security Rules
+    // Security Audit: April 2026
     // ============================================
     
-    // Proposals - Authenticated users can read, only creator can write
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'admin';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('.*@.*\\..*');
+    }
+    
+    function isValidStatus(status) {
+      return status in ['pending', 'accepted', 'rejected', 'paid', 'completed'];
+    }
+    
+    function isValidAmount(amount) {
+      return amount > 0 && amount < 1000000000;
+    }
+    
+    // Proposals - Owner + Admin access
+    // Security: Only owner and admins can read proposals
     match /proposals/{proposalId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && 
-        request.auth.uid == resource.data.createdBy;
+      allow read: if isOwner(resource.data.createdBy) || isAdmin();
+      allow create: if isAuthenticated() &&
+        isValidAmount(request.resource.data.amount) &&
+        isValidEmail(request.resource.data.clientEmail) &&
+        request.resource.data.status == 'pending';
+      allow update: if isAuthenticated() && 
+        (isOwner(resource.data.createdBy) || isAdmin()) &&
+        isValidStatus(request.resource.data.status);
+      allow delete: if isAdmin();
     }
     
     // Users - Users can only access their own data
     match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        request.auth.uid == userId;
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
     }
     
     // Collaborators - Read for authenticated, write for admins
     match /collaborators/{collaboratorId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        request.auth.token.role == 'admin';
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
     
-    // Payments - Read for involved parties only
+    // Payments - Only involved parties can access
+    // Security: Payer, payee, and admin only
     match /payments/{paymentId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && 
-        (request.auth.uid == resource.data.payerId || 
-         request.auth.token.role == 'admin');
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.payerId ||
+         request.auth.uid == resource.data.payeeId ||
+         isAdmin());
+      allow create: if isAuthenticated() &&
+        isValidAmount(request.resource.data.amount) &&
+        request.resource.data.status == 'pending';
+      allow update: if isAuthenticated() && 
+        (request.auth.uid == resource.data.payerId || isAdmin());
+      allow delete: if isAdmin();
     }
     
     // Agents - Public read, admin write
     match /agents/{agentId} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        request.auth.token.role == 'admin';
+      allow write: if isAdmin();
     }
     
     // Services - Public read, admin write
     match /services/{serviceId} {
       allow read: if true;
-      allow write: if request.auth != null && 
-        request.auth.token.role == 'admin';
+      allow write: if isAdmin();
+    }
+    
+    // Session logs - sensitive, admin only
+    match /sessionLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if isAuthenticated();
     }
   }
 }

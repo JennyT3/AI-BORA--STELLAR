@@ -9,10 +9,9 @@
  */
 
 import * as StellarSdk from '@stellar/stellar-sdk';
+import { CONTRACT_IDS, SOROBAN_CONFIG } from '../config/contracts';
 
-const RPC_URL = 'https://soroban-testnet.stellar.org';
-const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
-const CONTRACT_ID = 'CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5';
+const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL);
 
 // Check if Freighter is available
 export async function isFreighterAvailable(): Promise<boolean> {
@@ -54,7 +53,7 @@ export async function signWithFreighter(xdr: string): Promise<{ signedXdr: strin
 
     const publicKey = await freighter.getPublicKey();
     const signedXdr = await freighter.signTransaction(xdr, {
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
     });
 
     return { signedXdr, publicKey };
@@ -72,7 +71,7 @@ export async function buildProposalTransaction(
   amount: number,
   sourceAddress: string
 ): Promise<string> {
-  const server = new StellarSdk.SorobanRpc.Server(RPC_URL);
+  const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL);
   
   // Load source account
   const account = await server.getAccount(sourceAddress);
@@ -81,11 +80,11 @@ export async function buildProposalTransaction(
   const hashBytes = hexToBytes(pdfHash);
   
   // Build contract call
-  const contract = new StellarSdk.Contract(CONTRACT_ID);
+  const contract = new StellarSdk.Contract(CONTRACT_IDS.PROPOSAL_REGISTRY);
   
   const tx = new StellarSdk.TransactionBuilder(account, {
     fee: '100000',
-    networkPassphrase: NETWORK_PASSPHRASE,
+    networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(
       'store_proposal',
@@ -108,15 +107,15 @@ export async function buildSplitTransaction(
   tokenAddress: string,
   sourceAddress: string
 ): Promise<string> {
-  const server = new StellarSdk.SorobanRpc.Server(RPC_URL);
+  const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL);
   
   const account = await server.getAccount(sourceAddress);
   
-  const contract = new StellarSdk.Contract(CONTRACT_ID);
+  const contract = new StellarSdk.Contract(CONTRACT_IDS.PROPOSAL_REGISTRY);
   
   const tx = new StellarSdk.TransactionBuilder(account, {
     fee: '100000',
-    networkPassphrase: NETWORK_PASSPHRASE,
+    networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(
       'execute_split',
@@ -133,7 +132,7 @@ export async function buildSplitTransaction(
 
 // Submit signed transaction
 export async function submitSignedTransaction(signedXdr: string): Promise<{ hash: string; status: string }> {
-  const server = new StellarSdk.SorobanRpc.Server(RPC_URL);
+  const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL);
   
   const tx = StellarSdk.TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
   const result = await server.sendTransaction(tx);

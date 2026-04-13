@@ -10,6 +10,16 @@ Built for **Stellar Hacks: Agents hackathon (April 2026)**.
 
 ---
 
+## 📹 Demo Video
+
+[![AI BORA Demo](https://img.youtube.com/vi/Hqg2SnybAhE/0.jpg)](https://youtu.be/Hqg2SnybAhE)
+
+**Watch the full demo:** https://youtu.be/Hqg2SnybAhE
+
+---
+
+---
+
 ## The Problem
 
 Traditional B2B commerce suffers from:
@@ -350,11 +360,11 @@ Tests include:
 
 ---
 
-## Live Demo
+## Links
 
-- **App**: https://ai-bora-stellar.vercel.app
-- **Source**: https://github.com/JennyT3/AI-BORA--STELLAR
-- **Explorer**: https://stellar.expert/explorer/testnet
+- **Live App**: https://ai-bora-stellar.vercel.app
+- **Source Code**: https://github.com/JennyT3/AI-BORA--STELLAR
+- **Stellar Explorer**: https://stellar.expert/explorer/testnet
 
 ---
 

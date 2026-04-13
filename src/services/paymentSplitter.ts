@@ -1,10 +1,8 @@
 import * as StellarSdk from '@stellar/stellar-sdk';
+import { CONTRACT_IDS, SOROBAN_CONFIG } from '../config/contracts';
 
-const PAYMENT_SPLITTER_ID = 'CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P';
-const RPC_URL = 'https://soroban-testnet.stellar.org';
-const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
-
-const server = new StellarSdk.SorobanRpc.Server(RPC_URL, { allowHttp: true });
+export const PAYMENT_SPLITTER_ID = CONTRACT_IDS.PAYMENT_SPLITTER;
+const server = new StellarSdk.SorobanRpc.Server(SOROBAN_CONFIG.RPC_URL, { allowHttp: true });
 
 export interface PaymentSplitResult {
   success: boolean;
@@ -27,7 +25,7 @@ export async function createPaymentOnChain(
   
   const tx = new StellarSdk.TransactionBuilder(adminAccount, {
     fee: '100000',
-    networkPassphrase: NETWORK_PASSPHRASE,
+    networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
   })
     .addOperation(contract.call(
       'create_payment',
@@ -65,7 +63,7 @@ export async function executePaymentSplit(
     
     const tx = new StellarSdk.TransactionBuilder(adminAccount, {
       fee: '100000',
-      networkPassphrase: NETWORK_PASSPHRASE,
+      networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
     })
       .addOperation(contract.call(
         'execute_split',
@@ -131,7 +129,7 @@ export async function getPaymentFromChain(paymentId: string): Promise<{
     const result = await server.simulateTransaction(
       new StellarSdk.TransactionBuilder(server.getBaseUrl(), {
         fee: '10000',
-        networkPassphrase: NETWORK_PASSPHRASE,
+        networkPassphrase: SOROBAN_CONFIG.NETWORK_PASSPHRASE,
       })
         .appendOperation(contract.call('get_payment', paymentId))
         .setTimeout(30)
@@ -150,5 +148,3 @@ export async function getPaymentFromChain(paymentId: string): Promise<{
     return null;
   }
 }
-
-export { PAYMENT_SPLITTER_ID };

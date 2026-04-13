@@ -1,7 +1,34 @@
 import express from 'express';
+import cors from 'cors';
 import { Payment } from '@stellar/stellar-sdk';
 
 const app = express();
+
+// CORS Configuration - Restrict to known origins
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://aibora.com',
+  'https://www.aibora.com',
+  'https://aibora.vercel.app',
+  'https://aibora-staging.vercel.app',
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
 app.use(express.json());
 
 const PORT = process.env.MPP_PORT || 3003;

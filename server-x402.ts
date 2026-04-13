@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
 const PORT = process.env.PORT || 3002;
@@ -37,11 +38,11 @@ try {
   console.log('.env not found');
 }
 
-const VENDOR_SECRET = process.env.VENDOR_SECRET || process.env.VITE_VENDOR_SECRET || '';
+const VENDOR_SECRET = process.env.VENDOR_SECRET || '';
 const VENDOR_PUBLIC = process.env.VENDOR_PUBLIC || 'GDQX74MG4TVG7BBZCLDCOEOQX2PADCTRUIDAWG5KLIQ64LYURC5XC7CN';
 
 console.log('VENDOR_SECRET loaded:', !!VENDOR_SECRET);
-console.log('VENDOR_SECRET prefix:', VENDOR_SECRET?.slice(0, 8));
+// Security: Never log key values, only status
 const CLIENT_PUBLIC = 'GBMQWA3M4BLSM6HH4SIPVB4AL4F4LJUWYGS22G3EBUBIZYDY4HNCYGY2';
 
 // Payment Splitter (demo contract address)
@@ -77,12 +78,57 @@ const app = express();
 // ============================================
 // MIDDLEWARE
 // ============================================
+// CORS Configuration - Restrict to known origins
+const ALLOWED_ORIGINS = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://aibora.com',
+  'https://www.aibora.com',
+  'https://aibora.vercel.app',
+  'https://aibora-staging.vercel.app',
+];
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS: Blocked origin ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Payment', 'X-Payment-Tx', 'Accept'],
   exposedHeaders: ['PAYMENT-REQUIRED', 'X-Payment-Required', 'Content-Type'],
+  credentials: true,
 }));
+
+// Rate limiting for API endpoints
+// Security: Prevent DoS attacks and abuse
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Stricter rate limit for payment endpoints
+const paymentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each IP to 10 payment requests per hour
+  message: { error: 'Payment rate limit exceeded. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiting to API routes
+app.use('/api/ai/', apiLimiter);
+app.use('/api/payment/', paymentLimiter);
 
 app.use(express.json());
 
@@ -95,14 +141,14 @@ app.use((req, res, next) => {
 // STELLAR PAYMENT FUNCTIONS
 // ============================================
 
-async function createPayment(amount: number, destination: string, secretKey: string): Promise<{ success: boolean; txHash?: string; error?: string }> {
-  console.log('createPayment called with key:', secretKey?.slice(0, 8), 'dest:', destination?.slice(0, 8));
-  if (!secretKey || (!secretKey.startsWith('SC') && !secretKey.startsWith('SB'))) {
-    return { success: false, error: 'No valid secret key' };
+async function createPayment(amount: number, destination: string): Promise<{ success: boolean; txHash?: string; error?: string }> {
+  // Security: Never accept secret keys from client - use server-side key only
+  if (!VENDOR_SECRET || (!VENDOR_SECRET.startsWith('SC') && !VENDOR_SECRET.startsWith('SB'))) {
+    return { success: false, error: 'Server not configured for payments' };
   }
 
   try {
-    const keypair = StellarSdk.Keypair.fromSecret(secretKey);
+    const keypair = StellarSdk.Keypair.fromSecret(VENDOR_SECRET);
     const sourceAccount = await horizon.loadAccount(keypair.publicKey());
     
     const transaction = new StellarSdk.TransactionBuilder(sourceAccount, {
@@ -380,11 +426,13 @@ app.post('/api/split', (req, res) => {
   });
 });
 
-// Create payment
+// Create payment - server-side signing only
+// Security: Never accept secret keys from client requests
 app.post('/api/payment/create', async (req, res) => {
-  const { to = VENDOR_PUBLIC, amount = 0.01, fromSecret = VENDOR_SECRET } = req.body;
+  const { to = VENDOR_PUBLIC, amount = 0.01 } = req.body;
   
-  const result = await createPayment(amount, to, fromSecret);
+  // Security: Client cannot override fromSecret - always use server's VENDOR_SECRET
+  const result = await createPayment(amount, to);
   res.json(result);
 });
 
