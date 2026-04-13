@@ -111,7 +111,7 @@ async function createPayment(amount: number, destination: string, secretKey: str
     })
       .addOperation(StellarSdk.Operation.payment({
         destination: destination,
-        asset: StellarSdk.Asset.native(),
+        asset: new StellarSdk.Asset("native"),
         amount: amount.toString(),
       }))
       .setTimeout(30)
@@ -236,7 +236,8 @@ function send402(serviceId: string, req: express.Request, res: express.Response)
       amount: amountStroops.toString(),
       asset: "native",
       payTo: VENDOR_PUBLIC,
-      maxTimeoutSeconds: 300
+      maxTimeoutSeconds: 300,
+      extra: { areFeesSponsored: true }
     }]
   };
 

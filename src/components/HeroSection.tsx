@@ -34,12 +34,12 @@ export function HeroSection() {
             marginBottom: 20
           }}
         >
-          AI Agents That Pay
+          The Agentic Web's
           <br />
-          <span style={{ color: '#F25C05' }}>Each Other</span> Automatically
+          <span style={{ color: '#F25C05' }}>Sales Engine</span>
         </motion.h1>
 
-        {/* What is x402 */}
+        {/* What is AI BORA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,7 +57,7 @@ export function HeroSection() {
           }}>
             <FileText size={14} color="#22c55e" />
             <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, fontWeight: 600, color: '#22c55e' }}>
-              x402 = HTTP 402 Payment Required for AI Agents
+              On-Chain Proposals · AI Payments · 70/30 Split
             </span>
           </div>
         </motion.div>
@@ -77,9 +77,9 @@ export function HeroSection() {
             margin: '0 auto 32px'
           }}
         >
-          When an AI agent encounters a <span style={{ color: '#F25C05', fontWeight: 600 }}>402 Payment Required</span> response,
-          it reads the price, decides if acceptable, and pays automatically via Stellar USDC.
-          <span style={{ color: '#22c55e', fontWeight: 600 }}> No human intervention needed.</span>
+          B2B platform for <span style={{ color: '#22c55e', fontWeight: 600 }}>humans</span> and <span style={{ color: '#F25C05', fontWeight: 600 }}>AI agents</span>.
+          Create proposals, accept payments, and split profits automatically via Soroban smart contracts.
+          <span style={{ color: '#fff', fontWeight: 600 }}> Three payment flows, instant settlement.</span>
         </motion.p>
 
         {/* Features */}
@@ -90,10 +90,10 @@ export function HeroSection() {
           style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}
         >
           {[
-            { icon: Bot, label: 'AI pays AI', desc: 'Machine-to-machine payments' },
-            { icon: Zap, label: 'x402 Protocol', desc: 'HTTP 402 for AI agents' },
-            { icon: DollarSign, label: '70/30 Split', desc: 'On-chain distribution' },
-            { icon: Users, label: 'Collaborators', desc: 'Automatic payouts' },
+            { icon: Users, label: 'B2B Flow', desc: 'Human clients pay invoices' },
+            { icon: Bot, label: 'x402 Protocol', desc: 'AI agents negotiate & pay' },
+            { icon: Zap, label: 'MPP Direct', desc: 'On-chain micropayments' },
+            { icon: DollarSign, label: '70/30 Split', desc: 'Automatic distribution' },
           ].map((item, i) => {
             const Icon = item.icon;
             return (
@@ -216,21 +216,34 @@ export function HeroSection() {
           style={{ marginTop: 40 }}
         >
           <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: 12, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            How It Works
+            Three Payment Flows
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap', fontFamily: 'Montserrat, sans-serif', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
             {[
-              { num: '1', text: 'Agent discovers service', color: '#F25C05' },
-              { num: '2', text: 'Reads 402 header', color: '#F25C05' },
-              { num: '3', text: 'Pays via x402', color: '#F22283' },
-              { num: '4', text: 'Split 70/30 on-chain', color: '#22c55e' },
+              { num: '1', text: 'B2B: Client pays invoice', color: '#22c55e' },
+              { num: '2', text: 'x402: AI negotiates price', color: '#F25C05' },
+              { num: '3', text: 'MPP: Direct XLM transfer', color: '#8b5cf6' },
             ].map((step, i) => (
               <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ color: step.color, fontWeight: 700 }}>{step.num}.</span>
                 <span>{step.text}</span>
-                {i < 3 && <span style={{ marginLeft: 8, marginRight: 8, opacity: 0.3 }}>→</span>}
+                {i < 2 && <span style={{ marginLeft: 8, marginRight: 8, opacity: 0.3 }}>•</span>}
               </span>
             ))}
+          </div>
+        </motion.div>
+
+        {/* Contract Info */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          style={{ marginTop: 20 }}
+        >
+          <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>
+            <span style={{ color: '#F25C05' }}>●</span> ProposalRegistry
+            <span style={{ marginLeft: 12, color: '#22c55e' }}>●</span> PaymentSplitter
+            <span style={{ marginLeft: 12, color: '#8b5cf6' }}>●</span> AgentRegistry
           </div>
         </motion.div>
 
@@ -239,7 +252,7 @@ export function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          style={{ marginTop: 32 }}
+          style={{ marginTop: 24 }}
         >
           <div style={{ display: 'flex', gap: 20, justifyContent: 'center', fontFamily: 'Montserrat, sans-serif', fontSize: '0.75rem' }}>
             <Link to="/onboarding" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>

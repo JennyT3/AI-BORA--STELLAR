@@ -1,129 +1,159 @@
-# AI BORA - Stellar Blockchain B2B Sales Platform
+# AI BORA - The Agentic Web's Sales Engine
 
 [![Stellar](https://img.shields.io/badge/Stellar-Soroban%20Smart%20Contracts-orange)](https://stellar.org)
 [![x402](https://img.shields.io/badge/x402-Autonomous%20Agent%20Payments-blue)](https://x402.org)
 [![MPP](https://img.shields.io/badge/MPP-Machine%20Payments%20Protocol-green)](https://stellar.org/developers-blog/machine-payments-protocol)
 
-**B2B sales platform with real Stellar blockchain payments, Soroban smart contracts, x402 autonomous agent payments, and MPP support.** Built for **Stellar Hacks: Agents hackathon (April 2026)**.
+**AI BORA: The Agentic Web's Sales Engine. On-Chain Proposals, Autonomous AI Payments, Instant 70/30 Profit Sharing on Stellar.**
+
+Built for **Stellar Hacks: Agents hackathon (April 2026)**.
 
 ---
 
-## 🎯 Hackathon Criteria (x402 + MPP + Soroban)
+## The Problem
 
-### ✅ Soroban Smart Contracts
-- **ProposalRegistry** (`CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5`)
-  - Store proposal PDF hashes on-chain (SHA-256)
-  - Track status: pending → accepted → paid
-  - Verify document integrity
-  - **Connected to /admin/orcamento and QuickProposalForm**
-  - Deployed and verified on Stellar Expert (14+ invocations)
-  
-- **PaymentSplitter** (`CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P`)
-  - Automatic 70/30 distribution
-  - Admin receives 70%, collaborator receives 30%
-  - Called automatically after each payment
-  - **Connected to /pagamento page**
-  - Deployed and verified on Stellar Expert
-  
-- **AgentRegistry** (`CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M`)
-  - Register AI agents and their service rates
-  - Track total earned per agent
-  - Enable inter-contract interoperability
-  - Deployed and verified on Stellar Expert
+Traditional B2B commerce suffers from:
+- **3-7 day payment delays** - Freelancers wait for payouts
+- **High intermediary fees** - Platform cuts, processing delays
+- **Zero infrastructure for AI agents** - No way for autonomous agents to pay or get paid
+- **Manual profit splitting** - Accounting disputes, delayed collaborator payments
 
-### ✅ x402 Autonomous Agent Payments
-- **server-x402.ts**: Paid AI endpoints (402 Payment Required)
-- **agent-x402-v2.ts**: Autonomous agent that:
-  1. Reads 402 header dynamically
-  2. Decides if price is acceptable
-  3. Pays automatically via x402
-  4. Calls `execute_split` on PaymentSplitter contract
-  5. Distributes profits 70/30
+## The Solution
 
-### ✅ MPP (Machine Payments Protocol)
-- **server-mpp.ts**: SAC transfer endpoint
-- Direct on-chain settlement
-- Lower fees than x402
-- Compatible with standard Stellar wallets
+AI BORA is a blockchain-native B2B sales platform that automates the complete commercial transaction cycle using **Stellar**. It enables **three independent payment flows**:
 
-### ✅ Frontend Integration
-- **/admin/orcamento**: Generates proposal PDF → calculates SHA-256 → stores on ProposalRegistry contract
-- **/admin QuickProposalForm**: Same flow for quick proposals
-- **/pagamento**: Pays USDC → triggers PaymentSplitter.execute_split() → 70/30 distribution
-- **All hashes visible on Stellar Expert**
+| Flow | User Type | Negotiation | Settlement |
+|------|-----------|-------------|------------|
+| **UI Traditional** | Human (B2B) | Manual review | USDC instant |
+| **x402 Protocol** | AI Agent | Auto-decide via HTTP 402 | USDC instant |
+| **MPP Protocol** | AI Agent | None (fixed price) | XLM direct |
 
-### ✅ Interoperability
-- Multiple contracts communicate
-- AgentRegistry tracks payments from PaymentSplitter
-- ProposalRegistry updates status from frontend
-- Full end-to-end transparency
-
-### ✅ Documentation & Git History
-- Comprehensive README
-- Clear commit history: `feat:`, `fix:`, `chore:`
-- Rust workspace configured for GitHub detection
-- Unit tests in all contracts
+All payments trigger the **PaymentSplitter smart contract** → **70% to company, 30% to collaborator** automatically.
 
 ---
 
-## 🚀 Quick Start
+## How It Works (Three Payment Scenarios)
 
-```bash
-# 1. Setup environment
-cp .env.example .env
-# Edit .env with your keys (Stellar testnet, Firebase, Clerk)
+### SCENARIO 1: Traditional B2B (Human Flow)
 
-# 2. Run automated setup
-chmod +x setup.sh
-./setup.sh
-
-# Or use Node.js version
-node setup.mjs
-
-# This will:
-# - Install dependencies
-# - Fund Stellar accounts via Friendbot
-# - Add USDC trustline
-# - Start all servers (frontend, x402, MPP)
-
-# 3. Open browser
-# http://localhost:3000
+```
+Admin creates proposal → PDF + SHA-256 hash stored on-chain
+Client receives link → Reviews & accepts
+Collaborator assigned → Completes work
+Client pays USDC → PaymentSplitter executes split (70/30)
+All parties receive instant payment
 ```
 
+**Use when:** You're a company selling B2B services to human clients.
+
+### SCENARIO 2: AI Agents with Price Negotiation (x402)
+
+```
+External AI Agent → Discovers your services
+Your API → Responds HTTP 402 + price header
+Agent → Reads price, decides if acceptable
+If YES → Agent pays via x402, signs transaction
+Your Server → Verifies signature, delivers content
+PaymentSplitter → Auto-executes 70/30 split
+```
+
+**Use when:** You want AI agents to negotiate prices before paying.
+
+### SCENARIO 3: AI Agents Pay Directly (MPP)
+
+```
+AI Agent → Queries your service list
+Your Server → Returns fixed prices
+Agent → Pays directly on Stellar blockchain (XLM)
+Your Server → Detects payment via memo, delivers content
+PaymentSplitter → Auto-executes 70/30 split
+```
+
+**Use when:** You want zero intermediaries, lowest fees, direct on-chain settlement.
+
 ---
 
-## ⚠️ Three Independent Payment Modes
-
-**Each transaction uses ONE mode only. They are alternatives, NOT sequential steps.**
-
-| Mode | User Type | Interface | Protocol |
-|------|-----------|-----------|----------|
-| **UI Traditional** | Human | Web (`/pagamento`) | USDC direct payment |
-| **x402** | AI Agent | API | HTTP 402 + negotiation |
-| **MPP** | AI Agent | API | Stellar SAC transfer |
-
-### Which Mode to Use?
+## Which Mode to Use?
 
 ```
 Who is paying?
 │
-├── Human with browser ────► Use UI Traditional (/pagamento)
+├── Human with browser?────► Use UI Traditional (/pagamento)
 │
-├── AI Agent with x402 ────► Use x402 (server-x402.ts)
+├── AI Agent with x402?────► Use x402 (server-x402.ts)
 │
-└── AI Agent without x402 ─► Use MPP (server-mpp.ts)
+└── AI Agent without x402?──► Use MPP (server-mpp.ts)
 ```
 
 ---
 
-## 🏗️ Architecture
+## Smart Contracts (Stellar Testnet)
+
+### ProposalRegistry
+`CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5`
+
+- Store proposal PDF hashes on-chain (SHA-256)
+- Track status: pending → accepted → paid
+- Verify document integrity
+- **Deployed & verified** on Stellar Expert
+
+### PaymentSplitter  
+`CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P`
+
+- Triggers on every payment
+- Calculates 70% admin, 30% collaborator
+- Auto-distributes trustlessly
+- **Used in ALL 3 payment scenarios**
+
+### AgentRegistry
+`CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M`
+
+- Register AI agent identities
+- Track earnings per agent
+- Enable multi-agent coordination
+
+---
+
+## Real Transactions (Stellar Testnet)
+
+All payments verified on Stellar Expert:
+
+| Service | Amount | TX Hash |
+|---------|--------|---------|
+| marketing-plan | 0.05 XLM | `23a21e6010b3b0ccee675790c8f4c009ae621dd873dcdcaea58d3e1b1ddc4b11` |
+| sales-script | 0.03 XLM | `bafeb88b5f3b4bbc6b700accc02700c0c9b9198eeda427b2587d8c1ff82254ae` |
+| contract-draft | 0.10 XLM | `e48aef0e9b1735f4673b063c44dbb4979b86f0b48310a2e6893527509f5a36e0` |
+
+**Verify:** https://stellar.expert/explorer/testnet
+
+---
+
+## Quick Start
+
+```bash
+# 1. Setup environment
+cp .env.example .env
+# Edit .env with your Stellar testnet keys
+
+# 2. Run setup
+chmod +x setup.sh && ./setup.sh
+
+# 3. Start servers
+npm run dev           # Frontend (port 3000)
+npx tsx server-x402.ts # x402 server (port 3002)
+npx tsx server-mpp.ts  # MPP server (port 3003)
+```
+
+---
+
+## Architecture
 
 ### Flow A: Human Client (UI Traditional)
 
 ```
 ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌────────────┐
-│  ADMIN   │     │  CLIENT  │     │COLLABORATOR│    │  STELLAR   │
-│ (Human)  │     │ (Human)  │     │ (Human)   │    │ Blockchain │
+│  ADMIN   │     │  CLIENT  │     │COLLABOR- │     │  STELLAR   │
+│ (Human)  │     │ (Human)  │     │  ATOR    │     │ Blockchain │
 └────┬─────┘     └────┬─────┘     └────┬─────┘    └─────┬──────┘
      │                │                │                 │
      │ /admin/        │                │                 │
@@ -137,10 +167,7 @@ Who is paying?
                       └───────────────►│ Assign tasks    │
                                        │                 │
                                        │ Complete tasks  │
-                                       └─────────────────►│
-                                         Admin approves   │
-                                                          │
-                      /pagamento/:id ◄────────────────────┤
+                      /pagamento/:id ◄───────────────────┤
                       │                                    │
                       │ Pay USDC ──────────────────────────►│
                       │                                    │
@@ -155,267 +182,193 @@ Who is paying?
 ### Flow B: AI Agent (x402 Protocol)
 
 ```
-┌────────────┐                    ┌─────────────┐
-│  AI AGENT  │                    │ X402 SERVER │
-│ (Autonomous)│                   │ (Port 3002) │
-└─────┬──────┘                    └──────┬──────┘
-      │                                  │
-      │ 1. GET /api/ai/marketing-plan    │
-      │─────────────────────────────────►│
-      │                                  │
-      │ 2. 402 Payment Required          │
-      │    { amount: "0.01 USDC" }        │
-      │◄─────────────────────────────────│
-      │                                  │
-      │ 3. Decision: Price OK?           │
-      │    threshold = $0.05             │
-      │    0.01 < 0.05? → YES            │
-      │                                  │
-      │ 4. Sign transaction              │
-      │ 5. GET + X-Payment-Signature     │
-      │─────────────────────────────────►│
-      │                                  │
-      │ 6. 200 OK + content              │
-      │◄─────────────────────────────────│
-      │                                  │
-      │ 7. PaymentSplitter (optional)    │
-      │──────────────────────────────────►│
-      │                                  │
-      └───────────────────────────────────┘
+┌─────────────┐                    ┌─────────────┐
+│  AI AGENT   │                    │ X402 SERVER │
+│ (Autonomous)│                    │ (Port 3002) │
+└──────┬──────┘                    └──────┬──────┘
+       │                                  │
+       │ 1. GET /api/ai/marketing-plan    │
+       │─────────────────────────────────►│
+       │                                  │
+       │ 2. 402 Payment Required          │
+       │    { amount: "0.01 USDC" }        │
+       │◄─────────────────────────────────│
+       │                                  │
+       │ 3. Decision: Price OK?           │
+       │    threshold = $0.05             │
+       │    0.01 < 0.05? → YES            │
+       │                                  │
+       │ 4. Signs transaction             │
+       │ 5. GET + X-Payment-Signature     │
+       │─────────────────────────────────►│
+       │                                  │
+       │ 6. 200 OK + content               │
+       │◄─────────────────────────────────│
+       │                                  │
+       │ 7. PaymentSplitter (70/30)       │
+       │──────────────────────────────────►│
+       │                                  │
+       └───────────────────────────────────┘
 ```
 
 ### Flow C: AI Agent (MPP Protocol)
 
 ```
-┌────────────┐                    ┌─────────────┐
-│  AI AGENT  │                    │ MPP SERVER  │
-│ (Autonomous)│                   │ (Port 3003) │
-└─────┬──────┘                    └──────┬──────┘
-      │                                  │
-      │ 1. GET /mpp/services             │
-      │◄─────────────────────────────────│
-      │    { marketing-plan: $0.01 }     │
-      │                                  │
-      │ 2. Build Stellar transaction     │
-      │    - to: ADMIN_PUBLIC            │
-      │    - amount: 0.01 USDC            │
-      │    - memo: "ai:marketing-plan"    │
-      │                                  │
-      │ 3. Submit to Stellar Network ────┼───► STELLAR
-      │                                  │
-      │ 4. MPP detects memo              │
-      │    & delivers content            │
-      │◄─────────────────────────────────│
-      │                                  │
-      │ 5. PaymentSplitter (auto)         │
-      │    70% → Admin                   │
-      │    30% → Collaborator             │
-      │                                  │
-      └───────────────────────────────────┘
+┌─────────────┐                    ┌─────────────┐
+│  AI AGENT   │                    │ MPP SERVER  │
+│ (Autonomous)│                    │ (Port 3003) │
+└──────┬──────┘                    └──────┬──────┘
+       │                                  │
+       │ 1. GET /mpp/services             │
+       │◄─────────────────────────────────│
+       │    { marketing-plan: $0.05 }     │
+       │                                  │
+       │ 2. Build Stellar transaction     │
+       │    - to: ADMIN_PUBLIC             │
+       │    - amount: 0.05 XLM             │
+       │    - memo: "ai:marketing-plan"    │
+       │                                  │
+       │ 3. Submit to Stellar Network ────┼───► STELLAR
+       │                                  │
+       │ 4. MPP detects memo              │
+       │    & delivers content            │
+       │◄─────────────────────────────────│
+       │                                  │
+       │ 5. PaymentSplitter (70/30)       │
+       │    70% → Admin                   │
+       │    30% → Collaborator            │
+       │                                  │
+       └───────────────────────────────────┘
 ```
 
 ---
 
-## 🔗 Smart Contracts (Testnet)
+## Key Technologies
 
-| Contract | ID | Functions |
-|----------|-----|-----------|
-| **ProposalRegistry** | `CBUTZRV7YSJAYQTVSP3NSEDW3URRVCH3WDJQOXYASYQRNZFSLSIGROU5` | `store_proposal`, `get_proposal`, `update_status`, `verify_hash` |
-| **PaymentSplitter** | `CCP4JPWI33BC2XCDOLEDOIURMP7NPBY7I532H4N56ZDBCXX3A6BZNZ3P` | `create_payment`, `execute_split`, `get_payment` |
-| **AgentRegistry** | `CCXDYLNIWJJB7VNTUWBWJOH26LUZOXKE24JWOPE7Y2E3MOTX2TC66T7M` | `register_agent`, `get_agent`, `update_rates`, `record_payment` |
-
-### Payment Distribution
-- Admin: 70%
-- Collaborator: 30%
-- On-chain, transparent, verified
-
----
-
-## 🤖 x402 Autonomous Agent Flow
-
-### 1. Start the x402 server
-```bash
-npx tsx server-x402.ts
-```
-
-### 2. Run the autonomous agent
-```bash
-npx tsx agent-x402-v2.ts
-```
-
-### What it does:
-1. **Discovers** service endpoints
-2. **Reads** 402 Payment Required header
-3. **Decides** if price is acceptable (under configured threshold)
-4. **Pays** automatically via x402 protocol
-5. **Calls** PaymentSplitter.execute_split() on-chain
-6. **Distributes** 70/30 automatically
+| Technology | Purpose |
+|------------|---------|
+| **Soroban Smart Contracts** | 3 contracts fully deployed on Stellar testnet |
+| **x402 Protocol** | HTTP 402 standard for autonomous agent price negotiation |
+| **MPP (Machine Payments Protocol)** | Direct Stellar blockchain settlement |
+| **SHA-256 On-Chain Hashing** | Every proposal PDF hash stored on-chain |
+| **USDC/XLM Payments** | Circle testnet stablecoin + native XLM settlement |
+| **WebAuthn Authentication** | Passwordless login (fingerprint/Face ID) |
+| **Zero Intermediaries** | Direct wallet-to-wallet transfers |
 
 ---
 
-## 🏛️ MPP (Machine Payments Protocol)
-
-### Start the MPP server
-```bash
-npx tsx server-mpp.ts
-```
-
-### Endpoints
-- `GET /mpp/services` - List available AI services
-- `POST /mpp/pay` - Accept SAC transfer
-
-### Comparison
-| Protocol | Settlement | Fees | Requires Facilitator |
-|----------|-----------|------|-----------------------|
-| **x402** | On-chain | Higher | Yes |
-| **MPP** | On-chain | Lower | No |
-
-Both are implemented for complete hackathon compliance.
-
-### Quick Comparison
+## Payment Flow Comparison
 
 | Feature | UI Traditional | x402 | MPP |
-|---------|---------------|------|-----|
-| User | Human | AI Agent | AI Agent |
-| Interface | Web | API | API |
-| Price negotiation | Manual | Automatic (threshold) | None (fixed) |
-| Facilitator needed | No | Yes | No |
-| Best for | B2B sales | Dynamic APIs | Simple payments |
+|---------|----------------|------|-----|
+| **User** | Human | AI Agent | AI Agent |
+| **Interface** | Web browser | HTTP API | Stellar blockchain |
+| **Price Discovery** | Manual review | HTTP 402 header | Service list |
+| **Negotiation** | Manual | Automatic (agent decides) | None (fixed price) |
+| **Payment Method** | Click button | Agent signs + pays | Direct Stellar transfer |
+| **Settlement Time** | Instant | Instant | Instant |
+| **Fees** | Base fee (~0.00001 XLM) | Higher (signature verification) | Lower (direct payment) |
+| **Best For** | B2B sales | Dynamic APIs | Micro-transactions |
 
 ---
 
-## 📄 PDF Hash Verification
+## What Makes AI BORA Unique
 
-Every proposal PDF generates a SHA-256 hash that is stored on-chain in the ProposalRegistry smart contract:
+1. **Soroban smart contracts for B2B automation** - Complete workflow automation (proposal, status tracking, profit distribution)
 
-```typescript
-// In /admin/orcamento or /admin QuickProposalForm:
+2. **Autonomous AI agents as customers** - Both humans AND robots can buy your services
 
-// 1. Generate PDF
-const doc = await criarPDF();
-const pdfBlob = doc.output('blob');
+3. **Price negotiation for agents (x402)** - Agents see price BEFORE paying. Dynamic pricing for APIs.
 
-// 2. Calculate SHA-256
-const pdfArrayBuffer = await pdfBlob.arrayBuffer();
-const pdfHashBuffer = await crypto.subtle.digest('SHA-256', pdfArrayBuffer);
-const pdfHash = Array.from(new Uint8Array(pdfHashBuffer))
-  .map(b => b.toString(16).padStart(2, '0'))
-  .join('');
+4. **Direct on-chain settlement (MPP)** - No intermediaries. Zero fees except Stellar base fee.
 
-// 3. Store on Soroban ProposalRegistry
-const stellarResult = await storeProposalOnChain(
-  proposalId,
-  clientEmail,
-  pdfHash,
-  amount
-);
+5. **On-chain document verification** - SHA-256 proofs prevent disputes
 
-// 4. Save proposal with Stellar transaction hash
-await createProposal({
-  ...proposalData,
-  pdfHash,
-  stellarTxHash: stellarResult.txHash,
-  stellarExplorerUrl: stellarResult.explorerUrl
-});
-```
+6. **Automatic trustless profit splitting** - 70/30 split instant, every time
 
-**Verify on Stellar Expert:**
-1. Go to https://stellar.expert/explorer/testnet
-2. Search for transaction hash
-3. View `store_proposal` invocation
-4. See PDF SHA-256 hash in transaction data
-
-**Flow:**
-```
-/admin/orcamento (Admin creates proposal)
-  ↓
-Generate PDF with jsPDF
-  ↓
-Calculate SHA-256 hash
-  ↓
-ProposalRegistry.store_proposal()
-  ↓
-Transaction on Stellar testnet
-  ↓
-Save to Firestore with txHash
-  ↓
-Client views proposal
-  ↓
-Client pays USDC
-  ↓
-PaymentSplitter.execute_split()
-  ↓
-70% admin + 30% collaborator
-  ↓
-All transactions visible on Stellar Expert
-```
+7. **Production-ready with real deployments** - All contracts verified and invoked on testnet
 
 ---
 
-## 🔐 Security
-
-### Authentication
-- **WebAuthn Passkey**: Fingerprint/Face ID, no passwords
-- **Clerk Auth**: Optional, for production
-
-### CSP Configuration
-Allows necessary domains:
-- `connect-src`: Firebase, Stellar testnet, Horizon, friendbot
-- No external script injection
-- Safe defaults
-
-### Smart Contract Security
-- `require_auth()` on all state-changing functions
-- Admin-only operations
-- No unprotected external calls
-
----
-
-## 🧪 Smart Contract Tests
+## Test the Autonomous Agent
 
 ```bash
-# Run all contract tests
+# Run the agent that pays automatically
+npx tsx agent-x402-direct.ts
+```
+
+**Output:**
+```
+✅ marketing-plan: 0.05 XLM
+   TX: 23a21e6010b3b0ccee67...
+✅ sales-script: 0.03 XLM
+   TX: bafeb88b5f3b4bbc6b70...
+✅ contract-draft: 0.10 XLM
+   TX: e48aef0e9b1735f4673b...
+Total paid: 0.18 XLM
+```
+
+---
+
+## Smart Contract Tests
+
+```bash
 cargo test --all
-
-# Run specific contract
-cargo test -p proposal_registry
-cargo test -p payment_splitter
-cargo test -p agent_registry
-
-# With coverage
-cargo tarpaulin --all
 ```
 
 Tests include:
-- ✅ store_proposal with PDF hash
-- ✅ update_status transitions
-- ✅ verify_hash consistency
-- ✅ create_payment with 70/30 split
-- ✅ execute_split returns correct amounts
-- ✅ register_agent with service rates
-- ✅ record_payment updates earnings
+- store_proposal with PDF hash
+- update_status transitions  
+- verify_hash consistency
+- create_payment with 70/30 split
+- execute_split returns correct amounts
+- register_agent with service rates
+- record_payment updates earnings
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Frontend**: React + Vite + Tailwind + TypeScript
-- **Smart Contracts**: Soroban (Rust) - 3 contracts deployed
-- **Blockchain**: Stellar testnet via Soroban SDK
-- **Auth**: WebAuthn Passkey + Clerk
-- **Database**: Firebase Firestore
-- **Payment Protocols**: x402 + MPP
-- **Roles**: Admin / Client / Collaborator
+| Layer | Technology |
+|-------|------------|
+| Frontend | React + Vite + Tailwind + TypeScript |
+| Smart Contracts | Soroban (Rust) - 3 contracts deployed |
+| Blockchain | Stellar testnet via Soroban SDK |
+| Auth | WebAuthn Passkey |
+| Database | Firebase Firestore |
+| Payment Protocols | x402 + MPP |
 
 ---
 
-## 📞 Support
+## Security
 
-- Email: geral@aibora.pt
-- Website: https://aibora.pt
+- `require_auth()` on all state-changing functions
+- Admin-only operations
+- No unprotected external calls
+- CSP configured for necessary domains
+- WebAuthn passwordless authentication
+
+---
+
+## Live Demo
+
+- **App**: https://ai-bora-stellar.vercel.app
+- **Source**: https://github.com/JennyT3/AI-BORA--STELLAR
+- **Explorer**: https://stellar.expert/explorer/testnet
+
+---
+
+## Hackathon Achievement
+
+- Soroban Excellence: 3 fully functional contracts
+- Autonomous Agents: x402 + MPP protocols implemented
+- On-Chain Verification: SHA-256 proposal hashing
+- Real Integration: Frontend + Backend + Contracts + Blockchain
+- Production Code: TypeScript + Rust with proper testing
+- Clean Git History: Meaningful commits
 
 ---
 
 **Built for Stellar Hacks: Agents hackathon (April 2026)**
 
-*I am a B2B sales platform with real Stellar blockchain payments, Soroban smart contracts, and x402 autonomous agent payments. I demonstrate the full potential of on-chain B2B commerce: transparent proposals, automatic payment distribution, machine-to-machine transactions, and collaborative workflows.*
+*AI BORA solves the core problem of B2B commerce: slow payments, high fees, and no infrastructure for AI agents. On-chain proposals. Autonomous AI payments. Instant 70/30 profit sharing. Built on Stellar with Soroban smart contracts. Deployed and live.*

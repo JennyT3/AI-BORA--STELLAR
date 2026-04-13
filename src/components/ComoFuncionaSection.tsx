@@ -4,23 +4,23 @@ import { useSectionInView } from '../hooks/useSectionInView';
 const steps = [
   {
     num: "01",
-    title: "AI Agent discovers",
-    desc: "Autonomous agent finds services and reads pricing"
+    title: "Create Proposal",
+    desc: "Admin creates proposal with PDF hash stored on-chain"
   },
   {
     num: "02",
-    title: "402 Protocol",
-    desc: "Agent reads Payment Required header"
+    title: "Client Pays",
+    desc: "Human client pays invoice OR AI agent pays via x402/MPP"
   },
   {
     num: "03",
-    title: "Auto-payment",
-    desc: "Pays via Stellar USDC if price is acceptable"
+    title: "Smart Contract",
+    desc: "PaymentSplitter automatically calculates 70/30 split"
   },
   {
     num: "04",
-    title: "70/30 Split",
-    desc: "On-chain distribution to collaborators"
+    title: "Instant Payout",
+    desc: "Admin + collaborator receive funds trustlessly"
   }
 ];
 
