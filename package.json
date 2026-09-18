@@ -1,0 +1,13 @@
+{
+  "name": "aibora-stellar",
+  "private": true,
+  "version": "1.0.0",
+  "description": "AI BORA Stellar monorepo",
+  "scripts": {
+    "dev": "npm --prefix front run dev",
+    "build": "npm --prefix front run build",
+    "preview": "npm --prefix front run preview",
+    "lint": "npm --prefix front run lint && npm --prefix back run lint && npm --prefix ai run lint",
+    "test:contracts": "cargo test --workspace --manifest-path contracts/Cargo.toml"
+  }
+}

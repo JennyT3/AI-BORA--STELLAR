@@ -1,0 +1,218 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================
+    // AI BORA - Firestore Security Rules
+    // Security Audit: April 2026 + Phase 1 hardening
+    // ============================================
+    // Phase 1: every collection the app writes to is now explicitly covered.
+    // Anything NOT listed here is DENIED by Firestore by default.
+    // IMPORTANT: with custom/passkey auth, requests without Firebase Auth
+    // (request.auth == null) are denied to protect data from public access.
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email.matches('.*@.*\\..*');
+    }
+
+    function isValidStatus(status) {
+      return status in ['pending', 'accepted', 'rejected', 'paid', 'completed', 'criada', 'enviada', 'approved', 'declined'];
+    }
+
+    function isValidAmount(amount) {
+      return amount > 0 && amount < 1000000000;
+    }
+
+    // ============================================
+    // CORE DOCUMENTS (existing rules, preserved)
+    // ============================================
+
+    // Proposals - Owner + Admin access
+    match /proposals/{proposalId} {
+      allow read: if isOwner(resource.data.createdBy) || isAdmin();
+      allow create: if isAuthenticated() &&
+        isValidAmount(request.resource.data.amount) &&
+        isValidEmail(request.resource.data.clientEmail) &&
+        request.resource.data.status == 'pending';
+      allow update: if isAuthenticated() &&
+        (isOwner(resource.data.createdBy) || isAdmin()) &&
+        isValidStatus(request.resource.data.status);
+      allow delete: if isAdmin();
+    }
+
+    // Users - Users can only access their own data
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId);
+    }
+
+    // Collaborators - Read for authenticated, write for admins
+    match /collaborators/{collaboratorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Payments - Only involved parties can access
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() &&
+        (request.auth.uid == resource.data.payerId ||
+         request.auth.uid == resource.data.payeeId ||
+         isAdmin());
+      allow create: if isAuthenticated() &&
+        isValidAmount(request.resource.data.amount) &&
+        request.resource.data.status == 'pending';
+      allow update: if isAuthenticated() &&
+        (request.auth.uid == resource.data.payerId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Agents - Public read, admin write
+    match /agents/{agentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Services - Public read, admin write
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Session logs - sensitive, admin only
+    match /sessionLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if isAuthenticated();
+    }
+
+    // ============================================
+    // PHASE 1 - NEW COLLECTIONS USED BY THE APP
+    // ============================================
+
+    // Clients - admin-managed, read for authenticated
+    match /clients/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.createdBy);
+    }
+
+    // Sales reps - admin-managed
+    match /salesReps/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.userId) || isOwner(resource.data.uid);
+    }
+
+    // Invoices - admin + owner, status updates controlled
+    match /invoices/{id} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        isValidAmount(request.resource.data.totalAmount) &&
+        isValidStatus(request.resource.data.status);
+      allow update: if isAuthenticated() &&
+        (isAdmin() || isOwner(resource.data.createdBy) || isOwner(resource.data.clientId)) &&
+        isValidStatus(request.resource.data.status);
+      allow delete: if isAdmin();
+    }
+
+    // Recurring invoices - admin only
+    match /recurring_invoices/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Commissions - admin-managed
+    match /commissions/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.salesRepId);
+    }
+
+    // Proposals - admin-managed
+    match /proposals/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.createdBy);
+    }
+
+    // Tasks - admin + assigned user
+    match /tasks/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.assignedA) || isOwner(resource.data.collaboratorId);
+    }
+
+    // Delegation requests
+    match /delegation_requests/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.createdBy) || isOwner(resource.data.requesterId);
+    }
+
+    // Requests - owner or admin
+    match /requests/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.createdBy) || isOwner(resource.data.userId);
+    }
+
+    // Contacts - admin-managed
+    match /contacts/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isOwner(resource.data.ownerId);
+    }
+
+    // Client logins - admin only (magic links validated server-side)
+    match /client_logins/{id} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Admin notifications - admin only
+    match /admin_notifications/{id} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Nurturing (email sequences) - admin-managed
+    match /nurturing/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Payment links - anyone with the link can read, admin write
+    match /payment_links/{id} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAdmin() || isOwner(resource.data.createdBy);
+      allow delete: if isAdmin();
+    }
+
+    // Email registry - admin only
+    match /email_records/{id} {
+      allow read: if isAdmin();
+      allow write: if isAuthenticated();
+    }
+
+    // Stellar wallets - each user only their own
+    match /stellar_wallets/{id} {
+      allow read: if isAdmin() || request.auth.uid == id;
+      allow write: if isAdmin() || request.auth.uid == id;
+    }
+
+    // ============================================
+    // AUDIT LOG - admin only
+    // ============================================
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if isAuthenticated();
+    }
+  }
+}

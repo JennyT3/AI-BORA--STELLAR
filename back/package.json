@@ -1,0 +1,20 @@
+{
+  "name": "aibora-stellar-back",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "echo \"Serverless API functions compiled by Vercel (no-op build)\""
+  },
+  "dependencies": {
+    "@pollar/core": "^0.11.3",
+    "@stellar/stellar-sdk": "^12.3.0",
+    "firebase-admin": "^13.0.0",
+    "resend": "^6.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vercel/node": "^13.0.1",
+    "typescript": "~5.8.2"
+  }
+}

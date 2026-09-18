@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+dist/
+build/
+.out/
+
+# Environment variables (real values never committed)
+.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+
+# Sensitive files
+*.key
+*.pem
+credentials.json
+firebase-key.json
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+npm-debug.log*
+
+# Vercel
+.vercel
+
+# Rust build artifacts
+target/
+contracts/**/target/
+contracts/**/Cargo.lock
+**/*.wasm
+
+# Test snapshots
+test_snapshots/
+**/test_snapshots/
